@@ -4,7 +4,17 @@ using UnityEngine;
 
 public class SelectionManager : MonoBehaviour
 {
+    public static SelectionManager Instance => _instance;
+    public static SelectionManager _instance;
+
     private static Tile _selectedTile;
+
+    private bool playerControlsEnabled = false;
+
+    private void Awake()
+    {
+        _instance = this;
+    }
 
     public static void SetSelectedTile(Tile newTile)
     {
@@ -17,42 +27,55 @@ public class SelectionManager : MonoBehaviour
         _selectedTile.SetSelected(true);
     }
 
+    public void HandleTurnChange(bool isPlayerTurn)
+    {
+        playerControlsEnabled = isPlayerTurn;
+
+        if (_selectedTile != null)
+        {
+            _selectedTile.SetSelected(false);
+        }
+    }
+
     private void Update()
     {
-        Vector3 mousePos = CameraManager.MainCamera.ScreenToWorldPoint(Input.mousePosition);
-        RaycastHit2D[] hits = Physics2D.RaycastAll(mousePos, -Vector3.forward);
-
-        foreach (RaycastHit2D hit in hits)
+        if (playerControlsEnabled && (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)))
         {
-            Tile newTile = hit.transform.GetComponent<Tile>();
-            if (newTile != null)
+            Vector3 mousePos = CameraManager.MainCamera.ScreenToWorldPoint(Input.mousePosition);
+            RaycastHit2D[] hits = Physics2D.RaycastAll(mousePos, -Vector3.forward);
+
+            foreach (RaycastHit2D hit in hits)
             {
-                if (Input.GetMouseButtonDown(0))
+                Tile newTile = hit.transform.GetComponent<Tile>();
+                if (newTile != null)
                 {
-                    // don't do anything if select the same thing
-                    if (_selectedTile == newTile)
+                    if (Input.GetMouseButtonDown(0))
                     {
-                        return;
-                    }
+                        // don't do anything if select the same thing
+                        if (_selectedTile == newTile)
+                        {
+                            return;
+                        }
 
-                    // deselect previous
-                    if (_selectedTile != null)
-                    {
-                        _selectedTile.SetSelected(false);
-                        _selectedTile = null;
-                    }
+                        // deselect previous
+                        if (_selectedTile != null)
+                        {
+                            _selectedTile.SetSelected(false);
+                            _selectedTile = null;
+                        }
 
-                    // select new
-                    if (newTile.IsSelectable())
-                    {
-                        SetSelectedTile(newTile);
+                        // select new
+                        if (newTile.IsSelectable())
+                        {
+                            SetSelectedTile(newTile);
+                        }
                     }
-                }
-                else if (Input.GetMouseButton(1))
-                {
-                    if (_selectedTile != null)
+                    else if (Input.GetMouseButton(1))
                     {
-                        _selectedTile.SetActionTile(newTile);
+                        if (_selectedTile != null && _selectedTile.GetPawn().OnPlayerTeam)
+                        {
+                            _selectedTile.SetActionTile(newTile);
+                        }
                     }
                 }
             }

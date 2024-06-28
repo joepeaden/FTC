@@ -11,9 +11,9 @@ public class Tile : MonoBehaviour
     [SerializeField] private SpriteRenderer tileOverlayUI;
     [SerializeField] private SpriteRenderer tileHoverUI;
 
-    [SerializeField] private Character _character;
+    [SerializeField] private Pawn _pawn;
     private bool _isSelected;
-    private bool _isRangeHighighted;
+    private bool _isInMoveRange;
     private List<Tile> adjacentTiles = new();
 
     public void Initialize(Dictionary<Point, Tile> tiles, Point coord)
@@ -46,25 +46,29 @@ public class Tile : MonoBehaviour
 
     public bool IsSelectable()
     {
-        return _character != null;
+        return _pawn != null;
     }
 
-    public void CharacterEnterTile(Character newCharacter)
+    public void PawnEnterTile(Pawn newPawn)
     {
-        _character = newCharacter;
+        _pawn = newPawn;
         SelectionManager.SetSelectedTile(this);
+    }
+
+    public Pawn GetPawn()
+    {
+        return _pawn;
     }
 
     public void SetActionTile(Tile actionTile)
     {
-        if (_character != null)
+        if (_pawn != null)
         {
-            // hmmm. I had no idea that objects of the same type can access eachother's private variables...
-            if (actionTile._isRangeHighighted)
+            if (actionTile._isInMoveRange)
             {
-                _character.GoToSpot(actionTile.transform.position);
+                _pawn.ActOnTile(actionTile);
                 SetSelected(false);
-                _character = null;
+                _pawn = null;
             }
         }
     }
@@ -72,6 +76,44 @@ public class Tile : MonoBehaviour
     public void ToggleSelected()
     {
         SetSelected(!_isSelected);
+    }
+
+    public List<Tile> GetTilesInMoveRange()
+    {
+        if (_pawn == null)
+        {
+            return null;
+        }
+
+        int pawnMoveRange = _pawn.MoveRange;
+        List<Tile> tilesInRange = new();
+        foreach (Tile t in adjacentTiles)
+        {
+            t.GetTilesInMoveRangeRecursive(pawnMoveRange, tilesInRange);
+        }
+        
+        return tilesInRange;
+    }
+
+    private List<Tile> GetTilesInMoveRangeRecursive(int pawnMoveRange, List<Tile> tilesInRange)
+    {
+        if (pawnMoveRange > 0)
+        {
+            tilesInRange.Add(this);
+            pawnMoveRange--;
+
+            if (!_isSelected)
+            {
+                tilesInRange.Add(this);
+            }
+
+            foreach (Tile t in adjacentTiles)
+            {
+                t.GetTilesInMoveRangeRecursive(pawnMoveRange, tilesInRange);
+            }
+        }
+
+        return tilesInRange;
     }
 
     public void SetSelected(bool isSelected)
@@ -88,28 +130,28 @@ public class Tile : MonoBehaviour
             tileOverlayUI.enabled = false;
         }
 
-        if (_character != null)
+        if (_pawn != null)
         {
             if (_isSelected)
             {
-                int charMoveRange = _character.MoveRange;
+                int charMoveRange = _pawn.MoveRange;
                 foreach (Tile t in adjacentTiles)
                 {
-                    t.CheckIfInRange(charMoveRange, true);
+                    t.ColorTilesInMoveRange(charMoveRange, true);
                 }
             }
             else
             {
-                int charMoveRange = _character.MoveRange;
+                int charMoveRange = _pawn.MoveRange;
                 foreach (Tile t in adjacentTiles)
                 {
-                    t.CheckIfInRange(charMoveRange, false);
+                    t.ColorTilesInMoveRange(charMoveRange, false);
                 }
             }
         }
     }
 
-    public void CheckIfInRange(int moveRange, bool isHighlighting)
+    public void ColorTilesInMoveRange(int moveRange, bool isHighlighting)
     {
         if (moveRange > 0)
         {
@@ -119,12 +161,12 @@ public class Tile : MonoBehaviour
             {
                 tileOverlayUI.enabled = isHighlighting;
                 tileOverlayUI.sprite = moveRangeSprite;
-                _isRangeHighighted = isHighlighting;
+                _isInMoveRange = isHighlighting;
             }
 
             foreach (Tile t in adjacentTiles)
             {
-                t.CheckIfInRange(moveRange, isHighlighting);
+                t.ColorTilesInMoveRange(moveRange, isHighlighting);
             }
         }
         else
@@ -132,6 +174,7 @@ public class Tile : MonoBehaviour
             return;
         }
     }
+
 
     public void OnMouseEnter()
     {

@@ -5,24 +5,30 @@ using UnityEngine;
 
 public class GridGenerator : MonoBehaviour
 {
+    public static GridGenerator Instance => _instance;
+    private static GridGenerator _instance;
+
     [SerializeField] GameObject[] tilePrefabs;
     [SerializeField] int gridHeight;
     [SerializeField] int gridWidth;
     [SerializeField] float tileSize;
 
-    public Dictionary<Point, Tile> Tiles => _tiles;
     private Dictionary<Point, Tile> _tiles = new();
+    public List<Tile> PlayerSpawns => _playerSpawns;
+    public List<Tile> EnemySpawns => _enemySpawns;
+    private List<Tile> _playerSpawns = new();
+    private List<Tile> _enemySpawns = new();
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
+        _instance = this;
+
         GenerateGrid();
     }
 
     void GenerateGrid()
     {
-        Character c = FindAnyObjectByType<Character>();
-
         for (int x = 0; x < gridWidth; x++)
         {
             for (int y = 0; y < gridHeight; y++)
@@ -34,15 +40,21 @@ public class GridGenerator : MonoBehaviour
                 float posY = (x * tileSize - y * tileSize) / 4f;
 
                 tileGO.transform.position = new Vector3(posX, posY);
-                tileGO.name = "Tile (" + posX + ", " + posY + ")";
-
-                // temporary HOPEFULLY!
-                if (x == 0 && y == 0)
-                {
-                    tileGO.GetComponent<Tile>().CharacterEnterTile(c);
-                }
+                tileGO.name = "Tile (" + x + ", " + y + ")";
 
                 _tiles[new Point(x, y)] = tileGO.GetComponent<Tile>();
+
+                if (y <= 7)
+                {
+                    if (x == 0)
+                    {
+                        _playerSpawns.Add(tileGO.GetComponent<Tile>());
+                    }
+                    else if (x == 7)
+                    {
+                        _enemySpawns.Add(tileGO.GetComponent<Tile>());
+                    }
+                }
             }
         }
 
@@ -53,7 +65,5 @@ public class GridGenerator : MonoBehaviour
 
             tile.Initialize(_tiles, coord);
         }
-
-        _tiles[new Point(0, 0)].CheckIfInRange(c.MoveRange, true);
     }
 }
