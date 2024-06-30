@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class BattleManager : MonoBehaviour
@@ -11,6 +12,8 @@ public class BattleManager : MonoBehaviour
 
     private Pawn _activePawn;
 
+    [SerializeField] TMP_Text turnText;
+
     private void Awake()
     {
         _instance = this;
@@ -21,9 +24,27 @@ public class BattleManager : MonoBehaviour
         StartCoroutine(BeginBattle());
     }
 
-    public void PawnMoved(Pawn newPawn)
+    public void PawnActivated(Pawn newPawn)
     {
         _activePawn = newPawn;
+
+        //if (newPawn.ActionsThisTurn >= 2)
+        //{
+
+        if (SelectionManager.SelectedTile != null)
+        {
+            SelectionManager.SelectedTile.SetSelected(false);
+        }
+
+        StartCoroutine(SwapTurns());
+        //}
+    }
+
+    private IEnumerator SwapTurns()
+    {
+
+        SelectionManager.Instance.DisablePlayerControls();
+        yield return new WaitForSeconds(1f);
 
         if (!isPlayerTurn)
         {
@@ -45,6 +66,7 @@ public class BattleManager : MonoBehaviour
     {
         isPlayerTurn = true;
         SelectionManager.Instance.HandleTurnChange(true);
+        turnText.text = "Player Turn";
     }
 
     void StartEnemyTurn()
@@ -52,5 +74,6 @@ public class BattleManager : MonoBehaviour
         isPlayerTurn = false;
         SelectionManager.Instance.HandleTurnChange(false);
         EnemyAI.Instance.DoTurn();
+        turnText.text = "Enemy Turn";
     }
 }

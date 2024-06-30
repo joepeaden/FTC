@@ -7,6 +7,7 @@ public class SelectionManager : MonoBehaviour
     public static SelectionManager Instance => _instance;
     public static SelectionManager _instance;
 
+    public static Tile SelectedTile => _selectedTile;
     private static Tile _selectedTile;
 
     private bool playerControlsEnabled = false;
@@ -34,7 +35,14 @@ public class SelectionManager : MonoBehaviour
         if (_selectedTile != null)
         {
             _selectedTile.SetSelected(false);
+            _selectedTile = null;
         }
+    }
+
+    public void DisablePlayerControls()
+    {
+        playerControlsEnabled = false;
+        _selectedTile = null;
     }
 
     private void Update()
@@ -52,10 +60,10 @@ public class SelectionManager : MonoBehaviour
                     if (Input.GetMouseButtonDown(0))
                     {
                         // don't do anything if select the same thing
-                        if (_selectedTile == newTile)
-                        {
-                            return;
-                        }
+                        //if (_selectedTile == newTile)
+                        //{
+                        //    return;
+                        //}
 
                         // deselect previous
                         if (_selectedTile != null)
@@ -74,7 +82,19 @@ public class SelectionManager : MonoBehaviour
                     {
                         if (_selectedTile != null && _selectedTile.GetPawn().OnPlayerTeam)
                         {
-                            _selectedTile.SetActionTile(newTile);
+                            Pawn currentPawn = _selectedTile.GetPawn();
+                            if (currentPawn != null)
+                            {
+                                Pawn targetPawn = newTile.GetPawn();
+                                if (targetPawn != null && newTile.IsAdjacentTo(_selectedTile) && targetPawn.OnPlayerTeam != currentPawn.OnPlayerTeam)
+                                {
+                                    currentPawn.AttackPawn(targetPawn);
+                                }
+                                else if (newTile.IsInMoveRange && targetPawn == null)
+                                {
+                                    currentPawn.MoveToTile(newTile);
+                                }
+                            }
                         }
                     }
                 }

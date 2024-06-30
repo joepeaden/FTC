@@ -8,13 +8,19 @@ public class Pawn : MonoBehaviour
     public int MoveRange => moveRange;
     private int moveRange = 4;
 
-    public bool HasMovedThisTurn => _hasMovedThisTurn;
-    private bool _hasMovedThisTurn;
+    public int ActionsThisTurn => _actionsThisTurn;
+    private int _actionsThisTurn;
 
     public Tile CurrentTile => _currentTile;
     private Tile _currentTile;
 
     public bool OnPlayerTeam => _onPlayerTeam;
+
+    public int HitPoints => _hitPoints;
+    [SerializeField] private int _hitPoints;
+
+    public bool IsDead => _isDead;
+    private bool _isDead;
 
     [SerializeField] private bool _onPlayerTeam;
     [SerializeField] AIPathCustom pathfinder;
@@ -44,6 +50,10 @@ public class Pawn : MonoBehaviour
             _leg1SpriteRend.sprite = _enemyLegSprite;
             _leg2SpriteRend.sprite = _enemyLegSprite;
         }
+        else
+        {
+            transform.rotation *= Quaternion.Euler(0, 180, 0);
+        }
     }
 
     private void PickStartTile()
@@ -51,11 +61,17 @@ public class Pawn : MonoBehaviour
         Tile spawnTile;
         if (OnPlayerTeam)
         {
-            spawnTile = GridGenerator.Instance.PlayerSpawns[Random.Range(0, GridGenerator.Instance.PlayerSpawns.Count)];
+            do
+            {
+                spawnTile = GridGenerator.Instance.PlayerSpawns[Random.Range(0, GridGenerator.Instance.PlayerSpawns.Count)];
+            } while (spawnTile.GetPawn() != null);
         }
         else
         {
-            spawnTile = GridGenerator.Instance.EnemySpawns[Random.Range(0, GridGenerator.Instance.EnemySpawns.Count)];
+            do
+            {
+                spawnTile = GridGenerator.Instance.EnemySpawns[Random.Range(0, GridGenerator.Instance.EnemySpawns.Count)];
+            } while (spawnTile.GetPawn() != null) ;
         }
 
         _currentTile = spawnTile;
@@ -63,7 +79,35 @@ public class Pawn : MonoBehaviour
         transform.position = spawnTile.transform.position;
     }
 
-    public void ActOnTile(Tile actionTile)
+    public void AttackPawn(Pawn targetPawn)
+    {
+        _anim.Play("Attack");
+        targetPawn.TakeDamage();
+
+        _actionsThisTurn++;
+
+        BattleManager.Instance.PawnActivated(this);
+    }
+
+    public void TakeDamage()
+    {
+        _anim.Play("GetHit");
+        _hitPoints--;
+
+        if (_hitPoints <= 0)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        _anim.Play("Die");
+        CurrentTile.PawnExitTile();
+        _isDead = true;
+    }
+
+    public void MoveToTile(Tile actionTile)
     {
         Vector3 position = actionTile.transform.position;
 
@@ -72,7 +116,9 @@ public class Pawn : MonoBehaviour
 
         _anim.Play("Run");
 
-        _hasMovedThisTurn = true;
+        _actionsThisTurn++;
+
+        _currentTile.PawnExitTile();
         _currentTile = actionTile;
     }
 
@@ -93,7 +139,7 @@ public class Pawn : MonoBehaviour
 
         _anim.Play("Idle");
 
-        BattleManager.Instance.PawnMoved(this);
+        BattleManager.Instance.PawnActivated(this);
     }
 
     private void OnDestroy()

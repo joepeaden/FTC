@@ -13,6 +13,7 @@ public class Tile : MonoBehaviour
 
     [SerializeField] private Pawn _pawn;
     private bool _isSelected;
+    public bool IsInMoveRange => _isInMoveRange;
     private bool _isInMoveRange;
     private List<Tile> adjacentTiles = new();
 
@@ -44,6 +45,11 @@ public class Tile : MonoBehaviour
         }
     }
 
+    public List<Tile> GetAdjacentTiles()
+    {
+        return adjacentTiles;
+    }
+
     public bool IsSelectable()
     {
         return _pawn != null;
@@ -52,7 +58,17 @@ public class Tile : MonoBehaviour
     public void PawnEnterTile(Pawn newPawn)
     {
         _pawn = newPawn;
-        SelectionManager.SetSelectedTile(this);
+
+        if (_pawn.OnPlayerTeam)
+        {
+            //SelectionManager.SetSelectedTile(this);
+        }
+    }
+
+    public void PawnExitTile()
+    {
+        SetSelected(false);
+        _pawn = null;
     }
 
     public Pawn GetPawn()
@@ -60,17 +76,9 @@ public class Tile : MonoBehaviour
         return _pawn;
     }
 
-    public void SetActionTile(Tile actionTile)
+    public bool IsAdjacentTo(Tile t)
     {
-        if (_pawn != null)
-        {
-            if (actionTile._isInMoveRange)
-            {
-                _pawn.ActOnTile(actionTile);
-                SetSelected(false);
-                _pawn = null;
-            }
-        }
+        return adjacentTiles.Contains(t);
     }
 
     public void ToggleSelected()
