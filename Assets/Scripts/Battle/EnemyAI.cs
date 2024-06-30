@@ -4,18 +4,12 @@ using UnityEngine;
 
 public class EnemyAI : MonoBehaviour
 {
-    public static EnemyAI Instance => _instance;
-    private static EnemyAI _instance;
-
     [SerializeField] private List<Pawn> _pawns = new();
 
-    private void Awake()
+    public List<Pawn> GetLivingPawns()
     {
-        _instance = this;
-    }
-
-    public void DoTurn()
-    {
+        // OPTIMIZE: could just update the list when a pawn dies, not iterate
+        // whole list every time
         List<Pawn> pawnsToUse = new();
         foreach (Pawn p in _pawns)
         {
@@ -27,6 +21,12 @@ public class EnemyAI : MonoBehaviour
             pawnsToUse.Add(p);
         }
 
+        return pawnsToUse;
+    }
+
+    public void DoTurn()
+    {
+        List<Pawn> pawnsToUse = GetLivingPawns();
 
         Pawn activePawn = pawnsToUse[Random.Range(0, pawnsToUse.Count)];
 
