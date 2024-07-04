@@ -4,18 +4,10 @@ using UnityEngine;
 
 public class SelectionManager : MonoBehaviour
 {
-    public static SelectionManager Instance => _instance;
-    public static SelectionManager _instance;
-
     public static Tile SelectedTile => _selectedTile;
     private static Tile _selectedTile;
 
     private bool playerControlsEnabled = false;
-
-    private void Awake()
-    {
-        _instance = this;
-    }
 
     public static void SetSelectedTile(Tile newTile)
     {

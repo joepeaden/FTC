@@ -4,7 +4,13 @@ using UnityEngine;
 
 public class EnemyAI : MonoBehaviour
 {
-    [SerializeField] private List<Pawn> _pawns = new();
+    private List<Pawn> _pawns = new();
+
+    public void RegisterPawn(Pawn p)
+    {
+        _pawns.Add(p);
+        p.SetTeam(false);
+    }
 
     public List<Pawn> GetLivingPawns()
     {

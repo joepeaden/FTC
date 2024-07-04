@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class BattleManager : MonoBehaviour
 {
@@ -9,17 +11,47 @@ public class BattleManager : MonoBehaviour
 
     public static BattleManager Instance => _instance;
     private static BattleManager _instance;
-    private Pawn _activePawn;
+    private List<Pawn> friendlyPawns = new();
 
     [SerializeField] TMP_Text turnText;
+    [SerializeField] GameObject turnUI;
     [SerializeField] TMP_Text winLoseText;
     [SerializeField] GameObject winLoseUI;
     [SerializeField] private EnemyAI enemyAI;
-    [SerializeField] private List<Pawn> friendlyPawns;
+    [SerializeField] private Button gameOverButton;
+    [SerializeField] private SelectionManager _selectionManager;
+    [SerializeField] GameObject pawnPrefab;
+    [SerializeField] Transform enemyParent;
+    [SerializeField] Transform friendlyParent;
 
     private void Awake()
     {
         _instance = this;
+        gameOverButton.onClick.AddListener(ExitBattle);
+
+        int enemiesToSpawn;
+        if (GameManager.Instance != null)
+        {
+            enemiesToSpawn = GameManager.Instance.GetNumOfEnemiesToSpawn();
+        }
+        else
+        {
+            Debug.Log("No game manager, spawning default amount");
+            enemiesToSpawn = 4;
+        }
+
+        for (int i = 0; i < enemiesToSpawn; i++)
+        {
+            Pawn newPawn = Instantiate(pawnPrefab, enemyParent).GetComponent<Pawn>();
+            enemyAI.RegisterPawn(newPawn);
+        }
+
+        for (int i = 0; i < 4; i++)
+        {
+            Pawn newPawn = Instantiate(pawnPrefab, friendlyParent).GetComponent<Pawn>();
+            friendlyPawns.Add(newPawn);
+            newPawn.SetTeam(true);
+        }
     }
 
     private void OnEnable()
@@ -27,35 +59,40 @@ public class BattleManager : MonoBehaviour
         StartCoroutine(BeginBattle());
     }
 
-    public void PawnActivated(Pawn newPawn)
+    private void OnDestroy()
     {
-        _activePawn = newPawn;
+        gameOverButton.onClick.RemoveListener(ExitBattle);
+    }
 
-        //if (newPawn.ActionsThisTurn >= 2)
-        //{
+    private void ExitBattle()
+    {
+        SceneManager.LoadScene("DecisionsUI");
+    }
 
+    public void PawnActivated()
+    {
         if (SelectionManager.SelectedTile != null)
         {
             SelectionManager.SelectedTile.SetSelected(false);
         }
 
         StartCoroutine(SwapTurns());
-        //}
     }
 
     private IEnumerator SwapTurns()
     {
 
-        SelectionManager.Instance.DisablePlayerControls();
+        _selectionManager.DisablePlayerControls();
         yield return new WaitForSeconds(1f);
 
+        // see if the battle is over. If so, do sumthin about it 
         if (enemyAI.GetLivingPawns().Count <= 0)
         {
-            turnText.gameObject.SetActive(false);
+            turnUI.SetActive(false);
             winLoseUI.SetActive(true);
             winLoseText.text = "Victory!";
         }
-        else if (true)
+        else
         {
             int alivePawns = 0;
             foreach (Pawn p in friendlyPawns)
@@ -69,39 +106,41 @@ public class BattleManager : MonoBehaviour
 
             if (alivePawns <= 0)
             {
-                turnText.gameObject.SetActive(false);
+                turnUI.SetActive(false);
                 winLoseUI.SetActive(true);
                 winLoseText.text = "Defeat!";
             }
-        }
-
-        if (!isPlayerTurn)
-        {
-            StartPlayerTurn();
-        }
-        else
-        {
-            StartEnemyTurn();
+            else
+            {
+                if (!isPlayerTurn)
+                {
+                    StartPlayerTurn();
+                }
+                else
+                {
+                    StartEnemyTurn();
+                }
+            }
         }
     }
 
     private IEnumerator BeginBattle()
     {
-        yield return new WaitUntil(() => SelectionManager.Instance != null);
+        yield return new WaitUntil(() => _selectionManager != null);
         StartPlayerTurn();
     }
 
     void StartPlayerTurn()
     {
         isPlayerTurn = true;
-        SelectionManager.Instance.HandleTurnChange(true);
+        _selectionManager.HandleTurnChange(true);
         turnText.text = "Player Turn";
     }
 
     void StartEnemyTurn()
     {
         isPlayerTurn = false;
-        SelectionManager.Instance.HandleTurnChange(false);
+        _selectionManager.HandleTurnChange(false);
         enemyAI.DoTurn();
         turnText.text = "Enemy Turn";
     }

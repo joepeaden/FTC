@@ -8,13 +8,11 @@ public class Pawn : MonoBehaviour
     public int MoveRange => moveRange;
     private int moveRange = 4;
 
-    public int ActionsThisTurn => _actionsThisTurn;
-    private int _actionsThisTurn;
-
     public Tile CurrentTile => _currentTile;
     private Tile _currentTile;
 
     public bool OnPlayerTeam => _onPlayerTeam;
+    private bool _onPlayerTeam;
 
     public int HitPoints => _hitPoints;
     [SerializeField] private int _hitPoints;
@@ -22,7 +20,6 @@ public class Pawn : MonoBehaviour
     public bool IsDead => _isDead;
     private bool _isDead;
 
-    [SerializeField] private bool _onPlayerTeam;
     [SerializeField] AIPathCustom pathfinder;
     [SerializeField] private Animator _anim;
     [SerializeField] private Sprite _enemyHeadSprite;
@@ -36,6 +33,11 @@ public class Pawn : MonoBehaviour
     private void Awake()
     {
         pathfinder.OnDestinationReached.AddListener(HandleDestinationReached);
+    }
+
+    public void SetTeam(bool onPlayerTeam)
+    {
+        _onPlayerTeam = onPlayerTeam;
     }
 
     private void Start()
@@ -84,9 +86,7 @@ public class Pawn : MonoBehaviour
         _anim.Play("Attack");
         targetPawn.TakeDamage();
 
-        _actionsThisTurn++;
-
-        BattleManager.Instance.PawnActivated(this);
+        BattleManager.Instance.PawnActivated();
     }
 
     public void TakeDamage()
@@ -116,8 +116,6 @@ public class Pawn : MonoBehaviour
 
         _anim.Play("Run");
 
-        _actionsThisTurn++;
-
         _currentTile.PawnExitTile();
         _currentTile = actionTile;
     }
@@ -139,7 +137,7 @@ public class Pawn : MonoBehaviour
 
         _anim.Play("Idle");
 
-        BattleManager.Instance.PawnActivated(this);
+        BattleManager.Instance.PawnActivated();
     }
 
     private void OnDestroy()
