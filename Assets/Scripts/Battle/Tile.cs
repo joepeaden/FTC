@@ -117,7 +117,10 @@ public class Tile : MonoBehaviour
 
             foreach (Tile t in adjacentTiles)
             {
-                t.GetTilesInMoveRangeRecursive(pawnMoveRange, tilesInRange);
+                if (!tilesInRange.Contains(t))
+                {
+                    t.GetTilesInMoveRangeRecursive(pawnMoveRange, tilesInRange);
+                }
             }
         }
 

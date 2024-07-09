@@ -35,6 +35,11 @@ public class Pawn : MonoBehaviour
         pathfinder.OnDestinationReached.AddListener(HandleDestinationReached);
     }
 
+    public void SetCharacter(CharInfo character)
+    {
+        SetTeam(true);
+    }
+
     public void SetTeam(bool onPlayerTeam)
     {
         _onPlayerTeam = onPlayerTeam;

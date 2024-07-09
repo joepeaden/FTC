@@ -623,11 +623,6 @@ MonoBehaviour:
   winLoseText: {fileID: 199997959}
   winLoseUI: {fileID: 271587606}
   enemyAI: {fileID: 756036164}
-  friendlyPawns:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
   gameOverButton: {fileID: 1978440935}
   _selectionManager: {fileID: 756036161}
   pawnPrefab: {fileID: 2564854941951512812, guid: 8b7e6c0d0f7aa40e88f3125d19d33bf9, type: 3}

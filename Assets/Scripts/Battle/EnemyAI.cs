@@ -57,6 +57,8 @@ public class EnemyAI : MonoBehaviour
         {
             // At this point, we have not attacked anyone, so find somewhere to move
             List<Tile> moveOptions = activePawn.CurrentTile.GetTilesInMoveRange();
+            Tile tileToMoveTo;
+
             for (int i = 0; i < moveOptions.Count; i++)
             {
                 Tile t = moveOptions[i];
@@ -66,7 +68,15 @@ public class EnemyAI : MonoBehaviour
                 }
             }
 
-            Tile tileToMoveTo = moveOptions[Random.Range(0, moveOptions.Count)];
+            // for some reason sometimes the t.GetPawn null check above will
+            // fail, so just keep picking random tiles till there's a free one
+            do
+            {
+                tileToMoveTo = moveOptions[Random.Range(0, moveOptions.Count)];
+            }
+            while (tileToMoveTo.GetPawn() != null) ; 
+            
+
             activePawn.MoveToTile(tileToMoveTo);
         }
     }

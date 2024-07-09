@@ -7,6 +7,16 @@ using UnityEngine.UI;
 
 public class BattleManager : MonoBehaviour
 {
+    private const int DEFAULT_AMOUNT_TO_SPAWN = 4;
+
+    enum BattleResult
+    {
+        Win,
+        Lose,
+        Undecided
+    };
+    private BattleResult _battleResult;
+
     bool isPlayerTurn = false;
 
     public static BattleManager Instance => _instance;
@@ -33,11 +43,30 @@ public class BattleManager : MonoBehaviour
         if (GameManager.Instance != null)
         {
             enemiesToSpawn = GameManager.Instance.GetNumOfEnemiesToSpawn();
+
+            Pawn playerPawn = Instantiate(pawnPrefab, friendlyParent).GetComponent<Pawn>();
+            friendlyPawns.Add(playerPawn);
+            playerPawn.SetCharacter(GameManager.Instance.PlayerCharacter);
+
+            foreach (CharInfo character in GameManager.Instance.PlayerFollowers)
+            {
+                Pawn newPawn = Instantiate(pawnPrefab, friendlyParent).GetComponent<Pawn>();
+                friendlyPawns.Add(newPawn);
+                newPawn.SetCharacter(character);
+            }
         }
         else
         {
             Debug.Log("No game manager, spawning default amount");
-            enemiesToSpawn = 4;
+            enemiesToSpawn = DEFAULT_AMOUNT_TO_SPAWN;
+
+            // spawn some friendlies
+            for (int i = 0; i < DEFAULT_AMOUNT_TO_SPAWN; i++)
+            {
+                Pawn newPawn = Instantiate(pawnPrefab, friendlyParent).GetComponent<Pawn>();
+                friendlyPawns.Add(newPawn);
+                newPawn.SetTeam(true);
+            }
         }
 
         for (int i = 0; i < enemiesToSpawn; i++)
@@ -45,18 +74,12 @@ public class BattleManager : MonoBehaviour
             Pawn newPawn = Instantiate(pawnPrefab, enemyParent).GetComponent<Pawn>();
             enemyAI.RegisterPawn(newPawn);
         }
-
-        for (int i = 0; i < 4; i++)
-        {
-            Pawn newPawn = Instantiate(pawnPrefab, friendlyParent).GetComponent<Pawn>();
-            friendlyPawns.Add(newPawn);
-            newPawn.SetTeam(true);
-        }
     }
 
     private void OnEnable()
     {
-        StartCoroutine(BeginBattle());
+        _battleResult = BattleResult.Undecided;
+        StartPlayerTurn();
     }
 
     private void OnDestroy()
@@ -66,7 +89,9 @@ public class BattleManager : MonoBehaviour
 
     private void ExitBattle()
     {
-        SceneManager.LoadScene("DecisionsUI");
+        bool playerWon = _battleResult == BattleResult.Win;
+
+        GameManager.Instance.ExitBattle(playerWon);
     }
 
     public void PawnActivated()
@@ -91,6 +116,7 @@ public class BattleManager : MonoBehaviour
             turnUI.SetActive(false);
             winLoseUI.SetActive(true);
             winLoseText.text = "Victory!";
+            _battleResult = BattleResult.Win;
         }
         else
         {
@@ -109,6 +135,7 @@ public class BattleManager : MonoBehaviour
                 turnUI.SetActive(false);
                 winLoseUI.SetActive(true);
                 winLoseText.text = "Defeat!";
+                _battleResult = BattleResult.Lose;
             }
             else
             {
@@ -122,12 +149,6 @@ public class BattleManager : MonoBehaviour
                 }
             }
         }
-    }
-
-    private IEnumerator BeginBattle()
-    {
-        yield return new WaitUntil(() => _selectionManager != null);
-        StartPlayerTurn();
     }
 
     void StartPlayerTurn()
