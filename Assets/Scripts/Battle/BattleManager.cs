@@ -33,6 +33,44 @@ public class BattleManager : MonoBehaviour
     [SerializeField] GameObject pawnPrefab;
     [SerializeField] Transform enemyParent;
     [SerializeField] Transform friendlyParent;
+    [SerializeField] TMP_Text hitChanceText;
+
+    public void HandleTileHoverStart(Tile t)
+    {
+        Pawn p = t.GetPawn();
+        if (p == null)
+        {
+            return;
+        }
+        if (_selectionManager.SelectedTile == null)
+        {
+            return;
+        }
+
+        Pawn selectedPawn = _selectionManager.SelectedTile.GetPawn();
+        if (selectedPawn.OnPlayerTeam != p.OnPlayerTeam)
+        {
+            float hitChance = selectedPawn.GetHitChance(p);
+            ShowHitChanceForPawn(p, hitChance);
+        }
+    }
+
+    public void HandleTileHoverEnd(Tile t)
+    {
+        HideHitChance();
+    }
+
+    public void HideHitChance()
+    {
+        hitChanceText.gameObject.SetActive(false);
+    }
+
+    public void ShowHitChanceForPawn(Pawn p, float chance)
+    {
+        hitChanceText.gameObject.SetActive(true);
+        hitChanceText.transform.position = CameraManager.MainCamera.WorldToScreenPoint(p.transform.position);
+        hitChanceText.text = chance * 100 + "%";
+    }
 
     private void Awake()
     {
@@ -74,6 +112,9 @@ public class BattleManager : MonoBehaviour
             Pawn newPawn = Instantiate(pawnPrefab, enemyParent).GetComponent<Pawn>();
             enemyAI.RegisterPawn(newPawn);
         }
+
+        Tile.OnTileHoverStart.AddListener(HandleTileHoverStart);
+        Tile.OnTileHoverEnd.AddListener(HandleTileHoverEnd);
     }
 
     private void OnEnable()
@@ -85,6 +126,9 @@ public class BattleManager : MonoBehaviour
     private void OnDestroy()
     {
         gameOverButton.onClick.RemoveListener(ExitBattle);
+
+        Tile.OnTileHoverStart.RemoveListener(HandleTileHoverStart);
+        Tile.OnTileHoverEnd.RemoveListener(HandleTileHoverEnd);
     }
 
     private void ExitBattle()
@@ -96,9 +140,9 @@ public class BattleManager : MonoBehaviour
 
     public void PawnActivated()
     {
-        if (SelectionManager.SelectedTile != null)
+        if (_selectionManager.SelectedTile != null)
         {
-            SelectionManager.SelectedTile.SetSelected(false);
+            _selectionManager.SelectedTile.SetSelected(false);
         }
 
         StartCoroutine(SwapTurns());

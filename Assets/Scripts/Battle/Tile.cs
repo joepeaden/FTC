@@ -2,9 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Tile : MonoBehaviour
 {
+    public static UnityEvent<Tile> OnTileHoverStart = new();
+    public static UnityEvent<Tile> OnTileHoverEnd = new();
+
     [SerializeField] private Sprite selectionSprite;
     [SerializeField] private Sprite hoverSprite;
     [SerializeField] private Sprite moveRangeSprite;
@@ -190,11 +194,13 @@ public class Tile : MonoBehaviour
     public void OnMouseEnter()
     {
         tileHoverUI.enabled = true;
+        OnTileHoverStart.Invoke(this);
     }
 
     public void OnMouseExit()
     {
         tileHoverUI.enabled = false;
+        OnTileHoverEnd.Invoke(this);
     }
 
 }

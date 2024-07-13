@@ -38,7 +38,7 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene("DecisionsUI");
     }
 
-    public void TryAddFollower(int cost)
+    public CharInfo TryAddFollower(int cost)
     {
         int goldRemaining = _playerGold - cost;
         if (goldRemaining >= 0)
@@ -46,7 +46,11 @@ public class GameManager : MonoBehaviour
             CharInfo newFollower = new("Bob", false);
             _playerFollowers.Add(newFollower);
             _playerGold = goldRemaining;
+
+            return newFollower;
         }
+
+        return null;
     }
 
     public void LoadBattle(int numOfEnemies, int rewardAmount)

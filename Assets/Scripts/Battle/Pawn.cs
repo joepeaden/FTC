@@ -5,6 +5,10 @@ using Pathfinding;
 
 public class Pawn : MonoBehaviour
 {
+    public float baseHitChance;
+    public float baseDodgeChance;
+    public float surroundBonus;
+
     public int MoveRange => moveRange;
     private int moveRange = 4;
 
@@ -86,10 +90,38 @@ public class Pawn : MonoBehaviour
         transform.position = spawnTile.transform.position;
     }
 
+    public int GetAdjacentEnemies()
+    {
+        int numOfEnemies = 0;
+        foreach (Tile t in _currentTile.GetAdjacentTiles())
+        {
+            Pawn p = t.GetPawn();
+            if (p != null && p.OnPlayerTeam != _onPlayerTeam)
+            {
+                numOfEnemies++;
+            }
+        }
+
+        return numOfEnemies;
+    }
+
+    public float GetHitChance(Pawn targetPawn)
+    {
+        int targetSurroundedBy = targetPawn.GetAdjacentEnemies();
+        float hitChance = baseHitChance + (surroundBonus * targetSurroundedBy);
+        return hitChance;
+    }
+
     public void AttackPawn(Pawn targetPawn)
     {
         _anim.Play("Attack");
-        targetPawn.TakeDamage();
+
+        float hitChance = GetHitChance(targetPawn);
+        float hitRoll = Random.Range(0f, 1f);
+        if (hitRoll < hitChance)
+        {
+            targetPawn.TakeDamage();
+        }
 
         BattleManager.Instance.PawnActivated();
     }

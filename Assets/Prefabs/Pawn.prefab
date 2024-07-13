@@ -48,8 +48,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4568fb15ab62d42bf9be2379ed15af26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  baseHitChance: 0.4
+  baseDodgeChance: 0
+  surroundBonus: 0.2
   _hitPoints: 3
-  _onPlayerTeam: 0
   pathfinder: {fileID: 5092988425437815376}
   _anim: {fileID: 3764665701983993892}
   _enemyHeadSprite: {fileID: 21300000, guid: e6da235dd98984c0f8ec788d6da0f094, type: 3}

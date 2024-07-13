@@ -15,7 +15,7 @@ public class DecisionPanel : MonoBehaviour
     }
     private DecisionType _decisionType;
 
-    public UnityEvent OnRecruit = new();
+    public UnityEvent<CharInfo> OnRecruit = new();
 
     [SerializeField] private int _maxNumOfEnemies;
     [SerializeField] private int _minNumOfEnemies;
@@ -79,10 +79,13 @@ public class DecisionPanel : MonoBehaviour
             case DecisionType.Recruit:
                 if (GameManager.Instance != null)
                 {
-                    GameManager.Instance.TryAddFollower(goldAmount);
-                }
+                    CharInfo newFollower = GameManager.Instance.TryAddFollower(goldAmount);
 
-                OnRecruit.Invoke();
+                    if (newFollower != null)
+                    {
+                        OnRecruit.Invoke(newFollower);
+                    }
+                }
 
                 break;
         }
