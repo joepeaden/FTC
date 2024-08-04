@@ -5,10 +5,10 @@ using TMPro;
 
 public class TroopPanel : MonoBehaviour
 {
-    [SerializeField] TMP_Text troopName;
+    [SerializeField] TMP_Text troopNameText;
 
-    public void SetupPanel(CharInfo info)
+    public void SetupPanel(GameCharacter gameChar)
     {
-        troopName.text = info.CharName;
+        troopNameText.text = gameChar.CharName;
     }
 }

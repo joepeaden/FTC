@@ -15,7 +15,7 @@ public class DecisionPanel : MonoBehaviour
     }
     private DecisionType _decisionType;
 
-    public UnityEvent<CharInfo> OnRecruit = new();
+    public UnityEvent<GameCharacter> OnRecruit = new();
 
     [SerializeField] private int _maxNumOfEnemies;
     [SerializeField] private int _minNumOfEnemies;
@@ -27,6 +27,8 @@ public class DecisionPanel : MonoBehaviour
     int numOfEnemies;
     int goldAmount;
 
+    private GameCharacter _recruit;
+
     private void Awake()
     {
         GetComponent<Button>().onClick.AddListener(HandleClick);
@@ -34,12 +36,27 @@ public class DecisionPanel : MonoBehaviour
 
     public void GenerateRecruitOption()
     {
+        _recruit = new();
+
         goldAmount = 100;
 
         _numOfEnemiesTxt.gameObject.SetActive(false);
 
-        _titleText.text = "Recruit";
-        _descriptionText.text = "A local man looking for some good pay and a good fight to go with it.";
+        _titleText.text = _recruit.CharName;
+
+        switch (_recruit.GetBiggestMotivator())
+        {
+            case GameCharacter.Motivator.Avarice:
+                _descriptionText.text = _recruit.CharName + " desires wealth and posessions above all other things.";
+                break;
+            case GameCharacter.Motivator.Sanctimony:
+                _descriptionText.text = _recruit.CharName + " is righteous and honorable - and full of arrogance.";
+                break;
+            case GameCharacter.Motivator.Vainglory:
+                _descriptionText.text = _recruit.CharName + " wishes the crowds to know his name, be it by amazing deed or brutal death.";
+                break;
+        }
+
         _goldAmountText.text = "Cost: " + goldAmount + " gold";
 
         _decisionType = DecisionType.Recruit;
@@ -79,11 +96,12 @@ public class DecisionPanel : MonoBehaviour
             case DecisionType.Recruit:
                 if (GameManager.Instance != null)
                 {
-                    CharInfo newFollower = GameManager.Instance.TryAddFollower(goldAmount);
+                    GameCharacter newFollower = GameManager.Instance.TryAddFollower(goldAmount, _recruit);
 
                     if (newFollower != null)
                     {
                         OnRecruit.Invoke(newFollower);
+                        gameObject.SetActive(false);
                     }
                 }
 

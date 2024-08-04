@@ -14,14 +14,16 @@ public class GameManager : MonoBehaviour
     private int _potentialRewardAmount;
 
     public int PlayerGold => _playerGold;
-    [SerializeField] private int _playerGold = 100;
+    [SerializeField] private int _playerGold;
 
-    public CharInfo PlayerCharacter => _playerCharacter;
-    private CharInfo _playerCharacter;
+    public GameCharacter PlayerCharacter => _playerCharacter;
+    private GameCharacter _playerCharacter;
 
-    public List<CharInfo> PlayerFollowers => _playerFollowers;
-    private List<CharInfo> _playerFollowers = new();
+    public List<GameCharacter> PlayerFollowers => _playerFollowers;
+    private List<GameCharacter> _playerFollowers = new();
 
+    public GameCharacterData GameCharData => _gameCharData;
+    [SerializeField] private GameCharacterData _gameCharData;
 
     private void Awake()
     {
@@ -34,23 +36,31 @@ public class GameManager : MonoBehaviour
 
     public void StartNewGame(string playerCharName)
     {
-        _playerCharacter = new (playerCharName, true);
+        _playerCharacter = new (playerCharName, true, Random.Range(_gameCharData.minVice, _gameCharData.maxVice), Random.Range(_gameCharData.minVice, _gameCharData.maxVice), Random.Range(_gameCharData.minVice, _gameCharData.maxVice));
         SceneManager.LoadScene("DecisionsUI");
     }
 
-    public CharInfo TryAddFollower(int cost)
+    public GameCharacter TryAddFollower(int cost, GameCharacter newFollower)
     {
         int goldRemaining = _playerGold - cost;
         if (goldRemaining >= 0)
         {
-            CharInfo newFollower = new("Bob", false);
             _playerFollowers.Add(newFollower);
             _playerGold = goldRemaining;
 
             return newFollower;
         }
 
+
         return null;
+    }
+
+    public void RemoveFollower(GameCharacter follower)
+    {
+        if (_playerFollowers.Contains(follower))
+        {
+            _playerFollowers.Remove(follower);
+        }
     }
 
     public void LoadBattle(int numOfEnemies, int rewardAmount)

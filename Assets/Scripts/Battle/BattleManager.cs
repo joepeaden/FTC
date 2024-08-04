@@ -1,8 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class BattleManager : MonoBehaviour
@@ -17,60 +17,44 @@ public class BattleManager : MonoBehaviour
     };
     private BattleResult _battleResult;
 
-    bool isPlayerTurn = false;
-
     public static BattleManager Instance => _instance;
     private static BattleManager _instance;
     private List<Pawn> friendlyPawns = new();
 
+    [SerializeField] private Button _endTurnButton;
     [SerializeField] TMP_Text turnText;
     [SerializeField] GameObject turnUI;
     [SerializeField] TMP_Text winLoseText;
     [SerializeField] GameObject winLoseUI;
-    [SerializeField] private EnemyAI enemyAI;
+    [SerializeField] private EnemyAI _enemyAI;
     [SerializeField] private Button gameOverButton;
     [SerializeField] private SelectionManager _selectionManager;
     [SerializeField] GameObject pawnPrefab;
     [SerializeField] Transform enemyParent;
     [SerializeField] Transform friendlyParent;
     [SerializeField] TMP_Text hitChanceText;
+    [SerializeField] GameObject characterInfoPanel;
+    [SerializeField] TMP_Text characterNameText;
+    [SerializeField] TMP_Text characterMotivatorText;
+    [SerializeField] Image characterImageUI;
+    [SerializeField] TMP_Text healthText;
+    [SerializeField] StatBar healthBar;
+    [SerializeField] TMP_Text apText;
+    [SerializeField] StatBar apBar;
+    [SerializeField] TMP_Text motText;
+    [SerializeField] StatBar motBar;
+    [SerializeField] private GameObject _initStackGO;
+    [SerializeField] private Transform _initStackParent;
+    [SerializeField] GameObject pawnPreviewPrefab;
+    [SerializeField] private List<TextFloatUp> _floatingTexts = new();
+    [SerializeField] private CharacterTooltip charTooltip;
+    [SerializeField] private GameObject _instructionsUI;
+    [SerializeField] private Button _startBattleButton;
 
-    public void HandleTileHoverStart(Tile t)
-    {
-        Pawn p = t.GetPawn();
-        if (p == null)
-        {
-            return;
-        }
-        if (_selectionManager.SelectedTile == null)
-        {
-            return;
-        }
+    private Stack<Pawn> _initiativeStack = new ();
 
-        Pawn selectedPawn = _selectionManager.SelectedTile.GetPawn();
-        if (selectedPawn.OnPlayerTeam != p.OnPlayerTeam)
-        {
-            float hitChance = selectedPawn.GetHitChance(p);
-            ShowHitChanceForPawn(p, hitChance);
-        }
-    }
-
-    public void HandleTileHoverEnd(Tile t)
-    {
-        HideHitChance();
-    }
-
-    public void HideHitChance()
-    {
-        hitChanceText.gameObject.SetActive(false);
-    }
-
-    public void ShowHitChanceForPawn(Pawn p, float chance)
-    {
-        hitChanceText.gameObject.SetActive(true);
-        hitChanceText.transform.position = CameraManager.MainCamera.WorldToScreenPoint(p.transform.position);
-        hitChanceText.text = chance * 100 + "%";
-    }
+    public int TurnNumber => _turnNumber;
+    private int _turnNumber = -1;
 
     private void Awake()
     {
@@ -84,13 +68,13 @@ public class BattleManager : MonoBehaviour
 
             Pawn playerPawn = Instantiate(pawnPrefab, friendlyParent).GetComponent<Pawn>();
             friendlyPawns.Add(playerPawn);
-            playerPawn.SetCharacter(GameManager.Instance.PlayerCharacter);
+            playerPawn.SetCharacter(GameManager.Instance.PlayerCharacter, true);
 
-            foreach (CharInfo character in GameManager.Instance.PlayerFollowers)
+            foreach (GameCharacter character in GameManager.Instance.PlayerFollowers)
             {
                 Pawn newPawn = Instantiate(pawnPrefab, friendlyParent).GetComponent<Pawn>();
                 friendlyPawns.Add(newPawn);
-                newPawn.SetCharacter(character);
+                newPawn.SetCharacter(character, true);
             }
         }
         else
@@ -103,24 +87,26 @@ public class BattleManager : MonoBehaviour
             {
                 Pawn newPawn = Instantiate(pawnPrefab, friendlyParent).GetComponent<Pawn>();
                 friendlyPawns.Add(newPawn);
-                newPawn.SetTeam(true);
+                newPawn.SetCharacter(new GameCharacter(), true);
             }
         }
 
         for (int i = 0; i < enemiesToSpawn; i++)
         {
             Pawn newPawn = Instantiate(pawnPrefab, enemyParent).GetComponent<Pawn>();
-            enemyAI.RegisterPawn(newPawn);
+            _enemyAI.RegisterPawn(newPawn);
         }
 
         Tile.OnTileHoverStart.AddListener(HandleTileHoverStart);
         Tile.OnTileHoverEnd.AddListener(HandleTileHoverEnd);
+        _endTurnButton.onClick.AddListener(EndTurn);
+
+        _startBattleButton.onClick.AddListener(ToggleInstructions);
     }
 
-    private void OnEnable()
+    private void Start()
     {
         _battleResult = BattleResult.Undecided;
-        StartPlayerTurn();
     }
 
     private void OnDestroy()
@@ -129,7 +115,132 @@ public class BattleManager : MonoBehaviour
 
         Tile.OnTileHoverStart.RemoveListener(HandleTileHoverStart);
         Tile.OnTileHoverEnd.RemoveListener(HandleTileHoverEnd);
+        _endTurnButton.onClick.RemoveListener(EndTurn);
+        _startBattleButton.onClick.RemoveListener(ToggleInstructions);
     }
+
+    public void AddTextNotification(Vector3 pos, string str)
+    {
+        foreach (TextFloatUp txt in _floatingTexts)
+        {
+            if (txt.InUse)
+            {
+                continue;
+            }
+            else
+            {
+                txt.SetData(pos, str, Color.white);
+                break;
+            }
+        }
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            ToggleInstructions();
+        }
+    }
+
+    private void ToggleInstructions()
+    {
+        _instructionsUI.SetActive(!_instructionsUI.activeInHierarchy);
+        if (_turnNumber == -1)
+        {
+            StartBattle();
+        }
+    }
+
+    private void UpdateUIForPawn(Pawn p)
+    {
+        if (p != null)
+        {
+            characterInfoPanel.SetActive(true);
+            characterNameText.text = p.GameChar.CharName;
+            characterMotivatorText.text = p.CurrentMotivator.ToString();
+            healthText.text = "HP: " + p.HitPoints + "/" + p.MaxHitPoints;
+            healthBar.SetBar(p.MaxHitPoints, p.HitPoints);
+            apText.text = "AP: " + p.ActionPoints + "/" + p.MaxActionPoints;
+            apBar.SetBar(p.MaxActionPoints, p.ActionPoints);
+            motText.text = "MOT: " + p.Motivation + "/" + p.MaxMotivation;
+            motBar.SetBar(p.MaxMotivation, p.Motivation);
+
+            characterImageUI.sprite = p.GetFace();
+
+            _initStackGO.SetActive(true);
+            RefreshInitStackUI();
+        }
+    }
+
+    private void EndTurn()
+    {
+        Pawn activePawn = _selectionManager.SelectedTile.GetPawn();
+        PawnFinished(activePawn);
+    }
+
+    public void HandleTileHoverStart(Tile targetTile)
+    {
+        if (_selectionManager.SelectedTile == null)
+        {
+            return;
+        }
+
+        Pawn selectedPawn = _selectionManager.SelectedTile.GetPawn();
+        Pawn targetPawn = targetTile.GetPawn();
+
+        if (selectedPawn != null)
+        {
+            // if targetPawn is null, then we're hovering a movement tile.
+            if (targetPawn == null)
+            {
+                int expectedAPAfterMove = selectedPawn.GetAPAfterMove(targetTile);
+                apBar.SetBar(selectedPawn.MaxActionPoints, selectedPawn.ActionPoints, expectedAPAfterMove);
+
+                int expectedMotAfterMove = selectedPawn.GetMotivationAtTile(targetTile);
+                //Debug.Log("Expected MOT:" + expectedMotAfterMove);
+                motBar.SetBar(selectedPawn.MaxMotivation, selectedPawn.Motivation, expectedMotAfterMove);
+
+            }
+            else
+            {
+                ShowTooltipForPawn(targetPawn);
+                if (selectedPawn.OnPlayerTeam != targetPawn.OnPlayerTeam)
+                {
+                    apBar.SetBar(selectedPawn.MaxActionPoints, selectedPawn.ActionPoints, selectedPawn.GetAPAfterAttack());
+                }
+                else
+                {
+                    // otherwise we might be hovering ourselves or a teammate so reset the AP Bar
+                    apBar.SetBar(selectedPawn.MaxActionPoints, selectedPawn.ActionPoints);
+                }
+            }
+        }
+    }
+
+    public void HandleTileHoverEnd(Tile t)
+    {
+        HideHitChance();
+    }
+
+    public void HideHitChance()
+    {
+        hitChanceText.gameObject.SetActive(false);
+        charTooltip.Hide();
+    }
+
+    public void ShowTooltipForPawn(Pawn p)
+    {
+        charTooltip.SetPawn(p);
+
+        Pawn selectedPawn = _selectionManager.SelectedTile.GetPawn();
+        if (selectedPawn.GetAdjacentEnemies().Contains(p))
+        {
+            float chance = selectedPawn.GetHitChance(p);
+            charTooltip.ShowHitPreview(chance, selectedPawn.Damage);
+        }
+    }
+
 
     private void ExitBattle()
     {
@@ -138,29 +249,136 @@ public class BattleManager : MonoBehaviour
         GameManager.Instance.ExitBattle(playerWon);
     }
 
-    public void PawnActivated()
+    /// <summary>
+    /// When a pawn has used all AP and it's the next pawn's turn
+    /// </summary>
+    public void PawnFinished(Pawn p)
     {
         if (_selectionManager.SelectedTile != null)
         {
             _selectionManager.SelectedTile.SetSelected(false);
         }
 
-        StartCoroutine(SwapTurns());
+        StartCoroutine(NextActivation());
     }
 
-    private IEnumerator SwapTurns()
+    /// <summary>
+    /// When a pawn acts but not necessarily when it's finished
+    /// </summary>
+    /// <param name="p"></param>
+    public void PawnActivated(Pawn p)
     {
+        UpdateUIForPawn(p);
+        _selectionManager.SetSelectedTile(p.CurrentTile);
 
-        _selectionManager.DisablePlayerControls();
-        yield return new WaitForSeconds(1f);
+        if (!p.HasActionsRemaining())
+        {
+            PawnFinished(p);
+        }
+        else if (!p.OnPlayerTeam)
+        {
+            _enemyAI.DoTurn(p);
+        }
+    }
+
+    public void PawnKilled(Pawn p)
+    {
+        if (p.OnPlayerTeam && GameManager.Instance != null)
+        {
+            GameManager.Instance.RemoveFollower(p.GameChar);
+        }
+
+        RefreshInitStackUI();
+    }
+
+    private List<Pawn> GetFriendlyLivingPawns()
+    {
+        List<Pawn> livingPawns = new();
+        foreach (Pawn p in friendlyPawns)
+        {
+            if (!p.IsDead)
+            {
+                livingPawns.Add(p);
+            }
+        }
+
+        return livingPawns;
+    }
+
+    private void RefreshInitiativeStack()
+    {
+        _turnNumber++;
+        turnText.text = _turnNumber.ToString();
+
+        List<Pawn> pawnList = new();
+
+        foreach (Pawn p in GetFriendlyLivingPawns())
+        {
+            pawnList.Add(p);
+        }
+
+        foreach (Pawn p in _enemyAI.GetLivingPawns())
+        {
+            pawnList.Add(p);
+        }
+        
+        pawnList = pawnList.OrderBy(pawn => pawn.GameChar.Initiative).ToList();
+
+        // this way the stack can be sorted properly 
+        _initiativeStack = new(pawnList);
+    }
+
+    private void StartBattle()
+    {
+        _turnNumber = 0;
+        _instructionsUI.SetActive(false);
+        StartCoroutine(NextActivation());
+    }
+
+    public void RefreshInitStackUI()
+    {
+        for (int i = 0; i < _initStackParent.childCount; i++)
+        {
+            Transform child = _initStackParent.GetChild(i);
+            Destroy(child.gameObject);
+        }
+
+        int newChildCount = 0;
+        foreach (Pawn p in _initiativeStack)
+        {
+            // the UI only has space for 7 to look pretty
+            if (newChildCount > 7)
+                break;
+
+            if (p.IsDead)
+            {
+                continue;
+            }
+
+            GameObject pawnPreview = Instantiate(pawnPreviewPrefab, _initStackParent);
+            pawnPreview.GetComponent<Image>().sprite = p.GetFace();
+            newChildCount++;
+        }
+    }
+
+    private void HandleBattleResult(BattleResult battleResult)
+    {
+        turnUI.SetActive(false);
+        winLoseUI.SetActive(true);
+        characterInfoPanel.SetActive(false);
+        _initStackGO.SetActive(false);
+        winLoseText.text = battleResult == BattleResult.Win ? "Victory!" : "Defeat!" ;
+        _battleResult = battleResult;
+    }
+
+    public IEnumerator NextActivation()
+    {
+        Pawn curentPawn = GetNextPawn();
 
         // see if the battle is over. If so, do sumthin about it 
-        if (enemyAI.GetLivingPawns().Count <= 0)
+        if (_enemyAI.GetLivingPawns().Count <= 0)
         {
-            turnUI.SetActive(false);
-            winLoseUI.SetActive(true);
-            winLoseText.text = "Victory!";
-            _battleResult = BattleResult.Win;
+            HandleBattleResult(BattleResult.Win);
         }
         else
         {
@@ -176,37 +394,57 @@ public class BattleManager : MonoBehaviour
 
             if (alivePawns <= 0)
             {
-                turnUI.SetActive(false);
-                winLoseUI.SetActive(true);
-                winLoseText.text = "Defeat!";
-                _battleResult = BattleResult.Lose;
+                HandleBattleResult(BattleResult.Lose);
             }
             else
             {
-                if (!isPlayerTurn)
+                if (curentPawn.CurrentTile == null)
                 {
-                    StartPlayerTurn();
+                    yield return new WaitUntil(() => curentPawn.CurrentTile != null);
+                }
+
+                curentPawn.HandleActivation();
+                UpdateUIForPawn(curentPawn);
+                _selectionManager.HandleTurnChange(curentPawn.OnPlayerTeam);
+                _endTurnButton.gameObject.SetActive(curentPawn.OnPlayerTeam);
+
+                if (curentPawn.OnPlayerTeam)
+                {
+                    _selectionManager.SetSelectedTile(curentPawn.CurrentTile);
                 }
                 else
                 {
-                    StartEnemyTurn();
+                    _enemyAI.DoTurn(curentPawn);
                 }
             }
         }
     }
 
-    void StartPlayerTurn()
+    /// <summary>
+    /// Get next pawn in init stack, if no living pawns left return null
+    /// </summary>
+    /// <returns></returns>
+    private Pawn GetNextPawn()
     {
-        isPlayerTurn = true;
-        _selectionManager.HandleTurnChange(true);
-        turnText.text = "Player Turn";
+        if (_initiativeStack.Count == 0)
+        {
+            RefreshInitiativeStack();
+        }
+
+        Pawn p = _initiativeStack.Pop();
+        while (p.IsDead)
+        {
+            if (_initiativeStack.Count != 0)
+            {
+                p = _initiativeStack.Pop();
+            }
+            else
+            {
+                RefreshInitiativeStack();
+            }
+        }
+
+        return p;
     }
 
-    void StartEnemyTurn()
-    {
-        isPlayerTurn = false;
-        _selectionManager.HandleTurnChange(false);
-        enemyAI.DoTurn();
-        turnText.text = "Enemy Turn";
-    }
 }

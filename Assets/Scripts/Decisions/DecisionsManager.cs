@@ -13,16 +13,24 @@ public class DecisionsManager : MonoBehaviour
     [SerializeField] private Button _recruitsButton;
     [SerializeField] private Button _contractsButton;
     [SerializeField] private Button _troopsButton;
+    [SerializeField] private Button _shopButton;
     [SerializeField] private GameObject _recruitsScreen;
     [SerializeField] private GameObject _contractsScreen;
     [SerializeField] private GameObject _troopsScreen;
-    [SerializeField] private GameObject _troopPanelPrefab;
+    [SerializeField] private GameObject _shopScreen;
+    [SerializeField] private GameObject _inventoryScreen;
+    [SerializeField] private GameObject _troopsGrid;
+    [SerializeField] private GameObject _shopGrid;
+    [SerializeField] private GameObject _inventoryGrid;
+    [SerializeField] private GameObject _troopPrefab;
+    [SerializeField] private GameObject _itemPrefab;
 
     private void Awake()
     {
         _recruitsButton.onClick.AddListener(ShowRecruitsScreen);
         _contractsButton.onClick.AddListener(ShowContractsScreen);
         _troopsButton.onClick.AddListener(ShowTroopsScreen);
+        _shopButton.onClick.AddListener(ShowShopScreen);
     }
 
     private void OnEnable()
@@ -40,23 +48,43 @@ public class DecisionsManager : MonoBehaviour
             panel.OnRecruit.AddListener(HandleRecruit);
         }
 
-        AddCharacterPanel(GameManager.Instance.PlayerCharacter);
-        foreach (CharInfo character in GameManager.Instance.PlayerFollowers)
+        if (GameManager.Instance != null)
         {
-            AddCharacterPanel(character);
+            AddCharacterPanel(GameManager.Instance.PlayerCharacter);
+            foreach (GameCharacter character in GameManager.Instance.PlayerFollowers)
+            {
+                AddCharacterPanel(character);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                GameObject panelGO = Instantiate(_troopPrefab, _troopsGrid.transform);
+            }
+        }
+
+        for (int i = 0; i < 6; i++)
+        {
+            GameObject panelGO = Instantiate(_itemPrefab, _shopGrid.transform);
+        }
+
+        for (int i = 0; i < 6; i++)
+        {
+            GameObject panelGO = Instantiate(_itemPrefab, _inventoryGrid.transform);
         }
 
         UpdateGoldText();
     }
 
-    private void AddCharacterPanel(CharInfo character)
+    private void AddCharacterPanel(GameCharacter character)
     {
-        GameObject panelGO = Instantiate(_troopPanelPrefab, _troopsScreen.transform);
+        GameObject panelGO = Instantiate(_troopPrefab, _troopsGrid.transform);
         TroopPanel panel = panelGO.GetComponent<TroopPanel>();
         panel.SetupPanel(character);
     }
 
-    private void HandleRecruit(CharInfo newChar)
+    private void HandleRecruit(GameCharacter newChar)
     {
         UpdateGoldText();
         AddCharacterPanel(newChar);
@@ -72,6 +100,9 @@ public class DecisionsManager : MonoBehaviour
         _recruitsScreen.SetActive(true);
         _contractsScreen.SetActive(false);
         _troopsScreen.SetActive(false);
+        _shopScreen.SetActive(false);
+        _troopsScreen.SetActive(false);
+        _inventoryScreen.SetActive(false);
     }
 
     private void ShowContractsScreen()
@@ -79,13 +110,27 @@ public class DecisionsManager : MonoBehaviour
         _recruitsScreen.SetActive(false);
         _contractsScreen.SetActive(true);
         _troopsScreen.SetActive(false);
+        _shopScreen.SetActive(false);
+        _troopsScreen.SetActive(false);
+        _inventoryScreen.SetActive(false);
     }
 
     private void ShowTroopsScreen()
     {
         _recruitsScreen.SetActive(false);
         _contractsScreen.SetActive(false);
+        _shopScreen.SetActive(false);
         _troopsScreen.SetActive(true);
+        _inventoryScreen.SetActive(true);
+    }
+
+    private void ShowShopScreen()
+    {
+        _recruitsScreen.SetActive(false);
+        _contractsScreen.SetActive(false);
+        _shopScreen.SetActive(true);
+        _troopsScreen.SetActive(false);
+        _inventoryScreen.SetActive(true);
     }
 
     private void OnDestroy()
@@ -93,5 +138,6 @@ public class DecisionsManager : MonoBehaviour
         _recruitsButton.onClick.RemoveListener(ShowRecruitsScreen);
         _contractsButton.onClick.RemoveListener(ShowContractsScreen);
         _troopsButton.onClick.RemoveListener(ShowTroopsScreen);
+        _shopButton.onClick.RemoveListener(ShowShopScreen);
     }
 }

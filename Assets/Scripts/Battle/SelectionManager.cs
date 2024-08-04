@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class SelectionManager : MonoBehaviour
 {
@@ -49,28 +50,7 @@ public class SelectionManager : MonoBehaviour
                 Tile newTile = hit.transform.GetComponent<Tile>();
                 if (newTile != null)
                 {
-                    if (Input.GetMouseButtonDown(0))
-                    {
-                        // don't do anything if select the same thing
-                        //if (_selectedTile == newTile)
-                        //{
-                        //    return;
-                        //}
-
-                        // deselect previous
-                        if (_selectedTile != null)
-                        {
-                            _selectedTile.SetSelected(false);
-                            _selectedTile = null;
-                        }
-
-                        // select new
-                        if (newTile.IsSelectable())
-                        {
-                            SetSelectedTile(newTile);
-                        }
-                    }
-                    else if (Input.GetMouseButton(1))
+                    if (Input.GetMouseButton(1))
                     {
                         if (_selectedTile != null && _selectedTile.GetPawn().OnPlayerTeam)
                         {
@@ -80,11 +60,11 @@ public class SelectionManager : MonoBehaviour
                                 Pawn targetPawn = newTile.GetPawn();
                                 if (targetPawn != null && newTile.IsAdjacentTo(_selectedTile) && targetPawn.OnPlayerTeam != currentPawn.OnPlayerTeam)
                                 {
-                                    currentPawn.AttackPawn(targetPawn);
+                                    currentPawn.AttackPawnIfAPAvailable(targetPawn);
                                 }
                                 else if (newTile.IsInMoveRange && targetPawn == null)
                                 {
-                                    currentPawn.MoveToTile(newTile);
+                                    currentPawn.MoveToTileIfAPAvailable(newTile);
                                 }
                             }
                         }

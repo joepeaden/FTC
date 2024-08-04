@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -8,6 +9,7 @@ public class Tile : MonoBehaviour
 {
     public static UnityEvent<Tile> OnTileHoverStart = new();
     public static UnityEvent<Tile> OnTileHoverEnd = new();
+    private static UnityEvent OnTileSelectChange = new();
 
     [SerializeField] private Sprite selectionSprite;
     [SerializeField] private Sprite hoverSprite;
@@ -21,9 +23,30 @@ public class Tile : MonoBehaviour
     private bool _isInMoveRange;
     private List<Tile> adjacentTiles = new();
 
+    public Point Coordinates => _coordinates;
+    private Point _coordinates;
+
+    private void Awake()
+    {
+        OnTileSelectChange.AddListener(ResetTileVisuals);
+    }
+
+    private void OnDestroy()
+    {
+        OnTileSelectChange.RemoveListener(ResetTileVisuals);
+    }
+
+    private void ResetTileVisuals()
+    {
+        tileOverlayUI.enabled = false;
+        _isInMoveRange = false;
+    }
+
     public void Initialize(Dictionary<Point, Tile> tiles, Point coord)
     {
+        _coordinates = coord;
         Point p = new Point(coord.X + 1, coord.Y);
+
         if (tiles.ContainsKey(p))
         {
             adjacentTiles.Add(tiles[p]);
@@ -54,6 +77,13 @@ public class Tile : MonoBehaviour
         return adjacentTiles;
     }
 
+    public int GetTileDistance(Tile targetTile)
+    {
+        int yDiff = Mathf.Abs(targetTile.Coordinates.Y - _coordinates.Y);
+        int xDiff = Mathf.Abs(targetTile.Coordinates.X - _coordinates.X);
+        return xDiff + yDiff;
+    }
+
     public bool IsSelectable()
     {
         return _pawn != null;
@@ -62,11 +92,6 @@ public class Tile : MonoBehaviour
     public void PawnEnterTile(Pawn newPawn)
     {
         _pawn = newPawn;
-
-        if (_pawn.OnPlayerTeam)
-        {
-            //SelectionManager.SetSelectedTile(this);
-        }
     }
 
     public void PawnExitTile()
@@ -137,6 +162,8 @@ public class Tile : MonoBehaviour
 
         if (_isSelected)
         {
+            OnTileSelectChange.Invoke();
+
             tileOverlayUI.enabled = true;
             tileOverlayUI.sprite = selectionSprite;
         }

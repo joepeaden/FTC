@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class EnemyAI : MonoBehaviour
 {
@@ -9,7 +10,8 @@ public class EnemyAI : MonoBehaviour
     public void RegisterPawn(Pawn p)
     {
         _pawns.Add(p);
-        p.SetTeam(false);
+        GameCharacter guy = new();
+        p.SetCharacter(guy, false);
     }
 
     public List<Pawn> GetLivingPawns()
@@ -30,11 +32,17 @@ public class EnemyAI : MonoBehaviour
         return pawnsToUse;
     }
 
-    public void DoTurn()
+    public void DoTurn(Pawn p)
     {
-        List<Pawn> pawnsToUse = GetLivingPawns();
+        StartCoroutine(DoTurnCoroutine(p));
+    }
 
-        Pawn activePawn = pawnsToUse[Random.Range(0, pawnsToUse.Count)];
+    private IEnumerator DoTurnCoroutine(Pawn p)
+    {
+        // just add a pause so it's not jarring how fast turns change
+        yield return new WaitForSeconds(1f);
+
+        Pawn activePawn = p;
 
         // see if there's anyone adjacent to attack
         Pawn targetPawn = null;
@@ -51,7 +59,7 @@ public class EnemyAI : MonoBehaviour
 
         if (hasFoundTarget)
         {
-            activePawn.AttackPawn(targetPawn);
+            activePawn.AttackPawnIfAPAvailable(targetPawn);
         }
         else
         {
@@ -77,7 +85,7 @@ public class EnemyAI : MonoBehaviour
             while (tileToMoveTo.GetPawn() != null) ; 
             
 
-            activePawn.MoveToTile(tileToMoveTo);
+            activePawn.MoveToTileIfAPAvailable(tileToMoveTo);
         }
     }
 
