@@ -25,6 +25,12 @@ public class DecisionsManager : MonoBehaviour
     [SerializeField] private GameObject _troopPrefab;
     [SerializeField] private GameObject _itemPrefab;
 
+    [SerializeField] private List<ItemData> possibleShopItems = new();
+    [SerializeField] private int maxNumOfShopItems;
+    [SerializeField] private int minNumOfShopItems;
+
+    [SerializeField] private EquipmentTooltip equipToolTip;
+
     private void Awake()
     {
         _recruitsButton.onClick.AddListener(ShowRecruitsScreen);
@@ -35,12 +41,14 @@ public class DecisionsManager : MonoBehaviour
 
     private void OnEnable()
     {
+        // fill out contracts
         for (int i = 0; i < _contractsPanelParent.childCount; i++)
         {
             DecisionPanel panel =_contractsPanelParent.GetChild(i).GetComponent<DecisionPanel>();
             panel.GenerateContractOption();
         }
 
+        // fill out recruits
         for (int i = 0; i < _recruitPanelParent.childCount; i++)
         {
             DecisionPanel panel = _recruitPanelParent.GetChild(i).GetComponent<DecisionPanel>();
@@ -48,6 +56,7 @@ public class DecisionsManager : MonoBehaviour
             panel.OnRecruit.AddListener(HandleRecruit);
         }
 
+        // fill out warband
         if (GameManager.Instance != null)
         {
             AddCharacterPanel(GameManager.Instance.PlayerCharacter);
@@ -64,17 +73,32 @@ public class DecisionsManager : MonoBehaviour
             }
         }
 
-        for (int i = 0; i < 6; i++)
+        // fill out shop
+        int shopItemsCount = Random.Range(minNumOfShopItems, maxNumOfShopItems);
+        for (int i = 0; i < shopItemsCount; i++)
         {
-            GameObject panelGO = Instantiate(_itemPrefab, _shopGrid.transform);
+            ItemData item = possibleShopItems[Random.Range(0, possibleShopItems.Count)];
+            GameObject itemGO = Instantiate(_itemPrefab, _shopGrid.transform);
+            itemGO.GetComponent<ItemUI>().SetData(item, this);
         }
 
+        // fill out inventory
         for (int i = 0; i < 6; i++)
         {
             GameObject panelGO = Instantiate(_itemPrefab, _inventoryGrid.transform);
         }
 
         UpdateGoldText();
+    }
+
+    public void HandleItemHoverStart(ItemData item)
+    {
+        equipToolTip.SetItem(item);
+    }
+
+    public void HandleItemHoverEnd()
+    {
+        equipToolTip.Hide();
     }
 
     private void AddCharacterPanel(GameCharacter character)
@@ -92,7 +116,14 @@ public class DecisionsManager : MonoBehaviour
 
     private void UpdateGoldText()
     {
-        _goldText.text = "Gold: " + GameManager.Instance.PlayerGold.ToString();
+        if (GameManager.Instance != null)
+        {
+            _goldText.text = "Gold: " + GameManager.Instance.PlayerGold.ToString();
+        }
+        else
+        {
+            _goldText.text = "Gold: " + 200;
+        }
     }
 
     private void ShowRecruitsScreen()

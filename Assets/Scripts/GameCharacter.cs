@@ -30,6 +30,15 @@ public class GameCharacter
     public int HitPoints => _hitPoints;
     private int _hitPoints;
 
+    public ArmorItemData HeadItem => _headItem;
+    private ArmorItemData _headItem;
+
+    public ArmorItemData BodyItem => _bodyItem;
+    private ArmorItemData _bodyItem;
+
+    public WeaponItemData WeaponItem => _weaponItem;
+    private WeaponItemData _weaponItem;
+
     //public Sprite FaceSprite => _faceSprite;
     //private Sprite _faceSprite;
 
@@ -93,6 +102,29 @@ public class GameCharacter
 
         _initiative = Random.Range(1, 5);
         _hitPoints = Random.Range(3, 5);
+    }
+
+    public ItemData EquipItem(ItemData newItem)
+    {
+        ItemData oldItem = null;
+
+        switch (newItem.itemType)
+        {
+            case ItemType.Helmet:
+                oldItem = _headItem;
+                _headItem = (ArmorItemData) newItem;
+                break;
+            case ItemType.Armor:
+                oldItem = _bodyItem;
+                _bodyItem = (ArmorItemData) newItem;
+                break;
+            case ItemType.Weapon:
+                oldItem = _weaponItem;
+                _weaponItem = (WeaponItemData) newItem;
+                break;
+        }
+
+        return oldItem;
     }
 
     public Motivator GetBiggestMotivator()
