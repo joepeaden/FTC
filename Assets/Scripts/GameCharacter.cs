@@ -104,6 +104,22 @@ public class GameCharacter
         _hitPoints = Random.Range(3, 5);
     }
 
+    public void UnEquipItem(ItemData item)
+    {
+        switch (item.itemType)
+        {
+            case ItemType.Helmet:
+                _headItem = null;
+                break;
+            case ItemType.Armor:
+                _bodyItem = null;
+                break;
+            case ItemType.Weapon:
+                _weaponItem = null;
+                break;
+        }
+    }
+
     public ItemData EquipItem(ItemData newItem)
     {
         ItemData oldItem = null;

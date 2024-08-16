@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Iron Helmet
   description: An acceptable piece of noggin protection.
-  itemSprite: {fileID: 21300000, guid: 9ac4cb9986dd64a39ae73edfb54942c6, type: 3}
+  itemSprite: {fileID: 21300000, guid: 878010f5ae31e4b7d90701a96a107259, type: 3}
   itemPrice: 20
   itemType: 0
   protection: 2

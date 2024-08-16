@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Steel Sword
   description: A true weapon of war.
-  itemSprite: {fileID: 21300000, guid: 066cc7941702be2409b4c86b8dac4ea9, type: 3}
+  itemSprite: {fileID: 21300000, guid: 851653ee4abb04f638781f317540e06d, type: 3}
   itemPrice: 30
   itemType: 2
   damage: 3

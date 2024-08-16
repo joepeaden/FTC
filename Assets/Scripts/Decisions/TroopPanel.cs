@@ -2,13 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.Events;
+using UnityEngine.UI;
 
 public class TroopPanel : MonoBehaviour
 {
-    [SerializeField] TMP_Text troopNameText;
+    [SerializeField] private TMP_Text _troopNameText;
+    [SerializeField] private Button _theButton;
 
-    public void SetupPanel(GameCharacter gameChar)
+    public void SetupPanel(GameCharacter gameChar, UnityAction<GameCharacter> callback)
     {
-        troopNameText.text = gameChar.CharName;
+        _troopNameText.text = gameChar.CharName;
+        _theButton.onClick.AddListener(() => { callback(gameChar); });
+    }
+
+    private void OnDestroy()
+    {
+        _theButton.onClick.RemoveAllListeners();
     }
 }

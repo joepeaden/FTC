@@ -22,6 +22,9 @@ public class GameManager : MonoBehaviour
     public List<GameCharacter> PlayerFollowers => _playerFollowers;
     private List<GameCharacter> _playerFollowers = new();
 
+    public List<ItemData> PlayerInventory => _playerInventory;
+    private List<ItemData> _playerInventory = new();
+
     public GameCharacterData GameCharData => _gameCharData;
     [SerializeField] private GameCharacterData _gameCharData;
 
@@ -51,8 +54,35 @@ public class GameManager : MonoBehaviour
             return newFollower;
         }
 
-
         return null;
+    }
+
+    public void AddGold(int amount)
+    {
+        _playerGold += amount;
+    }
+
+    public void RemoveItem(ItemData item)
+    {
+        if (PlayerInventory.Contains(item))
+        {
+            PlayerInventory.Remove(item);
+        }
+    }
+
+    public bool TryAddItem(ItemData item)
+    {
+        if (item.itemPrice > _playerGold)
+        {
+            return false;
+        }
+
+        _playerGold -= item.itemPrice;
+
+        // add item to player inventory data structure
+        PlayerInventory.Add(item);
+
+        return true;
     }
 
     public void RemoveFollower(GameCharacter follower)

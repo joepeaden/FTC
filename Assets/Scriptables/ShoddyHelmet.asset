@@ -15,7 +15,7 @@ MonoBehaviour:
   itemName: Shoddy Helmet
   description: A poor man's helmet. Hopefully this will at least keep one's head
     dry.
-  itemSprite: {fileID: 21300000, guid: 3d311990b7c2c59478bacea537a60a53, type: 3}
+  itemSprite: {fileID: 21300000, guid: d5567d6d1c6eb486897947b90382d846, type: 3}
   itemPrice: 10
   itemType: 0
   protection: 1

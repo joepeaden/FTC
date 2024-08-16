@@ -12,6 +12,11 @@ public class EquipmentTooltip : MonoBehaviour
 
     public void SetItem(ItemData item)
     {
+        if (item == null)
+        {
+            return;
+        }
+
         gameObject.SetActive(true);
 
         equipmentNameText.text = item.itemName;

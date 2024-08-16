@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.Events;
 
 public class ItemUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
@@ -11,19 +12,48 @@ public class ItemUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     private TMP_Text itemPriceTxt;
     [SerializeField]
     private Image itemSpriteRend;
+    [SerializeField]
+    private Button theButton;
 
     public ItemData Item => _item;
     private ItemData _item;
 
     private DecisionsManager _decisionsManager;
 
-    public void SetData(ItemData theItem, DecisionsManager d)
+    public void SetData(ItemData theItem, DecisionsManager d, UnityAction<ItemUI> callback)
     {
+        _decisionsManager = d;
+
+        if (theItem == null)
+        {
+            return;
+        }
+
         itemSpriteRend.sprite = theItem.itemSprite;
         itemPriceTxt.text = theItem.itemPrice.ToString();
         _item = theItem;
+        
+        theButton.onClick.AddListener(() => { callback(this); });
+    }
 
-        _decisionsManager = d;
+    public void Clear()
+    {
+        // no reason to clear the _decisionsManager, but otherwise clear everything out
+
+        itemSpriteRend.sprite = null;
+        itemPriceTxt.text = "";
+        _item = null;
+        theButton.onClick.RemoveAllListeners();
+    }
+
+    public void SetCallback(UnityAction<ItemUI> callback)
+    {
+        theButton.onClick.AddListener(() => { callback(this); });
+    }
+
+    public void RemoveCallbacks()
+    {
+        theButton.onClick.RemoveAllListeners();
     }
 
     public void OnPointerEnter(PointerEventData eventData)
@@ -34,5 +64,10 @@ public class ItemUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     public void OnPointerExit(PointerEventData eventData)
     {
         _decisionsManager.HandleItemHoverEnd();
+    }
+
+    private void OnDestroy()
+    {
+        theButton.onClick.RemoveAllListeners();
     }
 }
