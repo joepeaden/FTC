@@ -14,7 +14,7 @@ public class GameManager : MonoBehaviour
     private int _potentialRewardAmount;
 
     public int PlayerGold => _playerGold;
-    [SerializeField] private int _playerGold;
+    private int _playerGold;
 
     public GameCharacter PlayerCharacter => _playerCharacter;
     private GameCharacter _playerCharacter;
@@ -40,6 +40,7 @@ public class GameManager : MonoBehaviour
     public void StartNewGame(string playerCharName)
     {
         _playerCharacter = new (playerCharName, true, Random.Range(_gameCharData.minVice, _gameCharData.maxVice), Random.Range(_gameCharData.minVice, _gameCharData.maxVice), Random.Range(_gameCharData.minVice, _gameCharData.maxVice));
+        _playerGold = GameCharData.startingGold;
         SceneManager.LoadScene("DecisionsUI");
     }
 

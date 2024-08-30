@@ -38,7 +38,14 @@ public class DecisionPanel : MonoBehaviour
     {
         _recruit = new();
 
-        goldAmount = 100;
+        if (GameManager.Instance != null)
+        {
+            goldAmount = GameManager.Instance.GameCharData.recruitPrice;
+        }
+        else
+        {
+            goldAmount = 100;
+        }
 
         _numOfEnemiesTxt.gameObject.SetActive(false);
 

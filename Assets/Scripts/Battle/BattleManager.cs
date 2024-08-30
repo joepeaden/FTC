@@ -36,7 +36,9 @@ public class BattleManager : MonoBehaviour
     [SerializeField] GameObject characterInfoPanel;
     [SerializeField] TMP_Text characterNameText;
     [SerializeField] TMP_Text characterMotivatorText;
-    [SerializeField] Image characterImageUI;
+    [SerializeField] PawnHeadPreview currentPawnPreview;
+    [SerializeField] TMP_Text armorText;
+    [SerializeField] StatBar armorBar;
     [SerializeField] TMP_Text healthText;
     [SerializeField] StatBar healthBar;
     [SerializeField] TMP_Text apText;
@@ -159,6 +161,8 @@ public class BattleManager : MonoBehaviour
             characterInfoPanel.SetActive(true);
             characterNameText.text = p.GameChar.CharName;
             characterMotivatorText.text = p.CurrentMotivator.ToString();
+            armorText.text = "AR: " + p.ArmorPoints + "/" + p.MaxArmorPoints;
+            armorBar.SetBar(p.MaxArmorPoints, p.ArmorPoints);
             healthText.text = "HP: " + p.HitPoints + "/" + p.MaxHitPoints;
             healthBar.SetBar(p.MaxHitPoints, p.HitPoints);
             apText.text = "AP: " + p.ActionPoints + "/" + p.MaxActionPoints;
@@ -166,7 +170,9 @@ public class BattleManager : MonoBehaviour
             motText.text = "MOT: " + p.Motivation + "/" + p.MaxMotivation;
             motBar.SetBar(p.MaxMotivation, p.Motivation);
 
-            characterImageUI.sprite = p.GetFace();
+            currentPawnPreview.SetData(p);
+            //currentPawnFace.sprite = p.GetFaceSprite();
+            //currentPawnHelm.sprite = p.GetFaceSprite();
 
             _initStackGO.SetActive(true);
             RefreshInitStackUI();
@@ -356,7 +362,7 @@ public class BattleManager : MonoBehaviour
             }
 
             GameObject pawnPreview = Instantiate(pawnPreviewPrefab, _initStackParent);
-            pawnPreview.GetComponent<Image>().sprite = p.GetFace();
+            pawnPreview.GetComponent<PawnHeadPreview>().SetData(p);
             newChildCount++;
         }
     }

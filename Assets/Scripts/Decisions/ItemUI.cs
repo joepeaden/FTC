@@ -20,8 +20,15 @@ public class ItemUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
     private DecisionsManager _decisionsManager;
 
+    public void Hide()
+    {
+        gameObject.SetActive(false);
+    }
+
     public void SetData(ItemData theItem, DecisionsManager d, UnityAction<ItemUI> callback)
     {
+        gameObject.SetActive(true);
+
         _decisionsManager = d;
 
         if (theItem == null)
@@ -30,7 +37,13 @@ public class ItemUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         }
 
         itemSpriteRend.sprite = theItem.itemSprite;
-        itemPriceTxt.text = theItem.itemPrice.ToString();
+
+        // the character preview ItemUI intances don't have prices
+        if (itemPriceTxt != null)
+        {
+            itemPriceTxt.text = theItem.itemPrice.ToString();
+        }
+
         _item = theItem;
         
         theButton.onClick.AddListener(() => { callback(this); });
@@ -41,7 +54,12 @@ public class ItemUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         // no reason to clear the _decisionsManager, but otherwise clear everything out
 
         itemSpriteRend.sprite = null;
-        itemPriceTxt.text = "";
+
+        if (itemPriceTxt != null)
+        {
+            itemPriceTxt.text = "";
+        }
+
         _item = null;
         theButton.onClick.RemoveAllListeners();
     }

@@ -35,6 +35,10 @@ public class Pawn : MonoBehaviour
     public int HitPoints => _hitPoints;
     private int _hitPoints;
 
+    public int MaxArmorPoints => _gameChar.GetTotalArmor();
+    public int ArmorPoints => _armorPoints;
+    private int _armorPoints;
+
     public int MaxActionPoints => Mathf.Clamp(_motivation * 2, 3, MAX_MOTIVATION*2);
     public int ActionPoints => _actionPoints;
     private int _actionPoints;
@@ -57,6 +61,8 @@ public class Pawn : MonoBehaviour
     [SerializeField] private SpriteRenderer _bodySpriteRend;
     [SerializeField] private SpriteRenderer _leg1SpriteRend;
     [SerializeField] private SpriteRenderer _leg2SpriteRend;
+    [SerializeField] private SpriteRenderer _helmSpriteRend;
+    [SerializeField] private SpriteRenderer _weaponSpriteRend;
 
     public GameCharacter GameChar => _gameChar;
     private GameCharacter _gameChar;
@@ -64,8 +70,7 @@ public class Pawn : MonoBehaviour
     public GameCharacter.Motivator CurrentMotivator => _currentMotivator;
     private GameCharacter.Motivator _currentMotivator;
 
-    public int Damage => _damage;
-    private int _damage = 1;
+    public int Damage => _gameChar.WeaponItem.damage;
 
     private void Awake()
     {
@@ -79,10 +84,21 @@ public class Pawn : MonoBehaviour
         SetTeam(isPlayerTeam);
         _currentMotivator = character.GetBiggestMotivator();
         _hitPoints = character.HitPoints;
+        _armorPoints = character.GetTotalArmor();
 
         // eventually put this in GameCharacter, for now just affected by battle
         _motivation = BASE_MOTIVATION;
         _actionPoints = MaxActionPoints;
+
+        if (_gameChar.WeaponItem != null)
+        {
+            _weaponSpriteRend.sprite = _gameChar.WeaponItem.itemSprite;
+        }
+
+        if (_gameChar.HelmItem != null)
+        {
+            _helmSpriteRend.sprite = _gameChar.HelmItem.itemSprite;
+        }
     }
 
     public void SetTeam(bool onPlayerTeam)
@@ -107,7 +123,7 @@ public class Pawn : MonoBehaviour
         return Mathf.Max(_actionPoints - (tileDist * _baseAPPerTileMoved), -1);
     }
 
-    public Sprite GetFace()
+    public Sprite GetFaceSprite()
     {
         // later, can return more than just a single sprite. For example wounds, current equipment, headgear,
         // hair, etc. I'm not sure how that will work.
@@ -116,6 +132,11 @@ public class Pawn : MonoBehaviour
         //{
             return _headSpriteRend.sprite;
         //}
+    }
+
+    public Sprite GetHelmSprite()
+    {
+        return _helmSpriteRend.sprite;
     }
 
     private void Start()
@@ -358,7 +379,7 @@ public class Pawn : MonoBehaviour
         float hitRoll = Random.Range(0f, 1f);
         if (hitRoll < hitChance)
         {
-            targetPawn.TakeDamage(_damage);
+            targetPawn.TakeDamage(_gameChar.WeaponItem.damage);
             BattleManager.Instance.AddTextNotification(transform.position, "Hit!");
         }
         else
@@ -374,7 +395,15 @@ public class Pawn : MonoBehaviour
     public void TakeDamage(int incomingDamage)
     {
         _anim.Play("GetHit");
-        _hitPoints -= incomingDamage;
+
+        if (_armorPoints > 0)
+        {
+            _armorPoints = Mathf.Max(0, (_armorPoints - incomingDamage));
+        }
+        else
+        {
+            _hitPoints -= incomingDamage;
+        }
 
         if (_hitPoints <= 0)
         {

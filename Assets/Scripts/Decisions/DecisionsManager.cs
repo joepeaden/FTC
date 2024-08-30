@@ -117,7 +117,14 @@ public class DecisionsManager : MonoBehaviour
         // if we're in character detail view then it should equip the item
         if (_charDetail.gameObject.activeInHierarchy)
         {
+            // equip character
             _charDetail.EquipItem(itemUI.Item);
+
+            // remove the item ffrom plyer inventory
+            GameManager.Instance.PlayerInventory.Remove(itemUI.Item);
+
+            // refresh UI for inventory
+            RefreshInventory();
         }
         // if in troops screen don't do anything
         else if (_troopsScreen.activeInHierarchy)

@@ -14,3 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   minVice: 0
   maxVice: 10
+  DefaultWeapon: {fileID: 11400000, guid: 10bfb3287a43940979f35f88999d4de9, type: 2}
+  startingGold: 100
+  recruitPrice: 50

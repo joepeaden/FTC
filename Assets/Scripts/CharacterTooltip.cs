@@ -10,6 +10,7 @@ public class CharacterTooltip : MonoBehaviour
     [SerializeField] TMP_Text characterMotivatorText;
     [SerializeField] TMP_Text hitChanceText;
     [SerializeField] GameObject hitChanceUI;
+    [SerializeField] StatBar armorBar;
     [SerializeField] StatBar healthBar;
     [SerializeField] StatBar apBar;
     [SerializeField] StatBar motBar;
@@ -21,6 +22,7 @@ public class CharacterTooltip : MonoBehaviour
         gameObject.SetActive(true);
         characterNameText.text = p.GameChar.CharName;
         characterMotivatorText.text = p.CurrentMotivator.ToString();
+        armorBar.SetBar(p.MaxArmorPoints, p.ArmorPoints);
         healthBar.SetBar(p.MaxHitPoints, p.HitPoints);
         apBar.SetBar(p.MaxActionPoints, p.ActionPoints);
         motBar.SetBar(p.MaxMotivation, p.Motivation);
@@ -39,6 +41,6 @@ public class CharacterTooltip : MonoBehaviour
         hitChanceUI.SetActive(true);
         hitChanceText.text = "To Hit: " + chance * 100 + "%";
 
-        healthBar.SetBar(_currentPawn.MaxHitPoints, _currentPawn.HitPoints, (_currentPawn.HitPoints - damage));
+        //healthBar.SetBar(_currentPawn.MaxHitPoints, _currentPawn.HitPoints, (_currentPawn.HitPoints - damage));
     }
 }

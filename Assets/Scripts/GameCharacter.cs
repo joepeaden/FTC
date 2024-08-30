@@ -30,8 +30,8 @@ public class GameCharacter
     public int HitPoints => _hitPoints;
     private int _hitPoints;
 
-    public ArmorItemData HeadItem => _headItem;
-    private ArmorItemData _headItem;
+    public ArmorItemData HelmItem => _helmItem;
+    private ArmorItemData _helmItem;
 
     public ArmorItemData BodyItem => _bodyItem;
     private ArmorItemData _bodyItem;
@@ -51,6 +51,8 @@ public class GameCharacter
         _sanctimony = sanctimony;
         _initiative = Random.Range(1, 5);
         _hitPoints = Random.Range(3, 5);
+
+        EquipItem(GameManager.Instance.GameCharData.DefaultWeapon);
     }
 
     public GameCharacter()
@@ -102,6 +104,18 @@ public class GameCharacter
 
         _initiative = Random.Range(1, 5);
         _hitPoints = Random.Range(3, 5);
+
+        EquipItem(GameManager.Instance.GameCharData.DefaultWeapon);
+    }
+
+    public int GetTotalArmor()
+    {
+        if (HelmItem != null)
+        {
+            return HelmItem.protection;
+        }
+
+        return 0;
     }
 
     public void UnEquipItem(ItemData item)
@@ -109,13 +123,13 @@ public class GameCharacter
         switch (item.itemType)
         {
             case ItemType.Helmet:
-                _headItem = null;
+                _helmItem = null;
                 break;
             case ItemType.Armor:
                 _bodyItem = null;
                 break;
             case ItemType.Weapon:
-                _weaponItem = null;
+                _weaponItem = GameManager.Instance.GameCharData.DefaultWeapon;
                 break;
         }
     }
@@ -127,8 +141,8 @@ public class GameCharacter
         switch (newItem.itemType)
         {
             case ItemType.Helmet:
-                oldItem = _headItem;
-                _headItem = (ArmorItemData) newItem;
+                oldItem = _helmItem;
+                _helmItem = (ArmorItemData) newItem;
                 break;
             case ItemType.Armor:
                 oldItem = _bodyItem;

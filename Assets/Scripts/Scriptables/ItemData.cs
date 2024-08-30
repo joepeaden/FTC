@@ -8,6 +8,7 @@ public class ItemData : ScriptableObject
     public Sprite itemSprite;
     public int itemPrice;
     public ItemType itemType;
+    public bool isDefault;
 }
 
 public enum ItemType

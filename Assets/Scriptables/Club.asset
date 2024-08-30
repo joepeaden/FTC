@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dd5a69d4543524cf881e71e538083d38, type: 3}
-  m_Name: RustySword
+  m_Name: Club
   m_EditorClassIdentifier: 
-  itemName: Spear
-  description: The ubiquitous stick with a pointy part on the end.
-  itemSprite: {fileID: 21300000, guid: 5dd9bc25db1ee487fb5661e588f93a1c, type: 3}
-  itemPrice: 50
+  itemName: Club
+  description: A hefty stick.
+  itemSprite: {fileID: 21300000, guid: afeb56ef8a8134c8e9bf7de703e30136, type: 3}
+  itemPrice: 0
   itemType: 2
-  isDefault: 0
-  damage: 2
+  isDefault: 1
+  damage: 1
