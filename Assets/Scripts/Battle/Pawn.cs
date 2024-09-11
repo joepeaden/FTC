@@ -134,11 +134,6 @@ public class Pawn : MonoBehaviour
         //}
     }
 
-    public Sprite GetHelmSprite()
-    {
-        return _helmSpriteRend.sprite;
-    }
-
     private void Start()
     {
         PickStartTile();
@@ -195,6 +190,12 @@ public class Pawn : MonoBehaviour
         {
             BattleManager.Instance.AddTextNotification(transform.position, uiString);
         }
+    }
+
+    // here here here do this
+    public int GetMotivationVsTarget(Pawn target)
+    {
+        return -1;
     }
 
     public int GetMotivationAtTile(Tile targetTile)

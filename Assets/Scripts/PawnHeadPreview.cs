@@ -10,11 +10,11 @@ public class PawnHeadPreview : MonoBehaviour
     {
         headRend.sprite = p.GetFaceSprite();
 
-        Sprite helmSprite = p.GetHelmSprite();
-        if (helmSprite != null)
+        ArmorItemData helm = p.GameChar.HelmItem;
+        if (helm != null)
         {
             helmRend.gameObject.SetActive(true);
-            helmRend.sprite = helmSprite;
+            helmRend.sprite = helm.itemSprite;
         }
         else
         {

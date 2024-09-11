@@ -19,7 +19,9 @@ public class BattleManager : MonoBehaviour
 
     public static BattleManager Instance => _instance;
     private static BattleManager _instance;
-    private List<Pawn> friendlyPawns = new();
+
+    public List<Pawn> PlayerPawns => _playerPawns;
+    private List<Pawn> _playerPawns = new();
 
     [SerializeField] private Button _endTurnButton;
     [SerializeField] TMP_Text turnText;
@@ -69,13 +71,13 @@ public class BattleManager : MonoBehaviour
             enemiesToSpawn = GameManager.Instance.GetNumOfEnemiesToSpawn();
 
             Pawn playerPawn = Instantiate(pawnPrefab, friendlyParent).GetComponent<Pawn>();
-            friendlyPawns.Add(playerPawn);
+            _playerPawns.Add(playerPawn);
             playerPawn.SetCharacter(GameManager.Instance.PlayerCharacter, true);
 
             foreach (GameCharacter character in GameManager.Instance.PlayerFollowers)
             {
                 Pawn newPawn = Instantiate(pawnPrefab, friendlyParent).GetComponent<Pawn>();
-                friendlyPawns.Add(newPawn);
+                _playerPawns.Add(newPawn);
                 newPawn.SetCharacter(character, true);
             }
         }
@@ -88,7 +90,7 @@ public class BattleManager : MonoBehaviour
             for (int i = 0; i < DEFAULT_AMOUNT_TO_SPAWN; i++)
             {
                 Pawn newPawn = Instantiate(pawnPrefab, friendlyParent).GetComponent<Pawn>();
-                friendlyPawns.Add(newPawn);
+                _playerPawns.Add(newPawn);
                 newPawn.SetCharacter(new GameCharacter(), true);
             }
         }
@@ -300,7 +302,7 @@ public class BattleManager : MonoBehaviour
     private List<Pawn> GetFriendlyLivingPawns()
     {
         List<Pawn> livingPawns = new();
-        foreach (Pawn p in friendlyPawns)
+        foreach (Pawn p in _playerPawns)
         {
             if (!p.IsDead)
             {
@@ -389,7 +391,7 @@ public class BattleManager : MonoBehaviour
         else
         {
             int alivePawns = 0;
-            foreach (Pawn p in friendlyPawns)
+            foreach (Pawn p in _playerPawns)
             {
                 if (p.IsDead)
                 {

@@ -37,56 +37,107 @@ public class EnemyAI : MonoBehaviour
         StartCoroutine(DoTurnCoroutine(p));
     }
 
-    private IEnumerator DoTurnCoroutine(Pawn p)
+    private IEnumerator DoTurnCoroutine(Pawn activePawn)
     {
         // just add a pause so it's not jarring how fast turns change
         yield return new WaitForSeconds(1f);
 
-        Pawn activePawn = p;
+        // see if there's anyone adjacent to attack, if so, attack
+        Pawn adjacentPawn = GetAdjacentTarget(activePawn);
+        if (adjacentPawn != null)
+        {
+            activePawn.AttackPawnIfAPAvailable(adjacentPawn);
+        }
+        // add comment
+        else
+        {
+            // dictionary is (pawn, advantagerating)  
+            Dictionary<Pawn, int> pawnAdvantageDict = new();
+            foreach (Pawn p in BattleManager.Instance.PlayerPawns)
+            {
+                if (p.IsDead)
+                {
+                    continue;
+                }
 
-        // see if there's anyone adjacent to attack
+                pawnAdvantageDict[p] = 0;
+            }
+
+            int activePawnEqRating = (activePawn.GameChar.GetTotalArmor() + activePawn.GameChar.WeaponItem.damage);
+            foreach (Pawn targetPawn in pawnAdvantageDict.Keys)
+            {
+                // get equipment advantage values
+                int targetEqRating = (targetPawn.GameChar.GetTotalArmor() + targetPawn.GameChar.WeaponItem.damage);
+                pawnAdvantageDict[targetPawn] = activePawnEqRating -  targetEqRating;
+
+                // get vice condition values
+
+                // need to figure this out
+                switch (activePawn.CurrentMotivator)
+                {
+                    case GameCharacter.Motivator.Sanctimony:
+
+                        // should I even do this?
+                        activePawn.GetMotivationVsTarget(targetPawn);
+
+                        //pawnAdvantageDict[targetPawn]
+                        break;
+
+                    case GameCharacter.Motivator.Avarice:
+                        break;
+
+                    case GameCharacter.Motivator.Vainglory:
+                        break;
+                }
+            }
+
+
+
+
+            //List<Tile> moveOptions = activePawn.CurrentTile.GetTilesInMoveRange();
+            //Tile tileToMoveTo;
+
+            //for (int i = 0; i < moveOptions.Count; i++)
+            //{
+            //    Tile t = moveOptions[i];
+            //    if (t.GetPawn() != null)
+            //    {
+            //        moveOptions.Remove(t);
+            //    }
+            //}
+
+            // for some reason sometimes the t.GetPawn null check above will
+            // fail, so just keep picking random tiles till there's a free one
+            //do
+            //{
+            //    tileToMoveTo = moveOptions[Random.Range(0, moveOptions.Count)];
+            //}
+            //while (tileToMoveTo.GetPawn() != null) ; 
+
+
+            //activePawn.MoveToTileIfAPAvailable(tileToMoveTo);
+        }
+    }
+
+    /// <summary>
+    /// Go through adjacent tiles and return the first player team pawn found,
+    /// if none return null
+    /// </summary>
+    /// <param name="activePawn"></param>
+    /// <returns></returns>
+    private Pawn GetAdjacentTarget(Pawn activePawn)
+    {
         Pawn targetPawn = null;
-        bool hasFoundTarget = false;
         foreach (Tile t in activePawn.CurrentTile.GetAdjacentTiles())
         {
             targetPawn = t.GetPawn();
             if (targetPawn != null && targetPawn.OnPlayerTeam)
             {
-                hasFoundTarget = true;
                 break;
             }
         }
 
-        if (hasFoundTarget)
-        {
-            activePawn.AttackPawnIfAPAvailable(targetPawn);
-        }
-        else
-        {
-            // At this point, we have not attacked anyone, so find somewhere to move
-            List<Tile> moveOptions = activePawn.CurrentTile.GetTilesInMoveRange();
-            Tile tileToMoveTo;
-
-            for (int i = 0; i < moveOptions.Count; i++)
-            {
-                Tile t = moveOptions[i];
-                if (t.GetPawn() != null)
-                {
-                    moveOptions.Remove(t);
-                }
-            }
-
-            // for some reason sometimes the t.GetPawn null check above will
-            // fail, so just keep picking random tiles till there's a free one
-            do
-            {
-                tileToMoveTo = moveOptions[Random.Range(0, moveOptions.Count)];
-            }
-            while (tileToMoveTo.GetPawn() != null) ; 
-            
-
-            activePawn.MoveToTileIfAPAvailable(tileToMoveTo);
-        }
+        return targetPawn;
     }
 
 
