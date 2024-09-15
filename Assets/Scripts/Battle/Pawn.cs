@@ -193,10 +193,10 @@ public class Pawn : MonoBehaviour
     }
 
     // here here here do this
-    public int GetMotivationVsTarget(Pawn target)
-    {
-        return -1;
-    }
+    //public int GetMotivationVsTarget(Pawn target)
+    //{
+    //    return GetMotivationAtTile(target.CurrentTile);
+    //}
 
     public int GetMotivationAtTile(Tile targetTile)
     {
@@ -447,15 +447,40 @@ public class Pawn : MonoBehaviour
         _actionPoints = MaxActionPoints;
     }
 
-    public void MoveToTileIfAPAvailable(Tile actionTile)
+    /// <summary>
+    /// Move as close as possible to the tile. If not enough AP, pick the next
+    /// closest tile that there is enough AP for
+    /// </summary>
+    /// <param name="targetTile"></param>
+    /// <returns></returns>
+    public void TryMoveToTile(Tile targetTile)
     {
-        int tileDistance = _currentTile.GetTileDistance(actionTile);
-        if (_actionPoints < _baseAPPerTileMoved * tileDistance)
+        if (_actionPoints < _baseAPPerTileMoved)
         {
             return;
         }
 
-        Vector3 position = actionTile.transform.position;
+        Tile adjustedTargetTile = targetTile;
+        int tileDistance = _currentTile.GetTileDistance(targetTile);
+        if (_actionPoints < _baseAPPerTileMoved * tileDistance)
+        {
+            List<Tile> moveOptions = _currentTile.GetTilesInMoveRange();
+
+            for (int i = 0; i < moveOptions.Count; i++)
+            {
+                Tile t = moveOptions[i];
+                if (t.GetPawn() != null)
+                {
+                    moveOptions.Remove(t);
+                }
+            }
+
+            moveOptions = moveOptions.OrderBy(x => (x.transform.position - targetTile.transform.position).magnitude).ToList();
+
+            adjustedTargetTile = moveOptions.First();
+        }
+
+        Vector3 position = adjustedTargetTile.transform.position;
 
         pathfinder.destination = position;
         pathfinder.enabled = true;
@@ -474,7 +499,7 @@ public class Pawn : MonoBehaviour
         }
 
         _currentTile.PawnExitTile();
-        _currentTile = actionTile;
+        _currentTile = adjustedTargetTile;
     }
 
     public void HandleDestinationReached()

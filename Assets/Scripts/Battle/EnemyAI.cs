@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -10,8 +11,6 @@ public class EnemyAI : MonoBehaviour
     public void RegisterPawn(Pawn p)
     {
         _pawns.Add(p);
-        GameCharacter guy = new();
-        p.SetCharacter(guy, false);
     }
 
     public List<Pawn> GetLivingPawns()
@@ -51,48 +50,76 @@ public class EnemyAI : MonoBehaviour
         // add comment
         else
         {
-            // dictionary is (pawn, advantagerating)  
-            Dictionary<Pawn, int> pawnAdvantageDict = new();
-            foreach (Pawn p in BattleManager.Instance.PlayerPawns)
-            {
-                if (p.IsDead)
-                {
-                    continue;
-                }
-
-                pawnAdvantageDict[p] = 0;
-            }
+            // dictionary is (tile, advantagerating)  
+            Dictionary<Tile, int> moveRatingDict = new();
 
             int activePawnEqRating = (activePawn.GameChar.GetTotalArmor() + activePawn.GameChar.WeaponItem.damage);
-            foreach (Pawn targetPawn in pawnAdvantageDict.Keys)
+            foreach (Pawn targetPawn in BattleManager.Instance.PlayerPawns)
             {
                 // get equipment advantage values
                 int targetEqRating = (targetPawn.GameChar.GetTotalArmor() + targetPawn.GameChar.WeaponItem.damage);
-                pawnAdvantageDict[targetPawn] = activePawnEqRating -  targetEqRating;
+                int eqAdvantageRating = activePawnEqRating - targetEqRating;
 
                 // get vice condition values
 
                 // need to figure this out
-                switch (activePawn.CurrentMotivator)
+                //switch (activePawn.CurrentMotivator)
+                //{
+                //    case GameCharacter.Motivator.Sanctimony:
+
+                //        // should I even do this?
+                //        activePawn.GetMotivationVsTarget(targetPawn);
+
+                //        //pawnAdvantageDict[targetPawn]
+                //        break;
+
+                //    case GameCharacter.Motivator.Avarice:
+                //        break;
+
+                //    case GameCharacter.Motivator.Vainglory:
+                //        break;
+                //}
+
+                // we're going to have to considerm motivation values at each target
+                // tile and pick the best one.
+                int maxMotivation = int.MinValue;
+                Tile bestTargetTile = null;
+                foreach (Tile potentialTargetTile in targetPawn.CurrentTile.GetAdjacentTiles())
                 {
-                    case GameCharacter.Motivator.Sanctimony:
+                    // don't consider if someone's there
+                    if (potentialTargetTile.GetPawn() != null)
+                    {
+                        continue;
+                    }
 
-                        // should I even do this?
-                        activePawn.GetMotivationVsTarget(targetPawn);
+                    int motATTile = activePawn.GetMotivationAtTile(potentialTargetTile);
 
-                        //pawnAdvantageDict[targetPawn]
-                        break;
+                    if (motATTile > maxMotivation)
+                    {
+                        maxMotivation = motATTile;
+                        bestTargetTile = potentialTargetTile;
+                    }
+                }
 
-                    case GameCharacter.Motivator.Avarice:
-                        break;
-
-                    case GameCharacter.Motivator.Vainglory:
-                        break;
+                // could be null if all positions around target are occupied
+                if (bestTargetTile != null)
+                {
+                    moveRatingDict[bestTargetTile] = maxMotivation + eqAdvantageRating;
                 }
             }
 
+            int bestOdds = int.MinValue;
+            Tile bestTile = activePawn.CurrentTile;
+            foreach (Tile t in moveRatingDict.Keys)
+            {
+                if (bestOdds < moveRatingDict[t])
+                {
+                    bestOdds = moveRatingDict[t];
+                    bestTile = t;
+                }
+            }
 
-
+            activePawn.TryMoveToTile(bestTile);
 
             //List<Tile> moveOptions = activePawn.CurrentTile.GetTilesInMoveRange();
             //Tile tileToMoveTo;
@@ -135,8 +162,11 @@ public class EnemyAI : MonoBehaviour
             {
                 break;
             }
+            else
+            {
+                targetPawn = null;
+            }
         }
-
         return targetPawn;
     }
 

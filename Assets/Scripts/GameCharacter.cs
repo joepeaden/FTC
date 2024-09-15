@@ -105,7 +105,10 @@ public class GameCharacter
         _initiative = Random.Range(1, 5);
         _hitPoints = Random.Range(3, 5);
 
-        EquipItem(GameManager.Instance.GameCharData.DefaultWeapon);
+        if (GameManager.Instance != null)
+        {
+            EquipItem(GameManager.Instance.GameCharData.DefaultWeapon);
+        }
     }
 
     public int GetTotalArmor()

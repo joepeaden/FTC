@@ -2595,6 +2595,7 @@ MonoBehaviour:
   charTooltip: {fileID: 421704842}
   _instructionsUI: {fileID: 1434978725}
   _startBattleButton: {fileID: 1854831978}
+  testWeapon: {fileID: 11400000, guid: 10bfb3287a43940979f35f88999d4de9, type: 2}
 --- !u!114 &756036164
 MonoBehaviour:
   m_ObjectHideFlags: 0

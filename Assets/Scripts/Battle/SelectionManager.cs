@@ -64,7 +64,7 @@ public class SelectionManager : MonoBehaviour
                                 }
                                 else if (newTile.IsInMoveRange && targetPawn == null)
                                 {
-                                    currentPawn.MoveToTileIfAPAvailable(newTile);
+                                    currentPawn.TryMoveToTile(newTile);
                                 }
                             }
                         }

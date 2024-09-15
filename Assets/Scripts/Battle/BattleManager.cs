@@ -54,6 +54,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private CharacterTooltip charTooltip;
     [SerializeField] private GameObject _instructionsUI;
     [SerializeField] private Button _startBattleButton;
+    [SerializeField] private WeaponItemData testWeapon;
 
     private Stack<Pawn> _initiativeStack = new ();
 
@@ -91,13 +92,22 @@ public class BattleManager : MonoBehaviour
             {
                 Pawn newPawn = Instantiate(pawnPrefab, friendlyParent).GetComponent<Pawn>();
                 _playerPawns.Add(newPawn);
-                newPawn.SetCharacter(new GameCharacter(), true);
+
+                GameCharacter testCharacter = new GameCharacter();
+                testCharacter.EquipItem(testWeapon);
+
+                newPawn.SetCharacter(testCharacter, true);
             }
         }
 
         for (int i = 0; i < enemiesToSpawn; i++)
         {
             Pawn newPawn = Instantiate(pawnPrefab, enemyParent).GetComponent<Pawn>();
+
+            GameCharacter guy = new();
+            guy.EquipItem(testWeapon);
+            newPawn.SetCharacter(guy, false);
+
             _enemyAI.RegisterPawn(newPawn);
         }
 
