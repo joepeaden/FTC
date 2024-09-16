@@ -21,7 +21,7 @@ public class Tile : MonoBehaviour
     private bool _isSelected;
     public bool IsInMoveRange => _isInMoveRange;
     private bool _isInMoveRange;
-    private List<Tile> adjacentTiles = new();
+    private List<Tile> _adjacentTiles = new();
 
     public Point Coordinates => _coordinates;
     private Point _coordinates;
@@ -49,32 +49,32 @@ public class Tile : MonoBehaviour
 
         if (tiles.ContainsKey(p))
         {
-            adjacentTiles.Add(tiles[p]);
+            _adjacentTiles.Add(tiles[p]);
         }
 
         p.X = coord.X - 1;
         if (tiles.ContainsKey(p))
         {
-            adjacentTiles.Add(tiles[p]);
+            _adjacentTiles.Add(tiles[p]);
         }
 
         p.Y = coord.Y + 1;
         p.X = coord.X;
         if (tiles.ContainsKey(p))
         {
-            adjacentTiles.Add(tiles[p]);
+            _adjacentTiles.Add(tiles[p]);
         }
 
         p.Y = coord.Y - 1;
         if (tiles.ContainsKey(p))
         {
-            adjacentTiles.Add(tiles[p]);
+            _adjacentTiles.Add(tiles[p]);
         }
     }
 
     public List<Tile> GetAdjacentTiles()
     {
-        return adjacentTiles;
+        return _adjacentTiles;
     }
 
     public int GetTileDistance(Tile targetTile)
@@ -107,7 +107,7 @@ public class Tile : MonoBehaviour
 
     public bool IsAdjacentTo(Tile t)
     {
-        return adjacentTiles.Contains(t);
+        return _adjacentTiles.Contains(t);
     }
 
     public void ToggleSelected()
@@ -124,7 +124,7 @@ public class Tile : MonoBehaviour
 
         int pawnMoveRange = _pawn.MoveRange;
         List<Tile> tilesInRange = new();
-        foreach (Tile t in adjacentTiles)
+        foreach (Tile t in _adjacentTiles)
         {
             t.GetTilesInMoveRangeRecursive(pawnMoveRange, tilesInRange);
         }
@@ -136,7 +136,6 @@ public class Tile : MonoBehaviour
     {
         if (pawnMoveRange > 0)
         {
-            tilesInRange.Add(this);
             pawnMoveRange--;
 
             if (!_isSelected)
@@ -144,7 +143,7 @@ public class Tile : MonoBehaviour
                 tilesInRange.Add(this);
             }
 
-            foreach (Tile t in adjacentTiles)
+            foreach (Tile t in _adjacentTiles)
             {
                 if (!tilesInRange.Contains(t))
                 {
@@ -177,7 +176,7 @@ public class Tile : MonoBehaviour
             if (_isSelected)
             {
                 int charMoveRange = _pawn.MoveRange;
-                foreach (Tile t in adjacentTiles)
+                foreach (Tile t in _adjacentTiles)
                 {
                     t.ColorTilesInMoveRange(charMoveRange, true);
                 }
@@ -185,7 +184,7 @@ public class Tile : MonoBehaviour
             else
             {
                 int charMoveRange = _pawn.MoveRange;
-                foreach (Tile t in adjacentTiles)
+                foreach (Tile t in _adjacentTiles)
                 {
                     t.ColorTilesInMoveRange(charMoveRange, false);
                 }
@@ -206,7 +205,7 @@ public class Tile : MonoBehaviour
                 _isInMoveRange = isHighlighting;
             }
 
-            foreach (Tile t in adjacentTiles)
+            foreach (Tile t in _adjacentTiles)
             {
                 t.ColorTilesInMoveRange(moveRange, isHighlighting);
             }
