@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08423bf94f3ec4f97b843abe2c28ede4, type: 3}
   m_Name: GameCharacterData
   m_EditorClassIdentifier: 
-  minVice: 0
-  maxVice: 10
+  minVice: 1
+  maxVice: 4
   DefaultWeapon: {fileID: 11400000, guid: 10bfb3287a43940979f35f88999d4de9, type: 2}
   startingGold: 100
   recruitPrice: 50

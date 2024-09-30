@@ -48,11 +48,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4568fb15ab62d42bf9be2379ed15af26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _baseAPPerTileMoved: 2
   _baseAPPerAttack: 3
   baseHitChance: 0.6
   baseDodgeChance: 0
   baseSurroundBonus: 0.2
+  MaxActionPoints: 6
   pathfinder: {fileID: 5092988425437815376}
   _anim: {fileID: 3764665701983993892}
   _enemyHeadSprite: {fileID: 21300000, guid: e6da235dd98984c0f8ec788d6da0f094, type: 3}

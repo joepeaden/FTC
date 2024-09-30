@@ -10,12 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5494fd04dbee14f34b60b102d5cb9856, type: 3}
-  m_Name: SteelHelmet
+  m_Name: SoldierHelm
   m_EditorClassIdentifier: 
-  itemName: Veteran's Helm
-  description: A well-crafted helmet that even shines a little.d.
-  itemSprite: {fileID: 21300000, guid: 0d1393c7a36d34fe8b64111af830ca2f, type: 3}
-  itemPrice: 200
+  itemName: Soldier Helmet
+  description: An acceptable piece of noggin protection.
+  itemSprite: {fileID: 21300000, guid: 878010f5ae31e4b7d90701a96a107259, type: 3}
+  itemPrice: 100
   itemType: 0
   isDefault: 0
-  protection: 3
+  protection: 2
+  moveMod: -1
+  initMod: -1

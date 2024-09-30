@@ -51,15 +51,15 @@ public class DecisionPanel : MonoBehaviour
 
         _titleText.text = _recruit.CharName;
 
-        switch (_recruit.GetBiggestMotivator())
+        switch (_recruit.Vice)
         {
-            case GameCharacter.Motivator.Avarice:
+            case GameCharacter.CharVices.Greed:
                 _descriptionText.text = _recruit.CharName + " desires wealth and posessions above all other things.";
                 break;
-            case GameCharacter.Motivator.Sanctimony:
+            case GameCharacter.CharVices.Honor:
                 _descriptionText.text = _recruit.CharName + " is righteous and honorable - and full of arrogance.";
                 break;
-            case GameCharacter.Motivator.Vainglory:
+            case GameCharacter.CharVices.Glory:
                 _descriptionText.text = _recruit.CharName + " wishes the crowds to know his name, be it by amazing deed or brutal death.";
                 break;
         }

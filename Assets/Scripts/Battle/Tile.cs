@@ -7,6 +7,8 @@ using UnityEngine.Events;
 
 public class Tile : MonoBehaviour
 {
+    public const int BASE_AP_TO_TRAVERSE = 2;
+
     public static UnityEvent<Tile> OnTileHoverStart = new();
     public static UnityEvent<Tile> OnTileHoverEnd = new();
     private static UnityEvent OnTileSelectChange = new();

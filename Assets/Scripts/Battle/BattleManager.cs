@@ -172,14 +172,14 @@ public class BattleManager : MonoBehaviour
         {
             characterInfoPanel.SetActive(true);
             characterNameText.text = p.GameChar.CharName;
-            characterMotivatorText.text = p.CurrentMotivator.ToString();
+            characterMotivatorText.text = p.CurrentVice.ToString();
             armorText.text = "AR: " + p.ArmorPoints + "/" + p.MaxArmorPoints;
             armorBar.SetBar(p.MaxArmorPoints, p.ArmorPoints);
             healthText.text = "HP: " + p.HitPoints + "/" + p.MaxHitPoints;
             healthBar.SetBar(p.MaxHitPoints, p.HitPoints);
-            apText.text = "AP: " + p.ActionPoints + "/" + p.MaxActionPoints;
-            apBar.SetBar(p.MaxActionPoints, p.ActionPoints);
-            motText.text = "MOT: " + p.Motivation + "/" + p.MaxMotivation;
+            apText.text = "AP: " + p.ActionPoints + "/" + Pawn.BASE_ACTION_POINTS;
+            apBar.SetBar(Pawn.BASE_ACTION_POINTS, p.ActionPoints);
+            motText.text = "MT: " + p.Motivation + "/" + p.MaxMotivation;
             motBar.SetBar(p.MaxMotivation, p.Motivation);
 
             currentPawnPreview.SetData(p);
@@ -213,11 +213,7 @@ public class BattleManager : MonoBehaviour
             if (targetPawn == null)
             {
                 int expectedAPAfterMove = selectedPawn.GetAPAfterMove(targetTile);
-                apBar.SetBar(selectedPawn.MaxActionPoints, selectedPawn.ActionPoints, expectedAPAfterMove);
-
-                int expectedMotAfterMove = selectedPawn.GetMotivationAtTile(targetTile);
-                //Debug.Log("Expected MOT:" + expectedMotAfterMove);
-                motBar.SetBar(selectedPawn.MaxMotivation, selectedPawn.Motivation, expectedMotAfterMove);
+                apBar.SetBar(Pawn.BASE_ACTION_POINTS, selectedPawn.ActionPoints, expectedAPAfterMove);
 
             }
             else
@@ -225,12 +221,12 @@ public class BattleManager : MonoBehaviour
                 ShowTooltipForPawn(targetPawn);
                 if (selectedPawn.OnPlayerTeam != targetPawn.OnPlayerTeam)
                 {
-                    apBar.SetBar(selectedPawn.MaxActionPoints, selectedPawn.ActionPoints, selectedPawn.GetAPAfterAttack());
+                    apBar.SetBar(Pawn.BASE_ACTION_POINTS, selectedPawn.ActionPoints, selectedPawn.GetAPAfterAttack());
                 }
                 else
                 {
                     // otherwise we might be hovering ourselves or a teammate so reset the AP Bar
-                    apBar.SetBar(selectedPawn.MaxActionPoints, selectedPawn.ActionPoints);
+                    apBar.SetBar(Pawn.BASE_ACTION_POINTS, selectedPawn.ActionPoints);
                 }
             }
         }
@@ -340,7 +336,7 @@ public class BattleManager : MonoBehaviour
             pawnList.Add(p);
         }
         
-        pawnList = pawnList.OrderBy(pawn => pawn.GameChar.Initiative).ToList();
+        pawnList = pawnList.OrderBy(pawn => pawn.GameChar.GetInitiative()).ToList();
 
         // this way the stack can be sorted properly 
         _initiativeStack = new(pawnList);

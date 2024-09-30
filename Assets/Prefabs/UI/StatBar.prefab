@@ -178,7 +178,6 @@ MonoBehaviour:
   statPipPrefab: {fileID: 7023157330226876881, guid: fc3647922fa0c450689d51a5f7230573, type: 3}
   statBarParent: {fileID: 657217948656527860}
   fill: {r: 1, g: 0, b: 0, a: 1}
-  fill2: {r: 0.3584906, g: 0.1268245, b: 0.1268245, a: 1}
   bgFill: {r: 0, g: 0, b: 0, a: 1}
 --- !u!1 &8731446838564389718
 GameObject:
@@ -237,7 +236,7 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 4
-  m_Spacing: 5
+  m_Spacing: 0
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 1

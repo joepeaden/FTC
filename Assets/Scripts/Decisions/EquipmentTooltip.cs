@@ -5,8 +5,19 @@ public class EquipmentTooltip : MonoBehaviour
 {
     [SerializeField] TMP_Text equipmentNameText;
     [SerializeField] TMP_Text descriptionText;
-    [SerializeField] TMP_Text statText;
-    [SerializeField] StatBar statBar;
+
+    [SerializeField] GameObject armorElements;
+    [SerializeField] TMP_Text protValue;
+    [SerializeField] GameObject moveModElements;
+    [SerializeField] TMP_Text moveModValue;
+    [SerializeField] GameObject initModElements;
+    [SerializeField] TMP_Text initModValue;
+    [SerializeField] GameObject viceModElements;
+    [SerializeField] TMP_Text viceModLabel;
+    [SerializeField] TMP_Text viceModValue;
+
+    [SerializeField] GameObject weaponElements;
+    [SerializeField] TMP_Text dmgValue;
 
     private ItemData _currentItem;
 
@@ -24,19 +35,55 @@ public class EquipmentTooltip : MonoBehaviour
 
         if (item.itemType == ItemType.Weapon)
         {
+            weaponElements.SetActive(true);
+            armorElements.SetActive(false);
             WeaponItemData weaponItem = (WeaponItemData)item;
-            statBar.SetBar(WeaponItemData.MAX_WEAPON_DAMAGE, weaponItem.damage);
-            statText.text = "DMG: " + weaponItem.damage;
+            dmgValue.text = weaponItem.damage.ToString();
         }
         else
         {
+            weaponElements.SetActive(false);
+            armorElements.SetActive(true);
             ArmorItemData armorItem = (ArmorItemData)item;
-            statBar.SetBar(ArmorItemData.MAX_ARMOR_PROTECTION, armorItem.protection);
-            statText.text = "PROT: " + armorItem.protection;
+            protValue.text = armorItem.protection.ToString();
+
+            UpdateModText(moveModElements, moveModValue, armorItem.moveMod);
+            UpdateModText(initModElements, initModValue, armorItem.initMod);
+            UpdateModText(viceModElements, viceModValue, armorItem.viceMod);
+            if (armorItem.viceMod != 0)
+            {
+                switch (armorItem.viceToMod)
+                {
+                    case GameCharacter.CharVices.Greed:
+                        viceModLabel.text = "GRD:";
+                        break;
+                    case GameCharacter.CharVices.Honor:
+                        viceModLabel.text = "HNR:";
+                        break;
+                    case GameCharacter.CharVices.Glory:
+                        viceModLabel.text = "GLY:";
+                        break;
+                }
+            }
         }
 
         _currentItem = item;
     }
+
+    private void UpdateModText(GameObject parentGO, TMP_Text valueText, int modifierValue)
+    {
+        if (modifierValue == 0)
+        {
+            valueText.gameObject.SetActive(false);
+            parentGO.gameObject.SetActive(false);
+        }
+        else
+        {
+            valueText.gameObject.SetActive(true);
+            parentGO.gameObject.SetActive(true);
+            valueText.text = modifierValue > 0 ? "+" + modifierValue.ToString() : modifierValue.ToString();
+        }
+    }    
 
     public void Hide()
     {

@@ -10,12 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5494fd04dbee14f34b60b102d5cb9856, type: 3}
-  m_Name: ShoddyHelmet
+  m_Name: FancyPeasantHelm
   m_EditorClassIdentifier: 
-  itemName: Peasant Helm
-  description: A poor man's helmet. Offers warmth and a little protection.
-  itemSprite: {fileID: 21300000, guid: d5567d6d1c6eb486897947b90382d846, type: 3}
-  itemPrice: 50
+  itemName: Fancy Helm
+  description: A helm designed more for fashion than combat.
+  itemSprite: {fileID: 21300000, guid: 8eb2ff5d15ad57044863329a435b3394, type: 3}
+  itemPrice: 200
   itemType: 0
   isDefault: 0
   protection: 1
+  moveMod: 0
+  initMod: 0
+  viceToMod: 0
+  viceMod: 3

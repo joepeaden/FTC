@@ -60,7 +60,7 @@ public class SelectionManager : MonoBehaviour
                                 Pawn targetPawn = newTile.GetPawn();
                                 if (targetPawn != null && newTile.IsAdjacentTo(_selectedTile) && targetPawn.OnPlayerTeam != currentPawn.OnPlayerTeam)
                                 {
-                                    currentPawn.AttackPawnIfAPAvailable(targetPawn);
+                                    currentPawn.AttackPawnIfResourcesAvailable(targetPawn);
                                 }
                                 else if (newTile.IsInMoveRange && targetPawn == null)
                                 {

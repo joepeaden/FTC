@@ -7,23 +7,17 @@ using UnityEngine.Events;
 
 public class Pawn : MonoBehaviour
 {
-    /// <summary>
-    /// Lol idk what to call it. Update motivation for pawns.
-    /// </summary>
-    private static UnityEvent PleaseUpdateMotivation = new();
+    private const int MOT_REGAIN_RATE = 10;
+    private const int MOT_BASIC_ATTACK_COST = 10;
+    public const int BASE_ACTION_POINTS = 6;
 
-    private const int BASE_MOTIVATION = 3;
-    private const int MIN_MOTIVATION = 1;
-    private const int MAX_MOTIVATION = 6;
-
-    [SerializeField] private int _baseAPPerTileMoved;
     [SerializeField] private int _baseAPPerAttack;
 
     public float baseHitChance;
     public float baseDodgeChance;
     public float baseSurroundBonus;
 
-    public int MoveRange => _actionPoints/_baseAPPerTileMoved;
+    public int MoveRange => _actionPoints/_gameChar.GetAPPerTileMoved();
 
     public Tile CurrentTile => _currentTile;
     private Tile _currentTile;
@@ -39,11 +33,10 @@ public class Pawn : MonoBehaviour
     public int ArmorPoints => _armorPoints;
     private int _armorPoints;
 
-    public int MaxActionPoints => Mathf.Clamp(_motivation * 2, 3, MAX_MOTIVATION*2);
     public int ActionPoints => _actionPoints;
     private int _actionPoints;
 
-    public int MaxMotivation => MAX_MOTIVATION;
+    public int MaxMotivation => GameChar.GetBattleMotivationCap();
     public int Motivation => _motivation;
     private int _motivation;
 
@@ -67,28 +60,24 @@ public class Pawn : MonoBehaviour
     public GameCharacter GameChar => _gameChar;
     private GameCharacter _gameChar;
 
-    public GameCharacter.Motivator CurrentMotivator => _currentMotivator;
-    private GameCharacter.Motivator _currentMotivator;
+    public GameCharacter.CharVices CurrentVice => _gameChar.Vice;
 
     public int Damage => _gameChar.WeaponItem.damage;
 
     private void Awake()
     {
         pathfinder.OnDestinationReached.AddListener(HandleDestinationReached);
-        PleaseUpdateMotivation.AddListener(UpdateMotivation);
     }
 
     public void SetCharacter(GameCharacter character, bool isPlayerTeam)
     {
         _gameChar = character;
         SetTeam(isPlayerTeam);
-        _currentMotivator = character.GetBiggestMotivator();
         _hitPoints = character.HitPoints;
         _armorPoints = character.GetTotalArmor();
 
-        // eventually put this in GameCharacter, for now just affected by battle
-        _motivation = BASE_MOTIVATION;
-        _actionPoints = MaxActionPoints;
+        _motivation = GameChar.GetBattleMotivationCap();
+        _actionPoints = BASE_ACTION_POINTS;
 
         if (_gameChar.WeaponItem != null)
         {
@@ -120,7 +109,7 @@ public class Pawn : MonoBehaviour
         }
 
         int tileDist = _currentTile.GetTileDistance(targetTile);
-        return Mathf.Max(_actionPoints - (tileDist * _baseAPPerTileMoved), -1);
+        return Mathf.Max(_actionPoints - (tileDist * _gameChar.GetAPPerTileMoved()), -1);
     }
 
     public Sprite GetFaceSprite()
@@ -151,153 +140,10 @@ public class Pawn : MonoBehaviour
             transform.rotation *= Quaternion.Euler(0, 180, 0);
         }
     }
-
-    private bool DecayMotivationIfNeeded()
-    {
-        List<Pawn> adjPawns = GetAdjacentEnemies();
-
-        // if there's no one adjacent, then no positive motivation condition (for now),
-        // decay motivation a little if above threshold.
-        if (adjPawns.Count == 0)
-        {
-            if (_motivation > BASE_MOTIVATION)
-            {
-                _motivation--;
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /// <summary>
-    /// Call to update motivation based on current situation
-    /// </summary>
-    /// <param name="motivator"></param>
+    
     private void UpdateMotivation()
     {
-        int oldMotivation = _motivation;
-
-        bool motDecayed = DecayMotivationIfNeeded();
-        if (!motDecayed)
-        {
-            _motivation = GetMotivationAtTile(_currentTile);
-        }
-
-        string uiString = (_motivation > oldMotivation ? "+" : "-") + " MOT";
-
-        if (oldMotivation != _motivation)
-        {
-            BattleManager.Instance.AddTextNotification(transform.position, uiString);
-        }
-    }
-
-    // here here here do this
-    //public int GetMotivationVsTarget(Pawn target)
-    //{
-    //    return GetMotivationAtTile(target.CurrentTile);
-    //}
-
-    public int GetMotivationAtTile(Tile targetTile)
-    {
-        // get adjacent enemy pawns at that tile
-        List<Pawn> adjEnemyPawns = targetTile.GetAdjacentTiles()
-            .Where(tile => tile.GetPawn() != null && tile.GetPawn().OnPlayerTeam != _onPlayerTeam)
-            .Select(tile => tile.GetPawn())
-            .ToList();
-
-        // if there's no one adjacent, then no conditions
-        if (adjEnemyPawns.Count == 0)
-        {
-            return _motivation;
-        }
-
-        int newMotivation = _motivation;
-
-        bool in1v1 = false;
-        bool isGangedUpOn = false;
-        bool isGangingUp = false;
-
-        // only facing one enemy
-        if (adjEnemyPawns.Count == 1)
-        {
-            if (_currentTile == targetTile)
-            {
-                in1v1 = adjEnemyPawns[0].GetAdjacentEnemies().Count == 1;
-            }
-            else
-            {
-                // 0 because this pawn isn't there yet (if we're previewing)
-                in1v1 = adjEnemyPawns[0].GetAdjacentEnemies().Count == 0;
-            }
-        }
-        else
-        {
-            isGangedUpOn = true;
-        }
-
-        foreach (Pawn p in adjEnemyPawns)
-        {
-            if (_currentTile == targetTile)
-            {
-                if (p.GetAdjacentEnemies().Count > 1)
-                {
-                    isGangingUp = true;
-                }
-            }
-            else
-            {
-                if (p.GetAdjacentEnemies().Count > 0)
-                {
-                    isGangingUp = true;
-                }
-            }
-        }
-
-        switch (_currentMotivator)
-        {
-            case GameCharacter.Motivator.Sanctimony:
-                
-                if (in1v1)
-                {
-                    newMotivation += 1;
-                }
-                
-                if (isGangingUp)
-                {
-                    newMotivation -= 1;
-                }
-
-                break;
-
-            case GameCharacter.Motivator.Vainglory:
-                if (isGangedUpOn)
-                {
-                    newMotivation += 1;
-                }
-
-                if (in1v1)
-                {
-                    newMotivation -= 1;
-                }
-                break;
-
-            case GameCharacter.Motivator.Avarice:
-                if (isGangingUp)
-                {
-                    newMotivation += 1;
-                }
-
-                if (isGangedUpOn)
-                {
-                    newMotivation -= 1;
-                }
-                break;
-
-        }
-
-        // make sure to stay in the valid range of motivation
-        return Mathf.Clamp(newMotivation, MIN_MOTIVATION, MAX_MOTIVATION);
+        _motivation = Mathf.Clamp(_motivation + MOT_REGAIN_RATE, _motivation, GameChar.GetBattleMotivationCap());
     }
 
     private void PickStartTile()
@@ -367,9 +213,9 @@ public class Pawn : MonoBehaviour
         return hitChance;
     }
 
-    public void AttackPawnIfAPAvailable(Pawn targetPawn)
+    public void AttackPawnIfResourcesAvailable(Pawn targetPawn)
     {
-        if (_actionPoints < _baseAPPerAttack)
+        if (_actionPoints < _baseAPPerAttack || _motivation < MOT_BASIC_ATTACK_COST)
         {
             return;
         }
@@ -389,6 +235,7 @@ public class Pawn : MonoBehaviour
         }
 
         _actionPoints -= _baseAPPerAttack;
+        _motivation -= MOT_BASIC_ATTACK_COST;
 
         BattleManager.Instance.PawnActivated(this);
     }
@@ -424,13 +271,13 @@ public class Pawn : MonoBehaviour
     public bool HasActionsRemaining()
     {
         // can still make an attack
-        if (_actionPoints >= _baseAPPerAttack)
+        if (_actionPoints >= _baseAPPerAttack && _motivation > MOT_BASIC_ATTACK_COST)
         {
             return true;
         }
 
         // can still move
-        if (!EngagedInCombat && _actionPoints >= _baseAPPerTileMoved)
+        if (!EngagedInCombat && _actionPoints >= _gameChar.GetAPPerTileMoved())
         {
             return true;
         }
@@ -440,11 +287,9 @@ public class Pawn : MonoBehaviour
 
     public void HandleActivation()
     {
-
         UpdateMotivation();
-        //PleaseUpdateMotivation.Invoke();
 
-        _actionPoints = MaxActionPoints;
+        _actionPoints = BASE_ACTION_POINTS;
     }
 
     /// <summary>
@@ -455,14 +300,14 @@ public class Pawn : MonoBehaviour
     /// <returns></returns>
     public void TryMoveToTile(Tile targetTile)
     {
-        if (_actionPoints < _baseAPPerTileMoved)
+        if (_actionPoints < _gameChar.GetAPPerTileMoved())
         {
             return;
         }
 
         Tile adjustedTargetTile = targetTile;
         int tileDistance = _currentTile.GetTileDistance(targetTile);
-        if (_actionPoints < _baseAPPerTileMoved * tileDistance)
+        if (_actionPoints < _gameChar.GetAPPerTileMoved() * tileDistance)
         {
             List<Tile> moveOptions = _currentTile.GetTilesInMoveRange();
 
@@ -487,15 +332,14 @@ public class Pawn : MonoBehaviour
 
         _anim.Play("Run");
 
-        // use whole turn to get out of combat with someone to avoid player
-        // going in and out of combat repeatedly to gain motivation
+        // use whole turn to get out of combat with someone
         if (EngagedInCombat)
         {
             _actionPoints = 0;
         }
         else
         {
-            _actionPoints -= _baseAPPerTileMoved * tileDistance;
+            _actionPoints -= _gameChar.GetAPPerTileMoved() * tileDistance;
         }
 
         _currentTile.PawnExitTile();
@@ -525,6 +369,5 @@ public class Pawn : MonoBehaviour
     private void OnDestroy()
     {
         pathfinder.OnDestinationReached.RemoveListener(HandleDestinationReached);
-        PleaseUpdateMotivation.RemoveListener(UpdateMotivation);
     }
 }

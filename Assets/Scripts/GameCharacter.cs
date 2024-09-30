@@ -4,11 +4,13 @@ using UnityEngine;
 
 public class GameCharacter
 {
-    public enum Motivator
+    private const int VICE_TO_MOT_MULTIPLIER = 10;
+
+    public enum CharVices
     {
-        Avarice,
-        Sanctimony,
-        Vainglory
+        Greed,
+        Honor,
+        Glory
     }
 
     public string CharName => _charName;
@@ -16,16 +18,11 @@ public class GameCharacter
     public bool IsPlayerChar => _isPlayerChar;
     private bool _isPlayerChar;
 
-    // motivators
-    public int Avarice => _avarice;
-    private int _avarice;
-    public int Sanctimony => _sanctimony;
-    private int _sanctimony;
-    public int Vainglory => _vainglory;
-    private int _vainglory;
-
-    public int Initiative => _initiative;
-    private int _initiative;
+    public CharVices Vice => _vice;
+    private CharVices _vice;
+    private int _charViceValue;
+    
+    private int _baseInitiative;
 
     public int HitPoints => _hitPoints;
     private int _hitPoints;
@@ -42,14 +39,13 @@ public class GameCharacter
     //public Sprite FaceSprite => _faceSprite;
     //private Sprite _faceSprite;
 
-    public GameCharacter(string newName, bool isPlayerCharacter, int avarice, int sanctimony, int vainglory)
+    public GameCharacter(string newName, bool isPlayerCharacter, CharVices newVice, int newViceValue)
     {
         _charName = newName;
         _isPlayerChar = isPlayerCharacter;
-        _avarice = avarice;
-        _vainglory = vainglory;
-        _sanctimony = sanctimony;
-        _initiative = Random.Range(1, 5);
+        _vice = newVice;
+        _charViceValue = newViceValue;
+        _baseInitiative = Random.Range(1, 5);
         _hitPoints = Random.Range(3, 5);
 
         EquipItem(GameManager.Instance.GameCharData.DefaultWeapon);
@@ -91,24 +87,49 @@ public class GameCharacter
         if (GameManager.Instance != null)
         {
             GameCharacterData data = GameManager.Instance.GameCharData;
-            _avarice = Random.Range(data.minVice, data.maxVice);
-            _vainglory = Random.Range(data.minVice, data.maxVice);
-            _sanctimony = Random.Range(data.minVice, data.maxVice);
+            _vice = (CharVices) Random.Range(0, 3);
+            _charViceValue = Random.Range(data.minVice, data.maxVice);
         }
         else
         {
-            _avarice = Random.Range(0, 10);
-            _vainglory = Random.Range(0, 10);
-            _sanctimony = Random.Range(0, 10);
+            _vice = (CharVices)Random.Range(0, 3);
+            _charViceValue = Random.Range(0, 10);
         }
 
-        _initiative = Random.Range(1, 5);
+        _baseInitiative = Random.Range(1, 5);
         _hitPoints = Random.Range(3, 5);
 
         if (GameManager.Instance != null)
         {
             EquipItem(GameManager.Instance.GameCharData.DefaultWeapon);
         }
+    }
+
+    public int GetTotalViceValue()
+    {
+        int equipmentViceBonus = 0;
+        if (_helmItem != null && _helmItem.viceToMod == _vice)
+        {
+            equipmentViceBonus += _helmItem.viceMod;
+        }
+
+        return _charViceValue + equipmentViceBonus;
+    }
+
+    public int GetInitiative()
+    {
+        int initMod = 0;
+        if (_helmItem != null)
+        {
+            initMod += _helmItem.initMod;
+        }
+
+        return _baseInitiative + initMod;
+    }
+
+    public int GetBattleMotivationCap()
+    {
+        return GetTotalViceValue() * VICE_TO_MOT_MULTIPLIER;
     }
 
     public int GetTotalArmor()
@@ -160,64 +181,16 @@ public class GameCharacter
         return oldItem;
     }
 
-    public Motivator GetBiggestMotivator()
+    public int GetMoveRange()
     {
-        if (Avarice > Vainglory && Avarice > Sanctimony)
-        {
-            return Motivator.Avarice;
-        }
-        else if (Sanctimony > Vainglory && Sanctimony > Avarice)
-        {
-            return Motivator.Sanctimony;
-        }
-        else if (Vainglory > Sanctimony && Vainglory > Avarice)
-        {
-            return Motivator.Vainglory;
-        }
-        else
-        {
-            // two motivators must be tied - pick a random one between the two.
-            int coinFlip = Random.Range(0, 2);
-            if (Avarice == Vainglory && Avarice > Sanctimony)
-            {
-                if (coinFlip == 1)
-                {
-                    return Motivator.Avarice;
-                }
-                else
-                {
-                    return Motivator.Vainglory;
-                }
-            }
-            else if (Sanctimony == Vainglory && Sanctimony > Avarice)
-            {
-                if (coinFlip == 1)
-                {
-                    return Motivator.Sanctimony;
-                }
-                else
-                {
-                    return Motivator.Vainglory;
-                }
-            }
-            else if(Avarice == Sanctimony && Sanctimony > Vainglory)
-            {
-                if (coinFlip == 1)
-                {
-                    return Motivator.Avarice;
-                }
-                else
-                {
-                    return Motivator.Sanctimony;
-                }
-            }
-            else
-            {
-                // all three are tied! Roll a D3 to pick.
-                int roll = Random.Range(0, 3);
-                return (Motivator) roll;
-            }
-        }
+        return Pawn.BASE_ACTION_POINTS/GetAPPerTileMoved();
     }
 
+    public int GetAPPerTileMoved()
+    {
+        int totalArmorAPMod = HelmItem != null ? -HelmItem.moveMod : 0;
+
+        // so if negative then it will add AP.
+        return Tile.BASE_AP_TO_TRAVERSE + totalArmorAPMod;
+    }
 }

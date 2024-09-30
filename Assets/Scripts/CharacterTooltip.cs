@@ -21,10 +21,10 @@ public class CharacterTooltip : MonoBehaviour
     {
         gameObject.SetActive(true);
         characterNameText.text = p.GameChar.CharName;
-        characterMotivatorText.text = p.CurrentMotivator.ToString();
+        characterMotivatorText.text = p.CurrentVice.ToString();
         armorBar.SetBar(p.MaxArmorPoints, p.ArmorPoints);
         healthBar.SetBar(p.MaxHitPoints, p.HitPoints);
-        apBar.SetBar(p.MaxActionPoints, p.ActionPoints);
+        apBar.SetBar(Pawn.BASE_ACTION_POINTS, p.ActionPoints);
         motBar.SetBar(p.MaxMotivation, p.Motivation);
 
         _currentPawn = p;

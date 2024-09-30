@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dd5a69d4543524cf881e71e538083d38, type: 3}
-  m_Name: RustySword
+  m_Name: Spear
   m_EditorClassIdentifier: 
   itemName: Spear
   description: The ubiquitous stick with a pointy part on the end.

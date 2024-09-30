@@ -45,7 +45,7 @@ public class EnemyAI : MonoBehaviour
         Pawn adjacentPawn = GetAdjacentTarget(activePawn);
         if (adjacentPawn != null)
         {
-            activePawn.AttackPawnIfAPAvailable(adjacentPawn);
+            activePawn.AttackPawnIfResourcesAvailable(adjacentPawn);
         }
         // add comment
         else
@@ -60,29 +60,6 @@ public class EnemyAI : MonoBehaviour
                 int targetEqRating = (targetPawn.GameChar.GetTotalArmor() + targetPawn.GameChar.WeaponItem.damage);
                 int eqAdvantageRating = activePawnEqRating - targetEqRating;
 
-                // get vice condition values
-
-                // need to figure this out
-                //switch (activePawn.CurrentMotivator)
-                //{
-                //    case GameCharacter.Motivator.Sanctimony:
-
-                //        // should I even do this?
-                //        activePawn.GetMotivationVsTarget(targetPawn);
-
-                //        //pawnAdvantageDict[targetPawn]
-                //        break;
-
-                //    case GameCharacter.Motivator.Avarice:
-                //        break;
-
-                //    case GameCharacter.Motivator.Vainglory:
-                //        break;
-                //}
-
-                // we're going to have to considerm motivation values at each target
-                // tile and pick the best one.
-                int maxMotivation = int.MinValue;
                 Tile bestTargetTile = null;
                 foreach (Tile potentialTargetTile in targetPawn.CurrentTile.GetAdjacentTiles())
                 {
@@ -92,19 +69,15 @@ public class EnemyAI : MonoBehaviour
                         continue;
                     }
 
-                    int motATTile = activePawn.GetMotivationAtTile(potentialTargetTile);
-
-                    if (motATTile > maxMotivation)
-                    {
-                        maxMotivation = motATTile;
-                        bestTargetTile = potentialTargetTile;
-                    }
+                    // just go with the first one for now
+                    bestTargetTile = potentialTargetTile;
+                    break;
                 }
 
                 // could be null if all positions around target are occupied
                 if (bestTargetTile != null)
                 {
-                    moveRatingDict[bestTargetTile] = maxMotivation + eqAdvantageRating;
+                    moveRatingDict[bestTargetTile] = eqAdvantageRating;
                 }
             }
 
@@ -120,29 +93,6 @@ public class EnemyAI : MonoBehaviour
             }
 
             activePawn.TryMoveToTile(bestTile);
-
-            //List<Tile> moveOptions = activePawn.CurrentTile.GetTilesInMoveRange();
-            //Tile tileToMoveTo;
-
-            //for (int i = 0; i < moveOptions.Count; i++)
-            //{
-            //    Tile t = moveOptions[i];
-            //    if (t.GetPawn() != null)
-            //    {
-            //        moveOptions.Remove(t);
-            //    }
-            //}
-
-            // for some reason sometimes the t.GetPawn null check above will
-            // fail, so just keep picking random tiles till there's a free one
-            //do
-            //{
-            //    tileToMoveTo = moveOptions[Random.Range(0, moveOptions.Count)];
-            //}
-            //while (tileToMoveTo.GetPawn() != null) ; 
-
-
-            //activePawn.MoveToTileIfAPAvailable(tileToMoveTo);
         }
     }
 

@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5494fd04dbee14f34b60b102d5cb9856, type: 3}
+  m_Name: PeasantHelm
+  m_EditorClassIdentifier: 
+  itemName: Peasant Helm
+  description: A poor man's helmet. Offers warmth and a little protection.
+  itemSprite: {fileID: 21300000, guid: d5567d6d1c6eb486897947b90382d846, type: 3}
+  itemPrice: 50
+  itemType: 0
+  isDefault: 0
+  protection: 1
+  moveMod: 0
+  initMod: 0
