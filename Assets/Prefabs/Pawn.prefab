@@ -149,6 +149,7 @@ MonoBehaviour:
   _helmSpriteRend: {fileID: 8961105137742510832}
   _weaponSpriteRend: {fileID: 8961913689103738166}
   hitSound: {fileID: 8300000, guid: 26e178cc91d704d69b9c8f5c90d8e061, type: 3}
+  armorHitSound: {fileID: 8300000, guid: f442ae3543bf8cd4b89b4085ed9f7917, type: 3}
   dieSound: {fileID: 8300000, guid: 53defb0490f384700828806354f94976, type: 3}
   _audioSource: {fileID: 5720785191603622845}
 --- !u!114 &5116864122955787313

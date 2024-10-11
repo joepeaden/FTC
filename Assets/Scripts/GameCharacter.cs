@@ -96,7 +96,7 @@ public class GameCharacter
         else
         {
             _vice = (CharVices)Random.Range(0, 3);
-            _charViceValue = Random.Range(0, 10);
+            _charViceValue = Random.Range(2, 6);
 
             _baseInitiative = Random.Range(0, 5);
             _hitPoints = Random.Range(30, 100);

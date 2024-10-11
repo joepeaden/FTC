@@ -56,6 +56,12 @@ public class EnemyAI : MonoBehaviour
             int activePawnEqRating = (activePawn.GameChar.GetTotalArmor() + activePawn.GameChar.GetWeaponDamageForAction(activePawn.GameChar.WeaponItem.baseAction));
             foreach (Pawn targetPawn in BattleManager.Instance.PlayerPawns)
             {
+                // don't circle around dead pawns forever (don't be fucking creepy)
+                if (targetPawn.IsDead)
+                {
+                    continue;
+                }
+
                 // get equipment advantage values
                 int targetEqRating = (targetPawn.GameChar.GetTotalArmor() + targetPawn.GameChar.GetWeaponDamageForAction(targetPawn.GameChar.WeaponItem.baseAction));
                 int eqAdvantageRating = activePawnEqRating - targetEqRating;
@@ -63,8 +69,9 @@ public class EnemyAI : MonoBehaviour
                 Tile bestTargetTile = null;
                 foreach (Tile potentialTargetTile in targetPawn.CurrentTile.GetAdjacentTiles())
                 {
+                    Pawn pawnAtTile = potentialTargetTile.GetPawn();
                     // don't consider if someone's there
-                    if (potentialTargetTile.GetPawn() != null)
+                    if (pawnAtTile != null  && !pawnAtTile.IsDead)
                     {
                         continue;
                     }

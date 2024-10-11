@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class BattleManager : MonoBehaviour
 {
-    private const int DEFAULT_AMOUNT_TO_SPAWN = 4;
+    private const int DEFAULT_MIN_AMOUNT_TO_SPAWN = 3;
+
+    private const int DEFAULT_MAX_AMOUNT_TO_SPAWN = 8;
 
     enum BattleResult
     {
@@ -54,8 +57,25 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private Button _startBattleButton;
     [SerializeField] private Transform _actionsParent;
     [SerializeField] private GameObject _actionButtonPrefab;
-    [SerializeField] private WeaponItemData testWeapon;
     [SerializeField] private GameObject bottomUIObjects;
+    [SerializeField] private ParticleSystem bloodEffect;
+    [SerializeField] private ParticleSystem armorHitEffect;
+
+    [Header("UI")]
+    [SerializeField] private Transform _healthBarParent;
+    [SerializeField] private MiniStatBar _miniStatBarPrefab;
+
+    [Header("Equipment")]
+    [SerializeField] private ArmorItemData lightHelm;
+    [SerializeField] private ArmorItemData medHelm;
+    [SerializeField] private ArmorItemData heavyHelm;
+    [SerializeField] private WeaponItemData club;
+    [SerializeField] private WeaponItemData sword;
+    [SerializeField] private WeaponItemData axe;
+    [SerializeField] private WeaponItemData spear;
+
+    public Pawn CurrentPawn => _currentPawn;
+    private Pawn _currentPawn;
 
     private List<ActionButton> actionButtons = new();
 
@@ -74,10 +94,10 @@ public class BattleManager : MonoBehaviour
         _instance = this;
         gameOverButton.onClick.AddListener(ExitBattle);
 
-        int enemiesToSpawn;
+        int dudesToSpawn;
         if (GameManager.Instance != null)
         {
-            enemiesToSpawn = GameManager.Instance.GetNumOfEnemiesToSpawn();
+            dudesToSpawn = GameManager.Instance.GetNumOfEnemiesToSpawn();
 
             Pawn playerPawn = Instantiate(pawnPrefab, friendlyParent).GetComponent<Pawn>();
             _playerPawns.Add(playerPawn);
@@ -88,35 +108,135 @@ public class BattleManager : MonoBehaviour
                 Pawn newPawn = Instantiate(pawnPrefab, friendlyParent).GetComponent<Pawn>();
                 _playerPawns.Add(newPawn);
                 newPawn.SetCharacter(character, true);
+
+                MiniStatBar miniStats = Instantiate(_miniStatBarPrefab, _healthBarParent);
+                miniStats.SetData(newPawn);
             }
         }
         else
         {
+            // change game over button text to "restart"
+            gameOverButton.GetComponentInChildren<TMP_Text>().text = "Restart";
+
             Debug.Log("No game manager, spawning default amount");
-            enemiesToSpawn = DEFAULT_AMOUNT_TO_SPAWN;
+            dudesToSpawn = Random.Range(DEFAULT_MIN_AMOUNT_TO_SPAWN, DEFAULT_MAX_AMOUNT_TO_SPAWN);
 
             // spawn some friendlies
-            for (int i = 0; i < DEFAULT_AMOUNT_TO_SPAWN; i++)
+            for (int i = 0; i < dudesToSpawn; i++)
             {
                 Pawn newPawn = Instantiate(pawnPrefab, friendlyParent).GetComponent<Pawn>();
                 _playerPawns.Add(newPawn);
 
-                GameCharacter testCharacter = new GameCharacter();
-                testCharacter.EquipItem(testWeapon);
+                GameCharacter guy = new GameCharacter();
 
-                newPawn.SetCharacter(testCharacter, true);
+                if (GameManager.Instance == null)
+                {
+                    // pick random weapon
+                    int roll = Random.Range(0, 4);
+                    switch (roll)
+                    {
+                        case 0:
+                            guy.EquipItem(club);
+                            break;
+                        case 1:
+                            guy.EquipItem(sword);
+                            break;
+                        case 2:
+                            guy.EquipItem(spear);
+                            break;
+                        case 3:
+                            guy.EquipItem(axe);
+                            break;
+                    }
+
+                    // pick random armor
+                    roll = Random.Range(0, 4);
+                    switch (roll)
+                    {
+                        case 0:
+                            // no armor
+                            break;
+                        case 1:
+                            guy.EquipItem(lightHelm);
+                            break;
+                        case 2:
+                            guy.EquipItem(heavyHelm);
+                            break;
+                        case 3:
+                            guy.EquipItem(medHelm);
+                            break;
+                    }
+
+                }
+                else
+                {
+                    guy.EquipItem(club);
+                }
+
+                newPawn.SetCharacter(guy, true);
+
+                MiniStatBar miniStats = Instantiate(_miniStatBarPrefab, _healthBarParent);
+                miniStats.SetData(newPawn);
             }
         }
 
-        for (int i = 0; i < enemiesToSpawn; i++)
+        dudesToSpawn = Random.Range(DEFAULT_MIN_AMOUNT_TO_SPAWN, DEFAULT_MAX_AMOUNT_TO_SPAWN);
+        for (int i = 0; i < dudesToSpawn; i++)
         {
             Pawn newPawn = Instantiate(pawnPrefab, enemyParent).GetComponent<Pawn>();
 
             GameCharacter guy = new();
-            guy.EquipItem(testWeapon);
+
+            if (GameManager.Instance == null)
+            {
+                // pick random weapon
+                int roll = Random.Range(0, 4);
+                switch(roll)
+                {
+                    case 0:
+                        guy.EquipItem(club);
+                        break;
+                    case 1:
+                        guy.EquipItem(sword);
+                        break;
+                    case 2:
+                        guy.EquipItem(spear);
+                        break;
+                    case 3:
+                        guy.EquipItem(axe);
+                        break;
+                }
+
+                // pick random armor
+                roll = Random.Range(0, 4);
+                switch (roll)
+                {
+                    case 0:
+                        // no armor
+                        break;
+                    case 1:
+                        guy.EquipItem(lightHelm);
+                        break;
+                    case 2:
+                        guy.EquipItem(heavyHelm);
+                        break;
+                    case 3:
+                        guy.EquipItem(medHelm);
+                        break;
+                }
+
+            }
+            else
+            {
+                guy.EquipItem(club);
+            }
+
             newPawn.SetCharacter(guy, false);
 
             _enemyAI.RegisterPawn(newPawn);
+
+            MiniStatBar miniStats = Instantiate(_miniStatBarPrefab, _healthBarParent);
+            miniStats.SetData(newPawn);
         }
 
         Tile.OnTileHoverStart.AddListener(HandleTileHoverStart);
@@ -139,6 +259,18 @@ public class BattleManager : MonoBehaviour
         Tile.OnTileHoverEnd.RemoveListener(HandleTileHoverEnd);
         _endTurnButton.onClick.RemoveListener(EndTurn);
         _startBattleButton.onClick.RemoveListener(ToggleInstructions);
+    }
+
+    public void PlayBloodSpurt(Vector3 location)
+    {
+        bloodEffect.gameObject.transform.position = location;
+        bloodEffect.Play();
+    }
+
+    public void PlayArmorHitFX(Vector3 location)
+    {
+        armorHitEffect.gameObject.transform.position = location;
+        armorHitEffect.Play();
     }
 
     public void AddTextNotification(Vector3 pos, string str)
@@ -212,18 +344,18 @@ public class BattleManager : MonoBehaviour
             if (p.OnPlayerTeam)
             {
                 GameObject actionButtonGO = Instantiate(_actionButtonPrefab, _actionsParent);
-                actionButtonGO.GetComponent<ActionButton>().SetDataButton(p.GameChar.WeaponItem.baseAction, HandleActionClicked);
+                actionButtonGO.GetComponent<ActionButton>().SetDataButton(p.GameChar.WeaponItem.baseAction, HandleActionClicked, KeyCode.Alpha1);
                 actionButtons.Add(actionButtonGO.GetComponent<ActionButton>());
                 if (p.GameChar.WeaponItem.specialAction != null)
                 {
                     actionButtonGO = Instantiate(_actionButtonPrefab, _actionsParent);
-                    actionButtonGO.GetComponent<ActionButton>().SetDataButton(p.GameChar.WeaponItem.specialAction, HandleActionClicked);
+                    actionButtonGO.GetComponent<ActionButton>().SetDataButton(p.GameChar.WeaponItem.specialAction, HandleActionClicked, KeyCode.Alpha2);
                 }
             }
         }
     }
 
-    private void ClearSelectedAction()
+    public void ClearSelectedAction()
     {
         foreach (ActionButton abutton in actionButtons)
         {
@@ -264,16 +396,7 @@ public class BattleManager : MonoBehaviour
             else
             {
                 ShowTooltipForPawn(targetPawn);
-                if (selectedPawn.OnPlayerTeam != targetPawn.OnPlayerTeam)
-                {
-                    apBar.SetBar(Pawn.BASE_ACTION_POINTS, selectedPawn.ActionPoints, selectedPawn.GetAPAfterAttack());
-                }
-                else
-                {
-                    // otherwise we might be hovering ourselves or a teammate so reset the AP Bar
-                    apBar.SetBar(Pawn.BASE_ACTION_POINTS, selectedPawn.ActionPoints);
-                }
-
+                
                 if (currentAction != null && targetPawn.OnPlayerTeam != selectedPawn.OnPlayerTeam && targetPawn.IsTargetInRange(selectedPawn, currentAction))
                 {
                     tilesToHighlight.Clear();
@@ -284,14 +407,19 @@ public class BattleManager : MonoBehaviour
                         {
                             tilesToHighlight.Add(selectedPawn.CurrentTile.GetClockwiseNextTile(targetTile));
                         }
-
-
                     }
 
                     foreach (Tile t in tilesToHighlight)
                     {
                         t.HighlightForAction();
                     }
+
+                    apBar.SetBar(Pawn.BASE_ACTION_POINTS, selectedPawn.ActionPoints, selectedPawn.GetAPAfterAction(currentAction));                    
+                }
+                else
+                {
+                    // otherwise we might be hovering ourselves or a teammate so reset the AP Bar
+                    apBar.SetBar(Pawn.BASE_ACTION_POINTS, selectedPawn.ActionPoints);
                 }
             }
         }
@@ -329,9 +457,16 @@ public class BattleManager : MonoBehaviour
 
     private void ExitBattle()
     {
-        bool playerWon = _battleResult == BattleResult.Win;
-
-        GameManager.Instance.ExitBattle(playerWon);
+        if (GameManager.Instance != null)
+        {
+            bool playerWon = _battleResult == BattleResult.Win;
+            GameManager.Instance.ExitBattle(playerWon);
+        }
+        else
+        {
+            // easy reload for testing
+            SceneManager.LoadScene("BattleScene");
+        }
     }
 
     /// <summary>
@@ -459,7 +594,7 @@ public class BattleManager : MonoBehaviour
 
     public IEnumerator NextActivation()
     {
-        Pawn curentPawn = GetNextPawn();
+        _currentPawn = GetNextPawn();
 
         // see if the battle is over. If so, do sumthin about it 
         if (_enemyAI.GetLivingPawns().Count <= 0)
@@ -484,23 +619,23 @@ public class BattleManager : MonoBehaviour
             }
             else
             {
-                if (curentPawn.CurrentTile == null)
+                if (_currentPawn.CurrentTile == null)
                 {
-                    yield return new WaitUntil(() => curentPawn.CurrentTile != null);
+                    yield return new WaitUntil(() => _currentPawn.CurrentTile != null);
                 }
 
-                curentPawn.HandleActivation();
-                UpdateUIForPawn(curentPawn);
-                _selectionManager.HandleTurnChange(curentPawn.OnPlayerTeam);
-                _endTurnButton.gameObject.SetActive(curentPawn.OnPlayerTeam);
+                _currentPawn.HandleActivation();
+                UpdateUIForPawn(_currentPawn);
+                _selectionManager.HandleTurnChange(_currentPawn.OnPlayerTeam);
+                _endTurnButton.gameObject.SetActive(_currentPawn.OnPlayerTeam);
 
-                if (curentPawn.OnPlayerTeam)
+                if (_currentPawn.OnPlayerTeam)
                 {
-                    _selectionManager.SetSelectedTile(curentPawn.CurrentTile);
+                    _selectionManager.SetSelectedTile(_currentPawn.CurrentTile);
                 }
                 else
                 {
-                    _enemyAI.DoTurn(curentPawn);
+                    _enemyAI.DoTurn(_currentPawn);
                 }
             }
         }
