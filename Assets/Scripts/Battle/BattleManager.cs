@@ -79,8 +79,8 @@ public class BattleManager : MonoBehaviour
 
     private List<ActionButton> actionButtons = new();
 
-    public ActionData CurrentAction => currentAction;
-    private ActionData currentAction;
+    public ActionData CurrentAction => _currentAction;
+    private ActionData _currentAction;
 
     private Stack<Pawn> _initiativeStack = new ();
 
@@ -350,6 +350,7 @@ public class BattleManager : MonoBehaviour
                 {
                     actionButtonGO = Instantiate(_actionButtonPrefab, _actionsParent);
                     actionButtonGO.GetComponent<ActionButton>().SetDataButton(p.GameChar.WeaponItem.specialAction, HandleActionClicked, KeyCode.Alpha2);
+                    actionButtons.Add(actionButtonGO.GetComponent<ActionButton>());
                 }
             }
         }
@@ -361,12 +362,27 @@ public class BattleManager : MonoBehaviour
         {
             abutton.SetInactive();
         }
-        currentAction = null;
+
+        if (_currentAction != null)
+        {
+            CurrentPawn.CurrentTile.HighlightTilesInRange(_currentAction.range + 1, false, Tile.TileHighlightType.AttackRange);
+            _currentAction = null;
+
+            if (CurrentPawn.HasActionsRemaining())
+            {
+                CurrentPawn.CurrentTile.HighlightTilesInRange(_currentPawn.MoveRange+1, true, Tile.TileHighlightType.Move);
+            }
+        }
     }
 
     private void HandleActionClicked(ActionData action)
     {
-        currentAction = action;
+        ClearSelectedAction();
+
+        _currentAction = action;
+
+        CurrentPawn.CurrentTile.HighlightTilesInRange(_currentPawn.MoveRange+1, false, Tile.TileHighlightType.Move);
+        CurrentPawn.CurrentTile.HighlightTilesInRange(_currentAction.range+1, true, Tile.TileHighlightType.AttackRange);
     }
 
     private void EndTurn()
@@ -387,40 +403,37 @@ public class BattleManager : MonoBehaviour
 
         if (selectedPawn != null)
         {
+            if (_currentAction != null && targetTile.GetTileDistance(selectedPawn.CurrentTile) <= _currentAction.range)// ;// && targetPawn.OnPlayerTeam != selectedPawn.OnPlayerTeam && targetPawn.IsTargetInRange(selectedPawn, _currentAction))
+            {
+                tilesToHighlight.Clear();
+                tilesToHighlight.Add(targetTile);
+                if (_currentAction != null)
+                {
+                    if (_currentAction.attackStyle == ActionData.AttackStyle.LShape)
+                    {
+                        tilesToHighlight.Add(selectedPawn.CurrentTile.GetClockwiseNextTile(targetTile));
+                    }
+                }
+
+                foreach (Tile t in tilesToHighlight)
+                {
+                    t.HighlightForAction();
+                }
+
+                apBar.SetBar(Pawn.BASE_ACTION_POINTS, selectedPawn.ActionPoints, selectedPawn.GetAPAfterAction(_currentAction));
+            }
+
             // if targetPawn is null, then we're hovering a movement tile.
             if (targetPawn == null)
             {
-                int expectedAPAfterMove = selectedPawn.GetAPAfterMove(targetTile);
-                apBar.SetBar(Pawn.BASE_ACTION_POINTS, selectedPawn.ActionPoints, expectedAPAfterMove);
+                    int expectedAPAfterMove = selectedPawn.GetAPAfterMove(targetTile);
+                    apBar.SetBar(Pawn.BASE_ACTION_POINTS, selectedPawn.ActionPoints, expectedAPAfterMove);
+                    // otherwise we might be hovering ourselves or a teammate so reset the AP Bar
+                    //apBar.SetBar(Pawn.BASE_ACTION_POINTS, selectedPawn.ActionPoints);
             }
             else
             {
                 ShowTooltipForPawn(targetPawn);
-                
-                if (currentAction != null && targetPawn.OnPlayerTeam != selectedPawn.OnPlayerTeam && targetPawn.IsTargetInRange(selectedPawn, currentAction))
-                {
-                    tilesToHighlight.Clear();
-                    tilesToHighlight.Add(targetTile);
-                    if (currentAction != null)
-                    {
-                        if (currentAction.attackStyle == ActionData.AttackStyle.LShape)
-                        {
-                            tilesToHighlight.Add(selectedPawn.CurrentTile.GetClockwiseNextTile(targetTile));
-                        }
-                    }
-
-                    foreach (Tile t in tilesToHighlight)
-                    {
-                        t.HighlightForAction();
-                    }
-
-                    apBar.SetBar(Pawn.BASE_ACTION_POINTS, selectedPawn.ActionPoints, selectedPawn.GetAPAfterAction(currentAction));                    
-                }
-                else
-                {
-                    // otherwise we might be hovering ourselves or a teammate so reset the AP Bar
-                    apBar.SetBar(Pawn.BASE_ACTION_POINTS, selectedPawn.ActionPoints);
-                }
             }
         }
     }
@@ -492,6 +505,16 @@ public class BattleManager : MonoBehaviour
         _selectionManager.SetSelectedTile(p.CurrentTile);
 
         ClearSelectedAction();
+
+        // see if the battle is over. If so, do sumthin about it 
+        if (CheckEnemyWipedOut())
+        {
+            HandleBattleResult(BattleResult.Win);
+        }
+        else if (CheckPlayerWipedOut())
+        {
+            HandleBattleResult(BattleResult.Lose);
+        }
 
         if (!p.HasActionsRemaining())
         {
@@ -592,28 +615,38 @@ public class BattleManager : MonoBehaviour
         _battleResult = battleResult;
     }
 
+    private bool CheckEnemyWipedOut()
+    {
+        return _enemyAI.GetLivingPawns().Count <= 0;
+    }
+
+    private bool CheckPlayerWipedOut()
+    {
+        int alivePawns = 0;
+        foreach (Pawn p in _playerPawns)
+        {
+            if (p.IsDead)
+            {
+                continue;
+            }
+            alivePawns++;
+        }
+
+        return alivePawns <= 0;
+    }
+
     public IEnumerator NextActivation()
     {
         _currentPawn = GetNextPawn();
 
         // see if the battle is over. If so, do sumthin about it 
-        if (_enemyAI.GetLivingPawns().Count <= 0)
+        if (CheckEnemyWipedOut())
         {
             HandleBattleResult(BattleResult.Win);
         }
         else
         {
-            int alivePawns = 0;
-            foreach (Pawn p in _playerPawns)
-            {
-                if (p.IsDead)
-                {
-                    continue;
-                }
-                alivePawns++;
-            }
-
-            if (alivePawns <= 0)
+            if (CheckPlayerWipedOut())
             {
                 HandleBattleResult(BattleResult.Lose);
             }

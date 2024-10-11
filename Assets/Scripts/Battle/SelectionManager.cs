@@ -60,7 +60,7 @@ public class SelectionManager : MonoBehaviour
                             {
                                 currentPawn.AttackPawnIfResourcesAvailable(targetPawn);
                             }
-                            else if (newTile.IsInMoveRange && targetPawn == null)
+                            else if (newTile.IsInRangeOf(currentPawn.CurrentTile, currentPawn.MoveRange) && targetPawn == null && BattleManager.Instance.CurrentAction == null)
                             {
                                 currentPawn.TryMoveToTile(newTile);
                             }

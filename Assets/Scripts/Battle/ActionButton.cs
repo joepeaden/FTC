@@ -119,8 +119,8 @@ public class ActionButton : MonoBehaviour
 
         if (_isSelected)
         {
-            image.sprite = selectedImage;
             _callback(_action);
+            image.sprite = selectedImage;
         }
         else
         {

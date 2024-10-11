@@ -445,12 +445,17 @@ public class Pawn : MonoBehaviour
         }
         
         // can still move
-        if (!EngagedInCombat && _actionPoints >= _gameChar.GetAPPerTileMoved())
+        if (!EngagedInCombat && HasMovesLeft())
         {
             return true;
         }
 
         return false;
+    }
+
+    public bool HasMovesLeft()
+    {
+        return _actionPoints >= _gameChar.GetAPPerTileMoved();
     }
 
     public void HandleActivation()

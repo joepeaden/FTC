@@ -7,6 +7,13 @@ using UnityEngine.Events;
 
 public class Tile : MonoBehaviour
 {
+    public enum TileHighlightType
+    {
+        Move,
+        AttackRange,
+        AttackTarget
+    }
+
     public const int BASE_AP_TO_TRAVERSE = 2;
 
     public static UnityEvent<Tile> OnTileHoverStart = new();
@@ -17,17 +24,19 @@ public class Tile : MonoBehaviour
     [SerializeField] private Sprite hoverSprite;
     [SerializeField] private Sprite moveRangeSprite;
     [SerializeField] private Sprite attackHighlightSprite;
+    [SerializeField] private Sprite attackTargetHighlightSprite;
     [SerializeField] private SpriteRenderer tileOverlayUI;
     [SerializeField] private SpriteRenderer tileHoverUI;
 
     [SerializeField] private Pawn _pawn;
     private bool _isSelected;
-    public bool IsInMoveRange => _isInMoveRange;
-    private bool _isInMoveRange;
+    //private bool _isInMoveRange;
     private List<Tile> _adjacentTiles = new();
 
     public Point Coordinates => _coordinates;
     private Point _coordinates;
+
+    private Sprite _prevHighlightSprite;
 
     private void Awake()
     {
@@ -39,10 +48,15 @@ public class Tile : MonoBehaviour
         OnTileSelectChange.RemoveListener(ResetTileVisuals);
     }
 
+    public bool IsInRangeOf(Tile t, int range)
+    {
+        return GetTileDistance(t) <= range;
+    }
+
     private void ResetTileVisuals()
     {
         tileOverlayUI.enabled = false;
-        _isInMoveRange = false;
+        //_isInMoveRange = false;
     }
 
     public void Initialize(Dictionary<Point, Tile> tiles, Point coord)
@@ -244,19 +258,19 @@ public class Tile : MonoBehaviour
         {
             if (_isSelected)
             {
-                int charMoveRange = _pawn.MoveRange;
-                foreach (Tile t in _adjacentTiles)
-                {
-                    t.HighlightTilesInMoveRange(charMoveRange, true);
-                }
+                //int charMoveRange = _pawn.MoveRange;
+                //foreach (Tile t in _adjacentTiles)
+                //{
+                    HighlightTilesInRange(_pawn.MoveRange+1, true, TileHighlightType.Move);
+                //}
             }
             else
             {
-                int charMoveRange = _pawn.MoveRange;
-                foreach (Tile t in _adjacentTiles)
-                {
-                    t.HighlightTilesInMoveRange(charMoveRange, false);
-                }
+                //int charMoveRange = _pawn.MoveRange;
+                //foreach (Tile t in _adjacentTiles)
+                //{
+                    HighlightTilesInRange(_pawn.MoveRange+1, false, TileHighlightType.Move);
+                //}
             }
         }
     }
@@ -264,12 +278,17 @@ public class Tile : MonoBehaviour
     public void HighlightForAction()
     {
         tileOverlayUI.enabled = true;
-        tileOverlayUI.sprite = attackHighlightSprite;
+        tileOverlayUI.sprite = attackTargetHighlightSprite;
+
     }
 
     public void ClearActionHighlight()
     {
-        if (IsInMoveRange)
+        if (BattleManager.Instance.CurrentAction != null && BattleManager.Instance.CurrentPawn.CurrentTile.IsInRangeOf(this, BattleManager.Instance.CurrentAction.range))
+        {
+            tileOverlayUI.sprite = attackHighlightSprite;
+        }
+        else if (BattleManager.Instance.CurrentPawn.HasMovesLeft() && BattleManager.Instance.CurrentPawn.CurrentTile.IsInRangeOf(this, BattleManager.Instance.CurrentPawn.MoveRange))
         {
             tileOverlayUI.sprite = moveRangeSprite;
         }
@@ -279,22 +298,31 @@ public class Tile : MonoBehaviour
         }
     }
 
-    public void HighlightTilesInMoveRange(int moveRange, bool isHighlighting)
+    public void HighlightTilesInRange(int range, bool isHighlighting, TileHighlightType highlightType)
     {
-        if (moveRange > 0)
+        if (range > 0)
         {
-            moveRange--;
+            range--;
 
             if (!_isSelected)
             {
                 tileOverlayUI.enabled = isHighlighting;
-                tileOverlayUI.sprite = moveRangeSprite;
-                _isInMoveRange = isHighlighting;
+
+                switch (highlightType)
+                {
+                    case TileHighlightType.Move:
+                        tileOverlayUI.sprite = moveRangeSprite;
+                        break;
+                    case TileHighlightType.AttackRange:
+                        tileOverlayUI.sprite = attackHighlightSprite;
+                        break;
+                }
+                //_isInMoveRange = isHighlighting;
             }
 
             foreach (Tile t in _adjacentTiles)
             {
-                t.HighlightTilesInMoveRange(moveRange, isHighlighting);
+                t.HighlightTilesInRange(range, isHighlighting, highlightType);
             }
         }
         else
