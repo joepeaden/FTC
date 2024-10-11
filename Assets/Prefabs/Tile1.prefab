@@ -358,6 +358,7 @@ MonoBehaviour:
   selectionSprite: {fileID: 21300000, guid: c34e91e3fb1af4616a37fbd8ad4366df, type: 3}
   hoverSprite: {fileID: 21300000, guid: 98df362d46505407e860ee272c8ee36b, type: 3}
   moveRangeSprite: {fileID: 21300000, guid: 87705c8be948744fdb21cb3419b1c653, type: 3}
+  attackHighlightSprite: {fileID: 21300000, guid: a7671d60fd3aa4d7c8d1f0e0e6de47ff, type: 3}
   tileOverlayUI: {fileID: 8157718088664233285}
   tileHoverUI: {fileID: 4394614102146550778}
   _pawn: {fileID: 0}

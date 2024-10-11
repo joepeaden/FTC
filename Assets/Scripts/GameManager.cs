@@ -31,9 +31,11 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         _instance = this;
-
         DontDestroyOnLoad(gameObject);
+    }
 
+    private void Start()
+    {
         SceneManager.LoadScene("MainMenu");
     }
 
@@ -42,7 +44,7 @@ public class GameManager : MonoBehaviour
         _playerCharacter = new (playerCharName, true, (GameCharacter.CharVices) Random.Range(0, 3), Random.Range(_gameCharData.minVice, _gameCharData.maxVice));
 
 #if UNITY_EDITOR
-        _playerGold = 2000;
+        _playerGold = 100;
 #else
         _playerGold = GameCharData.startingGold;
 #endif

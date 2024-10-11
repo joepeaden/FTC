@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd5a69d4543524cf881e71e538083d38, type: 3}
+  m_Name: Spear
+  m_EditorClassIdentifier: 
+  itemName: Spear
+  description: The ubiquitous stick with a pointy part on the end. Spears have long
+    reach and are good at penetrating armor. They do extra damage at range 2.
+  itemSprite: {fileID: 21300000, guid: 5dd9bc25db1ee487fb5661e588f93a1c, type: 3}
+  itemPrice: 10
+  itemType: 2
+  isDefault: 0
+  baseDamage: 25
+  baseArmorDamage: 0.2
+  basePenetrationDamage: 0.7
+  baseAccMod: 0.2
+  baseAction: {fileID: 11400000, guid: c9883d60b42ef4f27b565e2cb529408e, type: 2}
+  specialAction: {fileID: 11400000, guid: c5c11da93a8724b40979c6f2e458ea9b, type: 2}
+  hitSound: {fileID: 8300000, guid: c8cc8ca7e4f674f4196c02429fe47895, type: 3}
+  killSound: {fileID: 8300000, guid: 8091b8b16c3c8eb42ab3ce54abd8b670, type: 3}
+  missSound: {fileID: 8300000, guid: 89998cf45320f974ea4c9a4fcb2e668b, type: 3}

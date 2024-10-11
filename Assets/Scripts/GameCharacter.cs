@@ -45,8 +45,8 @@ public class GameCharacter
         _isPlayerChar = isPlayerCharacter;
         _vice = newVice;
         _charViceValue = newViceValue;
-        _baseInitiative = Random.Range(1, 5);
-        _hitPoints = Random.Range(3, 5);
+        _baseInitiative = Random.Range(GameManager.Instance.GameCharData.minInit, GameManager.Instance.GameCharData.maxInit);
+        _hitPoints = Random.Range(GameManager.Instance.GameCharData.minHP, GameManager.Instance.GameCharData.maxHP);
 
         EquipItem(GameManager.Instance.GameCharData.DefaultWeapon);
     }
@@ -89,20 +89,43 @@ public class GameCharacter
             GameCharacterData data = GameManager.Instance.GameCharData;
             _vice = (CharVices) Random.Range(0, 3);
             _charViceValue = Random.Range(data.minVice, data.maxVice);
+
+            _baseInitiative = Random.Range(GameManager.Instance.GameCharData.minInit, GameManager.Instance.GameCharData.maxInit);
+            _hitPoints = Random.Range(GameManager.Instance.GameCharData.minHP, GameManager.Instance.GameCharData.maxHP);
         }
         else
         {
             _vice = (CharVices)Random.Range(0, 3);
             _charViceValue = Random.Range(0, 10);
+
+            _baseInitiative = Random.Range(0, 5);
+            _hitPoints = Random.Range(30, 100);
+
         }
-
-        _baseInitiative = Random.Range(1, 5);
-        _hitPoints = Random.Range(3, 5);
-
         if (GameManager.Instance != null)
         {
             EquipItem(GameManager.Instance.GameCharData.DefaultWeapon);
         }
+    }
+
+    public float GetCharHitChance()
+    {
+        return _weaponItem.baseAccMod;
+    }
+
+    public int GetWeaponDamageForAction(ActionData action)
+    {
+        return action.damageMod + _weaponItem.baseDamage;
+    }
+
+    public int GetWeaponArmorDamageForAction(ActionData action)
+    {
+        return Mathf.RoundToInt(GetWeaponDamageForAction(action) * (action.armorDamageMod + _weaponItem.baseArmorDamage));
+    }
+
+    public int GetWeaponPenetrationDamageForAction(ActionData action)
+    {
+        return Mathf.RoundToInt(GetWeaponDamageForAction(action) * (action.penetrationDamageMod + _weaponItem.basePenetrationDamage));
     }
 
     public int GetTotalViceValue()

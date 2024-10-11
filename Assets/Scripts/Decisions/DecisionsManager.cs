@@ -32,8 +32,6 @@ public class DecisionsManager : MonoBehaviour
     [SerializeField] private CharDetailPanel _charDetail;
     [SerializeField] private Button _disableCharPanelButton;
 
-    [SerializeField] private EquipmentTooltip equipToolTip;
-
     private void Awake()
     {
         _recruitsButton.onClick.AddListener(ShowRecruitsScreen);
@@ -96,6 +94,10 @@ public class DecisionsManager : MonoBehaviour
 
     public void RefreshInventory()
     {
+        // muahahahahaha lazy bug fix  (the tooltip wasn't closing when a gameobjectw as destroyed because
+        // of purchase or unequip etc.
+        TooltipManager.Instance.HandleCloseTooltip();
+
         for (int i = 0; i < _inventoryGrid.transform.childCount; i++)
         {
             Destroy(_inventoryGrid.transform.GetChild(i).gameObject);
@@ -113,7 +115,7 @@ public class DecisionsManager : MonoBehaviour
     }
 
     public void HandleInventoryItemSelected(ItemUI itemUI)
-    {
+    {         
         // if we're in character detail view then it should equip the item
         if (_charDetail.gameObject.activeInHierarchy)
         {
@@ -168,16 +170,6 @@ public class DecisionsManager : MonoBehaviour
         itemUI.SetCallback(HandleInventoryItemSelected);
 
         UpdateGoldText();
-    }
-
-    public void HandleItemHoverStart(ItemData item)
-    {
-        equipToolTip.SetItem(item);
-    }
-
-    public void HandleItemHoverEnd()
-    {
-        equipToolTip.Hide();
     }
 
     private void AddCharacterPanel(GameCharacter character)

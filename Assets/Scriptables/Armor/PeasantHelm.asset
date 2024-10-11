@@ -15,9 +15,11 @@ MonoBehaviour:
   itemName: Peasant Helm
   description: A poor man's helmet. Offers warmth and a little protection.
   itemSprite: {fileID: 21300000, guid: d5567d6d1c6eb486897947b90382d846, type: 3}
-  itemPrice: 50
+  itemPrice: 20
   itemType: 0
   isDefault: 0
-  protection: 1
+  protection: 10
   moveMod: 0
   initMod: 0
+  viceToMod: 0
+  viceMod: 0

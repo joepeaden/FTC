@@ -16,6 +16,7 @@ public class Tile : MonoBehaviour
     [SerializeField] private Sprite selectionSprite;
     [SerializeField] private Sprite hoverSprite;
     [SerializeField] private Sprite moveRangeSprite;
+    [SerializeField] private Sprite attackHighlightSprite;
     [SerializeField] private SpriteRenderer tileOverlayUI;
     [SerializeField] private SpriteRenderer tileHoverUI;
 
@@ -71,6 +72,72 @@ public class Tile : MonoBehaviour
         if (tiles.ContainsKey(p))
         {
             _adjacentTiles.Add(tiles[p]);
+        }
+    }
+
+    public Tile GetAdjacentTileInDirection(Tile startTile)
+    {
+        List<Tile> adjTiles = GetAdjacentTiles();
+
+        if (startTile.Coordinates.X > Coordinates.X)
+        {
+            // attack was down, get target to left
+            Tile t = adjTiles.Where(tile => tile.Coordinates.X < Coordinates.X).FirstOrDefault();
+            return t;
+        }
+        else if (startTile.Coordinates.X < Coordinates.X)
+        {
+            // attack was up, get target to right
+            Tile t = adjTiles.Where(tile => tile.Coordinates.X > Coordinates.X).FirstOrDefault();
+            return t;
+        }
+        else if (startTile.Coordinates.Y > Coordinates.Y)
+        {
+            // attack was to the right, get target down
+            Tile t = adjTiles.Where(tile => tile.Coordinates.Y < Coordinates.Y).FirstOrDefault();
+            return t;
+        }
+        else
+        {
+            // attack was to left, get target up
+            Tile t = adjTiles.Where(tile => tile.Coordinates.Y > Coordinates.Y).FirstOrDefault();
+            return t;
+        }
+    }
+
+    /// <summary>
+    /// Get the next tile clockwise from the start tile that is still adjacent
+    /// to this one
+    /// </summary>
+    /// <param name="startTile"></param>
+    /// <returns></returns>
+    public Tile GetClockwiseNextTile(Tile startTile)
+    {
+        List<Tile> adjTiles = GetAdjacentTiles();
+
+        if (startTile.Coordinates.X > Coordinates.X)
+        {
+            // attack was to left, get target up
+            Tile t = adjTiles.Where(tile => tile.Coordinates.Y > Coordinates.Y).FirstOrDefault();
+            return t;
+        }
+        else if (startTile.Coordinates.X < Coordinates.X)
+        {
+            // attack was to the right, get target down
+            Tile t = adjTiles.Where(tile => tile.Coordinates.Y < Coordinates.Y).FirstOrDefault();
+            return t;
+        }
+        else if (startTile.Coordinates.Y > Coordinates.Y)
+        {
+            // attack was down, get target to left
+            Tile t = adjTiles.Where(tile => tile.Coordinates.X < Coordinates.X).FirstOrDefault();
+            return t;
+        }
+        else
+        {
+            // attack was up, get target to right
+            Tile t = adjTiles.Where(tile => tile.Coordinates.X > Coordinates.X).FirstOrDefault();
+            return t;
         }
     }
 
@@ -180,7 +247,7 @@ public class Tile : MonoBehaviour
                 int charMoveRange = _pawn.MoveRange;
                 foreach (Tile t in _adjacentTiles)
                 {
-                    t.ColorTilesInMoveRange(charMoveRange, true);
+                    t.HighlightTilesInMoveRange(charMoveRange, true);
                 }
             }
             else
@@ -188,13 +255,31 @@ public class Tile : MonoBehaviour
                 int charMoveRange = _pawn.MoveRange;
                 foreach (Tile t in _adjacentTiles)
                 {
-                    t.ColorTilesInMoveRange(charMoveRange, false);
+                    t.HighlightTilesInMoveRange(charMoveRange, false);
                 }
             }
         }
     }
 
-    public void ColorTilesInMoveRange(int moveRange, bool isHighlighting)
+    public void HighlightForAction()
+    {
+        tileOverlayUI.enabled = true;
+        tileOverlayUI.sprite = attackHighlightSprite;
+    }
+
+    public void ClearActionHighlight()
+    {
+        if (IsInMoveRange)
+        {
+            tileOverlayUI.sprite = moveRangeSprite;
+        }
+        else
+        {
+            tileOverlayUI.enabled = false;
+        }
+    }
+
+    public void HighlightTilesInMoveRange(int moveRange, bool isHighlighting)
     {
         if (moveRange > 0)
         {
@@ -209,7 +294,7 @@ public class Tile : MonoBehaviour
 
             foreach (Tile t in _adjacentTiles)
             {
-                t.ColorTilesInMoveRange(moveRange, isHighlighting);
+                t.HighlightTilesInMoveRange(moveRange, isHighlighting);
             }
         }
         else

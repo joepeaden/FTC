@@ -57,12 +57,14 @@ public class Pawn : MonoBehaviour
     [SerializeField] private SpriteRenderer _helmSpriteRend;
     [SerializeField] private SpriteRenderer _weaponSpriteRend;
 
+    [SerializeField] private AudioClip hitSound;
+    [SerializeField] private AudioClip dieSound;
+    [SerializeField] private AudioSource _audioSource;
+
     public GameCharacter GameChar => _gameChar;
     private GameCharacter _gameChar;
 
     public GameCharacter.CharVices CurrentVice => _gameChar.Vice;
-
-    public int Damage => _gameChar.WeaponItem.damage;
 
     private void Awake()
     {
@@ -209,59 +211,159 @@ public class Pawn : MonoBehaviour
                 break;
         }
 
-        float hitChance = baseHitChance + motivationHitBonus;
+        float hitChance = baseHitChance + motivationHitBonus + GameChar.GetCharHitChance() + (BattleManager.Instance.CurrentAction != null ? BattleManager.Instance.CurrentAction.accMod : 0);
         return hitChance;
     }
 
-    public void AttackPawnIfResourcesAvailable(Pawn targetPawn)
+    public bool IsTargetInRange(Pawn targetPawn, ActionData currentAction)
     {
-        if (_actionPoints < _baseAPPerAttack || _motivation < MOT_BASIC_ATTACK_COST)
+        if (targetPawn.CurrentTile.GetTileDistance(CurrentTile) <= currentAction.range)
         {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public void AttackPawnIfResourcesAvailable(Pawn primaryTargetPawn)
+    {
+        ActionData currentAction;
+        if (primaryTargetPawn._onPlayerTeam)
+        {
+            currentAction = GameChar.WeaponItem.baseAction;
+        }
+        else
+        {
+            currentAction = BattleManager.Instance.CurrentAction;
+        }
+
+
+        if (_actionPoints < currentAction.apCost || _motivation < currentAction.motCost)
+        {
+            BattleManager.Instance.PawnActivated(this);
             return;
         }
 
         _anim.Play("Attack");
 
-        float hitChance = GetHitChance(targetPawn);
-        float hitRoll = Random.Range(0f, 1f);
-        if (hitRoll < hitChance)
+        List<Pawn> targetPawns = new();
+        targetPawns.Add(primaryTargetPawn);
+
+        if (currentAction.attackStyle == ActionData.AttackStyle.LShape)
         {
-            targetPawn.TakeDamage(_gameChar.WeaponItem.damage);
-            BattleManager.Instance.AddTextNotification(transform.position, "Hit!");
-        }
-        else
-        {
-            BattleManager.Instance.AddTextNotification(transform.position, "Miss!");
+            Tile clockwiseNextTile = _currentTile.GetClockwiseNextTile(primaryTargetPawn.CurrentTile);
+            if (clockwiseNextTile.GetPawn())
+            {
+                targetPawns.Add(clockwiseNextTile.GetPawn());
+            }
         }
 
-        _actionPoints -= _baseAPPerAttack;
-        _motivation -= MOT_BASIC_ATTACK_COST;
+        foreach (Pawn targetPawn in targetPawns)
+        {
+            AttackPawn(targetPawn, currentAction);
+        }
+
+        _actionPoints -= currentAction.apCost;
+        _motivation -= currentAction.motCost;
 
         BattleManager.Instance.PawnActivated(this);
     }
 
-    public void TakeDamage(int incomingDamage)
+    private void AttackPawn(Pawn targetPawn, ActionData currentAction)
     {
-        _anim.Play("GetHit");
-
-        if (_armorPoints > 0)
+        float hitChance = GetHitChance(targetPawn);
+        float hitRoll = Random.Range(0f, 1f);
+        if (hitRoll < hitChance)
         {
-            _armorPoints = Mathf.Max(0, (_armorPoints - incomingDamage));
+            targetPawn.TakeDamage(this, currentAction);
+            BattleManager.Instance.AddTextNotification(transform.position, "Hit!");
+
+            if (targetPawn.IsDead)
+            {
+                StartCoroutine(PlayAudioAfterDelay(.35f, GameChar.WeaponItem.killSound));
+            }
+            else
+            {
+                StartCoroutine(PlayAudioAfterDelay(.35f, GameChar.WeaponItem.hitSound));
+            }
         }
         else
         {
-            _hitPoints -= incomingDamage;
+            targetPawn.TriggerDodge();
+            BattleManager.Instance.AddTextNotification(transform.position, "Miss!");
+            StartCoroutine(PlayAudioAfterDelay(.35f, GameChar.WeaponItem.missSound));
+        }
+
+    }
+
+    public void TriggerDodge()
+    {
+        StartCoroutine(PlayAnimationAfterDelay(.2f, "Dodge"));
+    }
+
+    public void TakeDamage(Pawn attackingPawn, ActionData actionUsed)
+    {
+        int hitPointsDmg;
+        GameCharacter attackingCharacter = attackingPawn.GameChar;
+        float extraDmgMult = 1;
+
+        if (actionUsed.rangeForExtraDamage > 0 && CurrentTile.GetTileDistance(attackingPawn.CurrentTile) == actionUsed.rangeForExtraDamage)
+        {
+            // this could just become critical hits later perhaps.
+            extraDmgMult = actionUsed.extraDmgMultiplier;
+        }
+
+        if (_armorPoints > 0)
+        {
+            _armorPoints = Mathf.Max(0, (_armorPoints - Mathf.RoundToInt(attackingCharacter.GetWeaponArmorDamageForAction(actionUsed) * extraDmgMult)));
+            hitPointsDmg = Mathf.RoundToInt(attackingCharacter.GetWeaponPenetrationDamageForAction(actionUsed) * extraDmgMult);
+        }
+        else
+        {
+            hitPointsDmg = Mathf.RoundToInt(attackingCharacter.GetWeaponDamageForAction(actionUsed) * extraDmgMult);
+        }
+
+        _hitPoints -= Mathf.Max(0, hitPointsDmg);
+
+        // make the helmet gone if there's no armor for cool factor
+        if (_armorPoints <= 0)
+        {
+            _helmSpriteRend.enabled = false;
         }
 
         if (_hitPoints <= 0)
         {
             Die();
         }
+        else
+        {
+            StartCoroutine(PlayAnimationAfterDelay(.2f, "GetHit"));
+            StartCoroutine(PlayAudioAfterDelay(.35f, hitSound));
+        }
+    }
+
+    private IEnumerator PlayAnimationAfterDelay(float delay, string animName)
+    {
+        yield return new WaitForSeconds(delay);
+
+
+        _anim.Play(animName);
+    }
+
+    private IEnumerator PlayAudioAfterDelay(float delay, AudioClip clip)
+    {
+        yield return new WaitForSeconds(delay);
+
+        _audioSource.clip = clip;
+        _audioSource.Play();
     }
 
     private void Die()
     {
-        _anim.Play("Die");
+        StartCoroutine(PlayAnimationAfterDelay(.2f, "Die"));
+        StartCoroutine(PlayAudioAfterDelay(.35f, dieSound));
         CurrentTile.PawnExitTile();
         _isDead = true;
 
@@ -271,7 +373,8 @@ public class Pawn : MonoBehaviour
     public bool HasActionsRemaining()
     {
         // can still make an attack
-        if (_actionPoints >= _baseAPPerAttack && _motivation > MOT_BASIC_ATTACK_COST)
+        if ((_actionPoints >= GameChar.WeaponItem.baseAction.apCost && _motivation > GameChar.WeaponItem.baseAction.motCost)
+            || (GameChar.WeaponItem.specialAction != null && _actionPoints >= GameChar.WeaponItem.specialAction.apCost && _motivation > GameChar.WeaponItem.specialAction.motCost))
         {
             return true;
         }

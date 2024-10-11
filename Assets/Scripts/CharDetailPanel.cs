@@ -15,6 +15,8 @@ public class CharDetailPanel : MonoBehaviour
     private DecisionsManager _decisions;
     [SerializeField] private ItemUI _helmUI;
     [SerializeField] private ItemUI _weaponUI;
+    [SerializeField] private Transform _actionsParent;
+    [SerializeField] private GameObject _actionsButtonPrefab;
 
     public void Setup(DecisionsManager decisions)
     {
@@ -50,6 +52,19 @@ public class CharDetailPanel : MonoBehaviour
         else if (_weaponUI != null)
         {
             _weaponUI.Hide();
+        }
+
+        for (int i = 0; i < _actionsParent.childCount; i++)
+        {
+            Destroy(_actionsParent.GetChild(i).gameObject);
+        }
+
+        GameObject actionButtonGO = Instantiate(_actionsButtonPrefab, _actionsParent);
+        actionButtonGO.GetComponent<ActionButton>().SetDataDisplay(character.WeaponItem.baseAction);
+        if (character.WeaponItem.specialAction != null)
+        {
+            actionButtonGO = Instantiate(_actionsButtonPrefab, _actionsParent);
+            actionButtonGO.GetComponent<ActionButton>().SetDataDisplay(character.WeaponItem.specialAction);
         }
     }
 

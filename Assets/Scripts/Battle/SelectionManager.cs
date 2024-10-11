@@ -40,7 +40,7 @@ public class SelectionManager : MonoBehaviour
 
     private void Update()
     {
-        if (playerControlsEnabled && (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)))
+        if (playerControlsEnabled && Input.GetMouseButtonDown(0))
         {
             Vector3 mousePos = CameraManager.MainCamera.ScreenToWorldPoint(Input.mousePosition);
             RaycastHit2D[] hits = Physics2D.RaycastAll(mousePos, -Vector3.forward);
@@ -50,25 +50,23 @@ public class SelectionManager : MonoBehaviour
                 Tile newTile = hit.transform.GetComponent<Tile>();
                 if (newTile != null)
                 {
-                    if (Input.GetMouseButton(1))
+                    if (_selectedTile != null && _selectedTile.GetPawn().OnPlayerTeam)
                     {
-                        if (_selectedTile != null && _selectedTile.GetPawn().OnPlayerTeam)
+                        Pawn currentPawn = _selectedTile.GetPawn();
+                        if (currentPawn != null)
                         {
-                            Pawn currentPawn = _selectedTile.GetPawn();
-                            if (currentPawn != null)
+                            Pawn targetPawn = newTile.GetPawn();
+                            if (BattleManager.Instance.CurrentAction != null && targetPawn != null && currentPawn.IsTargetInRange(targetPawn, BattleManager.Instance.CurrentAction) && targetPawn.OnPlayerTeam != currentPawn.OnPlayerTeam)
                             {
-                                Pawn targetPawn = newTile.GetPawn();
-                                if (targetPawn != null && newTile.IsAdjacentTo(_selectedTile) && targetPawn.OnPlayerTeam != currentPawn.OnPlayerTeam)
-                                {
-                                    currentPawn.AttackPawnIfResourcesAvailable(targetPawn);
-                                }
-                                else if (newTile.IsInMoveRange && targetPawn == null)
-                                {
-                                    currentPawn.TryMoveToTile(newTile);
-                                }
+                                currentPawn.AttackPawnIfResourcesAvailable(targetPawn);
+                            }
+                            else if (newTile.IsInMoveRange && targetPawn == null)
+                            {
+                                currentPawn.TryMoveToTile(newTile);
                             }
                         }
                     }
+
                 }
             }
         }

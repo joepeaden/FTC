@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
 
-public class ItemUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class ItemUI : MonoBehaviour
 {
     [SerializeField]
     private TMP_Text itemPriceTxt;
@@ -18,8 +18,6 @@ public class ItemUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     public ItemData Item => _item;
     private ItemData _item;
 
-    private DecisionsManager _decisionsManager;
-
     public void Hide()
     {
         gameObject.SetActive(false);
@@ -28,8 +26,6 @@ public class ItemUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     public void SetData(ItemData theItem, DecisionsManager d, UnityAction<ItemUI> callback)
     {
         gameObject.SetActive(true);
-
-        _decisionsManager = d;
 
         if (theItem == null)
         {
@@ -72,16 +68,6 @@ public class ItemUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     public void RemoveCallbacks()
     {
         theButton.onClick.RemoveAllListeners();
-    }
-
-    public void OnPointerEnter(PointerEventData eventData)
-    {
-        _decisionsManager.HandleItemHoverStart(_item);
-    }
-
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        _decisionsManager.HandleItemHoverEnd();
     }
 
     private void OnDestroy()

@@ -53,11 +53,11 @@ public class EnemyAI : MonoBehaviour
             // dictionary is (tile, advantagerating)  
             Dictionary<Tile, int> moveRatingDict = new();
 
-            int activePawnEqRating = (activePawn.GameChar.GetTotalArmor() + activePawn.GameChar.WeaponItem.damage);
+            int activePawnEqRating = (activePawn.GameChar.GetTotalArmor() + activePawn.GameChar.GetWeaponDamageForAction(activePawn.GameChar.WeaponItem.baseAction));
             foreach (Pawn targetPawn in BattleManager.Instance.PlayerPawns)
             {
                 // get equipment advantage values
-                int targetEqRating = (targetPawn.GameChar.GetTotalArmor() + targetPawn.GameChar.WeaponItem.damage);
+                int targetEqRating = (targetPawn.GameChar.GetTotalArmor() + targetPawn.GameChar.GetWeaponDamageForAction(targetPawn.GameChar.WeaponItem.baseAction));
                 int eqAdvantageRating = activePawnEqRating - targetEqRating;
 
                 Tile bestTargetTile = null;

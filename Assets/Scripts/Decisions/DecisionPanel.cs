@@ -72,7 +72,7 @@ public class DecisionPanel : MonoBehaviour
     public void GenerateContractOption()
     {
         numOfEnemies = Random.Range(_minNumOfEnemies, _maxNumOfEnemies);
-        goldAmount = numOfEnemies * 100;
+        goldAmount = numOfEnemies * 25;
 
         _titleText.text = "Contract";
         _descriptionText.text = "Here here! Local ruffians have disturbed m'lord's lands and terrorized the people of this here village. A group of men is hereby requested to deal with them.";

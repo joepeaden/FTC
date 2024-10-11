@@ -3,7 +3,7 @@ using TMPro;
 
 public class EquipmentTooltip : MonoBehaviour
 {
-    [SerializeField] TMP_Text equipmentNameText;
+    [SerializeField] TMP_Text nameText;
     [SerializeField] TMP_Text descriptionText;
 
     [SerializeField] GameObject armorElements;
@@ -15,11 +15,18 @@ public class EquipmentTooltip : MonoBehaviour
     [SerializeField] GameObject viceModElements;
     [SerializeField] TMP_Text viceModLabel;
     [SerializeField] TMP_Text viceModValue;
+    [SerializeField] TMP_Text armorDmgValue;
+    [SerializeField] TMP_Text penDmgValue;
+    [SerializeField] GameObject infoLine;
+    [SerializeField] Transform infoParent;
 
     [SerializeField] GameObject weaponElements;
     [SerializeField] TMP_Text dmgValue;
 
-    private ItemData _currentItem;
+    private void Awake()
+    {
+        DontDestroyOnLoad(gameObject);
+    }
 
     public void SetItem(ItemData item)
     {
@@ -30,15 +37,22 @@ public class EquipmentTooltip : MonoBehaviour
 
         gameObject.SetActive(true);
 
-        equipmentNameText.text = item.itemName;
+        nameText.text = item.itemName;
         descriptionText.text = item.description;
+
+        for (int i = 0; i < infoParent.childCount; i++)
+        {
+            Destroy(infoParent.GetChild(i).gameObject);
+        }
 
         if (item.itemType == ItemType.Weapon)
         {
             weaponElements.SetActive(true);
             armorElements.SetActive(false);
             WeaponItemData weaponItem = (WeaponItemData)item;
-            dmgValue.text = weaponItem.damage.ToString();
+            dmgValue.text = weaponItem.baseDamage.ToString();
+            armorDmgValue.text = (weaponItem.baseArmorDamage * 100).ToString() + "%";
+            penDmgValue.text = (weaponItem.basePenetrationDamage * 100).ToString() + "%";
         }
         else
         {
@@ -66,8 +80,58 @@ public class EquipmentTooltip : MonoBehaviour
                 }
             }
         }
+    }
 
-        _currentItem = item;
+    public void SetAction(ActionData action)
+    {
+        if (action == null)
+        {
+            return;
+        }
+
+        armorElements.SetActive(false);
+        weaponElements.SetActive(false);
+
+        gameObject.SetActive(true);
+
+        nameText.text = action.actionName;
+        descriptionText.text = action.description;
+
+        for (int i = 0; i < infoParent.childCount; i++)
+        {
+            Destroy(infoParent.GetChild(i).gameObject);
+        }
+
+        GameObject newLine = Instantiate(infoLine, infoParent);
+        newLine.GetComponent<InfoLine>().SetData("MOT Cost", action.motCost.ToString());
+        newLine = Instantiate(infoLine, infoParent);
+        newLine.GetComponent<InfoLine>().SetData("AP Cost", action.apCost.ToString());
+        newLine = Instantiate(infoLine, infoParent);
+        newLine.GetComponent<InfoLine>().SetData("Range", action.range.ToString());
+
+        if (action.damageMod > 0)
+        {
+            newLine = Instantiate(infoLine, infoParent);
+            newLine.GetComponent<InfoLine>().SetData("DMG Mod", action.damageMod.ToString());
+        }
+
+        if (action.armorDamageMod > 0)
+        {
+            newLine = Instantiate(infoLine, infoParent);
+            newLine.GetComponent<InfoLine>().SetData("AMR DMG Mod", (action.armorDamageMod * 100).ToString() + "%");
+        }
+
+        if (action.penetrationDamageMod > 0)
+        {
+            newLine = Instantiate(infoLine, infoParent);
+            newLine.GetComponent<InfoLine>().SetData("AMR PEN Mod", (action.penetrationDamageMod * 100).ToString() + "%");
+        }
+
+        if (action.accMod > 0)
+        {
+            newLine = Instantiate(infoLine, infoParent);
+            newLine.GetComponent<InfoLine>().SetData("ACC Mod", (action.accMod * 100).ToString() + "%");
+        }
     }
 
     private void UpdateModText(GameObject parentGO, TMP_Text valueText, int modifierValue)

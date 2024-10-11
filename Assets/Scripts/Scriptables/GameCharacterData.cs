@@ -11,4 +11,9 @@ public class GameCharacterData : ScriptableObject
 
     public int startingGold;
     public int recruitPrice;
+
+    public int minInit;
+    public int maxInit;
+    public int minHP;
+    public int maxHP;
 }

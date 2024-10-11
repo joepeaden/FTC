@@ -35,7 +35,6 @@ public class BattleManager : MonoBehaviour
     [SerializeField] Transform enemyParent;
     [SerializeField] Transform friendlyParent;
     [SerializeField] TMP_Text hitChanceText;
-    [SerializeField] GameObject characterInfoPanel;
     [SerializeField] TMP_Text characterNameText;
     [SerializeField] TMP_Text characterMotivatorText;
     [SerializeField] PawnHeadPreview currentPawnPreview;
@@ -47,19 +46,28 @@ public class BattleManager : MonoBehaviour
     [SerializeField] StatBar apBar;
     [SerializeField] TMP_Text motText;
     [SerializeField] StatBar motBar;
-    [SerializeField] private GameObject _initStackGO;
     [SerializeField] private Transform _initStackParent;
     [SerializeField] GameObject pawnPreviewPrefab;
     [SerializeField] private List<TextFloatUp> _floatingTexts = new();
     [SerializeField] private CharacterTooltip charTooltip;
     [SerializeField] private GameObject _instructionsUI;
     [SerializeField] private Button _startBattleButton;
+    [SerializeField] private Transform _actionsParent;
+    [SerializeField] private GameObject _actionButtonPrefab;
     [SerializeField] private WeaponItemData testWeapon;
+    [SerializeField] private GameObject bottomUIObjects;
+
+    private List<ActionButton> actionButtons = new();
+
+    public ActionData CurrentAction => currentAction;
+    private ActionData currentAction;
 
     private Stack<Pawn> _initiativeStack = new ();
 
     public int TurnNumber => _turnNumber;
     private int _turnNumber = -1;
+
+    private List<Tile> tilesToHighlight = new();
 
     private void Awake()
     {
@@ -155,6 +163,12 @@ public class BattleManager : MonoBehaviour
         {
             ToggleInstructions();
         }
+
+        if (Input.GetMouseButtonDown(1))
+        {
+            ClearSelectedAction();
+        }
+
     }
 
     private void ToggleInstructions()
@@ -170,7 +184,7 @@ public class BattleManager : MonoBehaviour
     {
         if (p != null)
         {
-            characterInfoPanel.SetActive(true);
+            bottomUIObjects.SetActive(true);
             characterNameText.text = p.GameChar.CharName;
             characterMotivatorText.text = p.CurrentVice.ToString();
             armorText.text = "AR: " + p.ArmorPoints + "/" + p.MaxArmorPoints;
@@ -186,9 +200,41 @@ public class BattleManager : MonoBehaviour
             //currentPawnFace.sprite = p.GetFaceSprite();
             //currentPawnHelm.sprite = p.GetFaceSprite();
 
-            _initStackGO.SetActive(true);
             RefreshInitStackUI();
+
+            for (int i = 0; i < _actionsParent.childCount; i++)
+            {
+                Destroy(_actionsParent.GetChild(i).gameObject);
+            }
+
+            actionButtons.Clear();
+
+            if (p.OnPlayerTeam)
+            {
+                GameObject actionButtonGO = Instantiate(_actionButtonPrefab, _actionsParent);
+                actionButtonGO.GetComponent<ActionButton>().SetDataButton(p.GameChar.WeaponItem.baseAction, HandleActionClicked);
+                actionButtons.Add(actionButtonGO.GetComponent<ActionButton>());
+                if (p.GameChar.WeaponItem.specialAction != null)
+                {
+                    actionButtonGO = Instantiate(_actionButtonPrefab, _actionsParent);
+                    actionButtonGO.GetComponent<ActionButton>().SetDataButton(p.GameChar.WeaponItem.specialAction, HandleActionClicked);
+                }
+            }
         }
+    }
+
+    private void ClearSelectedAction()
+    {
+        foreach (ActionButton abutton in actionButtons)
+        {
+            abutton.SetInactive();
+        }
+        currentAction = null;
+    }
+
+    private void HandleActionClicked(ActionData action)
+    {
+        currentAction = action;
     }
 
     private void EndTurn()
@@ -214,7 +260,6 @@ public class BattleManager : MonoBehaviour
             {
                 int expectedAPAfterMove = selectedPawn.GetAPAfterMove(targetTile);
                 apBar.SetBar(Pawn.BASE_ACTION_POINTS, selectedPawn.ActionPoints, expectedAPAfterMove);
-
             }
             else
             {
@@ -228,6 +273,26 @@ public class BattleManager : MonoBehaviour
                     // otherwise we might be hovering ourselves or a teammate so reset the AP Bar
                     apBar.SetBar(Pawn.BASE_ACTION_POINTS, selectedPawn.ActionPoints);
                 }
+
+                if (currentAction != null && targetPawn.OnPlayerTeam != selectedPawn.OnPlayerTeam && targetPawn.IsTargetInRange(selectedPawn, currentAction))
+                {
+                    tilesToHighlight.Clear();
+                    tilesToHighlight.Add(targetTile);
+                    if (currentAction != null)
+                    {
+                        if (currentAction.attackStyle == ActionData.AttackStyle.LShape)
+                        {
+                            tilesToHighlight.Add(selectedPawn.CurrentTile.GetClockwiseNextTile(targetTile));
+                        }
+
+
+                    }
+
+                    foreach (Tile t in tilesToHighlight)
+                    {
+                        t.HighlightForAction();
+                    }
+                }
             }
         }
     }
@@ -235,6 +300,12 @@ public class BattleManager : MonoBehaviour
     public void HandleTileHoverEnd(Tile t)
     {
         HideHitChance();
+
+        foreach(Tile highlightedTile in tilesToHighlight)
+        {
+            highlightedTile.ClearActionHighlight();
+        }
+        tilesToHighlight.Clear();
     }
 
     public void HideHitChance()
@@ -251,7 +322,7 @@ public class BattleManager : MonoBehaviour
         if (selectedPawn.GetAdjacentEnemies().Contains(p))
         {
             float chance = selectedPawn.GetHitChance(p);
-            charTooltip.ShowHitPreview(chance, selectedPawn.Damage);
+            charTooltip.ShowHitPreview(chance);//, selectedPawn.Damage);
         }
     }
 
@@ -284,6 +355,8 @@ public class BattleManager : MonoBehaviour
     {
         UpdateUIForPawn(p);
         _selectionManager.SetSelectedTile(p.CurrentTile);
+
+        ClearSelectedAction();
 
         if (!p.HasActionsRemaining())
         {
@@ -379,8 +452,7 @@ public class BattleManager : MonoBehaviour
     {
         turnUI.SetActive(false);
         winLoseUI.SetActive(true);
-        characterInfoPanel.SetActive(false);
-        _initStackGO.SetActive(false);
+        bottomUIObjects.SetActive(false);
         winLoseText.text = battleResult == BattleResult.Win ? "Victory!" : "Defeat!" ;
         _battleResult = battleResult;
     }

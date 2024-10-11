@@ -36,7 +36,7 @@ public class CharacterTooltip : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void ShowHitPreview(float chance, int damage)
+    public void ShowHitPreview(float chance)//, int damage)
     {
         hitChanceUI.SetActive(true);
         hitChanceText.text = "To Hit: " + chance * 100 + "%";
