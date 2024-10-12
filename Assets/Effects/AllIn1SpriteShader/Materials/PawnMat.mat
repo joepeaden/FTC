@@ -12,9 +12,9 @@ Material:
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
+  - GLOW_ON
   - HITEFFECT_ON
   - INNEROUTLINE_ON
-  - OFFSETUV_ON
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -123,7 +123,7 @@ Material:
     - _GhostTransparency: 0
     - _GlitchAmount: 3
     - _GlitchSize: 1
-    - _Glow: 6
+    - _Glow: 0
     - _GlowGlobal: 1
     - _GradBlend: 1
     - _GradBoostX: 1.2

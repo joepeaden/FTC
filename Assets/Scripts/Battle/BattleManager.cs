@@ -535,6 +535,8 @@ public class BattleManager : MonoBehaviour
     /// </summary>
     public void PawnFinished(Pawn p)
     {
+        p.HandleTurnEnded();
+
         if (_selectionManager.SelectedTile != null)
         {
             _selectionManager.SelectedTile.SetSelected(false);
@@ -615,7 +617,7 @@ public class BattleManager : MonoBehaviour
             pawnList.Add(p);
         }
         
-        pawnList = pawnList.OrderBy(pawn => pawn.GameChar.GetInitiative()).ToList();
+        pawnList = pawnList.OrderBy(pawn => pawn.Initiative).ToList();
 
         // this way the stack can be sorted properly 
         _initiativeStack = new(pawnList);

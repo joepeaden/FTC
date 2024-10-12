@@ -12,6 +12,8 @@ public class Pawn : MonoBehaviour
     public const int BASE_ACTION_POINTS = 6;
 
     public UnityEvent OnPawnHit = new();
+    private static UnityEvent UpdateMotivationEvent = new();
+    public UnityEvent OnEffectGained = new();
 
     public float baseHitChance;
     public float baseDodgeChance;
@@ -40,10 +42,15 @@ public class Pawn : MonoBehaviour
     public int Motivation => _motivation;
     private int _motivation;
 
+    public int Initiative => GameChar.GetInitiative() + GetInitBuff();
+
     public bool IsDead => _isDead;
     private bool _isDead;
 
     public bool EngagedInCombat => GetAdjacentEnemies().Count > 0;
+
+    public bool IsMotivated => _isMotivated;
+    private bool _isMotivated;
 
     [SerializeField] AIPathCustom pathfinder;
 
@@ -52,6 +59,15 @@ public class Pawn : MonoBehaviour
     [SerializeField] private Sprite _enemyHeadSprite;
     [SerializeField] private Sprite _enemyBodySprite;
     [SerializeField] private Sprite _enemyLegSprite;
+    [SerializeField] private Sprite _gloryHeadSprite;
+    [SerializeField] private Sprite _gloryBodySprite;
+    [SerializeField] private Sprite _gloryLegSprite;
+    [SerializeField] private Sprite _honorHeadSprite;
+    [SerializeField] private Sprite _honorBodySprite;
+    [SerializeField] private Sprite _honorLegSprite;
+    [SerializeField] private Sprite _greedHeadSprite;
+    [SerializeField] private Sprite _greedBodySprite;
+    [SerializeField] private Sprite _greedLegSprite;
     [SerializeField] private SpriteRenderer _headSpriteRend;
     [SerializeField] private SpriteRenderer _bodySpriteRend;
     [SerializeField] private SpriteRenderer _leg1SpriteRend;
@@ -63,6 +79,9 @@ public class Pawn : MonoBehaviour
     [SerializeField] private AudioClip hitSound;
     [SerializeField] private AudioClip armorHitSound;
     [SerializeField] private AudioClip dieSound;
+    [SerializeField] private AudioClip greedViceSound;
+    [SerializeField] private AudioClip gloryViceSound;
+    [SerializeField] private AudioClip honorViceSound;
     [SerializeField] private AudioSource _audioSource;
 
     public GameCharacter GameChar => _gameChar;
@@ -70,10 +89,23 @@ public class Pawn : MonoBehaviour
 
     public GameCharacter.CharVices CurrentVice => _gameChar.Vice;
 
+    private bool _hasMadeFreeAttack;
+
+    #region UnityEvents
+
     private void Awake()
     {
         pathfinder.OnDestinationReached.AddListener(HandleDestinationReached);
+        UpdateMotivationEvent.AddListener(UpdateMotivatedStatus);
     }
+
+    private void OnDestroy()
+    {
+        pathfinder.OnDestinationReached.RemoveListener(HandleDestinationReached);
+        UpdateMotivationEvent.RemoveListener(UpdateMotivatedStatus);
+    }
+
+    #endregion
 
     public void SetCharacter(GameCharacter character, bool isPlayerTeam)
     {
@@ -93,6 +125,28 @@ public class Pawn : MonoBehaviour
         if (_gameChar.HelmItem != null)
         {
             _helmSpriteRend.sprite = _gameChar.HelmItem.itemSprite;
+        }
+
+        switch (character.Vice)
+        {
+            case GameCharacter.CharVices.Greed:
+                _headSpriteRend.sprite = _greedHeadSprite;
+                _bodySpriteRend.sprite = _greedBodySprite;
+                _leg1SpriteRend.sprite = _greedLegSprite;
+                _leg2SpriteRend.sprite = _greedLegSprite;
+                break;
+            case GameCharacter.CharVices.Honor:
+                _headSpriteRend.sprite = _honorHeadSprite;
+                _bodySpriteRend.sprite = _honorBodySprite;
+                _leg1SpriteRend.sprite = _honorLegSprite;
+                _leg2SpriteRend.sprite = _honorLegSprite;
+                break;
+            case GameCharacter.CharVices.Glory:
+                _headSpriteRend.sprite = _gloryHeadSprite;
+                _bodySpriteRend.sprite = _gloryBodySprite;
+                _leg1SpriteRend.sprite = _gloryLegSprite;
+                _leg2SpriteRend.sprite = _gloryLegSprite;
+                break;
         }
     }
 
@@ -136,10 +190,10 @@ public class Pawn : MonoBehaviour
 
         if (!OnPlayerTeam)
         {
-            _headSpriteRend.sprite = _enemyHeadSprite;
-            _bodySpriteRend.sprite = _enemyBodySprite;
-            _leg1SpriteRend.sprite = _enemyLegSprite;
-            _leg2SpriteRend.sprite = _enemyLegSprite;
+            //_headSpriteRend.sprite = _enemyHeadSprite;
+            //_bodySpriteRend.sprite = _enemyBodySprite;
+            //_leg1SpriteRend.sprite = _enemyLegSprite;
+            //_leg2SpriteRend.sprite = _enemyLegSprite;
         }
         else
         {
@@ -174,6 +228,21 @@ public class Pawn : MonoBehaviour
         spawnTile.PawnEnterTile(this);
         transform.position = spawnTile.transform.position;
     }
+    
+    public List<Pawn> GetAdjacentPawns()
+    {
+        List<Pawn> adjPawns = new();
+        foreach (Tile t in _currentTile.GetAdjacentTiles())
+        {
+            Pawn p = t.GetPawn();
+            if (p != null && !p.IsDead)
+            {
+                adjPawns.Add(p);
+            }
+        }
+
+        return adjPawns;
+    }
 
     public List<Pawn> GetAdjacentEnemies()
     {
@@ -181,7 +250,7 @@ public class Pawn : MonoBehaviour
         foreach (Tile t in _currentTile.GetAdjacentTiles())
         {
             Pawn p = t.GetPawn();
-            if (p != null && p.OnPlayerTeam != _onPlayerTeam)
+            if (p != null && p.OnPlayerTeam != _onPlayerTeam && !p.IsDead)
             {
                 adjacentEnemies.Add(p);
             }
@@ -189,6 +258,8 @@ public class Pawn : MonoBehaviour
 
         return adjacentEnemies;
     }
+
+    #region Combat
 
     public float GetHitChance(Pawn targetPawn)
     {
@@ -219,6 +290,18 @@ public class Pawn : MonoBehaviour
 
         // don't wanna include yourself so - 1
         float surroundHitBonus = (surroundingAllies - 1) * .05f;
+
+        // greedy passive is increased hit bonus when surround
+        if (GameChar.Vice == GameCharacter.CharVices.Greed && _isMotivated)
+        {
+            motivationHitBonus = surroundHitBonus;
+        }
+
+        // honor passive is better dodge in 1v1
+        if (targetPawn.GameChar.Vice == GameCharacter.CharVices.Honor && targetPawn._isMotivated)
+        {
+            motivationHitBonus = -.2f;
+        }
 
         float hitChance = baseHitChance + motivationHitBonus + surroundHitBonus + GameChar.GetCharHitChance() + (BattleManager.Instance.CurrentAction != null ? BattleManager.Instance.CurrentAction.accMod : 0);
         return hitChance;
@@ -274,10 +357,22 @@ public class Pawn : MonoBehaviour
             AttackPawn(targetPawn, currentAction);
         }
 
-        _actionPoints -= currentAction.apCost;
-        _motivation -= currentAction.motCost;
+        if (GameChar.Vice == GameCharacter.CharVices.Glory && _isMotivated && !_hasMadeFreeAttack)
+        {
+            _hasMadeFreeAttack = true;
+        }
+        else
+        {
+            _actionPoints -= currentAction.apCost;
+            _motivation -= currentAction.motCost;
+        }
 
         BattleManager.Instance.PawnActivated(this);
+    }
+
+    public void HandleTurnEnded()
+    {
+        _hasMadeFreeAttack = false;
     }
 
     private void AttackPawn(Pawn targetPawn, ActionData currentAction)
@@ -370,6 +465,21 @@ public class Pawn : MonoBehaviour
         OnPawnHit.Invoke();
     }
 
+    private void Die()
+    {
+        StartCoroutine(PlayAnimationAfterDelay(.2f, "Die"));
+        StartCoroutine(PlayAudioAfterDelay(.35f, dieSound));
+
+        _isDead = true;
+        UpdateMotivationEvent.Invoke();
+        CurrentTile.PawnExitTile();
+        BattleManager.Instance.PawnKilled(this);
+    }
+
+    #endregion
+
+    #region FX
+
     private IEnumerator PlayArmorHitFXAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
@@ -398,15 +508,7 @@ public class Pawn : MonoBehaviour
         _audioSource.Play();
     }
 
-    private void Die()
-    {
-        StartCoroutine(PlayAnimationAfterDelay(.2f, "Die"));
-        StartCoroutine(PlayAudioAfterDelay(.35f, dieSound));
-        CurrentTile.PawnExitTile();
-        _isDead = true;
-
-        BattleManager.Instance.PawnKilled(this);
-    }
+    #endregion
 
     /// <summary>
     /// Does the character have enough resources to make any action?
@@ -464,6 +566,8 @@ public class Pawn : MonoBehaviour
 
         _actionPoints = BASE_ACTION_POINTS;
     }
+
+    #region Movement
 
     /// <summary>
     /// Move as close as possible to the tile. If not enough AP, pick the next
@@ -536,11 +640,117 @@ public class Pawn : MonoBehaviour
 
         _anim.Play("Idle");
 
+        UpdateMotivationEvent.Invoke();
+
         BattleManager.Instance.PawnActivated(this);
     }
 
-    private void OnDestroy()
+    #endregion
+
+    #region Motivation
+
+    public int GetInitBuff()
     {
-        pathfinder.OnDestinationReached.RemoveListener(HandleDestinationReached);
+        if (GameChar.Vice == GameCharacter.CharVices.Glory && _isMotivated)
+        {
+            return 100;
+        }
+        else
+        {
+            return 0;
+        }
     }
+
+    public void UpdateMotivatedStatus()
+    {
+        if (IsDead)
+        {
+            _isMotivated = false;
+            return;
+        }
+
+        bool wasInMotCondition = _isMotivated;
+
+        // get adjacent enemy pawns at that tile
+        List<Pawn> adjEnemyPawns = GetAdjacentEnemies();
+
+        // if there's no one adjacent, then no conditions
+        if (adjEnemyPawns.Count == 0)
+        {
+            return;
+        }
+
+        bool in1v1 = false;
+        bool isGangedUpOn = false;
+        bool isGangingUp = false;
+
+        // only facing one enemy
+        if (adjEnemyPawns.Count == 1)
+        {
+            in1v1 = adjEnemyPawns[0].GetAdjacentEnemies().Count == 1;
+        }
+        else
+        {
+            isGangedUpOn = true;
+        }
+
+        foreach (Pawn p in adjEnemyPawns)
+        {
+            if (_currentTile == CurrentTile)
+            {
+                if (p.GetAdjacentEnemies().Count > 1)
+                {
+                    isGangingUp = true;
+                }
+            }
+            else
+            {
+                if (p.GetAdjacentEnemies().Count > 0)
+                {
+                    isGangingUp = true;
+                }
+            }
+        }
+
+        string textOnMotivate = "";
+
+        switch (GameChar.Vice)
+        {
+            case GameCharacter.CharVices.Honor:
+                _isMotivated = in1v1;
+                textOnMotivate = "Duel!";
+                break;
+
+            case GameCharacter.CharVices.Glory:
+                _isMotivated = isGangedUpOn;
+                textOnMotivate = "Surrounded!";
+                break;
+
+            case GameCharacter.CharVices.Greed:
+                _isMotivated = isGangingUp;
+                textOnMotivate = "Surrounding!";
+                break;
+        }
+
+        if (_isMotivated && !wasInMotCondition)
+        {
+            //_anim.Play("MotivatedGain");
+            //_audioSource.clip = greedViceSound;
+            //_audioSource.Play();
+
+            BattleManager.Instance.AddTextNotification(transform.position, "+ " + textOnMotivate);
+        }
+        else if (!_isMotivated && wasInMotCondition)
+        {
+            BattleManager.Instance.AddTextNotification(transform.position, "- " + textOnMotivate);
+            //_anim.Play("MotivatedLoss");
+        }
+
+        //_anim.SetBool("IsMotivated", _isInMotCondition);
+
+        OnEffectGained.Invoke();
+
+    }
+
+    #endregion
 }

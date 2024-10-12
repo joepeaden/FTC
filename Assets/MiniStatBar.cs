@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MiniStatBar : MonoBehaviour
 {
@@ -9,16 +10,13 @@ public class MiniStatBar : MonoBehaviour
     [SerializeField] private StatBar _hpBar;
     [SerializeField] private StatBar _arBar;
 
+    [SerializeField] private Image _effectIconPrefab;
+    [SerializeField] private Transform _effectIconParent;
+
     private Pawn _pawn;
 
-    public void SetData(Pawn p)
-    {
-        _pawn = p;
 
-        UpdateBars();
-
-        p.OnPawnHit.AddListener(UpdateBars);
-    }
+    #region UnityEventFunctions
 
     private void Update()
     {
@@ -28,6 +26,24 @@ public class MiniStatBar : MonoBehaviour
             objScreenPos.y += yOffset;
             GetComponent<RectTransform>().position = objScreenPos;
         }
+    }
+
+    private void OnDestroy()
+    {
+        _pawn.OnPawnHit.RemoveListener(UpdateBars);
+        _pawn.OnEffectGained.RemoveListener(UpdateEffects);
+    }
+
+    #endregion
+
+    public void SetData(Pawn p)
+    {
+        _pawn = p;
+
+        UpdateBars();
+
+        p.OnPawnHit.AddListener(UpdateBars);
+        p.OnEffectGained.AddListener(UpdateEffects);
     }
 
     private void UpdateBars()
@@ -50,8 +66,17 @@ public class MiniStatBar : MonoBehaviour
         _hpBar.SetBar(_pawn.MaxHitPoints, _pawn.HitPoints);
     }
 
-    private void OnDestroy()
+    private void UpdateEffects()
     {
-        _pawn.OnPawnHit.RemoveListener(UpdateBars);
+        for (int i = 0; i < _effectIconParent.childCount; i++)
+        {
+            Destroy(_effectIconParent.GetChild(i).gameObject);
+        }
+
+        if (_pawn.IsMotivated)
+        {
+            Instantiate(_effectIconPrefab, _effectIconParent);
+        }
     }
+
 }

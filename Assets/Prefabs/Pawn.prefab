@@ -133,7 +133,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4568fb15ab62d42bf9be2379ed15af26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _baseAPPerAttack: 3
+  OnPawnHit:
+    m_PersistentCalls:
+      m_Calls: []
   baseHitChance: 0.6
   baseDodgeChance: 0
   baseSurroundBonus: 0.2
@@ -142,6 +144,15 @@ MonoBehaviour:
   _enemyHeadSprite: {fileID: 21300000, guid: e6da235dd98984c0f8ec788d6da0f094, type: 3}
   _enemyBodySprite: {fileID: 21300000, guid: 25aae8409129046f8a064cccae2f68ae, type: 3}
   _enemyLegSprite: {fileID: 21300000, guid: 47bf8c41ddee44625a89710d6ca25476, type: 3}
+  _gloryHeadSprite: {fileID: 21300000, guid: 99e157ed821524580a0ac12011772fc5, type: 3}
+  _gloryBodySprite: {fileID: 21300000, guid: cd054a5a82cf94127a2a2c2f45964fdc, type: 3}
+  _gloryLegSprite: {fileID: 21300000, guid: 01b2a2301363e4f1b9884daff9304408, type: 3}
+  _honorHeadSprite: {fileID: 21300000, guid: 240b2e69224cb4834af169bb475c62a9, type: 3}
+  _honorBodySprite: {fileID: 21300000, guid: 750444447a94f4f80b014ac53346eb22, type: 3}
+  _honorLegSprite: {fileID: 21300000, guid: a4fbf08e9bf7d4de0845edbceb80cd82, type: 3}
+  _greedHeadSprite: {fileID: 21300000, guid: 58c1dc30f643c4a7ebe41a61cba850b4, type: 3}
+  _greedBodySprite: {fileID: 21300000, guid: be913452713344c9f9a0e5ff4922d1dc, type: 3}
+  _greedLegSprite: {fileID: 21300000, guid: a3144be4d7751436283b0a27d30bc9c9, type: 3}
   _headSpriteRend: {fileID: 8961852416644960450}
   _bodySpriteRend: {fileID: 8960198913141712320}
   _leg1SpriteRend: {fileID: 8960287608822202652}
@@ -151,6 +162,9 @@ MonoBehaviour:
   hitSound: {fileID: 8300000, guid: 26e178cc91d704d69b9c8f5c90d8e061, type: 3}
   armorHitSound: {fileID: 8300000, guid: f442ae3543bf8cd4b89b4085ed9f7917, type: 3}
   dieSound: {fileID: 8300000, guid: 53defb0490f384700828806354f94976, type: 3}
+  greedViceSound: {fileID: 8300000, guid: 79583bfe2f93448b1a562ce657902064, type: 3}
+  gloryViceSound: {fileID: 0}
+  honorViceSound: {fileID: 0}
   _audioSource: {fileID: 5720785191603622845}
 --- !u!114 &5116864122955787313
 MonoBehaviour:

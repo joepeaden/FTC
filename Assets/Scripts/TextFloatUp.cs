@@ -16,7 +16,9 @@ public class TextFloatUp : MonoBehaviour
     public void SetData(Vector3 position, string text, Color color)
     {
         StopAllCoroutines();
-        transform.position = new Vector3(position.x, position.y + heightOffset, position.z);
+        Vector3 newPos = Camera.main.WorldToScreenPoint(position);
+        newPos.y += heightOffset;
+        transform.position = newPos;
         textElement.text = text;
         StartCoroutine(Fade());
         _inUse = true;
