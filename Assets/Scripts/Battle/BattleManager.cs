@@ -64,6 +64,9 @@ public class BattleManager : MonoBehaviour
     [Header("UI")]
     [SerializeField] private Transform _healthBarParent;
     [SerializeField] private MiniStatBar _miniStatBarPrefab;
+    [SerializeField] private GameObject _instructionsP1;
+    [SerializeField] private GameObject _instructionsP2;
+    [SerializeField] private Button _nextInstructionsButton;
 
     [Header("Equipment")]
     [SerializeField] private ArmorItemData lightHelm;
@@ -241,9 +244,11 @@ public class BattleManager : MonoBehaviour
 
         Tile.OnTileHoverStart.AddListener(HandleTileHoverStart);
         Tile.OnTileHoverEnd.AddListener(HandleTileHoverEnd);
-        _endTurnButton.onClick.AddListener(EndTurn);
 
+        // UI
+        _endTurnButton.onClick.AddListener(EndTurn);
         _startBattleButton.onClick.AddListener(ToggleInstructions);
+        _nextInstructionsButton.onClick.AddListener(NextInstructions);
     }
 
     private void Start()
@@ -251,26 +256,47 @@ public class BattleManager : MonoBehaviour
         _battleResult = BattleResult.Undecided;
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            ToggleInstructions();
+        }
+
+        if (Input.GetMouseButtonDown(1))
+        {
+            ClearSelectedAction();
+        }
+
+    }
+
     private void OnDestroy()
     {
-        gameOverButton.onClick.RemoveListener(ExitBattle);
-
         Tile.OnTileHoverStart.RemoveListener(HandleTileHoverStart);
         Tile.OnTileHoverEnd.RemoveListener(HandleTileHoverEnd);
+
+        // UI
         _endTurnButton.onClick.RemoveListener(EndTurn);
+        gameOverButton.onClick.RemoveListener(ExitBattle);
         _startBattleButton.onClick.RemoveListener(ToggleInstructions);
+        _nextInstructionsButton.onClick.AddListener(NextInstructions);
     }
 
-    public void PlayBloodSpurt(Vector3 location)
+    #region UI
+
+    private void NextInstructions()
     {
-        bloodEffect.gameObject.transform.position = location;
-        bloodEffect.Play();
+        _instructionsP1.SetActive(!_instructionsP1.activeInHierarchy);
+        _instructionsP2.SetActive(!_instructionsP2.activeInHierarchy);
     }
 
-    public void PlayArmorHitFX(Vector3 location)
+    private void ToggleInstructions()
     {
-        armorHitEffect.gameObject.transform.position = location;
-        armorHitEffect.Play();
+        _instructionsUI.SetActive(!_instructionsUI.activeInHierarchy);
+        if (_turnNumber == -1)
+        {
+            StartBattle();
+        }
     }
 
     public void AddTextNotification(Vector3 pos, string str)
@@ -289,26 +315,29 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    private void Update()
+    public void RefreshInitStackUI()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        for (int i = 0; i < _initStackParent.childCount; i++)
         {
-            ToggleInstructions();
+            Transform child = _initStackParent.GetChild(i);
+            Destroy(child.gameObject);
         }
 
-        if (Input.GetMouseButtonDown(1))
+        int newChildCount = 0;
+        foreach (Pawn p in _initiativeStack)
         {
-            ClearSelectedAction();
-        }
+            // the UI only has space for 7 to look pretty
+            if (newChildCount > 7)
+                break;
 
-    }
+            if (p.IsDead)
+            {
+                continue;
+            }
 
-    private void ToggleInstructions()
-    {
-        _instructionsUI.SetActive(!_instructionsUI.activeInHierarchy);
-        if (_turnNumber == -1)
-        {
-            StartBattle();
+            GameObject pawnPreview = Instantiate(pawnPreviewPrefab, _initStackParent);
+            pawnPreview.GetComponent<PawnHeadPreview>().SetData(p);
+            newChildCount++;
         }
     }
 
@@ -356,41 +385,6 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    public void ClearSelectedAction()
-    {
-        foreach (ActionButton abutton in actionButtons)
-        {
-            abutton.SetInactive();
-        }
-
-        if (_currentAction != null)
-        {
-            CurrentPawn.CurrentTile.HighlightTilesInRange(_currentAction.range + 1, false, Tile.TileHighlightType.AttackRange);
-            _currentAction = null;
-
-            if (CurrentPawn.HasActionsRemaining())
-            {
-                CurrentPawn.CurrentTile.HighlightTilesInRange(_currentPawn.MoveRange+1, true, Tile.TileHighlightType.Move);
-            }
-        }
-    }
-
-    private void HandleActionClicked(ActionData action)
-    {
-        ClearSelectedAction();
-
-        _currentAction = action;
-
-        CurrentPawn.CurrentTile.HighlightTilesInRange(_currentPawn.MoveRange+1, false, Tile.TileHighlightType.Move);
-        CurrentPawn.CurrentTile.HighlightTilesInRange(_currentAction.range+1, true, Tile.TileHighlightType.AttackRange);
-    }
-
-    private void EndTurn()
-    {
-        Pawn activePawn = _selectionManager.SelectedTile.GetPawn();
-        PawnFinished(activePawn);
-    }
-
     public void HandleTileHoverStart(Tile targetTile)
     {
         if (_selectionManager.SelectedTile == null)
@@ -426,10 +420,10 @@ public class BattleManager : MonoBehaviour
             // if targetPawn is null, then we're hovering a movement tile.
             if (targetPawn == null)
             {
-                    int expectedAPAfterMove = selectedPawn.GetAPAfterMove(targetTile);
-                    apBar.SetBar(Pawn.BASE_ACTION_POINTS, selectedPawn.ActionPoints, expectedAPAfterMove);
-                    // otherwise we might be hovering ourselves or a teammate so reset the AP Bar
-                    //apBar.SetBar(Pawn.BASE_ACTION_POINTS, selectedPawn.ActionPoints);
+                int expectedAPAfterMove = selectedPawn.GetAPAfterMove(targetTile);
+                apBar.SetBar(Pawn.BASE_ACTION_POINTS, selectedPawn.ActionPoints, expectedAPAfterMove);
+                // otherwise we might be hovering ourselves or a teammate so reset the AP Bar
+                //apBar.SetBar(Pawn.BASE_ACTION_POINTS, selectedPawn.ActionPoints);
             }
             else
             {
@@ -442,7 +436,7 @@ public class BattleManager : MonoBehaviour
     {
         HideHitChance();
 
-        foreach(Tile highlightedTile in tilesToHighlight)
+        foreach (Tile highlightedTile in tilesToHighlight)
         {
             highlightedTile.ClearActionHighlight();
         }
@@ -467,6 +461,60 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+    #endregion
+
+    #region FX
+
+    public void PlayBloodSpurt(Vector3 location)
+    {
+        bloodEffect.gameObject.transform.position = location;
+        bloodEffect.Play();
+    }
+
+    public void PlayArmorHitFX(Vector3 location)
+    {
+        armorHitEffect.gameObject.transform.position = location;
+        armorHitEffect.Play();
+    }
+
+    #endregion
+
+    #region BattleManagement
+
+    public void ClearSelectedAction()
+    {
+        foreach (ActionButton abutton in actionButtons)
+        {
+            abutton.SetInactive();
+        }
+
+        if (_currentAction != null)
+        {
+            CurrentPawn.CurrentTile.HighlightTilesInRange(_currentAction.range + 1, false, Tile.TileHighlightType.AttackRange);
+            _currentAction = null;
+
+            if (CurrentPawn.HasActionsRemaining())
+            {
+                CurrentPawn.CurrentTile.HighlightTilesInRange(_currentPawn.MoveRange+1, true, Tile.TileHighlightType.Move);
+            }
+        }
+    }
+
+    private void HandleActionClicked(ActionData action)
+    {
+        ClearSelectedAction();
+
+        _currentAction = action;
+
+        CurrentPawn.CurrentTile.HighlightTilesInRange(_currentPawn.MoveRange+1, false, Tile.TileHighlightType.Move);
+        CurrentPawn.CurrentTile.HighlightTilesInRange(_currentAction.range+1, true, Tile.TileHighlightType.AttackRange);
+    }
+
+    private void EndTurn()
+    {
+        Pawn activePawn = _selectionManager.SelectedTile.GetPawn();
+        PawnFinished(activePawn);
+    }
 
     private void ExitBattle()
     {
@@ -580,32 +628,6 @@ public class BattleManager : MonoBehaviour
         StartCoroutine(NextActivation());
     }
 
-    public void RefreshInitStackUI()
-    {
-        for (int i = 0; i < _initStackParent.childCount; i++)
-        {
-            Transform child = _initStackParent.GetChild(i);
-            Destroy(child.gameObject);
-        }
-
-        int newChildCount = 0;
-        foreach (Pawn p in _initiativeStack)
-        {
-            // the UI only has space for 7 to look pretty
-            if (newChildCount > 7)
-                break;
-
-            if (p.IsDead)
-            {
-                continue;
-            }
-
-            GameObject pawnPreview = Instantiate(pawnPreviewPrefab, _initStackParent);
-            pawnPreview.GetComponent<PawnHeadPreview>().SetData(p);
-            newChildCount++;
-        }
-    }
-
     private void HandleBattleResult(BattleResult battleResult)
     {
         turnUI.SetActive(false);
@@ -701,4 +723,5 @@ public class BattleManager : MonoBehaviour
         return p;
     }
 
+    #endregion
 }
