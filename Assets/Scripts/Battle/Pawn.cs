@@ -10,10 +10,11 @@ public class Pawn : MonoBehaviour
     private const int MOT_REGAIN_RATE = 10;
     private const int MOT_BASIC_ATTACK_COST = 10;
     public const int BASE_ACTION_POINTS = 6;
+    public const int MOTIVATED_MOT_REGAIN_BUFF = 15;
 
     public UnityEvent OnPawnHit = new();
     private static UnityEvent UpdateMotivationEvent = new();
-    public UnityEvent OnEffectGained = new();
+    public UnityEvent OnEffectUpdate = new();
 
     public float baseHitChance;
     public float baseDodgeChance;
@@ -59,15 +60,6 @@ public class Pawn : MonoBehaviour
     [SerializeField] private Sprite _enemyHeadSprite;
     [SerializeField] private Sprite _enemyBodySprite;
     [SerializeField] private Sprite _enemyLegSprite;
-    [SerializeField] private Sprite _gloryHeadSprite;
-    [SerializeField] private Sprite _gloryBodySprite;
-    [SerializeField] private Sprite _gloryLegSprite;
-    [SerializeField] private Sprite _honorHeadSprite;
-    [SerializeField] private Sprite _honorBodySprite;
-    [SerializeField] private Sprite _honorLegSprite;
-    [SerializeField] private Sprite _greedHeadSprite;
-    [SerializeField] private Sprite _greedBodySprite;
-    [SerializeField] private Sprite _greedLegSprite;
     [SerializeField] private SpriteRenderer _headSpriteRend;
     [SerializeField] private SpriteRenderer _bodySpriteRend;
     [SerializeField] private SpriteRenderer _leg1SpriteRend;
@@ -126,28 +118,6 @@ public class Pawn : MonoBehaviour
         {
             _helmSpriteRend.sprite = _gameChar.HelmItem.itemSprite;
         }
-
-        switch (character.Vice)
-        {
-            case GameCharacter.CharVices.Greed:
-                _headSpriteRend.sprite = _greedHeadSprite;
-                _bodySpriteRend.sprite = _greedBodySprite;
-                _leg1SpriteRend.sprite = _greedLegSprite;
-                _leg2SpriteRend.sprite = _greedLegSprite;
-                break;
-            case GameCharacter.CharVices.Honor:
-                _headSpriteRend.sprite = _honorHeadSprite;
-                _bodySpriteRend.sprite = _honorBodySprite;
-                _leg1SpriteRend.sprite = _honorLegSprite;
-                _leg2SpriteRend.sprite = _honorLegSprite;
-                break;
-            case GameCharacter.CharVices.Glory:
-                _headSpriteRend.sprite = _gloryHeadSprite;
-                _bodySpriteRend.sprite = _gloryBodySprite;
-                _leg1SpriteRend.sprite = _gloryLegSprite;
-                _leg2SpriteRend.sprite = _gloryLegSprite;
-                break;
-        }
     }
 
     public void SetTeam(bool onPlayerTeam)
@@ -190,10 +160,10 @@ public class Pawn : MonoBehaviour
 
         if (!OnPlayerTeam)
         {
-            //_headSpriteRend.sprite = _enemyHeadSprite;
-            //_bodySpriteRend.sprite = _enemyBodySprite;
-            //_leg1SpriteRend.sprite = _enemyLegSprite;
-            //_leg2SpriteRend.sprite = _enemyLegSprite;
+            _headSpriteRend.sprite = _enemyHeadSprite;
+            _bodySpriteRend.sprite = _enemyBodySprite;
+            _leg1SpriteRend.sprite = _enemyLegSprite;
+            _leg2SpriteRend.sprite = _enemyLegSprite;
         }
         else
         {
@@ -201,9 +171,9 @@ public class Pawn : MonoBehaviour
         }
     }
 
-    private void UpdateMotivation()
+    private void UpdateMotivationResource()
     {
-        _motivation = Mathf.Clamp(_motivation + MOT_REGAIN_RATE, _motivation, GameChar.GetBattleMotivationCap());
+        _motivation = Mathf.Clamp(_motivation + MOT_REGAIN_RATE + (_isMotivated ? MOTIVATED_MOT_REGAIN_BUFF : 0), _motivation, GameChar.GetBattleMotivationCap());
     }
 
     private void PickStartTile()
@@ -295,6 +265,12 @@ public class Pawn : MonoBehaviour
         if (GameChar.Vice == GameCharacter.CharVices.Greed && _isMotivated)
         {
             motivationHitBonus = surroundHitBonus;
+        }
+
+        // honor passive is big bonus to hit
+        if (GameChar.Vice == GameCharacter.CharVices.Honor && _isMotivated)
+        {
+            motivationHitBonus = +.2f;
         }
 
         // honor passive is better dodge in 1v1
@@ -562,7 +538,7 @@ public class Pawn : MonoBehaviour
 
     public void HandleActivation()
     {
-        UpdateMotivation();
+        UpdateMotivationResource();
 
         _actionPoints = BASE_ACTION_POINTS;
     }
@@ -674,82 +650,80 @@ public class Pawn : MonoBehaviour
         // get adjacent enemy pawns at that tile
         List<Pawn> adjEnemyPawns = GetAdjacentEnemies();
 
-        // if there's no one adjacent, then no conditions
+        // if there's no one adjacent, then just lose condition (all conditions
+        // are enemy adjacency based)
         if (adjEnemyPawns.Count == 0)
         {
-            return;
-        }
-
-        bool in1v1 = false;
-        bool isGangedUpOn = false;
-        bool isGangingUp = false;
-
-        // only facing one enemy
-        if (adjEnemyPawns.Count == 1)
-        {
-            in1v1 = adjEnemyPawns[0].GetAdjacentEnemies().Count == 1;
+            _isMotivated = false;
         }
         else
         {
-            isGangedUpOn = true;
-        }
+            bool in1v1 = false;
+            bool isGangedUpOn = false;
+            bool isGangingUp = false;
 
-        foreach (Pawn p in adjEnemyPawns)
-        {
-            if (_currentTile == CurrentTile)
+            // only facing one enemy
+            if (adjEnemyPawns.Count == 1)
             {
-                if (p.GetAdjacentEnemies().Count > 1)
-                {
-                    isGangingUp = true;
-                }
+                in1v1 = adjEnemyPawns[0].GetAdjacentEnemies().Count == 1;
             }
             else
             {
-                if (p.GetAdjacentEnemies().Count > 0)
+                isGangedUpOn = true;
+            }
+
+            foreach (Pawn p in adjEnemyPawns)
+            {
+                if (_currentTile == CurrentTile)
                 {
-                    isGangingUp = true;
+                    if (p.GetAdjacentEnemies().Count > 1)
+                    {
+                        isGangingUp = true;
+                    }
                 }
+                else
+                {
+                    if (p.GetAdjacentEnemies().Count > 0)
+                    {
+                        isGangingUp = true;
+                    }
+                }
+            }
+
+            string textOnMotivate = "";
+
+            switch (GameChar.Vice)
+            {
+                case GameCharacter.CharVices.Honor:
+                    _isMotivated = in1v1;
+                    textOnMotivate = "Duel!";
+                    break;
+
+                case GameCharacter.CharVices.Glory:
+                    _isMotivated = isGangedUpOn;
+                    textOnMotivate = "Surrounded!";
+                    break;
+
+                case GameCharacter.CharVices.Greed:
+                    _isMotivated = isGangingUp;
+                    textOnMotivate = "Surrounding!";
+                    break;
+            }
+
+            if (_isMotivated && !wasInMotCondition)
+            {
+                _audioSource.clip = greedViceSound;
+                _audioSource.Play();
+
+                BattleManager.Instance.AddTextNotification(transform.position, "+ " + textOnMotivate);
+            }
+            else if (!_isMotivated && wasInMotCondition)
+            {
+                BattleManager.Instance.AddTextNotification(transform.position, "- " + textOnMotivate);
             }
         }
 
-        string textOnMotivate = "";
-
-        switch (GameChar.Vice)
-        {
-            case GameCharacter.CharVices.Honor:
-                _isMotivated = in1v1;
-                textOnMotivate = "Duel!";
-                break;
-
-            case GameCharacter.CharVices.Glory:
-                _isMotivated = isGangedUpOn;
-                textOnMotivate = "Surrounded!";
-                break;
-
-            case GameCharacter.CharVices.Greed:
-                _isMotivated = isGangingUp;
-                textOnMotivate = "Surrounding!";
-                break;
-        }
-
-        if (_isMotivated && !wasInMotCondition)
-        {
-            //_anim.Play("MotivatedGain");
-            //_audioSource.clip = greedViceSound;
-            //_audioSource.Play();
-
-            BattleManager.Instance.AddTextNotification(transform.position, "+ " + textOnMotivate);
-        }
-        else if (!_isMotivated && wasInMotCondition)
-        {
-            BattleManager.Instance.AddTextNotification(transform.position, "- " + textOnMotivate);
-            //_anim.Play("MotivatedLoss");
-        }
-
-        //_anim.SetBool("IsMotivated", _isInMotCondition);
-
-        OnEffectGained.Invoke();
-
+        OnEffectUpdate.Invoke();
     }
 
     #endregion

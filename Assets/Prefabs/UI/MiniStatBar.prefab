@@ -80,7 +80,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   statPipPrefab: {fileID: 7023157330226876881, guid: fc3647922fa0c450689d51a5f7230573, type: 3}
   statBarParent: {fileID: 4697133069069182033}
-  fill: {r: 0.47058824, g: 0.47058824, b: 0.47058824, a: 1}
+  fill: {r: 0.8784314, g: 0.84313726, b: 0.19607843, a: 1}
   bgFill: {r: 0, g: 0, b: 0, a: 1}
 --- !u!114 &8478803551173503356
 MonoBehaviour:
@@ -342,7 +342,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31db8f4ee00d9433bad65c8b7f0ef8d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  yOffset: -50
+  yOffset: 100
   _hpBar: {fileID: 2769647349328183334}
   _arBar: {fileID: 830731294002789371}
   _effectIconPrefab: {fileID: 8370381676954603734, guid: 6adc95086d9274db6899fd87a349d5fb, type: 3}
