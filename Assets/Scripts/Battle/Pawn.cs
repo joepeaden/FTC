@@ -118,6 +118,9 @@ public class Pawn : MonoBehaviour
         {
             _helmSpriteRend.sprite = _gameChar.HelmItem.itemSprite;
         }
+
+
+        //_anim.SetInteger("Vice", (int)_gameChar.Vice);
     }
 
     public void SetTeam(bool onPlayerTeam)
@@ -540,6 +543,7 @@ public class Pawn : MonoBehaviour
     {
         UpdateMotivationResource();
 
+        _anim.Play("MotivatedGain");
         _actionPoints = BASE_ACTION_POINTS;
     }
 
@@ -715,10 +719,16 @@ public class Pawn : MonoBehaviour
                 _audioSource.clip = greedViceSound;
                 _audioSource.Play();
 
+                //_anim.Play("MotivatedGain");
+                //_anim.SetBool("IsMotivated", true);
+
                 BattleManager.Instance.AddTextNotification(transform.position, "+ " + textOnMotivate);
             }
             else if (!_isMotivated && wasInMotCondition)
             {
+                //_anim.Play("MotivatedLoss");
+                //_anim.SetBool("IsMotivated", false);
+
                 BattleManager.Instance.AddTextNotification(transform.position, "- " + textOnMotivate);
             }
         }
