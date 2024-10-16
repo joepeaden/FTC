@@ -86,8 +86,13 @@ public class ActionButton : MonoBehaviour
 
         UpdateInteractivity();
 
+        if (BattleManager.Instance.CurrentAction == action)
+        {
+            image.sprite = selectedImage;
+        }
+
         _hotKey = hotkey;
-        hotKeyText.text = GetKeyCodeDisplay(hotkey);
+        hotKeyText.text = $"({GetKeyCodeDisplay(hotkey)})";
 
         _callback = callback;
         _button.onClick.AddListener(HandleClick);

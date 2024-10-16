@@ -16,9 +16,19 @@ public class TextFloatUp : MonoBehaviour
     public void SetData(Vector3 position, string text, Color color)
     {
         StopAllCoroutines();
+
         Vector3 newPos = Camera.main.WorldToScreenPoint(position);
         newPos.y += heightOffset;
-        transform.position = newPos;
+
+        // Convert screen position to a position relative to the UI's canvas
+        Vector2 uiPos;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            transform.parent as RectTransform,
+            newPos,
+            Camera.main,
+            out uiPos);
+
+        GetComponent<RectTransform>().anchoredPosition = uiPos;
         textElement.text = text;
         StartCoroutine(Fade());
         _inUse = true;

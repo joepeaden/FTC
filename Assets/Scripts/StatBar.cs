@@ -9,14 +9,22 @@ public class StatBar : MonoBehaviour
     public Transform statBarParent;
     [SerializeField] private Color fill;
     [SerializeField] private Color bgFill;
+    private Color _previewFill;
 
     private List<Image> _previewPips = new();
 
-    private bool _previewGreaterThan;
+    //private bool _previewGreaterThan;
 
     private void Start()
     {
-        StartCoroutine(FlashPreviewPips());
+        //StartCoroutine(FlashPreviewPips());
+
+        // make the preview background gray
+        Color prevFill = fill;
+        prevFill.r -= .5f;
+        prevFill.g -= .5f;
+        prevFill.b -= .5f;
+        _previewFill = prevFill;
     }
 
     /// <summary>
@@ -52,9 +60,9 @@ public class StatBar : MonoBehaviour
     private void SetStatPipColor(GameObject statPip, int currentVal, int previewVal, int index)
     {
         Image pipImage = statPip.GetComponent<Image>();
-        if (currentVal > previewVal)
-        {
-            _previewGreaterThan = false;
+        //if (currentVal > previewVal)
+        //{
+            //_previewGreaterThan = false;
             if (currentVal <= index)
             {
                 if (_previewPips.Contains(pipImage))
@@ -71,10 +79,9 @@ public class StatBar : MonoBehaviour
             {
                 if (!_previewPips.Contains(pipImage))
                 {
-                    pipImage.color = fill;
-                    _previewPips.Add(pipImage);
+                    pipImage.color = _previewFill;
+                    //_previewPips.Add(pipImage);
                 }
-
             }
             else
             {
@@ -85,97 +92,99 @@ public class StatBar : MonoBehaviour
 
                 pipImage.color = fill;
             }
-        }
-        else
-        {
-            _previewGreaterThan = true;
+        //}
+        //else
+        //{
+        //    _previewGreaterThan = true;
 
-            // previewValue will be -1 if no preview requested
-            if (previewVal <= index)
-            {
-                if (_previewPips.Contains(pipImage))
-                {
-                    _previewPips.Remove(pipImage);
-                }
+        //    // previewValue will be -1 if no preview requested
+        //    if (previewVal <= index)
+        //    {
+        //        if (_previewPips.Contains(pipImage))
+        //        {
+        //            _previewPips.Remove(pipImage);
+        //        }
 
-                pipImage.color = bgFill;
+        //        pipImage.color = bgFill;
                 
-            }
-            else if(previewVal != -1 && currentVal <= index)
-            {
-                if (!_previewPips.Contains(pipImage))
-                {
-                    pipImage.color = fill;
-                    _previewPips.Add(pipImage);
-                }
+        //    }
+        //    else if(previewVal != -1 && currentVal <= index)
+        //    {
+        //        if (!_previewPips.Contains(pipImage))
+        //        {
+        //            pipImage.color = _previewFill;
+        //            //_previewPips.Add(pipImage);
+        //        }
                 
-            }
-            else
-            {
-                if (_previewPips.Contains(pipImage))
-                {
-                    _previewPips.Remove(pipImage);
-                }
+        //    }
+        //    else
+        //    {
+        //        if (_previewPips.Contains(pipImage))
+        //        {
+        //            _previewPips.Remove(pipImage);
+        //        }
 
-                pipImage.color = fill;
+        //        pipImage.color = fill;
                 
-            }
-        }
+        //    }
+        //}
     }
 
-    private IEnumerator FlashPreviewPips()
-    {
-        while (true)
-        {
-            if (_previewGreaterThan)
-            {
-                for (float i = 0; i < 1; i += .01f)
-                {
-                    foreach (Image pipImage in _previewPips)
-                    {
-                        Color pipColor = pipImage.color;
-                        pipColor.a = i;
-                        pipImage.color = pipColor;
-                    }
-                    yield return new WaitForSeconds(.001f);
-                }
+    //private IEnumerator FlashPreviewPips()
+    //{
+    //    while (true)
+    //    {
+    //        Debug.Log(_previewPips.Count);
 
-                for (float i = 1; i > 0; i -= .01f)
-                {
-                    foreach (Image pipImage in _previewPips)
-                    {
-                        Color pipColor = pipImage.color;
-                        pipColor.a = i;
-                        pipImage.color = pipColor;
-                    }
-                    yield return new WaitForSeconds(.001f);
-                }
-            }
-            else
-            {
-                for (float i = 1; i > 0; i -= .01f)
-                {
-                    foreach (Image pipImage in _previewPips)
-                    {
-                        Color pipColor = pipImage.color;
-                        pipColor.a = i;
-                        pipImage.color = pipColor;
-                    }
-                    yield return new WaitForSeconds(.001f);
-                }
+    //        if (_previewGreaterThan)
+    //        {
+    //            for (float i = 0; i < 1; i += .01f)
+    //            {
+    //                foreach (Image pipImage in _previewPips)
+    //                {
+    //                    Color pipColor = pipImage.color;
+    //                    pipColor.a = i;
+    //                    pipImage.color = pipColor;
+    //                }
+    //                yield return new WaitForSeconds(.001f);
+    //            }
+
+    //            for (float i = 1; i > 0; i -= .01f)
+    //            {
+    //                foreach (Image pipImage in _previewPips)
+    //                {
+    //                    Color pipColor = pipImage.color;
+    //                    pipColor.a = i;
+    //                    pipImage.color = pipColor;
+    //                }
+    //                yield return new WaitForSeconds(.001f);
+    //            }
+    //        }
+    //        else
+    //        {
+    //            for (float i = 1; i > 0; i -= .01f)
+    //            {
+    //                foreach (Image pipImage in _previewPips)
+    //                {
+    //                    Color pipColor = pipImage.color;
+    //                    pipColor.a = i;
+    //                    pipImage.color = pipColor;
+    //                }
+    //                yield return new WaitForSeconds(.001f);
+    //            }
 
 
-                for (float i = 0; i < 1; i += .01f)
-                {
-                    foreach (Image pipImage in _previewPips)
-                    {
-                        Color pipColor = pipImage.color;
-                        pipColor.a = i;
-                        pipImage.color = pipColor;
-                    }
-                    yield return new WaitForSeconds(.001f);
-                }
-            }
-        }
-    }
+    //            for (float i = 0; i < 1; i += .01f)
+    //            {
+    //                foreach (Image pipImage in _previewPips)
+    //                {
+    //                    Color pipColor = pipImage.color;
+    //                    pipColor.a = i;
+    //                    pipImage.color = pipColor;
+    //                }
+    //                yield return new WaitForSeconds(.001f);
+    //            }
+    //        }
+    //    }
+    //}
 }

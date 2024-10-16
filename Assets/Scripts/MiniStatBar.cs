@@ -34,7 +34,19 @@ public class MiniStatBar : MonoBehaviour
         {
             Vector3 objScreenPos = Camera.main.WorldToScreenPoint(_pawn.transform.position);
             objScreenPos.y += yOffset;
-            GetComponent<RectTransform>().position = objScreenPos;
+
+
+            // Convert screen position to a position relative to the UI's canvas
+            Vector2 uiPos;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                transform.parent as RectTransform,
+                objScreenPos,
+                Camera.main,
+                out uiPos);
+
+
+
+            GetComponent<RectTransform>().anchoredPosition = uiPos;
         }
     }
 
@@ -113,7 +125,7 @@ public class MiniStatBar : MonoBehaviour
     {
         if (_pawn.IsMotivated)
         {
-            _classIcon.material.SetFloat("_InnerOutlineAlpha", 1f);
+            _classIcon.material.SetFloat("_InnerOutlineAlpha", .5f);
             //StartCoroutine(UpdateShineLocation());
             //_classIcon.transform.localScale = _originalClassIconScale * 1.3f;
         }

@@ -133,6 +133,11 @@ public class Pawn : MonoBehaviour
         return ActionPoints - theAction.apCost;
     }
 
+    public int GetMTAfterAction(ActionData theAction)
+    {
+        return Motivation - theAction.motCost;
+    }
+
     public int GetAPAfterMove(Tile targetTile)
     {
         // will have no AP if leaving combat
@@ -358,6 +363,10 @@ public class Pawn : MonoBehaviour
     {
         float hitChance = GetHitChance(targetPawn);
         float hitRoll = Random.Range(0f, 1f);
+
+        //BattleLogUI.Instance.AddLogEntry($"{GameChar.CharName} uses {currentAction.actionName} against {targetPawn.GameChar.CharName}!");
+        //BattleLogUI.Instance.AddLogEntry($"Chance: {(int)(hitChance * 100)}, Rolled: {(int)(hitRoll * 100)}");
+
         if (hitRoll < hitChance)
         {
             bool targetHadArmor = targetPawn.ArmorPoints > 0;
@@ -450,6 +459,14 @@ public class Pawn : MonoBehaviour
         StartCoroutine(PlayAudioAfterDelay(.35f, dieSound));
 
         _isDead = true;
+
+        _bodySpriteRend.sortingLayerName = "DeadCharacters";
+        _headSpriteRend.sortingLayerName = "DeadCharacters";
+        _helmSpriteRend.sortingLayerName = "DeadCharacters";
+        _weaponSpriteRend.sortingLayerName = "DeadCharacters";
+        _leg1SpriteRend.sortingLayerName = "DeadCharacters";
+        _leg2SpriteRend.sortingLayerName = "DeadCharacters";
+
         UpdateMotivationEvent.Invoke();
         CurrentTile.PawnExitTile();
         BattleManager.Instance.PawnKilled(this);
@@ -497,7 +514,7 @@ public class Pawn : MonoBehaviour
     {
         if (theAction != null)
         {
-            if (_actionPoints >= theAction.apCost && _motivation > theAction.motCost)
+            if (_actionPoints >= theAction.apCost && _motivation >= theAction.motCost)
             {
                 return true;
             }
