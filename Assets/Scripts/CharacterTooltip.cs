@@ -19,32 +19,6 @@ public class CharacterTooltip : MonoBehaviour
 
     private Pawn _currentPawn;
 
-    //private void Start()
-    //{
-    //    BattleManager.Instance.OnActionUpdated.AddListener(UpdateTooltip);
-    //}
-
-    //private void OnDestroy()
-    //{
-    //    BattleManager.Instance.OnActionUpdated.RemoveListener(UpdateTooltip);
-    //}
-
-    //private void UpdateTooltip(ActionData newAction)
-    //{
-    //    if (_tooltip.activeInHierarchy)
-    //    {
-    //        SetPawn(_currentPawn);
-
-    //        if (hitChanceUI.activeInHierarchy && newAction != null)
-    //        {
-    //            // cheating here, but whatever. If you're a potential employer
-    //            // and you're looking at this - I wouldn't do this to you! But
-    //            // I'm the boss here and I'm not paying myself, so I say it's okay.
-    //            ShowHitPreview(int.Parse(hitChanceText.text), _currentPawn.GameChar.GetWeaponDamageForAction(newAction));
-    //        }
-    //    }
-    //}
-
     public void SetPawn(Pawn p)
     {
         _tooltip.SetActive(true);

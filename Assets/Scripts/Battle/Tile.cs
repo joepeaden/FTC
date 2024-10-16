@@ -238,6 +238,12 @@ public class Tile : MonoBehaviour
         return tilesInRange;
     }
 
+    public void HighlightTileAsActive()
+    {
+        tileOverlayUI.enabled = true;
+        tileOverlayUI.sprite = selectionSprite;
+    }
+
     public void SetSelected(bool isSelected)
     {
         _isSelected = isSelected;
@@ -245,41 +251,38 @@ public class Tile : MonoBehaviour
         if (_isSelected)
         {
             OnTileSelectChange.Invoke();
-
-            tileOverlayUI.enabled = true;
-            tileOverlayUI.sprite = selectionSprite;
+            HighlightTileAsActive();
         }
         else
         {
             tileOverlayUI.enabled = false;
         }
 
-        if (_pawn != null)
-        {
-            if (_isSelected)
-            {
+        //if (_pawn != null)
+        //{
+        //    if (_isSelected)
+        //    {
                 //int charMoveRange = _pawn.MoveRange;
                 //foreach (Tile t in _adjacentTiles)
                 //{
-                    HighlightTilesInRange(_pawn.MoveRange+1, true, TileHighlightType.Move);
+                    //HighlightTilesInRange(_pawn.MoveRange+1, true, TileHighlightType.Move);
                 //}
-            }
-            else
-            {
+            //}
+            //else
+            //{
                 //int charMoveRange = _pawn.MoveRange;
                 //foreach (Tile t in _adjacentTiles)
                 //{
-                    HighlightTilesInRange(_pawn.MoveRange+1, false, TileHighlightType.Move);
+                    //HighlightTilesInRange(_pawn.MoveRange+1, false, TileHighlightType.Move);
                 //}
-            }
-        }
+            //}
+        
     }
 
     public void HighlightForAction()
     {
         tileOverlayUI.enabled = true;
         tileOverlayUI.sprite = attackTargetHighlightSprite;
-
     }
 
     public void ClearActionHighlight()

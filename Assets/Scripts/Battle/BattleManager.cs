@@ -70,6 +70,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private GameObject _instructionsP1;
     [SerializeField] private GameObject _instructionsP2;
     [SerializeField] private Button _nextInstructionsButton;
+    [SerializeField] private RectTransform _pawnPointer;
 
     [Header("Equipment")]
     [SerializeField] private ArmorItemData lightHelm;
@@ -82,7 +83,7 @@ public class BattleManager : MonoBehaviour
 
     public Pawn CurrentPawn => _currentPawn;
     private Pawn _currentPawn;
-    private Pawn _hoveredPawn;
+    private Tile _hoveredTile;
 
     private List<ActionButton> actionButtons = new();
 
@@ -272,9 +273,16 @@ public class BattleManager : MonoBehaviour
             EndTurn();
         }
 
+        // a better way to do this, for sure, would be on click method in tile 
+        //if (Input.GetMouseButtonDown(0) && _hoveredTile != null && CurrentPawn != null && CurrentPawn.OnPlayerTeam && CurrentAction == null)
+        //{
+        //    _selectionManager.SetSelectedTile(CurrentPawn.CurrentTile);
+        //}
+
         if (Input.GetMouseButtonDown(1))
         {
             ClearSelectedAction();
+            //_selectionManager.ClearSelectedTile();
         }
 
     }
@@ -292,6 +300,28 @@ public class BattleManager : MonoBehaviour
     }
 
     #region UI
+
+    private void OnHoverInitPawnPreview(Pawn p)
+    {
+        Vector3 objScreenPos = Camera.main.WorldToScreenPoint(p.transform.position);
+        objScreenPos.y += 150;
+
+        // Convert screen position to a position relative to the UI's canvas
+        Vector2 uiPos;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            _pawnPointer.parent as RectTransform,
+            objScreenPos,
+            Camera.main,
+            out uiPos);
+
+        _pawnPointer.gameObject.SetActive(true);
+        _pawnPointer.anchoredPosition = uiPos;
+    }
+
+    private void HandleEndHoverInitPawnPreview()
+    {
+        _pawnPointer.gameObject.SetActive(false);
+    }
 
     private void NextInstructions()
     {
@@ -329,6 +359,10 @@ public class BattleManager : MonoBehaviour
         for (int i = 0; i < _initStackParent.childCount; i++)
         {
             Transform child = _initStackParent.GetChild(i);
+
+            child.GetComponent<PawnHeadPreview>().OnPawnPreviewHoverStart.RemoveListener(OnHoverInitPawnPreview);
+            child.GetComponent<PawnHeadPreview>().OnPawnPreviewHoverEnd.RemoveListener(HandleEndHoverInitPawnPreview);
+
             Destroy(child.gameObject);
         }
 
@@ -346,6 +380,10 @@ public class BattleManager : MonoBehaviour
 
             GameObject pawnPreview = Instantiate(pawnPreviewPrefab, _initStackParent);
             pawnPreview.GetComponent<PawnHeadPreview>().SetData(p);
+
+            pawnPreview.GetComponent<PawnHeadPreview>().OnPawnPreviewHoverStart.AddListener(OnHoverInitPawnPreview);
+            pawnPreview.GetComponent<PawnHeadPreview>().OnPawnPreviewHoverEnd.AddListener(HandleEndHoverInitPawnPreview);
+
             newChildCount++;
         }
     }
@@ -405,7 +443,8 @@ public class BattleManager : MonoBehaviour
 
     public void HandleTileHoverStart(Tile targetTile)
     {
-        _hoveredPawn = targetTile.GetPawn();
+        _hoveredTile = targetTile;
+        Pawn hoveredPawn = targetTile.GetPawn();
 
         if (_selectionManager.SelectedTile != null)
         {
@@ -434,7 +473,7 @@ public class BattleManager : MonoBehaviour
                 }
 
                 // if targetPawn is null, then we're hovering a movement tile.
-                if (_hoveredPawn == null)
+                if (hoveredPawn == null)
                 {
                     int expectedAPAfterMove = _currentPawn.GetAPAfterMove(targetTile);
                     apBar.SetBar(Pawn.BASE_ACTION_POINTS, _currentPawn.ActionPoints, expectedAPAfterMove);
@@ -443,7 +482,7 @@ public class BattleManager : MonoBehaviour
             }
         }
 
-        if (_hoveredPawn != null)
+        if (hoveredPawn != null)
         {
             StopCoroutine(OpenTooltipAfterPause());
             StartCoroutine(OpenTooltipAfterPause());
@@ -467,7 +506,7 @@ public class BattleManager : MonoBehaviour
         }
         tilesToHighlight.Clear();
 
-        _hoveredPawn = null;
+        _hoveredTile = null;
     }
 
     public void HideHitChance()
@@ -478,40 +517,42 @@ public class BattleManager : MonoBehaviour
 
     public void ShowTooltipForPawn()
     {
-        if (_hoveredPawn == null)
+        if (_hoveredTile == null)
         {
             return;
         }
 
-        charTooltip.SetPawn(_hoveredPawn);
-
-        if (_selectionManager.SelectedTile != null &&_selectionManager.SelectedTile.GetPawn() != null)
+        Pawn hoveredPawn = _hoveredTile.GetPawn();
+        if (hoveredPawn == null)
         {
-            Pawn selectedPawn = _selectionManager.SelectedTile.GetPawn();
-            if (selectedPawn.GetAdjacentEnemies().Contains(_hoveredPawn) && selectedPawn.OnPlayerTeam)
+            return;
+        }
+
+        charTooltip.SetPawn(hoveredPawn);
+
+        if (CurrentAction != null && CurrentPawn.OnPlayerTeam && CurrentPawn.IsTargetInRange(hoveredPawn, CurrentAction))
+        {
+            float chance = CurrentPawn.GetHitChance(hoveredPawn);
+
+            if (CurrentAction != null)
             {
-                float chance = selectedPawn.GetHitChance(_hoveredPawn);
+                ActionData attackAction = CurrentAction;
 
-                if (CurrentAction != null)
+                int arDamage;
+                int hpDamage;
+                if (hoveredPawn.ArmorPoints > 0)
                 {
-                    ActionData attackAction = CurrentAction;
-
-                    int arDamage;
-                    int hpDamage;
-                    if (_hoveredPawn.ArmorPoints > 0)
-                    {
-                        arDamage = CurrentPawn.GameChar.GetWeaponArmorDamageForAction(attackAction);
-                        hpDamage = CurrentPawn.GameChar.GetWeaponPenetrationDamageForAction(attackAction);
-                    }
-                    else
-                    {
-                        arDamage = 0;
-                        hpDamage = CurrentPawn.GameChar.GetWeaponDamageForAction(attackAction);
-                    }
-
-                    // have to account for armor too
-                    charTooltip.ShowHitPreview(chance, hpDamage, arDamage);
+                    arDamage = CurrentPawn.GameChar.GetWeaponArmorDamageForAction(attackAction);
+                    hpDamage = CurrentPawn.GameChar.GetWeaponPenetrationDamageForAction(attackAction);
                 }
+                else
+                {
+                    arDamage = 0;
+                    hpDamage = CurrentPawn.GameChar.GetWeaponDamageForAction(attackAction);
+                }
+
+                // have to account for armor too
+                charTooltip.ShowHitPreview(chance, hpDamage, arDamage);
             }
         }
     }
@@ -545,13 +586,15 @@ public class BattleManager : MonoBehaviour
 
         if (_currentAction != null)
         {
-            CurrentPawn.CurrentTile.HighlightTilesInRange(_currentAction.range + 1, false, Tile.TileHighlightType.AttackRange);
+            //CurrentPawn.CurrentTile.HighlightTilesInRange(_currentAction.range + 1, false, Tile.TileHighlightType.AttackRange);
             _currentAction = null;
 
-            if (CurrentPawn.HasActionsRemaining())
-            {
-                CurrentPawn.CurrentTile.HighlightTilesInRange(_currentPawn.MoveRange+1, true, Tile.TileHighlightType.Move);
-            }
+            _selectionManager.SetIdleMode(true);
+
+            //if (CurrentPawn.HasActionsRemaining())
+            //{
+            //    CurrentPawn.CurrentTile.HighlightTilesInRange(_currentPawn.MoveRange+1, true, Tile.TileHighlightType.Move);
+            //}
         }
 
         ShowTooltipForPawn();
@@ -564,8 +607,12 @@ public class BattleManager : MonoBehaviour
 
         _currentAction = action;
 
-        CurrentPawn.CurrentTile.HighlightTilesInRange(_currentPawn.MoveRange+1, false, Tile.TileHighlightType.Move);
-        CurrentPawn.CurrentTile.HighlightTilesInRange(_currentAction.range+1, true, Tile.TileHighlightType.AttackRange);
+        _selectionManager.SetIdleMode(false);
+
+        //_selectionManager.SetSelectedTile(CurrentPawn.CurrentTile);
+
+        //CurrentPawn.CurrentTile.HighlightTilesInRange(_currentPawn.MoveRange+1, false, Tile.TileHighlightType.Move);
+        //CurrentPawn.CurrentTile.HighlightTilesInRange(_currentAction.range+1, true, Tile.TileHighlightType.AttackRange);
 
         //OnActionUpdated.Invoke(action);
 
@@ -615,7 +662,10 @@ public class BattleManager : MonoBehaviour
     public void PawnActivated(Pawn p)
     {
         UpdateUIForPawn(p);
-        _selectionManager.SetSelectedTile(p.CurrentTile);
+        //_selectionManager.SetSelectedTile(p.CurrentTile);
+
+        // update selected tile after a potential move
+        _selectionManager.SetSelectedTile(CurrentPawn.CurrentTile);
 
         ClearSelectedAction();
 
@@ -749,11 +799,11 @@ public class BattleManager : MonoBehaviour
                 _selectionManager.HandleTurnChange(_currentPawn.OnPlayerTeam);
                 _endTurnButton.gameObject.SetActive(_currentPawn.OnPlayerTeam);
 
-                if (_currentPawn.OnPlayerTeam)
-                {
-                    _selectionManager.SetSelectedTile(_currentPawn.CurrentTile);
-                }
-                else
+                if (!_currentPawn.OnPlayerTeam)
+                //{
+                    //_selectionManager.SetSelectedTile(_currentPawn.CurrentTile);
+                //}
+                //else
                 {
                     _enemyAI.DoTurn(_currentPawn);
                 }

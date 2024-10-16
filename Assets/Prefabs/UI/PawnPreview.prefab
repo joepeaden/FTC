@@ -95,7 +95,7 @@ MonoBehaviour:
   m_MinWidth: -1
   m_MinHeight: -1
   m_PreferredWidth: 250
-  m_PreferredHeight: 250
+  m_PreferredHeight: 400
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
@@ -111,6 +111,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1c8ab8ab107048ddb42dd05671bfb4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnPawnPreviewHoverStart:
+    m_PersistentCalls:
+      m_Calls: []
+  OnPawnPreviewHoverEnd:
+    m_PersistentCalls:
+      m_Calls: []
   helmRend: {fileID: 6153041850193298425}
   headRend: {fileID: 9030747813326016527}
 --- !u!1 &6682236553767794535
@@ -149,7 +155,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -53.1, y: 125.1}
+  m_AnchoredPosition: {x: -53.1, y: 204}
   m_SizeDelta: {x: 547.4, y: 336}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &825458440364871317

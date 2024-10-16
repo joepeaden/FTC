@@ -31,7 +31,7 @@ public class CharDetailPanel : MonoBehaviour
         _viceText.text = _currentCharacter.Vice.ToString() + " (" + _currentCharacter.GetTotalViceValue().ToString() + ")";
         _motivText.text = _currentCharacter.GetBattleMotivationCap().ToString();
         _moveText.text = _currentCharacter.GetMoveRange().ToString();
-        _initText.text = _currentCharacter.GetInitiative().ToString();
+        _initText.text = _currentCharacter.GetInitiativeWithEquipment().ToString();
 
         _helmUI.RemoveCallbacks();
         _weaponUI.RemoveCallbacks();

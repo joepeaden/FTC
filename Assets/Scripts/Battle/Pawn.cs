@@ -43,7 +43,7 @@ public class Pawn : MonoBehaviour
     public int Motivation => _motivation;
     private int _motivation;
 
-    public int Initiative => GameChar.GetInitiative() + GetInitBuff();
+    public int Initiative => GetInit() + GetInitBuff();
 
     public bool IsDead => _isDead;
     private bool _isDead;
@@ -526,8 +526,8 @@ public class Pawn : MonoBehaviour
         else
         {
             // can still make an attack
-            if ((_actionPoints >= GameChar.WeaponItem.baseAction.apCost && _motivation > GameChar.WeaponItem.baseAction.motCost)
-                || (GameChar.WeaponItem.specialAction != null && _actionPoints >= GameChar.WeaponItem.specialAction.apCost && _motivation > GameChar.WeaponItem.specialAction.motCost))
+            if ((_actionPoints >= GameChar.WeaponItem.baseAction.apCost && _motivation >= GameChar.WeaponItem.baseAction.motCost)
+                || (GameChar.WeaponItem.specialAction != null && _actionPoints >= GameChar.WeaponItem.specialAction.apCost && _motivation >= GameChar.WeaponItem.specialAction.motCost))
             {
                 return true;
             }
@@ -560,6 +560,8 @@ public class Pawn : MonoBehaviour
     {
         UpdateMotivationResource();
 
+        //_audioSource.clip = greedViceSound;
+        //_audioSource.Play();
         _anim.Play("MotivatedGain");
         _actionPoints = BASE_ACTION_POINTS;
     }
@@ -645,6 +647,14 @@ public class Pawn : MonoBehaviour
     #endregion
 
     #region Motivation
+
+    public int GetInit()
+    {
+        int baseInit = GameChar.BaseInitiative;
+        int helmInit = ArmorPoints > 0 ? GameChar.HelmItem.initMod : 0;
+
+        return baseInit + helmInit;
+    }
 
     public int GetInitBuff()
     {
@@ -733,8 +743,8 @@ public class Pawn : MonoBehaviour
 
             if (_isMotivated && !wasInMotCondition)
             {
-                _audioSource.clip = greedViceSound;
-                _audioSource.Play();
+                //_audioSource.clip = greedViceSound;
+                //_audioSource.Play();
 
                 //_anim.Play("MotivatedGain");
                 //_anim.SetBool("IsMotivated", true);

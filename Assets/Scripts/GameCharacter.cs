@@ -21,7 +21,8 @@ public class GameCharacter
     public CharVices Vice => _vice;
     private CharVices _vice;
     private int _charViceValue;
-    
+
+    public int BaseInitiative => _baseInitiative;
     private int _baseInitiative;
 
     public int HitPoints => _hitPoints;
@@ -139,7 +140,7 @@ public class GameCharacter
         return _charViceValue + equipmentViceBonus;
     }
 
-    public int GetInitiative()
+    public int GetInitiativeWithEquipment()
     {
         int initMod = 0;
         if (_helmItem != null)
