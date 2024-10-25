@@ -160,6 +160,9 @@ MonoBehaviour:
   gloryViceSound: {fileID: 0}
   honorViceSound: {fileID: 0}
   _audioSource: {fileID: 5720785191603622845}
+  honorEffect: {fileID: 11400000, guid: 92a3ee2f6f05b457d892b4dc41103e74, type: 2}
+  greedEffect: {fileID: 11400000, guid: a511b8c44e95c4aa7b80f10ecfd913be, type: 2}
+  gloryEffect: {fileID: 11400000, guid: 9309324bd5fc64e649b79b461626dbbb, type: 2}
 --- !u!114 &5116864122955787313
 MonoBehaviour:
   m_ObjectHideFlags: 0

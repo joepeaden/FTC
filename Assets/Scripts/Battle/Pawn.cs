@@ -14,7 +14,7 @@ public class Pawn : MonoBehaviour
 
     public UnityEvent OnPawnHit = new();
     private static UnityEvent UpdateMotivationEvent = new();
-    public UnityEvent OnEffectUpdate = new();
+    public UnityEvent<List<EffectData>> OnEffectUpdate = new();
 
     public float baseHitChance;
     public float baseDodgeChance;
@@ -75,6 +75,13 @@ public class Pawn : MonoBehaviour
     [SerializeField] private AudioClip gloryViceSound;
     [SerializeField] private AudioClip honorViceSound;
     [SerializeField] private AudioSource _audioSource;
+
+    [Header("Character Effects")]
+    [SerializeField] private EffectData honorEffect;
+    [SerializeField] private EffectData greedEffect;
+    [SerializeField] private EffectData gloryEffect;
+    public List<EffectData> CurrentEffects => currentEffects;
+    private List<EffectData> currentEffects = new();
 
     public GameCharacter GameChar => _gameChar;
     private GameCharacter _gameChar;
@@ -676,10 +683,14 @@ public class Pawn : MonoBehaviour
             return;
         }
 
+        currentEffects.Clear();
+
         bool wasInMotCondition = _isMotivated;
 
         // get adjacent enemy pawns at that tile
         List<Pawn> adjEnemyPawns = GetAdjacentEnemies();
+
+        EffectData effectGained = null;
 
         // if there's no one adjacent, then just lose condition (all conditions
         // are enemy adjacency based)
@@ -721,23 +732,26 @@ public class Pawn : MonoBehaviour
                 }
             }
 
-            string textOnMotivate = "";
-
             switch (GameChar.Vice)
             {
                 case GameCharacter.CharVices.Honor:
                     _isMotivated = in1v1;
-                    textOnMotivate = "Duel!";
+                    effectGained = honorEffect;
                     break;
 
                 case GameCharacter.CharVices.Glory:
                     _isMotivated = isGangedUpOn;
-                    textOnMotivate = "Surrounded!";
+                    effectGained = gloryEffect;
                     break;
 
                 case GameCharacter.CharVices.Greed:
                     _isMotivated = isGangingUp;
-                    textOnMotivate = "Surrounding!";
+                    effectGained = greedEffect;
+                    break;
+
+                default:
+                    effectGained = honorEffect;
+                    Debug.LogWarning("Unhandled vice in effect gained!");
                     break;
             }
 
@@ -749,18 +763,23 @@ public class Pawn : MonoBehaviour
                 //_anim.Play("MotivatedGain");
                 //_anim.SetBool("IsMotivated", true);
 
-                BattleManager.Instance.AddTextNotification(transform.position, "+ " + textOnMotivate);
+                BattleManager.Instance.AddTextNotification(transform.position, "+ " + effectGained.effectName);
             }
             else if (!_isMotivated && wasInMotCondition)
             {
                 //_anim.Play("MotivatedLoss");
                 //_anim.SetBool("IsMotivated", false);
 
-                BattleManager.Instance.AddTextNotification(transform.position, "- " + textOnMotivate);
+                BattleManager.Instance.AddTextNotification(transform.position, "- " + effectGained.effectName);
             }
         }
 
-        OnEffectUpdate.Invoke();
+        if (IsMotivated)
+        {
+            currentEffects.Add(effectGained);
+        }
+
+        OnEffectUpdate.Invoke(currentEffects);
     }
 
     #endregion

@@ -64,20 +64,20 @@ public class MiniStatBar : MonoBehaviour
 
         UpdateBars();
 
-        switch (_pawn.CurrentVice)
-        {
-            case GameCharacter.CharVices.Greed:
-                _classIcon.color = Color.green;
-                break;
-            case GameCharacter.CharVices.Glory:
-                _classIcon.color = Color.red;
-                break;
-            case GameCharacter.CharVices.Honor:
-                _classIcon.color = Color.blue;
-                break;
-        }
+        //switch (_pawn.CurrentVice)
+        //{
+        //    case GameCharacter.CharVices.Greed:
+        //        _classIcon.color = Color.green;
+        //        break;
+        //    case GameCharacter.CharVices.Glory:
+        //        _classIcon.color = Color.red;
+        //        break;
+        //    case GameCharacter.CharVices.Honor:
+        //        _classIcon.color = Color.blue;
+        //        break;
+        //}
 
-        _classIcon.material.SetColor("_InnerOutlineColor", _classIcon.color);
+        //_classIcon.material.SetColor("_InnerOutlineColor", _classIcon.color);
 
         p.OnPawnHit.AddListener(UpdateBars);
         p.OnEffectUpdate.AddListener(UpdateEffects);
@@ -121,44 +121,18 @@ public class MiniStatBar : MonoBehaviour
         }
     }
 
-    private void UpdateEffects()
+    private void UpdateEffects(List<EffectData> effects)
     {
-        if (_pawn.IsMotivated)
+        for (int i = 0; i < _effectIconParent.childCount; i++)
         {
-            _classIcon.material.SetFloat("_InnerOutlineAlpha", .5f);
-            //StartCoroutine(UpdateShineLocation());
-            //_classIcon.transform.localScale = _originalClassIconScale * 1.3f;
+            Destroy(_effectIconParent.GetChild(i).gameObject);
         }
-        else
+
+        foreach (EffectData effect in effects)
         {
-            _classIcon.material.SetFloat("_InnerOutlineAlpha", 0f);
-            //StopCoroutine(UpdateShineLocation());
-            //_classIcon.material.SetFloat("_ShineLocation", 0f);
-            //_classIcon.transform.localScale = _originalClassIconScale;
+            Image effectIcon = Instantiate(_effectIconPrefab, _effectIconParent);
+            effectIcon.sprite = effect.effectSprite;
         }
-        //for (int i = 0; i < _effectIconParent.childCount; i++)
-        //{
-        //    Destroy(_effectIconParent.GetChild(i).gameObject);
-        //}
-
-        //if (_pawn.IsMotivated)
-        //{
-        //    Image effectIcon = Instantiate(_effectIconPrefab, _effectIconParent);
-
-        //    switch (_pawn.CurrentVice)
-        //    {
-        //        case GameCharacter.CharVices.Greed:
-        //            effectIcon.color = Color.green;
-        //            break;
-        //        case GameCharacter.CharVices.Glory:
-        //            effectIcon.color = Color.red;
-        //            break;
-        //        case GameCharacter.CharVices.Honor:
-        //            effectIcon.color = Color.blue;
-        //            break;
-        //    }
-
-        //}
     }
 
 }

@@ -7,6 +7,10 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Events;
 
+/// <summary>
+/// Manages the Battle scene.
+/// Quite clearly, this class should be broken up into 2 - 3 scripts (UI at least should be isolated)
+/// </summary>
 public class BattleManager : MonoBehaviour
 {
     private const int DEFAULT_MIN_AMOUNT_TO_SPAWN = 4;
@@ -23,8 +27,6 @@ public class BattleManager : MonoBehaviour
 
     public static BattleManager Instance => _instance;
     private static BattleManager _instance;
-
-    //public UnityEvent<ActionData> OnActionUpdated = new();
 
     public List<Pawn> PlayerPawns => _playerPawns;
     private List<Pawn> _playerPawns = new();
@@ -71,6 +73,8 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private GameObject _instructionsP2;
     [SerializeField] private Button _nextInstructionsButton;
     [SerializeField] private RectTransform _pawnPointer;
+    [SerializeField] private Transform _pawnEffectsParent;
+    [SerializeField] private Image _pawnEffectLargePrefab;
 
     [Header("Equipment")]
     [SerializeField] private ArmorItemData lightHelm;
@@ -388,6 +392,21 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+    private void UpdateEffects(List<EffectData> effects)
+    {
+        for (int i = 0; i < _pawnEffectsParent.childCount; i++)
+        {
+            Destroy(_pawnEffectsParent.GetChild(i).gameObject);
+        }
+
+        foreach (EffectData effect in effects)
+        {
+            Image newIcon = Instantiate(_pawnEffectLargePrefab, _pawnEffectsParent);
+            newIcon.sprite = effect.effectSprite;
+            newIcon.GetComponent<EffectIcon>().SetData(effect);
+        }
+    }
+
     private void UpdateUIForPawn(Pawn p)
     {
         if (p != null)
@@ -438,6 +457,8 @@ public class BattleManager : MonoBehaviour
                     actionButtons.Add(actionButtonGO.GetComponent<ActionButton>());
                 }
             }
+
+            UpdateEffects(p.CurrentEffects);
         }
     }
 
@@ -774,6 +795,11 @@ public class BattleManager : MonoBehaviour
 
     public IEnumerator NextActivation()
     {
+        if (_currentPawn != null)
+        {
+            _currentPawn.OnEffectUpdate.RemoveListener(UpdateEffects);
+        }
+
         _currentPawn = GetNextPawn();
 
         // see if the battle is over. If so, do sumthin about it 
@@ -796,6 +822,8 @@ public class BattleManager : MonoBehaviour
 
                 _currentPawn.HandleActivation();
                 UpdateUIForPawn(_currentPawn);
+                _currentPawn.OnEffectUpdate.AddListener(UpdateEffects);
+
                 _selectionManager.HandleTurnChange(_currentPawn.OnPlayerTeam);
                 _endTurnButton.gameObject.SetActive(_currentPawn.OnPlayerTeam);
 

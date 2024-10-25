@@ -881,10 +881,10 @@ RectTransform:
   m_Father: {fileID: 2671727013325291813}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 225, y: -270.81}
+  m_SizeDelta: {x: 390, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &4345895533646141444
 MonoBehaviour:
@@ -1493,6 +1493,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nameText: {fileID: 4203903637314877706}
   descriptionText: {fileID: 3359182783488394546}
+  headerDiv: {fileID: 5668410588500025134}
   armorElements: {fileID: 6513765449517221452}
   protValue: {fileID: 1002730375886012214}
   moveModElements: {fileID: 8869905277261262664}

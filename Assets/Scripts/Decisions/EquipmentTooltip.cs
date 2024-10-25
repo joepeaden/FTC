@@ -5,6 +5,7 @@ public class EquipmentTooltip : MonoBehaviour
 {
     [SerializeField] TMP_Text nameText;
     [SerializeField] TMP_Text descriptionText;
+    [SerializeField] GameObject headerDiv;
 
     [SerializeField] GameObject armorElements;
     [SerializeField] TMP_Text protValue;
@@ -36,6 +37,7 @@ public class EquipmentTooltip : MonoBehaviour
         }
 
         gameObject.SetActive(true);
+        headerDiv.SetActive(true);
 
         nameText.text = item.itemName;
         descriptionText.text = item.description;
@@ -93,6 +95,7 @@ public class EquipmentTooltip : MonoBehaviour
         weaponElements.SetActive(false);
 
         gameObject.SetActive(true);
+        headerDiv.SetActive(true);
 
         nameText.text = action.actionName;
         descriptionText.text = action.description;
@@ -131,6 +134,28 @@ public class EquipmentTooltip : MonoBehaviour
         {
             newLine = Instantiate(infoLine, infoParent);
             newLine.GetComponent<InfoLine>().SetData("ACC Mod", (action.accMod * 100).ToString() + "%");
+        }
+    }
+
+    public void SetEffect(EffectData effect)
+    {
+        if (effect == null)
+        {
+            return;
+        }
+
+        armorElements.SetActive(false);
+        weaponElements.SetActive(false);
+
+        gameObject.SetActive(true);
+        headerDiv.SetActive(false);
+
+        nameText.text = effect.effectName;
+        descriptionText.text = effect.description;
+
+        for (int i = 0; i < infoParent.childCount; i++)
+        {
+            Destroy(infoParent.GetChild(i).gameObject);
         }
     }
 

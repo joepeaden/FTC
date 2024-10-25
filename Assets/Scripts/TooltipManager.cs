@@ -30,6 +30,12 @@ public class TooltipManager : MonoBehaviour
         {
             _tooltip.SetAction(actionButton.Action);
         }
+
+        EffectIcon effectIcon = hoveredGO.GetComponent<EffectIcon>();
+        if (effectIcon != null)
+        {
+            _tooltip.SetEffect(effectIcon.Effect);
+        }
     }
 
     public void HandleCloseTooltip()
