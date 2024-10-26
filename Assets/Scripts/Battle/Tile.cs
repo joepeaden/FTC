@@ -27,6 +27,11 @@ public class Tile : MonoBehaviour
     [SerializeField] private Sprite attackTargetHighlightSprite;
     [SerializeField] private SpriteRenderer tileOverlayUI;
     [SerializeField] private SpriteRenderer tileHoverUI;
+    [SerializeField] GameObject[] impassableObjectPrefabs;
+
+    public bool IsImpassable => _isImpassable;
+    private bool _isImpassable = false;
+    private GameObject impassableObjectRef;
 
     [SerializeField] private Pawn _pawn;
     private bool _isSelected;
@@ -56,13 +61,32 @@ public class Tile : MonoBehaviour
     private void ResetTileVisuals()
     {
         tileOverlayUI.enabled = false;
-        //_isInMoveRange = false;
     }
 
-    public void Initialize(Dictionary<Point, Tile> tiles, Point coord)
+    public void SetImpassable(bool isImpassable)
+    {
+        _isImpassable = isImpassable;
+
+        if (isImpassable)
+        {
+            GameObject impassableObjectPrefab = impassableObjectPrefabs[Random.Range(0, impassableObjectPrefabs.Length)];
+            impassableObjectRef = Instantiate(impassableObjectPrefab, transform);
+        }
+        else
+        {
+            if (impassableObjectRef != null)
+            {
+                Destroy(impassableObjectRef);
+            }
+        }
+    }
+
+    public void Initialize(Dictionary<Point, Tile> tiles, Point coord, bool isImpassable)
     {
         _coordinates = coord;
         Point p = new Point(coord.X + 1, coord.Y);
+
+        SetImpassable(isImpassable);
 
         if (tiles.ContainsKey(p))
         {
@@ -209,15 +233,21 @@ public class Tile : MonoBehaviour
         List<Tile> tilesInRange = new();
         foreach (Tile t in _adjacentTiles)
         {
-            t.GetTilesInMoveRangeRecursive(pawnMoveRange, tilesInRange);
+            t.GetTilesInMoveRangeRecursive(_pawn, pawnMoveRange, tilesInRange);
         }
         
         return tilesInRange;
     }
 
-    private List<Tile> GetTilesInMoveRangeRecursive(int pawnMoveRange, List<Tile> tilesInRange)
+    public bool IsTraversableByThisPawn(Pawn traveller)
     {
-        if (pawnMoveRange > 0)
+        // Does it contain pawns or impassable tiles?
+        return !IsImpassable && (_pawn == null || _pawn != null && traveller.OnPlayerTeam == _pawn.OnPlayerTeam);
+    }
+
+    private List<Tile> GetTilesInMoveRangeRecursive(Pawn traveller, int pawnMoveRange, List<Tile> tilesInRange)
+    {
+        if (pawnMoveRange > 0 && IsTraversableByThisPawn(traveller))
         {
             pawnMoveRange--;
 
@@ -230,7 +260,7 @@ public class Tile : MonoBehaviour
             {
                 if (!tilesInRange.Contains(t))
                 {
-                    t.GetTilesInMoveRangeRecursive(pawnMoveRange, tilesInRange);
+                    t.GetTilesInMoveRangeRecursive(traveller, pawnMoveRange, tilesInRange);
                 }
             }
         }
@@ -257,26 +287,6 @@ public class Tile : MonoBehaviour
         {
             tileOverlayUI.enabled = false;
         }
-
-        //if (_pawn != null)
-        //{
-        //    if (_isSelected)
-        //    {
-                //int charMoveRange = _pawn.MoveRange;
-                //foreach (Tile t in _adjacentTiles)
-                //{
-                    //HighlightTilesInRange(_pawn.MoveRange+1, true, TileHighlightType.Move);
-                //}
-            //}
-            //else
-            //{
-                //int charMoveRange = _pawn.MoveRange;
-                //foreach (Tile t in _adjacentTiles)
-                //{
-                    //HighlightTilesInRange(_pawn.MoveRange+1, false, TileHighlightType.Move);
-                //}
-            //}
-        
     }
 
     public void HighlightForAction()
@@ -301,9 +311,35 @@ public class Tile : MonoBehaviour
         }
     }
 
-    public void HighlightTilesInRange(int range, bool isHighlighting, TileHighlightType highlightType)
+    public void HighlightTilesInRange(Pawn subjectPawn, int range, bool isHighlighting, TileHighlightType highlightType)
     {
-        if (range > 0)
+        if (!_isSelected)
+        {
+            tileOverlayUI.enabled = isHighlighting;
+
+            switch (highlightType)
+            {
+                case TileHighlightType.Move:
+                    tileOverlayUI.sprite = moveRangeSprite;
+                    break;
+                case TileHighlightType.AttackRange:
+                    tileOverlayUI.sprite = attackHighlightSprite;
+                    break;
+            }
+        }
+
+        foreach (Tile t in _adjacentTiles)
+        {
+            t.HighlightTilesInRangeRecursive(subjectPawn, range, isHighlighting, highlightType);
+        }
+    }
+
+    public void HighlightTilesInRangeRecursive(Pawn subjectPawn, int range, bool isHighlighting, TileHighlightType highlightType)
+    {
+        if (range > 0 && !IsImpassable &&
+            (_pawn == null ||
+            (subjectPawn.OnPlayerTeam == _pawn.OnPlayerTeam && TileHighlightType.Move == highlightType ||
+            TileHighlightType.Move != highlightType)))
         {
             range--;
 
@@ -320,12 +356,11 @@ public class Tile : MonoBehaviour
                         tileOverlayUI.sprite = attackHighlightSprite;
                         break;
                 }
-                //_isInMoveRange = isHighlighting;
             }
 
             foreach (Tile t in _adjacentTiles)
             {
-                t.HighlightTilesInRange(range, isHighlighting, highlightType);
+                t.HighlightTilesInRangeRecursive(subjectPawn, range, isHighlighting, highlightType);
             }
         }
         else

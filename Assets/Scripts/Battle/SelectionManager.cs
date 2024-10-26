@@ -66,10 +66,10 @@ public class SelectionManager : MonoBehaviour
 
         if (currentAction != null)
         {
-            _selectedTile.HighlightTilesInRange(currentAction.range + 1, false, Tile.TileHighlightType.AttackRange);
+            _selectedTile.HighlightTilesInRange(currentPawn, currentAction.range, false, Tile.TileHighlightType.AttackRange);
         }
 
-        _selectedTile.HighlightTilesInRange(currentPawn.MoveRange + 1, false, Tile.TileHighlightType.Move);
+        _selectedTile.HighlightTilesInRange(currentPawn, currentPawn.MoveRange, false, Tile.TileHighlightType.Move);
     }
 
     public void SetIdleMode(bool isIdle)
@@ -88,11 +88,11 @@ public class SelectionManager : MonoBehaviour
 
         if (currentAction != null)
         {
-            _selectedTile.HighlightTilesInRange(currentAction.range + 1, !isIdle, Tile.TileHighlightType.AttackRange);
+            _selectedTile.HighlightTilesInRange(currentPawn, currentAction.range, !isIdle, Tile.TileHighlightType.AttackRange);
         }
         else
         {
-            _selectedTile.HighlightTilesInRange(currentPawn.MoveRange + 1, !isIdle, Tile.TileHighlightType.Move);
+            _selectedTile.HighlightTilesInRange(currentPawn, currentPawn.MoveRange, !isIdle, Tile.TileHighlightType.Move);
         }
     }
 
@@ -106,9 +106,6 @@ public class SelectionManager : MonoBehaviour
             if (_inIdleMode)
             {
                 SetIdleMode(false);
-
-                //CurrentPawn.CurrentTile.HighlightTilesInRange(_currentAction.range + 1, false, Tile.TileHighlightType.AttackRange);
-                //HighlightTilesInRange(_pawn.MoveRange + 1, false, TileHighlightType.Move);
             }
             else
             {
@@ -118,18 +115,18 @@ public class SelectionManager : MonoBehaviour
                 foreach (RaycastHit2D hit in hits)
                 {
                     Tile newTile = hit.transform.GetComponent<Tile>();
-                    if (newTile != null)
+                    if (newTile != null && !newTile.IsImpassable)
                     {
-                        if (currentPawn.OnPlayerTeam)//_selectedTile != null && _selectedTile.GetPawn().OnPlayerTeam)
+                        if (currentPawn.OnPlayerTeam)
                         {
-                            //Pawn currentPawn = _selectedTile.GetPawn();
                             Pawn targetPawn = newTile.GetPawn();
                             if (currentAction != null && targetPawn != null && currentPawn.IsTargetInRange(targetPawn, currentAction) && targetPawn.OnPlayerTeam != currentPawn.OnPlayerTeam)
                             {
                                 ClearHighlights();
                                 currentPawn.AttackPawnIfResourcesAvailable(targetPawn);
                             }
-                            else if (newTile.IsInRangeOf(currentPawn.CurrentTile, currentPawn.MoveRange) && targetPawn == null && currentAction == null && _selectedTile != null)
+                            //newTile.IsInRangeOf(currentPawn.CurrentTile, currentPawn.MoveRange)
+                            else if (currentPawn.CurrentTile.GetTilesInMoveRange().Contains(newTile) && targetPawn == null && currentAction == null && _selectedTile != null)
                             {
                                 ClearHighlights();
                                 currentPawn.TryMoveToTile(newTile);

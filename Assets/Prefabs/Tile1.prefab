@@ -71,7 +71,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -896573283
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 98df362d46505407e860ee272c8ee36b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -155,7 +155,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -896573283
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: 98df362d46505407e860ee272c8ee36b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -362,6 +362,8 @@ MonoBehaviour:
   attackTargetHighlightSprite: {fileID: 21300000, guid: 68694f32466694c25be58e5c110ab06e, type: 3}
   tileOverlayUI: {fileID: 8157718088664233285}
   tileHoverUI: {fileID: 4394614102146550778}
+  impassableObjectPrefabs:
+  - {fileID: 7057367235877927591, guid: bf1d30f29730c40ab8a49bf0336cd358, type: 3}
   _pawn: {fileID: 0}
 --- !u!60 &5009864740182896781
 PolygonCollider2D:

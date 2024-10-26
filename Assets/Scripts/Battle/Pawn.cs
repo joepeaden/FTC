@@ -603,7 +603,7 @@ public class Pawn : MonoBehaviour
                 }
             }
 
-            moveOptions = moveOptions.OrderBy(tile => (tile.transform.position - targetTile.transform.position).magnitude).Where(tile => tile.GetPawn() == null).ToList();
+            moveOptions = moveOptions.OrderBy(tile => (tile.transform.position - targetTile.transform.position).magnitude).Where(tile => tile.IsTraversableByThisPawn(this)).ToList(); // tile.GetPawn() == null && 
 
             adjustedTargetTile = moveOptions.First();
         }
