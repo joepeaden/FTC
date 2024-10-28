@@ -258,6 +258,9 @@ public class BattleManager : MonoBehaviour
         _endTurnButton.onClick.AddListener(EndTurn);
         _startBattleButton.onClick.AddListener(ToggleInstructions);
         _nextInstructionsButton.onClick.AddListener(NextInstructions);
+
+        // show instructions
+        _instructionsUI.SetActive(true);
     }
 
     private void Start()

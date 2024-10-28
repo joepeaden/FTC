@@ -364,6 +364,9 @@ MonoBehaviour:
   tileHoverUI: {fileID: 4394614102146550778}
   impassableObjectPrefabs:
   - {fileID: 7057367235877927591, guid: bf1d30f29730c40ab8a49bf0336cd358, type: 3}
+  - {fileID: 3672944689813977534, guid: 11df6af4dff044bd197bdf08f25c5e35, type: 3}
+  - {fileID: 2137986869439738351, guid: 837d4c81089ba4ba89d9907aae60aaa7, type: 3}
+  - {fileID: 3582594325327190948, guid: bcb58aa3fa0af43f08b95c7647eb498a, type: 3}
   _pawn: {fileID: 0}
 --- !u!60 &5009864740182896781
 PolygonCollider2D:

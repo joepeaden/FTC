@@ -300,7 +300,9 @@ public class Pawn : MonoBehaviour
 
     public bool IsTargetInRange(Pawn targetPawn, ActionData currentAction)
     {
-        if (targetPawn.CurrentTile.GetTileDistance(CurrentTile) <= currentAction.range)
+        bool isCloseEnough = targetPawn.CurrentTile.GetTileDistance(CurrentTile) <= currentAction.range;
+
+        if (isCloseEnough)
         {
             return true;
         }

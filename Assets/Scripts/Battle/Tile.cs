@@ -65,6 +65,11 @@ public class Tile : MonoBehaviour
 
     public void SetImpassable(bool isImpassable)
     {
+        if (_isImpassable == isImpassable)
+        {
+            return;
+        }
+
         _isImpassable = isImpassable;
 
         if (isImpassable)
@@ -76,7 +81,7 @@ public class Tile : MonoBehaviour
         {
             if (impassableObjectRef != null)
             {
-                Destroy(impassableObjectRef);
+                DestroyImmediate(impassableObjectRef);
             }
         }
     }

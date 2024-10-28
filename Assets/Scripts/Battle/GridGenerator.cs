@@ -32,12 +32,21 @@ public class GridGenerator : MonoBehaviour
         AstarPath.active.Scan();
     }
 
-    void GenerateGrid()
+    public void GenerateGrid()
     {
+        _playerSpawns.Clear();
+        _enemySpawns.Clear();
+
         for (int x = 0; x < gridWidth; x++)
         {
             for (int y = 0; y < gridHeight; y++)
             {
+                Point gridPoint = new Point(x, y);
+                if (_tiles.ContainsKey(gridPoint) && _tiles[gridPoint] != null)
+                {
+                    DestroyImmediate(_tiles[gridPoint].gameObject);
+                }
+
                 GameObject tilePrefab = tilePrefabs[Random.Range(0, tilePrefabs.Length)];
                 GameObject tileGO = Instantiate(tilePrefab, transform);
 
@@ -47,7 +56,7 @@ public class GridGenerator : MonoBehaviour
                 tileGO.transform.position = new Vector3(posX, posY);
                 tileGO.name = "Tile (" + x + ", " + y + ")";
 
-                _tiles[new Point(x, y)] = tileGO.GetComponent<Tile>();
+                _tiles[gridPoint] = tileGO.GetComponent<Tile>();
 
                 if (y <= 7)
                 {
@@ -63,33 +72,42 @@ public class GridGenerator : MonoBehaviour
             }
         }
 
+        List<Tile> randomizedListOfTiles = new();
         foreach (KeyValuePair<Point, Tile> kvp in _tiles)
         {
             Tile tile = kvp.Value;
             Point coord = kvp.Key;
 
-            
+            tile.Initialize(_tiles, coord, false);
+
+            randomizedListOfTiles.Add(tile);
+        }
+
+        for (int i = 0; i < randomizedListOfTiles.Count; i++)
+        {
+            Tile tile = randomizedListOfTiles[Random.Range(0, randomizedListOfTiles.Count)];
+
             bool isImpassible = false;
             if (!_playerSpawns.Contains(tile) && !_enemySpawns.Contains(tile))
             {
                 isImpassible = Random.Range(0f, 1f) < impassableChancePerTile;
             }
 
-            tile.Initialize(_tiles, coord, isImpassible);
+            tile.SetImpassable(isImpassible);
 
-            if (!CheckConnectivity(_playerSpawns[0]))
+            if (isImpassible && !CheckConnectivity(_playerSpawns[0]) || !CheckConnectivity(_enemySpawns[0]))
             {
-                EnsureConnectivity();//tile.SetImpassable(false);
+                tile.SetImpassable(false);
+                //EnsureConnectivity();
             }
-        }
 
-        //if (!CheckConnectivity(_playerSpawns[0]))
-        //{
-        //    EnsureConnectivity();
-        //}
+            randomizedListOfTiles.Remove(tile);
+        }
     }
 
-    // BFS Connectivity Check
+    /// <summary>
+    /// BFS Connectivity Check
+    /// </summary>
     bool CheckConnectivity(Tile startTile)
     {
         HashSet<Tile> visited = new HashSet<Tile>();
@@ -135,7 +153,6 @@ public class GridGenerator : MonoBehaviour
             }
         }
 
-        // Try turning groups of impassable tiles to passable in sequence
         for (int i = 0; i < impassableTiles.Count; i++)
         {
             impassableTiles[i].SetImpassable(false); // Temporarily make passable

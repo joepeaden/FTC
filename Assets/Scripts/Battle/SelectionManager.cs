@@ -125,7 +125,6 @@ public class SelectionManager : MonoBehaviour
                                 ClearHighlights();
                                 currentPawn.AttackPawnIfResourcesAvailable(targetPawn);
                             }
-                            //newTile.IsInRangeOf(currentPawn.CurrentTile, currentPawn.MoveRange)
                             else if (currentPawn.CurrentTile.GetTilesInMoveRange().Contains(newTile) && targetPawn == null && currentAction == null && _selectedTile != null)
                             {
                                 ClearHighlights();
