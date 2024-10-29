@@ -50,6 +50,11 @@ public class EnemyAI : MonoBehaviour
         // add comment
         else
         {
+            // figure out who to target first
+            // figure out the path to get to that target
+            // go as far as possible along that path within move range
+
+
             // dictionary is (tile, advantagerating)  
             Dictionary<Tile, int> moveRatingDict = new();
 
