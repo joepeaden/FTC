@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using Pathfinding;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -38,6 +39,8 @@ public class Tile : MonoBehaviour
     //private bool _isInMoveRange;
     private List<Tile> _adjacentTiles = new();
 
+    public PointNode PathfindingNode => _pathfindingNode;
+    private PointNode _pathfindingNode;
     public Point Coordinates => _coordinates;
     private Point _coordinates;
 
@@ -84,15 +87,21 @@ public class Tile : MonoBehaviour
                 DestroyImmediate(impassableObjectRef);
             }
         }
+
+        _pathfindingNode.Walkable = !IsImpassable;
     }
 
     public void Initialize(Dictionary<Point, Tile> tiles, Point coord, bool isImpassable)
     {
         _coordinates = coord;
-        Point p = new Point(coord.X + 1, coord.Y);
+
+        PointGraph graph = AstarPath.active.data.pointGraph;
+        _pathfindingNode = graph.AddNode((Int3)transform.position);
 
         SetImpassable(isImpassable);
 
+        // set up adjacent tiles
+        Point p = new Point(coord.X + 1, coord.Y);
         if (tiles.ContainsKey(p))
         {
             _adjacentTiles.Add(tiles[p]);
@@ -115,6 +124,14 @@ public class Tile : MonoBehaviour
         if (tiles.ContainsKey(p))
         {
             _adjacentTiles.Add(tiles[p]);
+        }
+    }
+
+    public void UpdateNodeConnections()
+    {
+        foreach (Tile t in _adjacentTiles)
+        {
+            _pathfindingNode.AddConnection(t.PathfindingNode, 1);
         }
     }
 

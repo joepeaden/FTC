@@ -590,32 +590,34 @@ public class Pawn : MonoBehaviour
             return;
         }
 
-        Tile adjustedTargetTile = targetTile;
+        //Tile adjustedTargetTile = targetTile;
         int tileDistance = _currentTile.GetTileDistance(targetTile);
-        if (_actionPoints < _gameChar.GetAPPerTileMoved() * tileDistance)
-        {
-            List<Tile> moveOptions = _currentTile.GetTilesInMoveRange();
+        //if (_actionPoints < _gameChar.GetAPPerTileMoved() * tileDistance)
+        //{
+        //    List<Tile> moveOptions = _currentTile.GetTilesInMoveRange();
 
-            for (int i = 0; i < moveOptions.Count; i++)
-            {
-                Tile t = moveOptions[i];
-                if (t.GetPawn() != null)
-                {
-                    moveOptions.Remove(t);
-                }
-            }
+        //    for (int i = 0; i < moveOptions.Count; i++)
+        //    {
+        //        Tile t = moveOptions[i];
+        //        if (t.GetPawn() != null)
+        //        {
+        //            moveOptions.Remove(t);
+        //        }
+        //    }
 
-            moveOptions = moveOptions.OrderBy(tile => (tile.transform.position - targetTile.transform.position).magnitude).Where(tile => tile.IsTraversableByThisPawn(this)).ToList(); // tile.GetPawn() == null && 
+        //    moveOptions = moveOptions.OrderBy(tile => (tile.transform.position - targetTile.transform.position).magnitude).Where(tile => tile.IsTraversableByThisPawn(this)).ToList(); // tile.GetPawn() == null && 
 
-            adjustedTargetTile = moveOptions.First();
-        }
+        //    adjustedTargetTile = moveOptions.First();
+        //}
 
-        Vector3 position = adjustedTargetTile.transform.position;
-
-        pathfinder.destination = position;
-        pathfinder.enabled = true;
+        //Vector3 position = adjustedTargetTile.transform.position;
+        pathfinder.AttemptGoToLocation(targetTile.transform.position);
 
         _anim.Play("Run");
+
+        // the ap adjustments may need to happen as the pawn enters each tile. May be best to
+        // process things one tile at a time if implementing varying AP costs, etc. But not now.
+        // if doing that later, make sure to update the pathfinder code too.
 
         // use whole turn to get out of combat with someone
         if (EngagedInCombat)
@@ -628,7 +630,6 @@ public class Pawn : MonoBehaviour
         }
 
         _currentTile.PawnExitTile();
-        _currentTile = adjustedTargetTile;
     }
 
     public void HandleDestinationReached()
@@ -641,7 +642,8 @@ public class Pawn : MonoBehaviour
             if (newTile != null)
             {
                 newTile.PawnEnterTile(this);
-                pathfinder.enabled = false;
+                _currentTile = newTile;
+                //pathfinder.enabled = false;
                 break;
             }
         }

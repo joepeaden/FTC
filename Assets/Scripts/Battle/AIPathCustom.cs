@@ -7,11 +7,81 @@ using UnityEngine.Events;
 public class AIPathCustom : AIPath
 {
     public UnityEvent OnDestinationReached = new ();
+    private Seeker _seeker;
+    private Pawn _pawn;
 
-    public override void OnTargetReached()
+    private List<Vector3> _pathToFollow;
+    private int _currentPathIndex;
+
+    // only a local var that is used for tracking movement range when trying
+    // to get to a destination. Not accurate if not being used.
+    private int _pawnActionPoints;
+
+    protected override void Awake()
     {
-        base.OnTargetReached();
-        OnDestinationReached.Invoke();
+        _seeker = GetComponent<Seeker>();
+        _pawn = GetComponent<Pawn>();
+    }
+
+    public void AttemptGoToLocation(Vector3 goalDestination)
+    {
+        _seeker.StartPath(transform.position, goalDestination, OnPathCalculated);
+        _pawnActionPoints = _pawn.ActionPoints;
+    }
+
+    private void OnPathCalculated(Path p)
+    {
+        _pathToFollow = new List<Vector3> (p.vectorPath);
+        enabled = true;
+        _currentPathIndex = 0;
+        MoveToNextPathNode();
+    }
+
+    private void MoveToNextPathNode()
+    {
+        destination = _pathToFollow[_currentPathIndex];
+        _pawnActionPoints -= Tile.BASE_AP_TO_TRAVERSE;
+    }
+
+    //public override void OnTargetReached()
+    //{
+    //    base.OnTargetReached();
+
+    protected override void Update()
+    {
+        base.Update();
+
+        if ((transform.position - destination).magnitude <= 0.1f)
+        {
+            _currentPathIndex++;
+
+            bool nextTileHasPawn = false;
+            if (_currentPathIndex == _pathToFollow.Count-2)
+            {
+                RaycastHit2D[] hits = Physics2D.RaycastAll(_pathToFollow[_currentPathIndex+1], -Vector3.forward);
+                foreach (RaycastHit2D hit in hits)
+                {
+                    Tile newTile = hit.transform.GetComponent<Tile>();
+                    if (newTile != null)
+                    {
+                        nextTileHasPawn = newTile.GetPawn() != null;
+                        break;
+                    }
+                } 
+            }
+
+            if (_currentPathIndex >= _pathToFollow.Count
+                || _pawnActionPoints <= 0
+                || (nextTileHasPawn && _currentPathIndex == _pathToFollow.Count-2))
+            {
+                OnDestinationReached.Invoke();
+                enabled = false;
+            }
+            else
+            {
+                MoveToNextPathNode();
+            }
+        }
     }
 
     private void OnDestroy()
