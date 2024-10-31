@@ -34,18 +34,51 @@ public class AIPathCustom : AIPath
         _pathToFollow = new List<Vector3> (p.vectorPath);
         enabled = true;
         _currentPathIndex = 0;
+
+
+        int totalTilesToMove = _pathToFollow.Count - 1;
+        int apPerTileMoved = _pawn.GameChar.GetAPPerTileMoved();
+
+        // if not enough AP to move the total distance to goal,
+        // remove unreachable nodes
+        if (totalTilesToMove * apPerTileMoved > _pawnActionPoints)
+        {
+            Vector3 finalPosition = _pathToFollow[_pawnActionPoints / apPerTileMoved];
+            int finalIndex = _pathToFollow.IndexOf(finalPosition);
+            _pathToFollow.RemoveRange(finalIndex+1, (_pathToFollow.Count - (finalIndex + 1)));
+        }
+
+        // make sure there's no pawn at the final tile
+        int pathIndex = _pathToFollow.Count-1;
+        while (_pathToFollow.Count > 1)
+        {
+            Vector3 endPoint = _pathToFollow[pathIndex];
+            Tile finalTile = GridGenerator.Instance.GetClosestTileToPosition(endPoint);
+
+            if (finalTile.GetPawn() != null)
+            {
+                _pathToFollow.Remove(endPoint);
+            }
+            else
+            {
+                break;
+            }
+
+            pathIndex--;
+        }
+
         MoveToNextPathNode();
     }
 
     private void MoveToNextPathNode()
     {
         destination = _pathToFollow[_currentPathIndex];
-        _pawnActionPoints -= Tile.BASE_AP_TO_TRAVERSE;
-    }
 
-    //public override void OnTargetReached()
-    //{
-    //    base.OnTargetReached();
+        if (_currentPathIndex > 0)
+        {
+            _pawnActionPoints -= _pawn.GameChar.GetAPPerTileMoved();
+        }
+    }
 
     protected override void Update()
     {
@@ -55,24 +88,23 @@ public class AIPathCustom : AIPath
         {
             _currentPathIndex++;
 
-            bool nextTileHasPawn = false;
-            if (_currentPathIndex == _pathToFollow.Count-2)
-            {
-                RaycastHit2D[] hits = Physics2D.RaycastAll(_pathToFollow[_currentPathIndex+1], -Vector3.forward);
-                foreach (RaycastHit2D hit in hits)
-                {
-                    Tile newTile = hit.transform.GetComponent<Tile>();
-                    if (newTile != null)
-                    {
-                        nextTileHasPawn = newTile.GetPawn() != null;
-                        break;
-                    }
-                } 
-            }
+            //bool nextTileHasPawn = false;
+            //if (_currentPathIndex == _pathToFollow.Count-2)
+            //{
+                //RaycastHit2D[] hits = Physics2D.RaycastAll(_pathToFollow[_currentPathIndex+1], -Vector3.forward);
+                //foreach (RaycastHit2D hit in hits)
+                //{
+                //    Tile newTile = hit.transform.GetComponent<Tile>();
+                //    if (newTile != null)
+                //    {
+                //        nextTileHasPawn = newTile.GetPawn() != null;
+                //        break;
+                //    }
+                //} 
+            //}
 
             if (_currentPathIndex >= _pathToFollow.Count
-                || _pawnActionPoints <= 0
-                || (nextTileHasPawn && _currentPathIndex == _pathToFollow.Count-2))
+                || _pawnActionPoints <= 0)
             {
                 OnDestinationReached.Invoke();
                 enabled = false;

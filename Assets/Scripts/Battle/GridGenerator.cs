@@ -17,6 +17,7 @@ public class GridGenerator : MonoBehaviour
     [SerializeField] float tileSize;
     [SerializeField] float impassableChancePerTile;
 
+    public Dictionary<Point, Tile> Tiles => _tiles;
     private Dictionary<Point, Tile> _tiles = new();
 
     public List<Tile> PlayerSpawns => _playerSpawns;
@@ -65,6 +66,7 @@ public class GridGenerator : MonoBehaviour
 
                     GameObject tilePrefab = tilePrefabs[Random.Range(0, tilePrefabs.Length)];
                     GameObject tileGO = Instantiate(tilePrefab, transform);
+                    Tile tileScript = tileGO.GetComponent<Tile>();
 
                     float posX = (x * tileSize + y * tileSize) / 2f;
                     float posY = (x * tileSize - y * tileSize) / 4f;
@@ -72,17 +74,17 @@ public class GridGenerator : MonoBehaviour
                     tileGO.transform.position = new Vector3(posX, posY);
                     tileGO.name = "Tile (" + x + ", " + y + ")";
 
-                    _tiles[gridPoint] = tileGO.GetComponent<Tile>();
+                    _tiles[gridPoint] = tileScript;
 
-                    if (y <= 7)
+                    if (y <= 9)
                     {
                         if (x == 0)
                         {
-                            _playerSpawns.Add(tileGO.GetComponent<Tile>());
+                            _playerSpawns.Add(tileScript);
                         }
-                        else if (x == 7)
+                        else if (x == 9)
                         {
-                            _enemySpawns.Add(tileGO.GetComponent<Tile>());
+                            _enemySpawns.Add(tileScript);
                         }
                     }
                 }
@@ -127,6 +129,27 @@ public class GridGenerator : MonoBehaviour
 
         }));
 
+    }
+
+    /// <summary>
+    /// Get a tile by its position. Accounts for small variances in
+    /// the floating point numbers in Vector3 by just getting the closest one.
+    /// </summary>
+    /// <param name="pos"></param>
+    /// <returns></returns>
+    public Tile GetClosestTileToPosition(Vector3 pos)
+    {
+        foreach (Tile t in _tiles.Values)
+        {
+            if (Mathf.Abs(t.transform.position.x - pos.x) < .1f &&
+                Mathf.Abs(t.transform.position.y - pos.y) < .1f &&
+                Mathf.Abs(t.transform.position.z - pos.z) < .1f)
+            {
+                return t;
+            }
+        }
+
+        return null;
     }
 
     /// <summary>
