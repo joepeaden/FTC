@@ -15,4 +15,4 @@ MonoBehaviour:
   effectName: Glorious Moment
   description: When adjacent to more than one enemy, gain +100 initiative and 1 free
     basic attack action.
-  effectSprite: {fileID: 21300000, guid: 56b6d779582183d49878dc21bb5496bf, type: 3}
+  effectSprite: {fileID: 21300000, guid: b6795c96fef3b01439d1de6a75d33651, type: 3}

@@ -72,6 +72,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private GameObject _instructionsP1;
     [SerializeField] private GameObject _instructionsP2;
     [SerializeField] private Button _nextInstructionsButton;
+    [SerializeField] private Button _showInstructionsButton;
     [SerializeField] private RectTransform _pawnPointer;
     [SerializeField] private Transform _pawnEffectsParent;
     [SerializeField] private Image _pawnEffectLargePrefab;
@@ -258,6 +259,7 @@ public class BattleManager : MonoBehaviour
         _endTurnButton.onClick.AddListener(EndTurn);
         _startBattleButton.onClick.AddListener(ToggleInstructions);
         _nextInstructionsButton.onClick.AddListener(NextInstructions);
+        _showInstructionsButton.onClick.AddListener(ToggleInstructions);
 
         // show instructions
         _instructionsUI.SetActive(true);
@@ -304,6 +306,7 @@ public class BattleManager : MonoBehaviour
         gameOverButton.onClick.RemoveListener(ExitBattle);
         _startBattleButton.onClick.RemoveListener(ToggleInstructions);
         _nextInstructionsButton.onClick.AddListener(NextInstructions);
+        _showInstructionsButton.onClick.RemoveListener(ToggleInstructions);
     }
 
     #region UI
@@ -342,6 +345,15 @@ public class BattleManager : MonoBehaviour
         if (_turnNumber == -1)
         {
             StartBattle();
+        }
+
+        if (_instructionsUI.activeInHierarchy)
+        {
+            _selectionManager.DisablePlayerControls();
+        }
+        else
+        {
+            _selectionManager.EnablePlayerControls();
         }
     }
 

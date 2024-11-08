@@ -15,4 +15,4 @@ MonoBehaviour:
   effectName: Advantage
   description: When an adjacent enemy is adjacent to more than one ally, gain +10%
     chance to hit instead of +5% for each ally surrounding said enemy.
-  effectSprite: {fileID: 21300000, guid: aa0220e340287314eaf32953b38d2f77, type: 3}
+  effectSprite: {fileID: 21300000, guid: d605befd4bec61449b7a5c492aaf2361, type: 3}

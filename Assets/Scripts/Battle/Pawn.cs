@@ -366,6 +366,11 @@ public class Pawn : MonoBehaviour
     public void HandleTurnEnded()
     {
         _hasMadeFreeAttack = false;
+
+        if (!_isDead)
+        {
+            _anim.Play("Idle");
+        }
     }
 
     private void AttackPawn(Pawn targetPawn, ActionData currentAction)

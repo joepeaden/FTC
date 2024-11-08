@@ -56,7 +56,12 @@ public class SelectionManager : MonoBehaviour
     public void DisablePlayerControls()
     {
         _playerControlsEnabled = false;
-        _selectedTile = null;
+        //_selectedTile = null;
+    }
+
+    public void EnablePlayerControls()
+    {
+        _playerControlsEnabled = true;
     }
 
     public void ClearHighlights()
