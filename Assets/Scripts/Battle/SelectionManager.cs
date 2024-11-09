@@ -26,6 +26,12 @@ public class SelectionManager : MonoBehaviour
 
         _selectedTile = newTile;
         _selectedTile.SetSelected(true);
+
+        // if the character has moved here during it's turn and is not done yet (not a fresh pawn)
+        if (BattleManager.Instance.CurrentPawn.ActionPoints < Pawn.BASE_ACTION_POINTS && BattleManager.Instance.CurrentPawn.HasActionsRemaining())
+        {
+            _selectedTile.HighlightTilesInRange(BattleManager.Instance.CurrentPawn, BattleManager.Instance.CurrentPawn.MoveRange, true, Tile.TileHighlightType.Move);
+        }
     }
 
     public void ClearSelectedTile()

@@ -32,7 +32,7 @@ public class MiniStatBar : MonoBehaviour
     {
         if (_pawn != null)
         {
-            Vector3 objScreenPos = Camera.main.WorldToScreenPoint(_pawn.transform.position);
+            Vector3 objScreenPos = CameraManager.MainCamera.WorldToScreenPoint(_pawn.transform.position);
             objScreenPos.y += yOffset;
 
 
@@ -41,7 +41,7 @@ public class MiniStatBar : MonoBehaviour
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
                 transform.parent as RectTransform,
                 objScreenPos,
-                Camera.main,
+                CameraManager.MainCamera,
                 out uiPos);
 
 

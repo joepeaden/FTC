@@ -313,7 +313,7 @@ public class BattleManager : MonoBehaviour
 
     private void OnHoverInitPawnPreview(Pawn p)
     {
-        Vector3 objScreenPos = Camera.main.WorldToScreenPoint(p.transform.position);
+        Vector3 objScreenPos = CameraManager.MainCamera.WorldToScreenPoint(p.transform.position);
         objScreenPos.y += 150;
 
         // Convert screen position to a position relative to the UI's canvas
@@ -321,7 +321,7 @@ public class BattleManager : MonoBehaviour
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
             _pawnPointer.parent as RectTransform,
             objScreenPos,
-            Camera.main,
+            CameraManager.MainCamera,
             out uiPos);
 
         _pawnPointer.gameObject.SetActive(true);

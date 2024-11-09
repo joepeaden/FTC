@@ -655,6 +655,11 @@ public class Pawn : MonoBehaviour
 
         _anim.Play("Idle");
 
+        //if (HasActionsRemaining())
+        //{
+        //    _currentTile.HighlightTilesInRange(this, MoveRange, true, Tile.TileHighlightType.Move);
+        //}
+
         UpdateMotivationEvent.Invoke();
 
         BattleManager.Instance.PawnActivated(this);

@@ -17,7 +17,7 @@ public class TextFloatUp : MonoBehaviour
     {
         StopAllCoroutines();
 
-        Vector3 newPos = Camera.main.WorldToScreenPoint(position);
+        Vector3 newPos = CameraManager.MainCamera.WorldToScreenPoint(position);
         newPos.y += heightOffset;
 
         // Convert screen position to a position relative to the UI's canvas
@@ -25,7 +25,7 @@ public class TextFloatUp : MonoBehaviour
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
             transform.parent as RectTransform,
             newPos,
-            Camera.main,
+            CameraManager.MainCamera,
             out uiPos);
 
         GetComponent<RectTransform>().anchoredPosition = uiPos;
