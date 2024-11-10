@@ -4,6 +4,13 @@ using UnityEngine;
 
 public class FollowMouse : MonoBehaviour
 {
+    private RectTransform _rect;
+
+    private void Start()
+    {
+        _rect = GetComponent<RectTransform>();
+    }
+
     private void Update()
     {
         Vector2 mousePos;
@@ -13,19 +20,7 @@ public class FollowMouse : MonoBehaviour
             CameraManager.MainCamera,
             out mousePos);
 
-
-
-        // Convert screen position to a position relative to the UI's canvas
-        //Vector2 uiPos;
-        //RectTransformUtility.ScreenPointToLocalPointInRectangle(
-        //    transform.parent as RectTransform,
-        //    newPos,
-        //    Camera.main,
-        //    out uiPos);
-
-        //GetComponent<RectTransform>().anchoredPosition = uiPos;
-
         // Update the position of the UI element
-        GetComponent<RectTransform>().anchoredPosition = mousePos;
+        _rect.anchoredPosition = mousePos;
     }
 }

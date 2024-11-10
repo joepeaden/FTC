@@ -19,6 +19,7 @@ public class ActionButton : MonoBehaviour
     private UnityAction<ActionData> _callback;
 
     private KeyCode _hotKey;
+    public bool IsSelected => _isSelected;
     private bool _isSelected = false;
 
     // if it's not button mode then it's only for display purposes, so no interaction etc.

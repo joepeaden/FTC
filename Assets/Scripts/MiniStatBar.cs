@@ -15,8 +15,9 @@ public class MiniStatBar : MonoBehaviour
     [SerializeField] private Image _classIcon;
 
     private Pawn _pawn;
-
     private Vector3 _originalClassIconScale;
+    private RectTransform _rect;
+    private Vector3 _lastPawnPos;
 
     #region UnityEventFunctions
 
@@ -26,27 +27,16 @@ public class MiniStatBar : MonoBehaviour
         _classIcon.material = new Material(_classIcon.material);
 
         _originalClassIconScale = _classIcon.transform.localScale;
+        _rect = GetComponent<RectTransform>();
     }
 
     private void Update()
     {
-        if (_pawn != null)
+        if (_pawn != null && _pawn.transform.position != _lastPawnPos)
         {
-            Vector3 objScreenPos = CameraManager.MainCamera.WorldToScreenPoint(_pawn.transform.position);
-            objScreenPos.y += yOffset;
+            UpdatePosition();
 
-
-            // Convert screen position to a position relative to the UI's canvas
-            Vector2 uiPos;
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                transform.parent as RectTransform,
-                objScreenPos,
-                CameraManager.MainCamera,
-                out uiPos);
-
-
-
-            GetComponent<RectTransform>().anchoredPosition = uiPos;
+            _lastPawnPos = _pawn.transform.position;
         }
     }
 
@@ -58,9 +48,29 @@ public class MiniStatBar : MonoBehaviour
 
     #endregion
 
+    private void UpdatePosition()
+    {
+        Vector3 objScreenPos = CameraManager.MainCamera.WorldToScreenPoint(_pawn.transform.position);
+        objScreenPos.y += yOffset;
+
+
+        // Convert screen position to a position relative to the UI's canvas
+        Vector2 uiPos;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            transform.parent as RectTransform,
+            objScreenPos,
+            CameraManager.MainCamera,
+            out uiPos);
+
+        _rect.anchoredPosition = uiPos;
+    }
+
     public void SetData(Pawn p)
     {
         _pawn = p;
+        _lastPawnPos = _pawn.transform.position;
+
+        UpdatePosition();
 
         UpdateBars();
 

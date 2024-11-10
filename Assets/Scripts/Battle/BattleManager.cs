@@ -55,13 +55,11 @@ public class BattleManager : MonoBehaviour
     [SerializeField] TMP_Text motText;
     [SerializeField] StatBar motBar;
     [SerializeField] private Transform _initStackParent;
-    [SerializeField] GameObject pawnPreviewPrefab;
     [SerializeField] private List<TextFloatUp> _floatingTexts = new();
     [SerializeField] private CharacterTooltip charTooltip;
     [SerializeField] private GameObject _instructionsUI;
     [SerializeField] private Button _startBattleButton;
     [SerializeField] private Transform _actionsParent;
-    [SerializeField] private GameObject _actionButtonPrefab;
     [SerializeField] private GameObject bottomUIObjects;
     [SerializeField] private ParticleSystem bloodEffect;
     [SerializeField] private ParticleSystem armorHitEffect;
@@ -76,6 +74,10 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private RectTransform _pawnPointer;
     [SerializeField] private Transform _pawnEffectsParent;
     [SerializeField] private Image _pawnEffectLargePrefab;
+    [SerializeField] private ActionButton actionButton1;
+    [SerializeField] private ActionButton actionButton2;
+    [SerializeField] private ActionButton actionButton3;
+    [SerializeField] private ActionButton actionButton4;
 
     [Header("Equipment")]
     [SerializeField] private ArmorItemData lightHelm;
@@ -263,6 +265,13 @@ public class BattleManager : MonoBehaviour
 
         // show instructions
         _instructionsUI.SetActive(true);
+
+        // add action buttons to loop
+        // update the instantiation stuff in UpdatePawnUI whatever so it just uses the existing buttons
+        actionButtons.Add(actionButton1);
+        actionButtons.Add(actionButton2);
+        actionButtons.Add(actionButton3);
+        actionButtons.Add(actionButton4);
     }
 
     private void Start()
@@ -382,7 +391,8 @@ public class BattleManager : MonoBehaviour
             child.GetComponent<PawnHeadPreview>().OnPawnPreviewHoverStart.RemoveListener(OnHoverInitPawnPreview);
             child.GetComponent<PawnHeadPreview>().OnPawnPreviewHoverEnd.RemoveListener(HandleEndHoverInitPawnPreview);
 
-            Destroy(child.gameObject);
+            // return to object pool
+            child.gameObject.SetActive(false);
         }
 
         int newChildCount = 0;
@@ -397,7 +407,11 @@ public class BattleManager : MonoBehaviour
                 continue;
             }
 
-            GameObject pawnPreview = Instantiate(pawnPreviewPrefab, _initStackParent);
+            GameObject pawnPreview = ObjectPool.instance.GetPawnPreview();
+            pawnPreview.SetActive(true);
+            pawnPreview.transform.SetParent(_initStackParent);
+            // for some reason, the pawn previews get really mega stretched out.
+            pawnPreview.transform.localScale = Vector3.one;
             pawnPreview.GetComponent<PawnHeadPreview>().SetData(p);
 
             pawnPreview.GetComponent<PawnHeadPreview>().OnPawnPreviewHoverStart.AddListener(OnHoverInitPawnPreview);
@@ -453,23 +467,34 @@ public class BattleManager : MonoBehaviour
 
             RefreshInitStackUI();
 
-            for (int i = 0; i < _actionsParent.childCount; i++)
-            {
-                Destroy(_actionsParent.GetChild(i).gameObject);
-            }
-
             actionButtons.Clear();
 
             if (p.OnPlayerTeam)
             {
-                GameObject actionButtonGO = Instantiate(_actionButtonPrefab, _actionsParent);
-                actionButtonGO.GetComponent<ActionButton>().SetDataButton(p.GameChar.WeaponItem.baseAction, HandleActionClicked, KeyCode.Alpha1);
-                actionButtons.Add(actionButtonGO.GetComponent<ActionButton>());
+                //GameObject actionButtonGO = Instantiate(_actionButtonPrefab, _actionsParent);
+                if (actionButton1.Action != p.GameChar.WeaponItem.baseAction)
+                {
+                    actionButton1.SetDataButton(p.GameChar.WeaponItem.baseAction, HandleActionClicked, KeyCode.Alpha1);
+                }
+
                 if (p.GameChar.WeaponItem.specialAction != null)
                 {
-                    actionButtonGO = Instantiate(_actionButtonPrefab, _actionsParent);
-                    actionButtonGO.GetComponent<ActionButton>().SetDataButton(p.GameChar.WeaponItem.specialAction, HandleActionClicked, KeyCode.Alpha2);
-                    actionButtons.Add(actionButtonGO.GetComponent<ActionButton>());
+                    if (!actionButton2.gameObject.activeInHierarchy)
+                    {
+                        actionButton2.gameObject.SetActive(true);
+                    }
+
+                    if (actionButton2.Action != p.GameChar.WeaponItem.specialAction)
+                    {
+                        actionButton2.SetDataButton(p.GameChar.WeaponItem.specialAction, HandleActionClicked, KeyCode.Alpha2);
+                    }
+                }
+                else
+                {
+                    if (actionButton2.gameObject.activeInHierarchy)
+                    {
+                        actionButton2.gameObject.SetActive(false);
+                    }
                 }
             }
 
@@ -617,7 +642,10 @@ public class BattleManager : MonoBehaviour
     {
         foreach (ActionButton abutton in actionButtons)
         {
-            abutton.SetInactive();
+            if (abutton.IsSelected)
+            {
+                abutton.SetInactive();
+            }
         }
 
         if (_currentAction != null)
@@ -688,7 +716,7 @@ public class BattleManager : MonoBehaviour
             _selectionManager.SelectedTile.SetSelected(false);
         }
 
-        StartCoroutine(NextActivation());
+        NextActivation();
     }
 
     /// <summary>
@@ -776,7 +804,7 @@ public class BattleManager : MonoBehaviour
     {
         _turnNumber = 0;
         _instructionsUI.SetActive(false);
-        StartCoroutine(NextActivation());
+        NextActivation();
     }
 
     private void HandleBattleResult(BattleResult battleResult)
@@ -808,7 +836,7 @@ public class BattleManager : MonoBehaviour
         return alivePawns <= 0;
     }
 
-    public IEnumerator NextActivation()
+    public void NextActivation()
     {
         if (_currentPawn != null)
         {
@@ -830,10 +858,10 @@ public class BattleManager : MonoBehaviour
             }
             else
             {
-                if (_currentPawn.CurrentTile == null)
-                {
-                    yield return new WaitUntil(() => _currentPawn.CurrentTile != null);
-                }
+                //if (_currentPawn.CurrentTile == null)
+                //{
+                //    yield return new WaitUntil(() => _currentPawn.CurrentTile != null);
+                //}
 
                 _currentPawn.HandleActivation();
                 UpdateUIForPawn(_currentPawn);

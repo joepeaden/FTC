@@ -6,16 +6,18 @@ using UnityEngine.UI;
 public class StatBar : MonoBehaviour
 {
     public GameObject statPipPrefab;
-    public Transform statBarParent;
+    public RectTransform statBarParent;
     [SerializeField] private Color fill;
     [SerializeField] private Color bgFill;
     private Color _previewFill;
 
     private List<Image> _previewPips = new();
 
-    //private bool _previewGreaterThan;
+    private List<Image> statPips = new();
 
-    private void Start()
+    [SerializeField] private RectTransform fillBar;
+
+    private void Awake()
     {
         //StartCoroutine(FlashPreviewPips());
 
@@ -25,7 +27,10 @@ public class StatBar : MonoBehaviour
         prevFill.g -= .5f;
         prevFill.b -= .5f;
         _previewFill = prevFill;
+
+        fillBar.GetComponent<Image>().color = fill;
     }
+
 
     /// <summary>
     /// Set the bar based on a total and current value
@@ -34,157 +39,89 @@ public class StatBar : MonoBehaviour
     /// <param name="currentValue"></param>
     public void SetBar(int totalStatValue, int currentValue, int previewValue = -1)
     {
-        _previewPips.Clear();
-
-        if (totalStatValue != statBarParent.transform.childCount)
+        if (totalStatValue == 0)
         {
-            for (int i = 0; i < statBarParent.transform.childCount; i++)
+            return;
+        }
+
+        float parentWidth = statBarParent.rect.width;
+
+        // Calculate target width based on the desired ratio
+        float targetRatio = (float)currentValue / (float)totalStatValue;
+        float targetWidth = parentWidth * targetRatio;
+
+        // Set the width of _rect by adjusting its sizeDelta
+        fillBar.sizeDelta = new Vector2(targetWidth, fillBar.sizeDelta.y);
+
+        //int i = 0;
+        //if (statPips.Count == 0)
+        //{
+        //    // add... a lot of them for now.
+        //    for (; i < 300; i++)
+        //    {
+        //        statPips.Add(Instantiate(statPipPrefab, statBarParent).GetComponent<Image>());
+        //        statPips[i].gameObject.SetActive(false);
+        //    }
+        //}
+
+        //_previewPips.Clear();
+
+        //i = 0;
+        //for (; i < totalStatValue; i++)
+        //{
+        //    Image statPip = statPips[i];
+        //    if (!statPip.gameObject.activeInHierarchy)
+        //    {
+        //        statPip.gameObject.SetActive(true);
+        //    }
+
+        //    SetStatPipColor(statPip, currentValue, previewValue, i);
+        //}
+
+        //for (; i < statPips.Count; i++)
+        //{
+        //    if (statPips[i].gameObject.activeInHierarchy)
+        //    {
+        //        statPips[i].gameObject.SetActive(false);
+        //    }
+        //}
+    }
+
+    private void SetStatPipColor(Image statPip, int currentVal, int previewVal, int index)
+    {
+
+        if (currentVal <= index)
+        {
+            if (_previewPips.Contains(statPip))
             {
-                Destroy(statBarParent.GetChild(i).gameObject);
+                _previewPips.Remove(statPip);
             }
 
-            for (int i = 0; i < totalStatValue; i++)
+            if (statPip.color != bgFill)
             {
-                SetStatPipColor(Instantiate(statPipPrefab, statBarParent), currentValue, previewValue, i);
+                statPip.color = bgFill;
+            }
+
+        }
+        // previewValue will be -1 if no preview requested
+        else if (previewVal != -1 && previewVal <= index)
+        {
+            if (!_previewPips.Contains(statPip) && statPip.color != _previewFill)
+            {
+                statPip.color = _previewFill;
             }
         }
         else
         {
-            for (int i = 0; i < totalStatValue; i++)
+            if (_previewPips.Contains(statPip))
             {
-                SetStatPipColor(statBarParent.transform.GetChild(i).gameObject, currentValue, previewValue, i);
+                _previewPips.Remove(statPip);
             }
-        }
+
+            if (statPip.color != fill)
+            {
+                statPip.color = fill;
+            }
+        }   
     }
-
-    private void SetStatPipColor(GameObject statPip, int currentVal, int previewVal, int index)
-    {
-        Image pipImage = statPip.GetComponent<Image>();
-        //if (currentVal > previewVal)
-        //{
-            //_previewGreaterThan = false;
-            if (currentVal <= index)
-            {
-                if (_previewPips.Contains(pipImage))
-                {
-                    _previewPips.Remove(pipImage);
-                }
-
-                pipImage.color = bgFill;
-
-
-            }
-            // previewValue will be -1 if no preview requested
-            else if (previewVal != -1 && previewVal <= index)
-            {
-                if (!_previewPips.Contains(pipImage))
-                {
-                    pipImage.color = _previewFill;
-                    //_previewPips.Add(pipImage);
-                }
-            }
-            else
-            {
-                if (_previewPips.Contains(pipImage))
-                {
-                    _previewPips.Remove(pipImage);
-                }
-
-                pipImage.color = fill;
-            }
-        //}
-        //else
-        //{
-        //    _previewGreaterThan = true;
-
-        //    // previewValue will be -1 if no preview requested
-        //    if (previewVal <= index)
-        //    {
-        //        if (_previewPips.Contains(pipImage))
-        //        {
-        //            _previewPips.Remove(pipImage);
-        //        }
-
-        //        pipImage.color = bgFill;
-                
-        //    }
-        //    else if(previewVal != -1 && currentVal <= index)
-        //    {
-        //        if (!_previewPips.Contains(pipImage))
-        //        {
-        //            pipImage.color = _previewFill;
-        //            //_previewPips.Add(pipImage);
-        //        }
-                
-        //    }
-        //    else
-        //    {
-        //        if (_previewPips.Contains(pipImage))
-        //        {
-        //            _previewPips.Remove(pipImage);
-        //        }
-
-        //        pipImage.color = fill;
-                
-        //    }
-        //}
-    }
-
-    //private IEnumerator FlashPreviewPips()
-    //{
-    //    while (true)
-    //    {
-    //        Debug.Log(_previewPips.Count);
-
-    //        if (_previewGreaterThan)
-    //        {
-    //            for (float i = 0; i < 1; i += .01f)
-    //            {
-    //                foreach (Image pipImage in _previewPips)
-    //                {
-    //                    Color pipColor = pipImage.color;
-    //                    pipColor.a = i;
-    //                    pipImage.color = pipColor;
-    //                }
-    //                yield return new WaitForSeconds(.001f);
-    //            }
-
-    //            for (float i = 1; i > 0; i -= .01f)
-    //            {
-    //                foreach (Image pipImage in _previewPips)
-    //                {
-    //                    Color pipColor = pipImage.color;
-    //                    pipColor.a = i;
-    //                    pipImage.color = pipColor;
-    //                }
-    //                yield return new WaitForSeconds(.001f);
-    //            }
-    //        }
-    //        else
-    //        {
-    //            for (float i = 1; i > 0; i -= .01f)
-    //            {
-    //                foreach (Image pipImage in _previewPips)
-    //                {
-    //                    Color pipColor = pipImage.color;
-    //                    pipColor.a = i;
-    //                    pipImage.color = pipColor;
-    //                }
-    //                yield return new WaitForSeconds(.001f);
-    //            }
-
-
-    //            for (float i = 0; i < 1; i += .01f)
-    //            {
-    //                foreach (Image pipImage in _previewPips)
-    //                {
-    //                    Color pipColor = pipImage.color;
-    //                    pipColor.a = i;
-    //                    pipImage.color = pipColor;
-    //                }
-    //                yield return new WaitForSeconds(.001f);
-    //            }
-    //        }
-    //    }
-    //}
 }
