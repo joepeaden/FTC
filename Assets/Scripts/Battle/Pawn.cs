@@ -618,7 +618,7 @@ public class Pawn : MonoBehaviour
         //Vector3 position = adjustedTargetTile.transform.position;
         pathfinder.AttemptGoToLocation(targetTile.transform.position);
 
-        _anim.Play("Run");
+        _anim.Play("WobbleWalk");
 
         // the ap adjustments may need to happen as the pawn enters each tile. May be best to
         // process things one tile at a time if implementing varying AP costs, etc. But not now.

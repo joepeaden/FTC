@@ -56,10 +56,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: ImpassableObject2
       objectReference: {fileID: 0}
-    - target: {fileID: 8272751556209588414, guid: bf1d30f29730c40ab8a49bf0336cd358, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 21300000, guid: 52624e68deba11a4687ea8c688620cd4, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
