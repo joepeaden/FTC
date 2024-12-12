@@ -55,17 +55,17 @@ public class Pawn : MonoBehaviour
 
     [SerializeField] AIPathCustom pathfinder;
 
-    [Header("Visuals")]
-    [SerializeField] private Animator _anim;
-    [SerializeField] private Sprite _enemyHeadSprite;
-    [SerializeField] private Sprite _enemyBodySprite;
-    [SerializeField] private Sprite _enemyLegSprite;
-    [SerializeField] private SpriteRenderer _headSpriteRend;
-    [SerializeField] private SpriteRenderer _bodySpriteRend;
-    [SerializeField] private SpriteRenderer _leg1SpriteRend;
-    [SerializeField] private SpriteRenderer _leg2SpriteRend;
-    [SerializeField] private SpriteRenderer _helmSpriteRend;
-    [SerializeField] private SpriteRenderer _weaponSpriteRend;
+    //[Header("Visuals")]
+    //[SerializeField] private Animator _anim;
+    //[SerializeField] private Sprite _enemyHeadSprite;
+    //[SerializeField] private Sprite _enemyBodySprite;
+    //[SerializeField] private Sprite _enemyLegSprite;
+    //[SerializeField] private SpriteRenderer _headSpriteRend;
+    //[SerializeField] private SpriteRenderer _bodySpriteRend;
+    //[SerializeField] private SpriteRenderer _leg1SpriteRend;
+    //[SerializeField] private SpriteRenderer _leg2SpriteRend;
+    //[SerializeField] private SpriteRenderer _helmSpriteRend;
+    //[SerializeField] private SpriteRenderer _weaponSpriteRend;
 
     [Header("Audio")]
     [SerializeField] private AudioClip hitSound;
@@ -86,6 +86,9 @@ public class Pawn : MonoBehaviour
     public GameCharacter GameChar => _gameChar;
     private GameCharacter _gameChar;
 
+    [SerializeField]
+    private PawnSprite _spriteController;
+
     public GameCharacter.CharVices CurrentVice => _gameChar.Vice;
 
     private bool _hasMadeFreeAttack;
@@ -95,6 +98,7 @@ public class Pawn : MonoBehaviour
     private void Awake()
     {
         pathfinder.OnDestinationReached.AddListener(HandleDestinationReached);
+        
         UpdateMotivationEvent.AddListener(UpdateMotivatedStatus);
     }
 
@@ -116,15 +120,7 @@ public class Pawn : MonoBehaviour
         _motivation = GameChar.GetBattleMotivationCap();
         _actionPoints = BASE_ACTION_POINTS;
 
-        if (_gameChar.WeaponItem != null)
-        {
-            _weaponSpriteRend.sprite = _gameChar.WeaponItem.itemSprite;
-        }
-
-        if (_gameChar.HelmItem != null)
-        {
-            _helmSpriteRend.sprite = _gameChar.HelmItem.itemSprite;
-        }
+        _spriteController.SetData(character);
 
 
         //_anim.SetInteger("Vice", (int)_gameChar.Vice);
@@ -157,30 +153,29 @@ public class Pawn : MonoBehaviour
         return Mathf.Max(_actionPoints - (tileDist * _gameChar.GetAPPerTileMoved()), -1);
     }
 
-    public Sprite GetFaceSprite()
-    {
+    //public Sprite GetFaceSprite()
+    //{
         // later, can return more than just a single sprite. For example wounds, current equipment, headgear,
         // hair, etc. I'm not sure how that will work.
 
         //if (GameChar.FaceSprite == null)
         //{
-        return _headSpriteRend.sprite;
+        //return _headSpriteRend.sprite;
         //}
-    }
+    //}
 
     private void Start()
     {
         PickStartTile();
-        _anim.Play("Idle");
 
-        if (!OnPlayerTeam)
-        {
-            _headSpriteRend.sprite = _enemyHeadSprite;
-            _bodySpriteRend.sprite = _enemyBodySprite;
-            _leg1SpriteRend.sprite = _enemyLegSprite;
-            _leg2SpriteRend.sprite = _enemyLegSprite;
-        }
-        else
+        //if (!OnPlayerTeam)
+        //{
+        //    _headSpriteRend.sprite = _enemyHeadSprite;
+        //    _bodySpriteRend.sprite = _enemyBodySprite;
+        //    _leg1SpriteRend.sprite = _enemyLegSprite;
+        //    _leg2SpriteRend.sprite = _enemyLegSprite;
+        //}
+        if (OnPlayerTeam)
         {
             transform.rotation *= Quaternion.Euler(0, 180, 0);
         }
@@ -331,8 +326,6 @@ public class Pawn : MonoBehaviour
             return;
         }
 
-        _anim.Play("Attack");
-
         List<Pawn> targetPawns = new();
         targetPawns.Add(primaryTargetPawn);
 
@@ -369,7 +362,7 @@ public class Pawn : MonoBehaviour
 
         if (!_isDead)
         {
-            _anim.Play("Idle");
+            _spriteController.StopMoving();
         }
     }
 
@@ -408,7 +401,7 @@ public class Pawn : MonoBehaviour
 
     public void TriggerDodge()
     {
-        StartCoroutine(PlayAnimationAfterDelay(.2f, "Dodge"));
+        _spriteController.TriggerDodge();
     }
 
     public void TakeDamage(Pawn attackingPawn, ActionData actionUsed)
@@ -423,28 +416,20 @@ public class Pawn : MonoBehaviour
             extraDmgMult = actionUsed.extraDmgMultiplier;
         }
 
-        bool hadArmor = false;
+        bool armorHit = false;
         if (_armorPoints > 0)
         {
             _armorPoints = Mathf.Max(0, (_armorPoints - Mathf.RoundToInt(attackingCharacter.GetWeaponArmorDamageForAction(actionUsed) * extraDmgMult)));
             hitPointsDmg = Mathf.RoundToInt(attackingCharacter.GetWeaponPenetrationDamageForAction(actionUsed) * extraDmgMult);
-            StartCoroutine(PlayArmorHitFXAfterDelay(.32f));
-            hadArmor = true;
+            
+            armorHit = true;
         }
         else
         {
-            StartCoroutine(PlayBloodSpurtAfterDelay(.32f));
             hitPointsDmg = Mathf.RoundToInt(attackingCharacter.GetWeaponDamageForAction(actionUsed) * extraDmgMult);
         }
 
         _hitPoints -= Mathf.Max(0, hitPointsDmg);
-
-        // make the helmet gone if there's no armor for cool factor
-        if (_armorPoints <= 0)
-        {
-            _helmSpriteRend.enabled = false;
-        }
-
 
         if (_hitPoints <= 0)
         {
@@ -452,34 +437,28 @@ public class Pawn : MonoBehaviour
         }
         else
         {
-            if (hadArmor)
+            if (armorHit)
             {
                 StartCoroutine(PlayAudioAfterDelay(.35f, armorHitSound));
-                StartCoroutine(PlayAnimationAfterDelay(.2f, "GetArmorHit"));
+
             }
             else
             {
-                StartCoroutine(PlayAnimationAfterDelay(.2f, "GetHit"));
                 StartCoroutine(PlayAudioAfterDelay(.35f, hitSound));
             }
         }
+
+        _spriteController.HandleHit(_isDead, armorHit, armorHit && _armorPoints <= 0);
 
         OnPawnHit.Invoke();
     }
 
     private void Die()
     {
-        StartCoroutine(PlayAnimationAfterDelay(.2f, "Die"));
+        _spriteController.Die();
         StartCoroutine(PlayAudioAfterDelay(.35f, dieSound));
 
         _isDead = true;
-
-        _bodySpriteRend.sortingLayerName = "DeadCharacters";
-        _headSpriteRend.sortingLayerName = "DeadCharacters";
-        _helmSpriteRend.sortingLayerName = "DeadCharacters";
-        _weaponSpriteRend.sortingLayerName = "DeadCharacters";
-        _leg1SpriteRend.sortingLayerName = "DeadCharacters";
-        _leg2SpriteRend.sortingLayerName = "DeadCharacters";
 
         UpdateMotivationEvent.Invoke();
         CurrentTile.PawnExitTile();
@@ -490,25 +469,7 @@ public class Pawn : MonoBehaviour
 
     #region FX
 
-    private IEnumerator PlayArmorHitFXAfterDelay(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        BattleManager.Instance.PlayArmorHitFX(transform.position + (Vector3.up * .3f));
-    }
 
-    private IEnumerator PlayBloodSpurtAfterDelay(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        BattleManager.Instance.PlayBloodSpurt(transform.position + (Vector3.up * .3f));
-    }
-
-    private IEnumerator PlayAnimationAfterDelay(float delay, string animName)
-    {
-        yield return new WaitForSeconds(delay);
-
-
-        _anim.Play(animName);
-    }
 
     private IEnumerator PlayAudioAfterDelay(float delay, AudioClip clip)
     {
@@ -576,7 +537,7 @@ public class Pawn : MonoBehaviour
 
         //_audioSource.clip = greedViceSound;
         //_audioSource.Play();
-        _anim.Play("MotivatedGain");
+        /*_anim.Play("MotivatedGain");*/
         _actionPoints = BASE_ACTION_POINTS;
     }
 
@@ -618,7 +579,7 @@ public class Pawn : MonoBehaviour
         //Vector3 position = adjustedTargetTile.transform.position;
         pathfinder.AttemptGoToLocation(targetTile.transform.position);
 
-        _anim.Play("WobbleWalk");
+        _spriteController.Move();
 
         // the ap adjustments may need to happen as the pawn enters each tile. May be best to
         // process things one tile at a time if implementing varying AP costs, etc. But not now.
@@ -653,7 +614,7 @@ public class Pawn : MonoBehaviour
             }
         }
 
-        _anim.Play("Idle");
+        _spriteController.StopMoving();
 
         //if (HasActionsRemaining())
         //{

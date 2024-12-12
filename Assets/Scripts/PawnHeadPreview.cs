@@ -23,7 +23,7 @@ public class PawnHeadPreview : MonoBehaviour, IPointerEnterHandler, IPointerExit
     {
         _pawn = p;
 
-        headRend.sprite = p.GetFaceSprite();
+        //headRend.sprite = p.GetFaceSprite();
 
         ArmorItemData helm = p.GameChar.HelmItem;
         if (helm != null && p.ArmorPoints > 0)
