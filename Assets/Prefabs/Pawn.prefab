@@ -25,7 +25,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2271763499157363338}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -75,11 +75,10 @@ MonoBehaviour:
   _bodySpriteRend: {fileID: 1970687130719823551}
   _helmSpriteRend: {fileID: 523573614248301957}
   _weaponSpriteRend: {fileID: 3673270242807775494}
-  _charBody: {fileID: 0}
-  _upRightFace: {fileID: 21300000, guid: 77636eecde00cbb47a050427ae2e923f, type: 3}
-  _upLeftFace: {fileID: 21300000, guid: 77636eecde00cbb47a050427ae2e923f, type: 3}
-  _downLeftFace: {fileID: 21300000, guid: 46e5fe5a8bc67dc46ab8cc8bce04eb44, type: 3}
-  _downRightFace: {fileID: 21300000, guid: ad8a02ac8b7a55e40b7a3a56ee5cbd1f, type: 3}
+  _NEFace: {fileID: 21300000, guid: 77636eecde00cbb47a050427ae2e923f, type: 3}
+  _NWFace: {fileID: 21300000, guid: 77636eecde00cbb47a050427ae2e923f, type: 3}
+  _SWFace: {fileID: 21300000, guid: 46e5fe5a8bc67dc46ab8cc8bce04eb44, type: 3}
+  _SEFace: {fileID: 21300000, guid: ad8a02ac8b7a55e40b7a3a56ee5cbd1f, type: 3}
   _moveDust: {fileID: 0}
 --- !u!1 &4488067780767978663
 GameObject:
@@ -239,7 +238,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -163158445
   m_SortingLayer: 4
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: a8d27f40519ed8b4abef830b3b4fc6af, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -646,8 +645,8 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -163158445
   m_SortingLayer: 4
-  m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: ad8a02ac8b7a55e40b7a3a56ee5cbd1f, type: 3}
+  m_SortingOrder: 2
+  m_Sprite: {fileID: 21300000, guid: 46e5fe5a8bc67dc46ab8cc8bce04eb44, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

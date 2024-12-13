@@ -93,6 +93,9 @@ public class Pawn : MonoBehaviour
 
     private bool _hasMadeFreeAttack;
 
+    private bool _isMoving;
+    private Vector3 _lastPosition;
+
     #region UnityEvents
 
     private void Awake()
@@ -102,10 +105,24 @@ public class Pawn : MonoBehaviour
         UpdateMotivationEvent.AddListener(UpdateMotivatedStatus);
     }
 
+    private void Start()
+    {
+        PickStartTile();
+    }
+
     private void OnDestroy()
     {
         pathfinder.OnDestinationReached.RemoveListener(HandleDestinationReached);
         UpdateMotivationEvent.RemoveListener(UpdateMotivatedStatus);
+    }
+
+    private void Update()
+    {
+        if (_isMoving)
+        {
+            _spriteController.UpdateFacing(_lastPosition, transform.position);
+            _lastPosition = transform.position;
+        }
     }
 
     #endregion
@@ -163,23 +180,6 @@ public class Pawn : MonoBehaviour
         //return _headSpriteRend.sprite;
         //}
     //}
-
-    private void Start()
-    {
-        PickStartTile();
-
-        //if (!OnPlayerTeam)
-        //{
-        //    _headSpriteRend.sprite = _enemyHeadSprite;
-        //    _bodySpriteRend.sprite = _enemyBodySprite;
-        //    _leg1SpriteRend.sprite = _enemyLegSprite;
-        //    _leg2SpriteRend.sprite = _enemyLegSprite;
-        //}
-        if (OnPlayerTeam)
-        {
-            transform.rotation *= Quaternion.Euler(0, 180, 0);
-        }
-    }
 
     private void UpdateMotivationResource()
     {
@@ -354,6 +354,8 @@ public class Pawn : MonoBehaviour
         }
 
         BattleManager.Instance.PawnActivated(this);
+
+        _spriteController.UpdateFacing(transform.position, primaryTargetPawn.transform.position);
     }
 
     public void HandleTurnEnded()
@@ -596,6 +598,8 @@ public class Pawn : MonoBehaviour
         }
 
         _currentTile.PawnExitTile();
+
+        _isMoving = true;
     }
 
     public void HandleDestinationReached()
@@ -624,6 +628,28 @@ public class Pawn : MonoBehaviour
         UpdateMotivationEvent.Invoke();
 
         BattleManager.Instance.PawnActivated(this);
+
+        _isMoving = false;
+
+        FaceAdjacentEnemies(true);
+    }
+
+    public void FaceAdjacentEnemies(bool isFirst)
+    {
+        List<Pawn> adjEnemies = GetAdjacentEnemies();
+
+        if (adjEnemies.Count > 0)
+        {
+            _spriteController.UpdateFacing(transform.position, adjEnemies[0].transform.position);
+        }
+
+        if (isFirst)
+        {
+            for (int i = 0; i < adjEnemies.Count; i++)
+            {
+                adjEnemies[i].FaceAdjacentEnemies(false);
+            }
+        }
     }
 
     #endregion

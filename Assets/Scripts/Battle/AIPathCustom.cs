@@ -35,7 +35,6 @@ public class AIPathCustom : AIPath
         enabled = true;
         _currentPathIndex = 0;
 
-
         int totalTilesToMove = _pathToFollow.Count - 1;
         int apPerTileMoved = _pawn.GameChar.GetAPPerTileMoved();
 

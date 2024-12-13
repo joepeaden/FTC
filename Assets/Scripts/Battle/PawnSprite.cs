@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class PawnSprite : MonoBehaviour
 {
-
     //[Header("Visuals")]
     [SerializeField] private Animator _anim;
 
@@ -18,23 +17,15 @@ public class PawnSprite : MonoBehaviour
     private SpriteRenderer _helmSpriteRend;
     [SerializeField]
     private SpriteRenderer _weaponSpriteRend;
-    //[SerializeField]
-    //Transform _charBody;
-    //[SerializeField]
-    //Sprite headHitSprite;
-    //[SerializeField]
-    //Sprite bodyHitSprite;
 
     [SerializeField]
-    private Sprite _upRightFace;
+    private Sprite _NEFace;
     [SerializeField]
-    private Sprite _upLeftFace;
+    private Sprite _NWFace;
     [SerializeField]
-    private Sprite _downLeftFace;
+    private Sprite _SWFace;
     [SerializeField]
-    private Sprite _downRightFace;
-
-    //private bool _isMoving;
+    private Sprite _SEFace;
 
     [SerializeField] 
     private ParticleSystem _moveDust;
@@ -143,6 +134,48 @@ public class PawnSprite : MonoBehaviour
     public void Reset()
     {
     
+    }
+
+    /// <summary>
+    /// Update based on last position / new position
+    /// </summary>
+    /// <param name="originPosition"></param>
+    /// <param name="facingPosition"></param>
+    /// <remarks>
+    /// Perhaps worth having the currentPosition, even though the sprite
+    /// component is child of the pawn anyway - because the sprite might be moving
+    /// as a result from animation.
+    /// </remarks>
+    public void UpdateFacing(Vector3 originPosition, Vector3 facingPosition)
+    {
+        // going NE
+        if (facingPosition.x > originPosition.x && facingPosition.y > originPosition.y)
+        {
+            _faceSpriteRend.sprite = _NEFace;
+            _bodySpriteRend.sortingOrder = 2;
+            _faceSpriteRend.sortingOrder = 0;
+        }
+        // going NW
+        else if (facingPosition.x < originPosition.x && facingPosition.y > originPosition.y)
+        {
+            _faceSpriteRend.sprite = _NWFace;
+            _bodySpriteRend.sortingOrder = 2;
+            _faceSpriteRend.sortingOrder = 0;
+        }
+        // going SE
+        else if (facingPosition.x > originPosition.x && facingPosition.y < originPosition.y)
+        {
+            _faceSpriteRend.sprite = _SEFace;
+            _bodySpriteRend.sortingOrder = 0;
+            _faceSpriteRend.sortingOrder = 2;
+        }
+        // going SW
+        else
+        {
+            _faceSpriteRend.sprite = _SWFace;
+            _bodySpriteRend.sortingOrder = 0;
+            _faceSpriteRend.sortingOrder = 2;
+        }
     }
 
     #region Animations
