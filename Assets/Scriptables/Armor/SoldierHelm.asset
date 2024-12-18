@@ -14,7 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Soldier Helmet
   description: An acceptable piece of noggin protection.
-  itemSprite: {fileID: 21300000, guid: 878010f5ae31e4b7d90701a96a107259, type: 3}
+  itemSprite: {fileID: 21300000, guid: 2cb45437b30870e4c896f80e05af16a8, type: 3}
+  SESprite: {fileID: 21300000, guid: 2535d9a9a46e5d34da82736a16eb618c, type: 3}
+  SWSprite: {fileID: 21300000, guid: 2cb45437b30870e4c896f80e05af16a8, type: 3}
+  NWSprite: {fileID: 21300000, guid: 0081841fbad317a448ed213c9054963b, type: 3}
+  NESprite: {fileID: 21300000, guid: 79ef62ca6508a95489df8009a0a43be6, type: 3}
   itemPrice: 30
   itemType: 0
   isDefault: 0

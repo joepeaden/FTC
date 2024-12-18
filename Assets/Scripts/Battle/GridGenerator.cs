@@ -67,6 +67,7 @@ public class GridGenerator : MonoBehaviour
                     GameObject tilePrefab = tilePrefabs[Random.Range(0, tilePrefabs.Length)];
                     GameObject tileGO = Instantiate(tilePrefab, transform);
                     Tile tileScript = tileGO.GetComponent<Tile>();
+                    tileScript.SetTerrainSpriteRendLevel(Mathf.Abs(y) + Mathf.Abs(x-gridWidth));
 
                     float posX = (x * tileSize + y * tileSize) / 2f;
                     float posY = (x * tileSize - y * tileSize) / 4f;

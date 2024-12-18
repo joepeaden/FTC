@@ -30,6 +30,8 @@ public class PawnSprite : MonoBehaviour
     [SerializeField] 
     private ParticleSystem _moveDust;
 
+    private ArmorItemData _currentHelm;
+
     #region UnityEvents
 
     private void Start()
@@ -121,6 +123,8 @@ public class PawnSprite : MonoBehaviour
 
     public void SetData(GameCharacter _gameChar)
     {
+        _currentHelm = _gameChar.HelmItem;
+
         if (_gameChar.WeaponItem != null)
         {
             _weaponSpriteRend.sprite = _gameChar.WeaponItem.itemSprite;
@@ -128,7 +132,7 @@ public class PawnSprite : MonoBehaviour
 
         if (_gameChar.HelmItem != null)
         {
-            _helmSpriteRend.sprite = _gameChar.HelmItem.itemSprite;
+            _helmSpriteRend.sprite = _currentHelm.SWSprite; 
         }
     }
     public void Reset()
@@ -152,6 +156,10 @@ public class PawnSprite : MonoBehaviour
         if (facingPosition.x > originPosition.x && facingPosition.y > originPosition.y)
         {
             _faceSpriteRend.sprite = _NEFace;
+            if (_currentHelm != null)
+            {
+                _helmSpriteRend.sprite = _currentHelm.NESprite;
+            }
             _bodySpriteRend.sortingOrder = 2;
             _faceSpriteRend.sortingOrder = 0;
         }
@@ -159,6 +167,10 @@ public class PawnSprite : MonoBehaviour
         else if (facingPosition.x < originPosition.x && facingPosition.y > originPosition.y)
         {
             _faceSpriteRend.sprite = _NWFace;
+            if (_currentHelm != null)
+            {
+                _helmSpriteRend.sprite = _currentHelm.NWSprite;
+            }
             _bodySpriteRend.sortingOrder = 2;
             _faceSpriteRend.sortingOrder = 0;
         }
@@ -166,13 +178,21 @@ public class PawnSprite : MonoBehaviour
         else if (facingPosition.x > originPosition.x && facingPosition.y < originPosition.y)
         {
             _faceSpriteRend.sprite = _SEFace;
+            if (_currentHelm != null)
+            {
+                _helmSpriteRend.sprite = _currentHelm.SESprite;
+            }
             _bodySpriteRend.sortingOrder = 0;
             _faceSpriteRend.sortingOrder = 2;
         }
         // going SW
         else
         {
-            _faceSpriteRend.sprite = _SWFace;
+            _faceSpriteRend.sprite = _SWFace; 
+            if (_currentHelm != null)
+            {
+                _helmSpriteRend.sprite = _currentHelm.SWSprite;
+            }
             _bodySpriteRend.sortingOrder = 0;
             _faceSpriteRend.sortingOrder = 2;
         }

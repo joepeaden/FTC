@@ -21,6 +21,7 @@ public class Tile : MonoBehaviour
     public static UnityEvent<Tile> OnTileHoverEnd = new();
     private static UnityEvent OnTileSelectChange = new();
 
+    [SerializeField] private SpriteRenderer terrainSpritRend;
     [SerializeField] private Sprite selectionSprite;
     [SerializeField] private Sprite hoverSprite;
     [SerializeField] private Sprite moveRangeSprite;
@@ -32,7 +33,6 @@ public class Tile : MonoBehaviour
 
     public bool IsImpassable => _isImpassable;
     private bool _isImpassable = false;
-    private GameObject impassableObjectRef;
 
     [SerializeField] private Pawn _pawn;
     private bool _isSelected;
@@ -56,6 +56,11 @@ public class Tile : MonoBehaviour
         OnTileSelectChange.RemoveListener(ResetTileVisuals);
     }
 
+    public void SetTerrainSpriteRendLevel(int level)
+    {
+        terrainSpritRend.sortingOrder = level;
+    }
+
     public bool IsInRangeOf(Tile t, int range)
     {
         return GetTileDistance(t) <= range;
@@ -77,14 +82,16 @@ public class Tile : MonoBehaviour
 
         if (isImpassable)
         {
-            GameObject impassableObjectPrefab = impassableObjectPrefabs[Random.Range(0, impassableObjectPrefabs.Length)];
-            impassableObjectRef = Instantiate(impassableObjectPrefab, transform);
+
+            terrainSpritRend.gameObject.SetActive(true);
+            //GameObject impassableObjectPrefab = impassableObjectPrefabs[Random.Range(0, impassableObjectPrefabs.Length)];
+            //impassableObjectRef = Instantiate(impassableObjectPrefab, transform);
         }
         else
         {
-            if (impassableObjectRef != null)
+            if (terrainSpritRend.gameObject.activeInHierarchy)
             {
-                DestroyImmediate(impassableObjectRef);
+                terrainSpritRend.gameObject.SetActive(false);
             }
         }
 

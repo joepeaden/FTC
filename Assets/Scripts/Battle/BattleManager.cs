@@ -270,8 +270,8 @@ public class BattleManager : MonoBehaviour
         // update the instantiation stuff in UpdatePawnUI whatever so it just uses the existing buttons
         actionButtons.Add(actionButton1);
         actionButtons.Add(actionButton2);
-        actionButtons.Add(actionButton3);
-        actionButtons.Add(actionButton4);
+        //actionButtons.Add(actionButton3);
+        //actionButtons.Add(actionButton4);
     }
 
     private void Start()
@@ -467,7 +467,7 @@ public class BattleManager : MonoBehaviour
 
             RefreshInitStackUI();
 
-            actionButtons.Clear();
+            //actionButtons.Clear();
 
             if (p.OnPlayerTeam)
             {

@@ -31,7 +31,10 @@ public class GameCharacter
     public ArmorItemData HelmItem => _helmItem;
     private ArmorItemData _helmItem;
 
-    public ArmorItemData BodyItem => _bodyItem;
+    //public ArmorItemData BodyItem => _bodyItem;
+    /// <summary>
+    /// this probably needs to be removed.
+    /// </summary>
     private ArmorItemData _bodyItem;
 
     public WeaponItemData WeaponItem => _weaponItem;

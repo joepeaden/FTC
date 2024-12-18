@@ -14,7 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Veteran's Helm
   description: A well-crafted helmet that clearly belongs on a warrior's head.
-  itemSprite: {fileID: 21300000, guid: 0d1393c7a36d34fe8b64111af830ca2f, type: 3}
+  itemSprite: {fileID: 21300000, guid: 6e5fbb9c0db7c3d42a4e01f3cac44fc0, type: 3}
+  SESprite: {fileID: 21300000, guid: 247e74729896c6247b682a6aa3437fa9, type: 3}
+  SWSprite: {fileID: 21300000, guid: 6e5fbb9c0db7c3d42a4e01f3cac44fc0, type: 3}
+  NWSprite: {fileID: 21300000, guid: 61950b12daeacd54eb8cbbbeb285f193, type: 3}
+  NESprite: {fileID: 21300000, guid: 546159d504d1d8440baef50282ed8b60, type: 3}
   itemPrice: 50
   itemType: 0
   isDefault: 0

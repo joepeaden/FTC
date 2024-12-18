@@ -25,16 +25,16 @@ public class PawnHeadPreview : MonoBehaviour, IPointerEnterHandler, IPointerExit
 
         //headRend.sprite = p.GetFaceSprite();
 
-        ArmorItemData helm = p.GameChar.HelmItem;
-        if (helm != null && p.ArmorPoints > 0)
-        {
-            helmRend.gameObject.SetActive(true);
-            helmRend.sprite = helm.itemSprite;
-        }
-        else
-        {
-            helmRend.gameObject.SetActive(false);
-        }
+        //ArmorItemData helm = p.GameChar.HelmItem;
+        //if (helm != null && p.ArmorPoints > 0)
+        //{
+        //    helmRend.gameObject.SetActive(true);
+        //    helmRend.sprite = helm.itemSprite;
+        //}
+        //else
+        //{
+        //    helmRend.gameObject.SetActive(false);
+        //}
     }
 
     public void OnPointerEnter(PointerEventData eventData)

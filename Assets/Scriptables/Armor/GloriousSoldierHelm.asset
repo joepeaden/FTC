@@ -14,7 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Fearsome Helmet
   description: A helmet that is sure to draw attention on the battlefield.
-  itemSprite: {fileID: 21300000, guid: 9ac4cb9986dd64a39ae73edfb54942c6, type: 3}
+  itemSprite: {fileID: 21300000, guid: 2cb45437b30870e4c896f80e05af16a8, type: 3}
+  SESprite: {fileID: 21300000, guid: 6685fa208bb900449bd9685f187679c1, type: 3}
+  SWSprite: {fileID: 21300000, guid: 21154382f69ab7a4fb1d868c123a8be5, type: 3}
+  NWSprite: {fileID: 21300000, guid: 65124192ffdfc5c429e1fdda8915e668, type: 3}
+  NESprite: {fileID: 21300000, guid: 65eebd1679a47854a9e2146181b67030, type: 3}
   itemPrice: 100
   itemType: 0
   isDefault: 0
