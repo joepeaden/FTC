@@ -32,6 +32,14 @@ public class PawnSprite : MonoBehaviour
 
     private ArmorItemData _currentHelm;
 
+    private int _totalSpriteOrder;
+
+    private int _localBodyOrder;
+    private int _localHeadOrder;
+    private int _localFaceOrder;
+    private int _localHelmOrder;
+    private int _localWeaponOrder;
+
     #region UnityEvents
 
     private void Start()
@@ -150,8 +158,11 @@ public class PawnSprite : MonoBehaviour
     /// component is child of the pawn anyway - because the sprite might be moving
     /// as a result from animation.
     /// </remarks>
-    public void UpdateFacing(Vector3 originPosition, Vector3 facingPosition)
+    public void UpdateFacing(Vector3 originPosition, Vector3 facingPosition, Tile currentTile)
     {
+        // make sure he's rendered in front of and behind appropriate terrain pieces
+        int totalSpriteOrder = -(int)(currentTile.transform.position.y * 20);
+
         // going NE
         if (facingPosition.x > originPosition.x && facingPosition.y > originPosition.y)
         {
@@ -160,8 +171,8 @@ public class PawnSprite : MonoBehaviour
             {
                 _helmSpriteRend.sprite = _currentHelm.NESprite;
             }
-            _bodySpriteRend.sortingOrder = 2;
-            _faceSpriteRend.sortingOrder = 0;
+            _bodySpriteRend.sortingOrder = totalSpriteOrder + 2;
+            _faceSpriteRend.sortingOrder = totalSpriteOrder + 0;
         }
         // going NW
         else if (facingPosition.x < originPosition.x && facingPosition.y > originPosition.y)
@@ -171,8 +182,8 @@ public class PawnSprite : MonoBehaviour
             {
                 _helmSpriteRend.sprite = _currentHelm.NWSprite;
             }
-            _bodySpriteRend.sortingOrder = 2;
-            _faceSpriteRend.sortingOrder = 0;
+            _bodySpriteRend.sortingOrder = totalSpriteOrder + 2;
+            _faceSpriteRend.sortingOrder = totalSpriteOrder + 0;
         }
         // going SE
         else if (facingPosition.x > originPosition.x && facingPosition.y < originPosition.y)
@@ -182,8 +193,8 @@ public class PawnSprite : MonoBehaviour
             {
                 _helmSpriteRend.sprite = _currentHelm.SESprite;
             }
-            _bodySpriteRend.sortingOrder = 0;
-            _faceSpriteRend.sortingOrder = 2;
+            _bodySpriteRend.sortingOrder = totalSpriteOrder + 0;
+            _faceSpriteRend.sortingOrder = totalSpriteOrder + 2;
         }
         // going SW
         else
@@ -193,9 +204,13 @@ public class PawnSprite : MonoBehaviour
             {
                 _helmSpriteRend.sprite = _currentHelm.SWSprite;
             }
-            _bodySpriteRend.sortingOrder = 0;
-            _faceSpriteRend.sortingOrder = 2;
+            _bodySpriteRend.sortingOrder = totalSpriteOrder + 0;
+            _faceSpriteRend.sortingOrder = totalSpriteOrder + 2;
         }
+
+        _headSpriteRend.sortingOrder = 1 + totalSpriteOrder;
+        _weaponSpriteRend.sortingOrder = totalSpriteOrder;
+        _helmSpriteRend.sortingOrder = 4 + totalSpriteOrder;
     }
 
     #region Animations
@@ -213,6 +228,12 @@ public class PawnSprite : MonoBehaviour
     public void StopMoving()
     {
         _anim.Play("Idle");
+
+        //_faceSpriteRend.sortingOrder = newSortingOrder;
+        //_bodySpriteRend.sortingOrder = newSortingOrder;
+        //_headSpriteRend.sortingOrder = newSortingOrder;
+        //_helmSpriteRend.sortingOrder = newSortingOrder;
+        //_weaponSpriteRend.sortingOrder = newSortingOrder; 
     }
 
     public void Die()
@@ -223,6 +244,13 @@ public class PawnSprite : MonoBehaviour
         _headSpriteRend.sortingLayerName = "DeadCharacters";
         _helmSpriteRend.sortingLayerName = "DeadCharacters";
         _weaponSpriteRend.sortingLayerName = "DeadCharacters";
+
+        // not sure this matters but might as well. It's updated when pawn stops moving (see StopMoving)
+        _faceSpriteRend.sortingOrder = 0;
+        _bodySpriteRend.sortingOrder = 0;
+        _headSpriteRend.sortingOrder = 0;
+        _helmSpriteRend.sortingOrder = 0;
+        _weaponSpriteRend.sortingOrder = 0;
     }
 
     public void HandleHit(bool isDead, bool armorHit, bool armorDestroyed)

@@ -25,6 +25,8 @@ public class GridGenerator : MonoBehaviour
     private List<Tile> _playerSpawns = new();
     private List<Tile> _enemySpawns = new();
 
+    //private int layerIncrement = 10;
+
     void Awake()
     {
         _instance = this;
@@ -67,13 +69,16 @@ public class GridGenerator : MonoBehaviour
                     GameObject tilePrefab = tilePrefabs[Random.Range(0, tilePrefabs.Length)];
                     GameObject tileGO = Instantiate(tilePrefab, transform);
                     Tile tileScript = tileGO.GetComponent<Tile>();
-                    tileScript.SetTerrainSpriteRendLevel(Mathf.Abs(y) + Mathf.Abs(x-gridWidth));
 
                     float posX = (x * tileSize + y * tileSize) / 2f;
                     float posY = (x * tileSize - y * tileSize) / 4f;
 
                     tileGO.transform.position = new Vector3(posX, posY);
                     tileGO.name = "Tile (" + x + ", " + y + ")";
+
+                    // 10 unit increments (the y pos are all .5 different) so that there's enough
+                    // room for pawn sprite detail layering between obstacles
+                    tileScript.SetTerrainSortingOrder((int)(-1 * posY * 20));
 
                     _tiles[gridPoint] = tileScript;
 

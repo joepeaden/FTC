@@ -120,7 +120,7 @@ public class Pawn : MonoBehaviour
     {
         if (_isMoving)
         {
-            _spriteController.UpdateFacing(_lastPosition, transform.position);
+            _spriteController.UpdateFacing(_lastPosition, transform.position, CurrentTile);
             _lastPosition = transform.position;
         }
     }
@@ -355,7 +355,7 @@ public class Pawn : MonoBehaviour
 
         BattleManager.Instance.PawnActivated(this);
 
-        _spriteController.UpdateFacing(transform.position, primaryTargetPawn.transform.position);
+        _spriteController.UpdateFacing(transform.position, primaryTargetPawn.transform.position, CurrentTile);
     }
 
     public void HandleTurnEnded()
@@ -619,6 +619,7 @@ public class Pawn : MonoBehaviour
         }
 
         _spriteController.StopMoving();
+        UpdateSpriteOnStop(true);
 
         //if (HasActionsRemaining())
         //{
@@ -630,24 +631,27 @@ public class Pawn : MonoBehaviour
         BattleManager.Instance.PawnActivated(this);
 
         _isMoving = false;
-
-        FaceAdjacentEnemies(true);
     }
 
-    public void FaceAdjacentEnemies(bool isFirst)
+    public void UpdateSpriteOnStop(bool isFirst)
     {
+        // Face adjacent enemies
         List<Pawn> adjEnemies = GetAdjacentEnemies();
-
         if (adjEnemies.Count > 0)
         {
-            _spriteController.UpdateFacing(transform.position, adjEnemies[0].transform.position);
+            _spriteController.UpdateFacing(transform.position, adjEnemies[0].transform.position, CurrentTile);
+        }
+        else
+        {
+            _spriteController.UpdateFacing(_lastPosition, transform.position, CurrentTile);
         }
 
+        // get adjacent enemies to face me 
         if (isFirst)
         {
             for (int i = 0; i < adjEnemies.Count; i++)
             {
-                adjEnemies[i].FaceAdjacentEnemies(false);
+                adjEnemies[i].UpdateSpriteOnStop(false);
             }
         }
     }

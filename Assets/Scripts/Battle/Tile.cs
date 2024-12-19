@@ -56,7 +56,12 @@ public class Tile : MonoBehaviour
         OnTileSelectChange.RemoveListener(ResetTileVisuals);
     }
 
-    public void SetTerrainSpriteRendLevel(int level)
+    public int GetTerrainSortingOrder()
+    {
+        return terrainSpritRend.sortingOrder;
+    }
+    
+    public void SetTerrainSortingOrder(int level)
     {
         terrainSpritRend.sortingOrder = level;
     }
