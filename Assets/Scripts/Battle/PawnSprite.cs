@@ -46,7 +46,7 @@ public class PawnSprite : MonoBehaviour
     {
         _anim = GetComponent<Animator>();
 
-        _anim.Play("Idle");
+        _anim.Play("Idle", -1, Random.Range(0f, 1f));
     }
 
     private void OnDestroy()
@@ -173,6 +173,9 @@ public class PawnSprite : MonoBehaviour
             }
             _bodySpriteRend.sortingOrder = totalSpriteOrder + 2;
             _faceSpriteRend.sortingOrder = totalSpriteOrder + 0;
+
+            _weaponSpriteRend.transform.position = new Vector3(-0.4f, 0.07f, 0);
+            _weaponSpriteRend.transform.rotation = Quaternion.Euler(new Vector3(0, 0, -20));
         }
         // going NW
         else if (facingPosition.x < originPosition.x && facingPosition.y > originPosition.y)
@@ -184,6 +187,9 @@ public class PawnSprite : MonoBehaviour
             }
             _bodySpriteRend.sortingOrder = totalSpriteOrder + 2;
             _faceSpriteRend.sortingOrder = totalSpriteOrder + 0;
+
+            _weaponSpriteRend.transform.position = new Vector3(0.4f, 0.07f, 0);
+            _weaponSpriteRend.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 20));
         }
         // going SE
         else if (facingPosition.x > originPosition.x && facingPosition.y < originPosition.y)
@@ -195,6 +201,9 @@ public class PawnSprite : MonoBehaviour
             }
             _bodySpriteRend.sortingOrder = totalSpriteOrder + 0;
             _faceSpriteRend.sortingOrder = totalSpriteOrder + 2;
+
+            _weaponSpriteRend.transform.position = new Vector3(-0.4f, 0.07f, 0);
+            _weaponSpriteRend.transform.rotation = Quaternion.Euler(new Vector3(0, 0, -20));
         }
         // going SW
         else
@@ -206,6 +215,9 @@ public class PawnSprite : MonoBehaviour
             }
             _bodySpriteRend.sortingOrder = totalSpriteOrder + 0;
             _faceSpriteRend.sortingOrder = totalSpriteOrder + 2;
+
+            _weaponSpriteRend.transform.position = new Vector3(0.4f, 0.07f, 0);
+            _weaponSpriteRend.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 20));
         }
 
         _headSpriteRend.sortingOrder = 1 + totalSpriteOrder;
@@ -227,7 +239,7 @@ public class PawnSprite : MonoBehaviour
 
     public void StopMoving()
     {
-        _anim.Play("Idle");
+        _anim.Play("Idle", -1, Random.Range(0f,1f));
 
         //_faceSpriteRend.sortingOrder = newSortingOrder;
         //_bodySpriteRend.sortingOrder = newSortingOrder;
@@ -253,14 +265,30 @@ public class PawnSprite : MonoBehaviour
         _weaponSpriteRend.sortingOrder = 0;
     }
 
-    public void HandleHit(bool isDead, bool armorHit, bool armorDestroyed)
+    public void HandleHit(bool isDead, bool armorHit, bool armorDestroyed,  Vector2 pushbackDirection)
     {
+        string animationString = "GetHitNE";
         if (armorHit)
         {
             StartCoroutine(PlayArmorHitFXAfterDelay(.32f));
             if (!isDead)
             {
-                StartCoroutine(PlayAnimationAfterDelay(.2f, "GetArmorHit"));
+                if (pushbackDirection.x > 0 && pushbackDirection.y > 0)
+                {
+                    animationString = "GetHitArmorSW";
+                }
+                if (pushbackDirection.x < 0 && pushbackDirection.y > 0)
+                {
+                    animationString = "GetHitArmorSE";
+                }
+                if (pushbackDirection.x > 0 && pushbackDirection.y < 0)
+                {
+                    animationString = "GetHitArmorNW";
+                }
+                if (pushbackDirection.x < 0 && pushbackDirection.y < 0)
+                {
+                    animationString = "GetHitArmorNE";
+                }
             }
         }
         else
@@ -268,8 +296,29 @@ public class PawnSprite : MonoBehaviour
             StartCoroutine(PlayBloodSpurtAfterDelay(.32f));
             if (!isDead)
             {
-                StartCoroutine(PlayAnimationAfterDelay(.2f, "GetHit"));
+                if (pushbackDirection.x > 0 && pushbackDirection.y > 0) 
+                {
+                    animationString = "GetHitSW";
+                }
+                if (pushbackDirection.x < 0 && pushbackDirection.y > 0)
+                {                        
+                    animationString = "GetHitSE";
+                }
+                if (pushbackDirection.x > 0 && pushbackDirection.y < 0)
+                {
+                    animationString = "GetHitNW";
+                }
+                if (pushbackDirection.x < 0 && pushbackDirection.y < 0)
+                {                        
+                    animationString = "GetHitNE";
+                }
+
             }
+        }
+
+        if (!isDead)
+        {
+            StartCoroutine(PlayAnimationAfterDelay(.2f, animationString));
         }
 
         // make the helmet gone if there's no armor for cool factor

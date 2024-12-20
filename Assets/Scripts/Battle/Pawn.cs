@@ -450,7 +450,10 @@ public class Pawn : MonoBehaviour
             }
         }
 
-        _spriteController.HandleHit(_isDead, armorHit, armorHit && _armorPoints <= 0);
+        Vector2 attackDirection = transform.position - attackingPawn.transform.position;
+        attackDirection.Normalize();
+
+        _spriteController.HandleHit(_isDead, armorHit, armorHit && _armorPoints <= 0, attackDirection);
 
         OnPawnHit.Invoke();
     }
