@@ -40,13 +40,20 @@ public class PawnSprite : MonoBehaviour
     private int _localHelmOrder;
     private int _localWeaponOrder;
 
+    private FacingDirection _facingDirection;
+    private enum FacingDirection
+    {
+        NW,
+        NE,
+        SE,
+        SW
+    }
+
     #region UnityEvents
 
     private void Start()
     {
         _anim = GetComponent<Animator>();
-
-        _anim.Play("Idle", -1, Random.Range(0f, 1f));
     }
 
     private void OnDestroy()
@@ -129,23 +136,47 @@ public class PawnSprite : MonoBehaviour
 
     #endregion
 
-    public void SetData(GameCharacter _gameChar)
+    public void SetData(Pawn pawn)
     {
-        _currentHelm = _gameChar.HelmItem;
+        _currentHelm = pawn.GameChar.HelmItem;
 
-        if (_gameChar.WeaponItem != null)
+        if (pawn.GameChar.WeaponItem != null)
         {
-            _weaponSpriteRend.sprite = _gameChar.WeaponItem.itemSprite;
+            _weaponSpriteRend.sprite = pawn.GameChar.WeaponItem.itemSprite;
         }
 
-        if (_gameChar.HelmItem != null)
+        if (pawn.GameChar.HelmItem != null)
         {
-            _helmSpriteRend.sprite = _currentHelm.SWSprite; 
+            _helmSpriteRend.sprite = _currentHelm.SWSprite;
         }
+
+
+        if (pawn.OnPlayerTeam)
+        {
+            UpdateFacing(Vector3.zero, new Vector3(1, 1));
+            _anim.Play("IdleNE", 0, Random.Range(0f, 1f));
+        }
+        else
+        {
+            UpdateFacing(Vector3.zero, new Vector3(-1, -1));
+            _anim.Play("IdleSW", 0, Random.Range(0f, 1f));
+        }
+        
     }
+
     public void Reset()
     {
     
+    }
+
+    public void SetNewFacingAnimParam(string newFacing)
+    {
+        _anim.SetBool("NE", false);
+        _anim.SetBool("SE", false);
+        _anim.SetBool("SW", false);
+        _anim.SetBool("NW", false);
+
+        _anim.SetBool(newFacing, true);
     }
 
     /// <summary>
@@ -158,14 +189,20 @@ public class PawnSprite : MonoBehaviour
     /// component is child of the pawn anyway - because the sprite might be moving
     /// as a result from animation.
     /// </remarks>
-    public void UpdateFacing(Vector3 originPosition, Vector3 facingPosition, Tile currentTile)
+    public void UpdateFacing(Vector3 originPosition, Vector3 facingPosition, Tile currentTile = null)
     {
-        // make sure he's rendered in front of and behind appropriate terrain pieces
-        int totalSpriteOrder = -(int)(currentTile.transform.position.y * 20);
+        int totalSpriteOrder = 0;
+        if (currentTile != null)
+        {
+            // make sure he's rendered in front of and behind appropriate terrain pieces
+            totalSpriteOrder = -(int)(currentTile.transform.position.y * 20);
+        }
 
         // going NE
         if (facingPosition.x > originPosition.x && facingPosition.y > originPosition.y)
         {
+            _facingDirection = FacingDirection.NE;
+            SetNewFacingAnimParam("NE");
             _faceSpriteRend.sprite = _NEFace;
             if (_currentHelm != null)
             {
@@ -174,12 +211,14 @@ public class PawnSprite : MonoBehaviour
             _bodySpriteRend.sortingOrder = totalSpriteOrder + 2;
             _faceSpriteRend.sortingOrder = totalSpriteOrder + 0;
 
-            _weaponSpriteRend.transform.position = new Vector3(-0.4f, 0.07f, 0);
-            _weaponSpriteRend.transform.rotation = Quaternion.Euler(new Vector3(0, 0, -20));
+            //_weaponSpriteRend.transform.localPosition = new Vector3(0.4f, 0.37f, 0);
+            //_weaponSpriteRend.transform.rotation = Quaternion.Euler(new Vector3(0, 180, 20));
         }
         // going NW
         else if (facingPosition.x < originPosition.x && facingPosition.y > originPosition.y)
         {
+            _facingDirection = FacingDirection.NW;
+            SetNewFacingAnimParam("NW");
             _faceSpriteRend.sprite = _NWFace;
             if (_currentHelm != null)
             {
@@ -188,12 +227,14 @@ public class PawnSprite : MonoBehaviour
             _bodySpriteRend.sortingOrder = totalSpriteOrder + 2;
             _faceSpriteRend.sortingOrder = totalSpriteOrder + 0;
 
-            _weaponSpriteRend.transform.position = new Vector3(0.4f, 0.07f, 0);
-            _weaponSpriteRend.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 20));
+            //_weaponSpriteRend.transform.localPosition = new Vector3(-0.4f, 0.37f, 0);
+            //_weaponSpriteRend.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 20));
         }
         // going SE
         else if (facingPosition.x > originPosition.x && facingPosition.y < originPosition.y)
         {
+            _facingDirection = FacingDirection.SE;
+            SetNewFacingAnimParam("SE");
             _faceSpriteRend.sprite = _SEFace;
             if (_currentHelm != null)
             {
@@ -202,12 +243,14 @@ public class PawnSprite : MonoBehaviour
             _bodySpriteRend.sortingOrder = totalSpriteOrder + 0;
             _faceSpriteRend.sortingOrder = totalSpriteOrder + 2;
 
-            _weaponSpriteRend.transform.position = new Vector3(-0.4f, 0.07f, 0);
-            _weaponSpriteRend.transform.rotation = Quaternion.Euler(new Vector3(0, 0, -20));
+            //_weaponSpriteRend.transform.localPosition = new Vector3(0.4f, 0.37f, 0);
+            //_weaponSpriteRend.transform.rotation = Quaternion.Euler(new Vector3(0, 180, 20));
         }
         // going SW
         else
         {
+            _facingDirection = FacingDirection.SW;
+            SetNewFacingAnimParam("SW");
             _faceSpriteRend.sprite = _SWFace; 
             if (_currentHelm != null)
             {
@@ -216,8 +259,8 @@ public class PawnSprite : MonoBehaviour
             _bodySpriteRend.sortingOrder = totalSpriteOrder + 0;
             _faceSpriteRend.sortingOrder = totalSpriteOrder + 2;
 
-            _weaponSpriteRend.transform.position = new Vector3(0.4f, 0.07f, 0);
-            _weaponSpriteRend.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 20));
+            //_weaponSpriteRend.transform.localPosition = new Vector3(-0.4f, 0.37f, 0);
+            //_weaponSpriteRend.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 20));
         }
 
         _headSpriteRend.sortingOrder = 1 + totalSpriteOrder;
@@ -229,17 +272,50 @@ public class PawnSprite : MonoBehaviour
 
     public void PlayAttack()
     {
-        _anim.Play("Attack");
+        //_anim.Play("Attack");
     }
 
     public void Move()
     {
-        _anim.Play("WobbleWalk");
+        switch (_facingDirection)
+        {
+            case FacingDirection.NW:
+                _anim.Play("WalkNW");
+                break;
+            case FacingDirection.NE:
+                _anim.Play("WalkNE");
+                break;
+
+            case FacingDirection.SE:
+                _anim.Play("WalkSE");
+                break;
+
+            case FacingDirection.SW:
+                _anim.Play("WalkSW");
+                break;
+        }
     }
 
     public void StopMoving()
     {
-        _anim.Play("Idle", -1, Random.Range(0f,1f));
+        switch (_facingDirection)
+        {
+            case FacingDirection.NW:
+                _anim.Play("IdleNW", 0, Random.Range(0f, 1f));
+                break;
+            case FacingDirection.NE:
+                _anim.Play("IdleNE", 0, Random.Range(0f, 1f));
+                break;
+
+            case FacingDirection.SE:
+                _anim.Play("IdleSE", 0, Random.Range(0f, 1f));
+                break;
+
+            case FacingDirection.SW:
+                _anim.Play("IdleSW", 0, Random.Range(0f, 1f));
+                break;
+        }
+        
 
         //_faceSpriteRend.sortingOrder = newSortingOrder;
         //_bodySpriteRend.sortingOrder = newSortingOrder;
@@ -267,28 +343,28 @@ public class PawnSprite : MonoBehaviour
 
     public void HandleHit(bool isDead, bool armorHit, bool armorDestroyed,  Vector2 pushbackDirection)
     {
-        string animationString = "GetHitNE";
-        if (armorHit)
+        string animationString = "GetHit";//lNE";
+        if (false)//armorHit)
         {
             StartCoroutine(PlayArmorHitFXAfterDelay(.32f));
             if (!isDead)
             {
-                if (pushbackDirection.x > 0 && pushbackDirection.y > 0)
-                {
-                    animationString = "GetHitArmorSW";
-                }
-                if (pushbackDirection.x < 0 && pushbackDirection.y > 0)
-                {
-                    animationString = "GetHitArmorSE";
-                }
-                if (pushbackDirection.x > 0 && pushbackDirection.y < 0)
-                {
-                    animationString = "GetHitArmorNW";
-                }
-                if (pushbackDirection.x < 0 && pushbackDirection.y < 0)
-                {
-                    animationString = "GetHitArmorNE";
-                }
+                //if (pushbackDirection.x > 0 && pushbackDirection.y > 0)
+                //{
+                //    animationString = "GetHitArmorSW";
+                //}
+                //if (pushbackDirection.x < 0 && pushbackDirection.y > 0)
+                //{
+                //    animationString = "GetHitArmorSE";
+                //}
+                //if (pushbackDirection.x > 0 && pushbackDirection.y < 0)
+                //{
+                //    animationString = "GetHitArmorNW";
+                //}
+                //if (pushbackDirection.x < 0 && pushbackDirection.y < 0)
+                //{
+                //    animationString = "GetHitArmorNE";
+                //}
             }
         }
         else
@@ -296,12 +372,12 @@ public class PawnSprite : MonoBehaviour
             StartCoroutine(PlayBloodSpurtAfterDelay(.32f));
             if (!isDead)
             {
-                if (pushbackDirection.x > 0 && pushbackDirection.y > 0) 
+                if (pushbackDirection.x > 0 && pushbackDirection.y > 0)
                 {
                     animationString = "GetHitSW";
                 }
                 if (pushbackDirection.x < 0 && pushbackDirection.y > 0)
-                {                        
+                {
                     animationString = "GetHitSE";
                 }
                 if (pushbackDirection.x > 0 && pushbackDirection.y < 0)
@@ -309,7 +385,7 @@ public class PawnSprite : MonoBehaviour
                     animationString = "GetHitNW";
                 }
                 if (pushbackDirection.x < 0 && pushbackDirection.y < 0)
-                {                        
+                {
                     animationString = "GetHitNE";
                 }
 

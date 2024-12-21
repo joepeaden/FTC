@@ -137,8 +137,7 @@ public class Pawn : MonoBehaviour
         _motivation = GameChar.GetBattleMotivationCap();
         _actionPoints = BASE_ACTION_POINTS;
 
-        _spriteController.SetData(character);
-
+        _spriteController.SetData(this);
 
         //_anim.SetInteger("Vice", (int)_gameChar.Vice);
     }
