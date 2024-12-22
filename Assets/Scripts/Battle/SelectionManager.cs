@@ -114,41 +114,44 @@ public class SelectionManager : MonoBehaviour
             Pawn currentPawn = BattleManager.Instance.CurrentPawn;
             ActionData currentAction = BattleManager.Instance.CurrentAction;
 
-            if (_inIdleMode)
-            {
-                SetIdleMode(false);
-            }
-            else
-            {
-                Vector3 mousePos = CameraManager.MainCamera.ScreenToWorldPoint(Input.mousePosition);
-                RaycastHit2D[] hits = Physics2D.RaycastAll(mousePos, -Vector3.forward);
+            Vector3 mousePos = CameraManager.MainCamera.ScreenToWorldPoint(Input.mousePosition);
+            RaycastHit2D[] hits = Physics2D.RaycastAll(mousePos, -Vector3.forward);
 
-                foreach (RaycastHit2D hit in hits)
+            if (hits.Length > 0)
+            {
+                if (_inIdleMode)
                 {
-                    Tile newTile = hit.transform.GetComponent<Tile>();
-                    if (newTile != null && !newTile.IsImpassable)
+                    SetIdleMode(false);
+                }
+                else
+                {
+                    foreach (RaycastHit2D hit in hits)
                     {
-                        if (currentPawn.OnPlayerTeam)
+                        Tile newTile = hit.transform.GetComponent<Tile>();
+                        if (newTile != null && !newTile.IsImpassable)
                         {
-                            Pawn targetPawn = newTile.GetPawn();
-                            if (currentAction != null && targetPawn != null && currentPawn.IsTargetInRange(targetPawn, currentAction) && targetPawn.OnPlayerTeam != currentPawn.OnPlayerTeam)
+                            if (currentPawn.OnPlayerTeam)
                             {
-                                ClearHighlights();
-                                currentPawn.AttackPawnIfResourcesAvailable(targetPawn);
+                                Pawn targetPawn = newTile.GetPawn();
+                                if (currentAction != null && targetPawn != null && currentPawn.IsTargetInRange(targetPawn, currentAction) && targetPawn.OnPlayerTeam != currentPawn.OnPlayerTeam)
+                                {
+                                    ClearHighlights();
+                                    currentPawn.AttackPawnIfResourcesAvailable(targetPawn);
+                                }
+                                else if (currentPawn.CurrentTile.GetTilesInMoveRange().Contains(newTile) && targetPawn == null && currentAction == null && _selectedTile != null)
+                                {
+                                    ClearHighlights();
+                                    currentPawn.TryMoveToTile(newTile);
+                                }
                             }
-                            else if (currentPawn.CurrentTile.GetTilesInMoveRange().Contains(newTile) && targetPawn == null && currentAction == null && _selectedTile != null)
-                            {
-                                ClearHighlights();
-                                currentPawn.TryMoveToTile(newTile);
-                            }
-                        }
 
+                        }
                     }
                 }
             }
         }
         else if (_playerControlsEnabled && Input.GetMouseButtonDown(1))
-        {           
+        {
             SetIdleMode(true);
         }
     }

@@ -34,6 +34,8 @@ public class ActionButton : MonoBehaviour
         {
             _button = GetComponent<Button>();
         }
+
+        _button.onClick.AddListener(HandleClick);
     }
 
     public void SetInactive()
@@ -70,6 +72,11 @@ public class ActionButton : MonoBehaviour
         }
     }
 
+    public void SetSelected (bool isSelected)
+    {
+        _isSelected = false;
+    }
+
     /// <summary>
     /// For an interactable button
     /// </summary>
@@ -96,7 +103,6 @@ public class ActionButton : MonoBehaviour
         hotKeyText.text = $"({GetKeyCodeDisplay(hotkey)})";
 
         _callback = callback;
-        _button.onClick.AddListener(HandleClick);
     }
 
     private void Update()

@@ -469,9 +469,11 @@ public class BattleManager : MonoBehaviour
 
             //actionButtons.Clear();
 
+            actionButton1.SetSelected(false);
+            actionButton2.SetSelected(false);
+
             if (p.OnPlayerTeam)
             {
-                //GameObject actionButtonGO = Instantiate(_actionButtonPrefab, _actionsParent);
                 if (actionButton1.Action != p.GameChar.WeaponItem.baseAction)
                 {
                     actionButton1.SetDataButton(p.GameChar.WeaponItem.baseAction, HandleActionClicked, KeyCode.Alpha1);
