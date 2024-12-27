@@ -140,7 +140,7 @@ Material:
     - _HandDrawnAmount: 10
     - _HandDrawnSpeed: 5
     - _HitEffectBlend: 0
-    - _HitEffectGlow: 1
+    - _HitEffectGlow: 10
     - _HologramBlend: 1
     - _HologramMaxAlpha: 0.75
     - _HologramMinAlpha: 0.1
@@ -238,7 +238,7 @@ Material:
     - _GradTopLeftCol: {r: 1, g: 0, b: 0, a: 1}
     - _GradTopRightCol: {r: 1, g: 1, b: 0, a: 1}
     - _GreyscaleTintColor: {r: 1, g: 1, b: 1, a: 1}
-    - _HitEffectColor: {r: 0.9725491, g: 1, b: 0, a: 1}
+    - _HitEffectColor: {r: 1, g: 0, b: 0, a: 1}
     - _HologramStripeColor: {r: 0, g: 1, b: 1, a: 1}
     - _InnerOutlineColor: {r: 0.9713696, g: 1, b: 0, a: 1}
     - _OutlineColor: {r: 0.5768442, g: 0, b: 1, a: 1}
