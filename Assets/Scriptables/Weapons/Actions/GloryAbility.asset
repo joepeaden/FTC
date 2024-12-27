@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f757fd94518b7401cb0591f111a72102, type: 3}
+  m_Name: GloryAbility
+  m_EditorClassIdentifier: 
+  motCost: 15
+  apCost: 0
+  actionName: Glorious Moment
+  description: Today they will fear your name! Parry attacks that are dodged until
+    this character's next turn.
+  range: 1
+  damageMod: 0
+  armorDamageMod: 0
+  penetrationDamageMod: 0
+  accMod: 0
+  rangeForExtraDamage: 0
+  extraDmgMultiplier: -1
+  attackStyle: 0
+  enableFreeAttack: 0
+  enableParry: 1
+  turnsForEffect: 0

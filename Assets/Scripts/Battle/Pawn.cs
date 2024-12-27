@@ -361,10 +361,10 @@ public class Pawn : MonoBehaviour
     {
         _hasMadeFreeAttack = false;
 
-        if (!_isDead)
-        {
-            _spriteController.StopMoving();
-        }
+        //if (!_isDead)
+        //{
+        //    _spriteController.StopMoving();
+        //}
     }
 
     private void AttackPawn(Pawn targetPawn, ActionData currentAction)
@@ -375,6 +375,11 @@ public class Pawn : MonoBehaviour
         //BattleLogUI.Instance.AddLogEntry($"{GameChar.CharName} uses {currentAction.actionName} against {targetPawn.GameChar.CharName}!");
         //BattleLogUI.Instance.AddLogEntry($"Chance: {(int)(hitChance * 100)}, Rolled: {(int)(hitRoll * 100)}");
 
+        Vector2 attackDirection = transform.position - targetPawn.transform.position;
+        attackDirection.Normalize();
+
+        _spriteController.PlayAttack(attackDirection);
+
         if (hitRoll < hitChance)
         {
             bool targetHadArmor = targetPawn.ArmorPoints > 0;
@@ -384,18 +389,18 @@ public class Pawn : MonoBehaviour
 
             if (targetPawn.IsDead)
             {
-                StartCoroutine(PlayAudioAfterDelay(.35f, GameChar.WeaponItem.killSound));
+                StartCoroutine(PlayAudioAfterDelay(0f, GameChar.WeaponItem.killSound));
             }
             else if (!targetHadArmor)
             {
-                StartCoroutine(PlayAudioAfterDelay(.35f, GameChar.WeaponItem.hitSound));
+                StartCoroutine(PlayAudioAfterDelay(0f, GameChar.WeaponItem.hitSound));
             }
         }
         else
         {
             targetPawn.TriggerDodge();
             BattleManager.Instance.AddTextNotification(transform.position, "Miss!");
-            StartCoroutine(PlayAudioAfterDelay(.35f, GameChar.WeaponItem.missSound));
+            StartCoroutine(PlayAudioAfterDelay(0.1f, GameChar.WeaponItem.missSound));
         }
 
     }
@@ -440,19 +445,16 @@ public class Pawn : MonoBehaviour
         {
             if (armorHit)
             {
-                StartCoroutine(PlayAudioAfterDelay(.35f, armorHitSound));
+                StartCoroutine(PlayAudioAfterDelay(0f, armorHitSound));
 
             }
             else
             {
-                StartCoroutine(PlayAudioAfterDelay(.35f, hitSound));
+                StartCoroutine(PlayAudioAfterDelay(0f, hitSound));
             }
         }
 
-        Vector2 attackDirection = transform.position - attackingPawn.transform.position;
-        attackDirection.Normalize();
-
-        _spriteController.HandleHit(_isDead, armorHit, armorHit && _armorPoints <= 0, attackDirection);
+        _spriteController.HandleHit(_isDead, armorHit, armorHit && _armorPoints <= 0);
 
         OnPawnHit.Invoke();
     }
@@ -460,7 +462,7 @@ public class Pawn : MonoBehaviour
     private void Die()
     {
         _spriteController.Die();
-        StartCoroutine(PlayAudioAfterDelay(.35f, dieSound));
+        StartCoroutine(PlayAudioAfterDelay(0f, dieSound));
 
         _isDead = true;
 

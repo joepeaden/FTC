@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f757fd94518b7401cb0591f111a72102, type: 3}
+  m_Name: HonorAbility
+  m_EditorClassIdentifier: 
+  motCost: 15
+  apCost: 0
+  actionName: Smite
+  description: Give your opponent an honorable and quick death - attempt to hit for
+    extreme damage with slight hit penalty.
+  range: 1
+  damageMod: 100
+  armorDamageMod: 100
+  penetrationDamageMod: 100
+  accMod: -0.05
+  rangeForExtraDamage: 0
+  extraDmgMultiplier: -1
+  attackStyle: 0
+  enableFreeAttack: 0
+  enableParry: 0
+  turnsForEffect: 0

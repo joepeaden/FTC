@@ -270,9 +270,28 @@ public class PawnSprite : MonoBehaviour
 
     #region Animations
 
-    public void PlayAttack()
+    public void PlayAttack(Vector3 attackDirection)
     {
-        //_anim.Play("Attack");
+        string animationString = "AttackSW";
+
+        if (attackDirection.x > 0 && attackDirection.y > 0)
+        {
+            animationString = "AttackSW";
+        }
+        if (attackDirection.x < 0 && attackDirection.y > 0)
+        {
+            animationString = "AttackSE";
+        }
+        if (attackDirection.x > 0 && attackDirection.y < 0)
+        {
+            animationString = "AttackNW";
+        }
+        if (attackDirection.x < 0 && attackDirection.y < 0)
+        {
+            animationString = "AttackNE";
+        }
+
+        _anim.Play(animationString);
     }
 
     public void Move()
@@ -315,13 +334,6 @@ public class PawnSprite : MonoBehaviour
                 _anim.Play("IdleSW", 0, Random.Range(0f, 1f));
                 break;
         }
-        
-
-        //_faceSpriteRend.sortingOrder = newSortingOrder;
-        //_bodySpriteRend.sortingOrder = newSortingOrder;
-        //_headSpriteRend.sortingOrder = newSortingOrder;
-        //_helmSpriteRend.sortingOrder = newSortingOrder;
-        //_weaponSpriteRend.sortingOrder = newSortingOrder; 
     }
 
     public void Die()
@@ -341,60 +353,24 @@ public class PawnSprite : MonoBehaviour
         _weaponSpriteRend.sortingOrder = 0;
     }
 
-    public void HandleHit(bool isDead, bool armorHit, bool armorDestroyed,  Vector2 pushbackDirection)
+    public void HandleHit(bool isDead, bool armorHit, bool armorDestroyed)
     {
-        string animationString = "GetHit";//lNE";
-        if (false)//armorHit)
+        string animationString = "";
+        if (armorHit)
         {
-            StartCoroutine(PlayArmorHitFXAfterDelay(.32f));
-            if (!isDead)
-            {
-                //if (pushbackDirection.x > 0 && pushbackDirection.y > 0)
-                //{
-                //    animationString = "GetHitArmorSW";
-                //}
-                //if (pushbackDirection.x < 0 && pushbackDirection.y > 0)
-                //{
-                //    animationString = "GetHitArmorSE";
-                //}
-                //if (pushbackDirection.x > 0 && pushbackDirection.y < 0)
-                //{
-                //    animationString = "GetHitArmorNW";
-                //}
-                //if (pushbackDirection.x < 0 && pushbackDirection.y < 0)
-                //{
-                //    animationString = "GetHitArmorNE";
-                //}
-            }
+            StartCoroutine(PlayArmorHitFXAfterDelay(0f));
+            animationString = "GetHitARMR";
         }
         else
         {
-            StartCoroutine(PlayBloodSpurtAfterDelay(.32f));
-            if (!isDead)
-            {
-                if (pushbackDirection.x > 0 && pushbackDirection.y > 0)
-                {
-                    animationString = "GetHitSW";
-                }
-                if (pushbackDirection.x < 0 && pushbackDirection.y > 0)
-                {
-                    animationString = "GetHitSE";
-                }
-                if (pushbackDirection.x > 0 && pushbackDirection.y < 0)
-                {
-                    animationString = "GetHitNW";
-                }
-                if (pushbackDirection.x < 0 && pushbackDirection.y < 0)
-                {
-                    animationString = "GetHitNE";
-                }
-
-            }
+            StartCoroutine(PlayBloodSpurtAfterDelay(0f));
+            animationString = "GetHitHP";
         }
 
         if (!isDead)
         {
-            StartCoroutine(PlayAnimationAfterDelay(.2f, animationString));
+            _anim.Play(animationString);
+            //StartCoroutine(PlayAnimationAfterDelay(.2f, animationString));
         }
 
         // make the helmet gone if there's no armor for cool factor
