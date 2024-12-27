@@ -55,18 +55,6 @@ public class Pawn : MonoBehaviour
 
     [SerializeField] AIPathCustom pathfinder;
 
-    //[Header("Visuals")]
-    //[SerializeField] private Animator _anim;
-    //[SerializeField] private Sprite _enemyHeadSprite;
-    //[SerializeField] private Sprite _enemyBodySprite;
-    //[SerializeField] private Sprite _enemyLegSprite;
-    //[SerializeField] private SpriteRenderer _headSpriteRend;
-    //[SerializeField] private SpriteRenderer _bodySpriteRend;
-    //[SerializeField] private SpriteRenderer _leg1SpriteRend;
-    //[SerializeField] private SpriteRenderer _leg2SpriteRend;
-    //[SerializeField] private SpriteRenderer _helmSpriteRend;
-    //[SerializeField] private SpriteRenderer _weaponSpriteRend;
-
     [Header("Audio")]
     [SerializeField] private AudioClip hitSound;
     [SerializeField] private AudioClip armorHitSound;
@@ -108,6 +96,7 @@ public class Pawn : MonoBehaviour
     private void Start()
     {
         PickStartTile();
+        _spriteController.SetData(this);
     }
 
     private void OnDestroy()
@@ -120,7 +109,7 @@ public class Pawn : MonoBehaviour
     {
         if (_isMoving)
         {
-            _spriteController.UpdateFacing(_lastPosition, transform.position, CurrentTile);
+            _spriteController.UpdateFacingAndSpriteOrder(_lastPosition, transform.position, CurrentTile);
             _lastPosition = transform.position;
         }
     }
@@ -137,7 +126,6 @@ public class Pawn : MonoBehaviour
         _motivation = GameChar.GetBattleMotivationCap();
         _actionPoints = BASE_ACTION_POINTS;
 
-        _spriteController.SetData(this);
 
         //_anim.SetInteger("Vice", (int)_gameChar.Vice);
     }
@@ -354,13 +342,14 @@ public class Pawn : MonoBehaviour
 
         BattleManager.Instance.PawnActivated(this);
 
-        _spriteController.UpdateFacing(transform.position, primaryTargetPawn.transform.position, CurrentTile);
+        _spriteController.UpdateFacingAndSpriteOrder(transform.position, primaryTargetPawn.transform.position, CurrentTile);
     }
 
     public void HandleTurnEnded()
     {
         _hasMadeFreeAttack = false;
 
+        _spriteController.HandleTurnEnd();
         //if (!_isDead)
         //{
         //    _spriteController.StopMoving();
@@ -543,7 +532,7 @@ public class Pawn : MonoBehaviour
 
         //_audioSource.clip = greedViceSound;
         //_audioSource.Play();
-        /*_anim.Play("MotivatedGain");*/
+        _spriteController.HandleTurnBegin();
         _actionPoints = BASE_ACTION_POINTS;
     }
 
@@ -643,11 +632,11 @@ public class Pawn : MonoBehaviour
         List<Pawn> adjEnemies = GetAdjacentEnemies();
         if (adjEnemies.Count > 0)
         {
-            _spriteController.UpdateFacing(transform.position, adjEnemies[0].transform.position, CurrentTile);
+            _spriteController.UpdateFacingAndSpriteOrder(transform.position, adjEnemies[0].transform.position, CurrentTile);
         }
         else
         {
-            _spriteController.UpdateFacing(_lastPosition, transform.position, CurrentTile);
+            _spriteController.UpdateFacingAndSpriteOrder(_lastPosition, transform.position, CurrentTile);
         }
 
         // get adjacent enemies to face me 

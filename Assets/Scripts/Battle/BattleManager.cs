@@ -107,6 +107,7 @@ public class BattleManager : MonoBehaviour
     private void Awake()
     {
         _instance = this;
+
         gameOverButton.onClick.AddListener(ExitBattle);
 
         int dudesToSpawn;

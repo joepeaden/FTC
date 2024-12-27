@@ -5,11 +5,13 @@ using UnityEngine.EventSystems;
 
 public class PawnHeadPreview : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
+    [HideInInspector]
     public UnityEvent<Pawn> OnPawnPreviewHoverStart = new();
+    [HideInInspector]
     public UnityEvent OnPawnPreviewHoverEnd = new();
 
     [SerializeField] private Image helmRend;
-    [SerializeField] private Image headRend;
+    [SerializeField] private Image weaponRend;
 
     private Pawn _pawn;
 
@@ -25,16 +27,27 @@ public class PawnHeadPreview : MonoBehaviour, IPointerEnterHandler, IPointerExit
 
         //headRend.sprite = p.GetFaceSprite();
 
-        //ArmorItemData helm = p.GameChar.HelmItem;
-        //if (helm != null && p.ArmorPoints > 0)
-        //{
-        //    helmRend.gameObject.SetActive(true);
-        //    helmRend.sprite = helm.itemSprite;
-        //}
-        //else
-        //{
-        //    helmRend.gameObject.SetActive(false);
-        //}
+        ArmorItemData helm = p.GameChar.HelmItem;
+        if (helm != null && p.ArmorPoints > 0)
+        {
+            helmRend.gameObject.SetActive(true);
+            helmRend.sprite = helm.itemSprite;
+        }
+        else
+        {
+            helmRend.gameObject.SetActive(false);
+        }
+
+        WeaponItemData weapon = p.GameChar.WeaponItem;
+        if (weapon != null)
+        {
+            weaponRend.gameObject.SetActive(true);
+            weaponRend.sprite = weapon.itemSprite;
+        }
+        else
+        {
+            weaponRend.gameObject.SetActive(false);
+        }
     }
 
     public void OnPointerEnter(PointerEventData eventData)

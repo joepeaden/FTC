@@ -153,12 +153,12 @@ public class PawnSprite : MonoBehaviour
 
         if (pawn.OnPlayerTeam)
         {
-            UpdateFacing(Vector3.zero, new Vector3(1, 1));
+            UpdateFacingAndSpriteOrder(Vector3.zero, new Vector3(1, 1), pawn.CurrentTile);
             _anim.Play("IdleNE", 0, Random.Range(0f, 1f));
         }
         else
         {
-            UpdateFacing(Vector3.zero, new Vector3(-1, -1));
+            UpdateFacingAndSpriteOrder(Vector3.zero, new Vector3(-1, -1), pawn.CurrentTile);
             _anim.Play("IdleSW", 0, Random.Range(0f, 1f));
         }
         
@@ -167,6 +167,22 @@ public class PawnSprite : MonoBehaviour
     public void Reset()
     {
     
+    }
+
+    public void HandleTurnEnd()
+    {
+        _anim.SetBool("MyTurn", false);
+    }
+
+    public void HandleTurnBegin()
+    {
+        // MyTurn is just useful for triggering exit state to certain anims,
+        // like IdleMyTurn, if we're still in them on turn end, without
+        // explicitly calling Idle anim - so we don't interrupt another possible
+        // anim
+        _anim.SetBool("MyTurn", true);
+
+        _anim.Play("Activated");
     }
 
     public void SetNewFacingAnimParam(string newFacing)
@@ -189,7 +205,7 @@ public class PawnSprite : MonoBehaviour
     /// component is child of the pawn anyway - because the sprite might be moving
     /// as a result from animation.
     /// </remarks>
-    public void UpdateFacing(Vector3 originPosition, Vector3 facingPosition, Tile currentTile = null)
+    public void UpdateFacingAndSpriteOrder(Vector3 originPosition, Vector3 facingPosition, Tile currentTile = null)
     {
         int totalSpriteOrder = 0;
         if (currentTile != null)
@@ -346,11 +362,11 @@ public class PawnSprite : MonoBehaviour
         _weaponSpriteRend.sortingLayerName = "DeadCharacters";
 
         // not sure this matters but might as well. It's updated when pawn stops moving (see StopMoving)
-        _faceSpriteRend.sortingOrder = 0;
-        _bodySpriteRend.sortingOrder = 0;
-        _headSpriteRend.sortingOrder = 0;
-        _helmSpriteRend.sortingOrder = 0;
-        _weaponSpriteRend.sortingOrder = 0;
+        //_faceSpriteRend.sortingOrder = 0;
+        //_bodySpriteRend.sortingOrder = 0;
+        //_headSpriteRend.sortingOrder = 0;
+        //_helmSpriteRend.sortingOrder = 0;
+        //_weaponSpriteRend.sortingOrder = 0;
     }
 
     public void HandleHit(bool isDead, bool armorHit, bool armorDestroyed)

@@ -11,7 +11,7 @@ public class GridGenerator : MonoBehaviour
 
     //[SerializeField] AstarPath pathfindingGrid;
 
-    [SerializeField] GameObject[] tilePrefabs;
+    [SerializeField] GameObject tilePrefab;
     [SerializeField] int gridHeight;
     [SerializeField] int gridWidth;
     [SerializeField] float tileSize;
@@ -66,7 +66,6 @@ public class GridGenerator : MonoBehaviour
                         DestroyImmediate(_tiles[gridPoint].gameObject);
                     }
 
-                    GameObject tilePrefab = tilePrefabs[Random.Range(0, tilePrefabs.Length)];
                     GameObject tileGO = Instantiate(tilePrefab, transform);
                     Tile tileScript = tileGO.GetComponent<Tile>();
 

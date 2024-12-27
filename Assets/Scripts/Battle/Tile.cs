@@ -21,15 +21,16 @@ public class Tile : MonoBehaviour
     public static UnityEvent<Tile> OnTileHoverEnd = new();
     private static UnityEvent OnTileSelectChange = new();
 
+    [SerializeField] private List<Sprite> tileSprites = new();
+    [SerializeField] private SpriteRenderer tileSpriteRend;
     [SerializeField] private SpriteRenderer terrainSpritRend;
     [SerializeField] private Sprite selectionSprite;
-    [SerializeField] private Sprite hoverSprite;
+    //[SerializeField] private Sprite hoverSprite;
     [SerializeField] private Sprite moveRangeSprite;
     [SerializeField] private Sprite attackHighlightSprite;
     [SerializeField] private Sprite attackTargetHighlightSprite;
     [SerializeField] private SpriteRenderer tileOverlayUI;
     [SerializeField] private SpriteRenderer tileHoverUI;
-    [SerializeField] GameObject[] impassableObjectPrefabs;
 
     public bool IsImpassable => _isImpassable;
     private bool _isImpassable = false;
@@ -64,6 +65,7 @@ public class Tile : MonoBehaviour
     public void SetTerrainSortingOrder(int level)
     {
         terrainSpritRend.sortingOrder = level;
+        tileSpriteRend.sortingOrder = level;
     }
 
     public bool IsInRangeOf(Tile t, int range)
@@ -87,10 +89,7 @@ public class Tile : MonoBehaviour
 
         if (isImpassable)
         {
-
             terrainSpritRend.gameObject.SetActive(true);
-            //GameObject impassableObjectPrefab = impassableObjectPrefabs[Random.Range(0, impassableObjectPrefabs.Length)];
-            //impassableObjectRef = Instantiate(impassableObjectPrefab, transform);
         }
         else
         {
@@ -137,6 +136,8 @@ public class Tile : MonoBehaviour
         {
             _adjacentTiles.Add(tiles[p]);
         }
+
+        tileSpriteRend.sprite = tileSprites[Random.Range(0, tileSprites.Count)];
     }
 
     public void UpdateNodeConnections()
