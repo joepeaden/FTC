@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Events;
+using System.Threading.Tasks;
 
 /// <summary>
 /// Manages the Battle scene.
@@ -839,8 +840,11 @@ public class BattleManager : MonoBehaviour
         return alivePawns <= 0;
     }
 
-    public void NextActivation()
+    public async void NextActivation()
     {
+        // pause a little bit so the player can keep track of what the heck is happening
+        await Task.Delay(250);
+
         if (_currentPawn != null)
         {
             _currentPawn.OnEffectUpdate.RemoveListener(UpdateEffects);

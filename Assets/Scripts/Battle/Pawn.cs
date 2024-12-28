@@ -110,8 +110,8 @@ public class Pawn : MonoBehaviour
         if (_isMoving)
         {
             _spriteController.UpdateFacingAndSpriteOrder(_lastPosition, transform.position, CurrentTile);
-            _lastPosition = transform.position;
         }
+        _lastPosition = transform.position;
     }
 
     #endregion
@@ -350,10 +350,6 @@ public class Pawn : MonoBehaviour
         _hasMadeFreeAttack = false;
 
         _spriteController.HandleTurnEnd();
-        //if (!_isDead)
-        //{
-        //    _spriteController.StopMoving();
-        //}
     }
 
     private void AttackPawn(Pawn targetPawn, ActionData currentAction)
@@ -551,25 +547,7 @@ public class Pawn : MonoBehaviour
             return;
         }
 
-        //Tile adjustedTargetTile = targetTile;
         int tileDistance = _currentTile.GetTileDistance(targetTile);
-        //if (_actionPoints < _gameChar.GetAPPerTileMoved() * tileDistance)
-        //{
-        //    List<Tile> moveOptions = _currentTile.GetTilesInMoveRange();
-
-        //    for (int i = 0; i < moveOptions.Count; i++)
-        //    {
-        //        Tile t = moveOptions[i];
-        //        if (t.GetPawn() != null)
-        //        {
-        //            moveOptions.Remove(t);
-        //        }
-        //    }
-
-        //    moveOptions = moveOptions.OrderBy(tile => (tile.transform.position - targetTile.transform.position).magnitude).Where(tile => tile.IsTraversableByThisPawn(this)).ToList(); // tile.GetPawn() == null && 
-
-        //    adjustedTargetTile = moveOptions.First();
-        //}
 
         //Vector3 position = adjustedTargetTile.transform.position;
         pathfinder.AttemptGoToLocation(targetTile.transform.position);
@@ -613,11 +591,6 @@ public class Pawn : MonoBehaviour
 
         _spriteController.StopMoving();
         UpdateSpriteOnStop(true);
-
-        //if (HasActionsRemaining())
-        //{
-        //    _currentTile.HighlightTilesInRange(this, MoveRange, true, Tile.TileHighlightType.Move);
-        //}
 
         UpdateMotivationEvent.Invoke();
 

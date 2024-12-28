@@ -127,15 +127,14 @@ public class GameCharacter
         if (GameManager.Instance != null)
         {
             EquipItem(GameManager.Instance.GameCharData.DefaultWeapon);
-        }
-
-        if (onPlayerTeam)
-        {
-            _bodySprite = GameManager.Instance.GameCharData.blueShirt;
-        }
-        else
-        {
-            _bodySprite = GameManager.Instance.GameCharData.redShirt;
+            if (onPlayerTeam)
+            {
+                _bodySprite = GameManager.Instance.GameCharData.blueShirt;
+            }
+            else
+            {
+                _bodySprite = GameManager.Instance.GameCharData.redShirt;
+            }
         }
 
         _onPlayerTeam = onPlayerTeam;

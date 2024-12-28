@@ -73,7 +73,10 @@ public class PawnPreview : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
             weaponRend.gameObject.SetActive(false);
         }
 
-        bodyRend.sprite = bodySprite;
+        if (bodySprite != null)
+        {
+            bodyRend.sprite = bodySprite;
+        }
     }
 
     public void OnPointerEnter(PointerEventData eventData)
