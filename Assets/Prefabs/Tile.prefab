@@ -221,7 +221,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -342,20 +342,18 @@ MonoBehaviour:
   - {fileID: 21300000, guid: e45be383f8e8e4bf7970d0beb83a12a4, type: 3}
   - {fileID: 21300000, guid: 1a70a09ce4c0b4187b0215e7de8eb18f, type: 3}
   - {fileID: 21300000, guid: 51496dac715ad41e99dc61e0f55136ac, type: 3}
+  terrainSprites:
+  - {fileID: 21300000, guid: e4496bc7d37b56a408d8cbdd884c63b1, type: 3}
+  - {fileID: 21300000, guid: ed0bc25a7cc704303ab3f76f5acae69e, type: 3}
+  - {fileID: 21300000, guid: fe56b631c1f7849c4bed9c3a658a392f, type: 3}
   tileSpriteRend: {fileID: 1716172795536360721}
-  terrainSpritRend: {fileID: 5014756007081718938}
+  terrainSpriteRend: {fileID: 5014756007081718938}
   selectionSprite: {fileID: 21300000, guid: c34e91e3fb1af4616a37fbd8ad4366df, type: 3}
-  hoverSprite: {fileID: 21300000, guid: 98df362d46505407e860ee272c8ee36b, type: 3}
   moveRangeSprite: {fileID: 21300000, guid: 87705c8be948744fdb21cb3419b1c653, type: 3}
   attackHighlightSprite: {fileID: 21300000, guid: a7671d60fd3aa4d7c8d1f0e0e6de47ff, type: 3}
   attackTargetHighlightSprite: {fileID: 21300000, guid: 68694f32466694c25be58e5c110ab06e, type: 3}
   tileOverlayUI: {fileID: 8157718088664233285}
   tileHoverUI: {fileID: 4394614102146550778}
-  impassableObjectPrefabs:
-  - {fileID: 7057367235877927591, guid: bf1d30f29730c40ab8a49bf0336cd358, type: 3}
-  - {fileID: 3672944689813977534, guid: 11df6af4dff044bd197bdf08f25c5e35, type: 3}
-  - {fileID: 2137986869439738351, guid: 837d4c81089ba4ba89d9907aae60aaa7, type: 3}
-  - {fileID: 3582594325327190948, guid: bcb58aa3fa0af43f08b95c7647eb498a, type: 3}
   _pawn: {fileID: 0}
 --- !u!60 &5009864740182896781
 PolygonCollider2D:

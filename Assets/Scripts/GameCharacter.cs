@@ -37,13 +37,20 @@ public class GameCharacter
     /// </summary>
     private ArmorItemData _bodyItem;
 
+    public bool OnPlayerTeam => _onPlayerTeam;
+    private bool _onPlayerTeam;
+
+    // this may need to be associated with BodyItem later. Not sure at this point.
+    public Sprite BodySprite => _bodySprite;
+    private Sprite _bodySprite;
+
     public WeaponItemData WeaponItem => _weaponItem;
     private WeaponItemData _weaponItem;
 
     //public Sprite FaceSprite => _faceSprite;
     //private Sprite _faceSprite;
 
-    public GameCharacter(string newName, bool isPlayerCharacter, CharVices newVice, int newViceValue)
+    public GameCharacter(string newName, bool isPlayerCharacter, CharVices newVice, int newViceValue, bool onPlayerTeam)
     {
         _charName = newName;
         _isPlayerChar = isPlayerCharacter;
@@ -53,9 +60,20 @@ public class GameCharacter
         _hitPoints = Random.Range(GameManager.Instance.GameCharData.minHP, GameManager.Instance.GameCharData.maxHP);
 
         EquipItem(GameManager.Instance.GameCharData.DefaultWeapon);
+
+        if (onPlayerTeam)
+        {
+            _bodySprite = GameManager.Instance.GameCharData.blueShirt;
+        }
+        else
+        {
+            _bodySprite = GameManager.Instance.GameCharData.redShirt;
+        }
+
+        _onPlayerTeam = onPlayerTeam;
     }
 
-    public GameCharacter()
+    public GameCharacter(bool onPlayerTeam)
     {
         List<string> characterNameOptions = new()
         {
@@ -110,6 +128,17 @@ public class GameCharacter
         {
             EquipItem(GameManager.Instance.GameCharData.DefaultWeapon);
         }
+
+        if (onPlayerTeam)
+        {
+            _bodySprite = GameManager.Instance.GameCharData.blueShirt;
+        }
+        else
+        {
+            _bodySprite = GameManager.Instance.GameCharData.redShirt;
+        }
+
+        _onPlayerTeam = onPlayerTeam;
     }
 
     public float GetCharHitChance()

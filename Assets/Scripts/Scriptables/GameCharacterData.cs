@@ -16,4 +16,7 @@ public class GameCharacterData : ScriptableObject
     public int maxInit;
     public int minHP;
     public int maxHP;
+
+    public Sprite blueShirt;
+    public Sprite redShirt;
 }

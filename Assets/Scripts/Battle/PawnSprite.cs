@@ -161,7 +161,8 @@ public class PawnSprite : MonoBehaviour
             UpdateFacingAndSpriteOrder(Vector3.zero, new Vector3(-1, -1), pawn.CurrentTile);
             _anim.Play("IdleSW", 0, Random.Range(0f, 1f));
         }
-        
+
+        _bodySpriteRend.sprite = pawn.GameChar.BodySprite;
     }
 
     public void Reset()

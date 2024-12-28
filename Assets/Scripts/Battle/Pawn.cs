@@ -116,10 +116,10 @@ public class Pawn : MonoBehaviour
 
     #endregion
 
-    public void SetCharacter(GameCharacter character, bool isPlayerTeam)
+    public void SetCharacter(GameCharacter character)
     {
         _gameChar = character;
-        SetTeam(isPlayerTeam);
+        SetTeam(character.OnPlayerTeam);
         _hitPoints = character.HitPoints;
         _armorPoints = character.GetTotalArmor();
 

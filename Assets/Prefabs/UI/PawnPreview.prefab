@@ -66,7 +66,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 27ad3b3f1935eef47b6a7fd73b7265b8, type: 3}
+  m_Sprite: {fileID: 21300000, guid: e28b8f6f6cf28404eb455c6f677329ec, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -93,7 +93,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &4491923846014761724
 RectTransform:
   m_ObjectHideFlags: 0
@@ -142,7 +142,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 21154382f69ab7a4fb1d868c123a8be5, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -229,7 +229,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2881012879661761195}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d1c8ab8ab107048ddb42dd05671bfb4b, type: 3}
+  m_Script: {fileID: 11500000, guid: 255f2d61cc9a84732a36c4c8bd928cf2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   OnPawnPreviewHoverStart:
@@ -240,6 +240,7 @@ MonoBehaviour:
       m_Calls: []
   helmRend: {fileID: 7401029171953816348}
   weaponRend: {fileID: 2194946971119067045}
+  bodyRend: {fileID: 8573871576212199048}
 --- !u!1 &6339726119009229023
 GameObject:
   m_ObjectHideFlags: 0

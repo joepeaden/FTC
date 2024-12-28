@@ -22,8 +22,9 @@ public class Tile : MonoBehaviour
     private static UnityEvent OnTileSelectChange = new();
 
     [SerializeField] private List<Sprite> tileSprites = new();
+    [SerializeField] private List<Sprite> terrainSprites = new();
     [SerializeField] private SpriteRenderer tileSpriteRend;
-    [SerializeField] private SpriteRenderer terrainSpritRend;
+    [SerializeField] private SpriteRenderer terrainSpriteRend;
     [SerializeField] private Sprite selectionSprite;
     //[SerializeField] private Sprite hoverSprite;
     [SerializeField] private Sprite moveRangeSprite;
@@ -59,12 +60,12 @@ public class Tile : MonoBehaviour
 
     public int GetTerrainSortingOrder()
     {
-        return terrainSpritRend.sortingOrder;
+        return terrainSpriteRend.sortingOrder;
     }
     
     public void SetTerrainSortingOrder(int level)
     {
-        terrainSpritRend.sortingOrder = level;
+        terrainSpriteRend.sortingOrder = level;
         tileSpriteRend.sortingOrder = level;
     }
 
@@ -89,13 +90,13 @@ public class Tile : MonoBehaviour
 
         if (isImpassable)
         {
-            terrainSpritRend.gameObject.SetActive(true);
+            terrainSpriteRend.gameObject.SetActive(true);
         }
         else
         {
-            if (terrainSpritRend.gameObject.activeInHierarchy)
+            if (terrainSpriteRend.gameObject.activeInHierarchy)
             {
-                terrainSpritRend.gameObject.SetActive(false);
+                terrainSpriteRend.gameObject.SetActive(false);
             }
         }
 
@@ -138,6 +139,7 @@ public class Tile : MonoBehaviour
         }
 
         tileSpriteRend.sprite = tileSprites[Random.Range(0, tileSprites.Count)];
+        terrainSpriteRend.sprite = terrainSprites[Random.Range(0, terrainSprites.Count)];
     }
 
     public void UpdateNodeConnections()

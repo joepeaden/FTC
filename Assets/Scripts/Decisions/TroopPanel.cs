@@ -9,11 +9,27 @@ public class TroopPanel : MonoBehaviour
 {
     [SerializeField] private TMP_Text _troopNameText;
     [SerializeField] private Button _theButton;
+    [SerializeField] private PawnPreview _preview;
+
+    private GameCharacter _gameChar;
 
     public void SetupPanel(GameCharacter gameChar, UnityAction<GameCharacter> callback)
     {
         _troopNameText.text = gameChar.CharName;
         _theButton.onClick.AddListener(() => { callback(gameChar); });
+
+        _preview.SetData(gameChar);
+
+        _gameChar = gameChar;
+    }
+
+    private void OnEnable()
+    {
+        // when going back and forth between the equip screen and the troops screen, need to update the character gear.
+        if (_gameChar != null)
+        {
+            _preview.SetData(_gameChar);
+        }
     }
 
     private void OnDestroy()

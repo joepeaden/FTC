@@ -23,6 +23,7 @@ public class DecisionPanel : MonoBehaviour
     [SerializeField] private TMP_Text _goldAmountText;
     [SerializeField] private TMP_Text _descriptionText;
     [SerializeField] private TMP_Text _titleText;
+    [SerializeField] private PawnPreview _pawnPreview;
 
     int numOfEnemies;
     int goldAmount;
@@ -36,7 +37,7 @@ public class DecisionPanel : MonoBehaviour
 
     public void GenerateRecruitOption()
     {
-        _recruit = new();
+        _recruit = new(true);
 
         if (GameManager.Instance != null)
         {
@@ -67,6 +68,8 @@ public class DecisionPanel : MonoBehaviour
         _goldAmountText.text = "Cost: " + goldAmount + " gold";
 
         _decisionType = DecisionType.Recruit;
+
+        _pawnPreview.SetData(_recruit);
     }
 
     public void GenerateContractOption()
@@ -81,6 +84,8 @@ public class DecisionPanel : MonoBehaviour
         _goldAmountText.text = "Reward: " + goldAmount + " gold";
 
         _decisionType = DecisionType.Contract;
+
+        _pawnPreview.SetData(new GameCharacter(false));
     }
 
     private void HandleClick()

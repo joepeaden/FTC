@@ -45,7 +45,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] TMP_Text hitChanceText;
     [SerializeField] TMP_Text characterNameText;
     [SerializeField] TMP_Text characterMotivatorText;
-    [SerializeField] PawnHeadPreview currentPawnPreview;
+    [SerializeField] PawnPreview currentPawnPreview;
     [SerializeField] TMP_Text armorText;
     [SerializeField] StatBar armorBar;
     [SerializeField] TMP_Text healthText;
@@ -117,13 +117,13 @@ public class BattleManager : MonoBehaviour
 
             Pawn playerPawn = Instantiate(pawnPrefab, friendlyParent).GetComponent<Pawn>();
             _playerPawns.Add(playerPawn);
-            playerPawn.SetCharacter(GameManager.Instance.PlayerCharacter, true);
+            playerPawn.SetCharacter(GameManager.Instance.PlayerCharacter);
 
             foreach (GameCharacter character in GameManager.Instance.PlayerFollowers)
             {
                 Pawn newPawn = Instantiate(pawnPrefab, friendlyParent).GetComponent<Pawn>();
                 _playerPawns.Add(newPawn);
-                newPawn.SetCharacter(character, true);
+                newPawn.SetCharacter(character);
 
                 MiniStatBar miniStats = Instantiate(_miniStatBarPrefab, _healthBarParent);
                 miniStats.SetData(newPawn);
@@ -143,7 +143,7 @@ public class BattleManager : MonoBehaviour
                 Pawn newPawn = Instantiate(pawnPrefab, friendlyParent).GetComponent<Pawn>();
                 _playerPawns.Add(newPawn);
 
-                GameCharacter guy = new GameCharacter();
+                GameCharacter guy = new GameCharacter(true);
 
                 if (GameManager.Instance == null)
                 {
@@ -189,7 +189,7 @@ public class BattleManager : MonoBehaviour
                     guy.EquipItem(club);
                 }
 
-                newPawn.SetCharacter(guy, true);
+                newPawn.SetCharacter(guy);
 
                 MiniStatBar miniStats = Instantiate(_miniStatBarPrefab, _healthBarParent);
                 miniStats.SetData(newPawn);
@@ -201,7 +201,7 @@ public class BattleManager : MonoBehaviour
         {
             Pawn newPawn = Instantiate(pawnPrefab, enemyParent).GetComponent<Pawn>();
 
-            GameCharacter guy = new();
+            GameCharacter guy = new(false);
 
             if (GameManager.Instance == null)
             {
@@ -247,7 +247,7 @@ public class BattleManager : MonoBehaviour
                 guy.EquipItem(club);
             }
 
-            newPawn.SetCharacter(guy, false);
+            newPawn.SetCharacter(guy);
 
             _enemyAI.RegisterPawn(newPawn);
 
@@ -389,8 +389,8 @@ public class BattleManager : MonoBehaviour
         {
             Transform child = _initStackParent.GetChild(i);
 
-            child.GetComponent<PawnHeadPreview>().OnPawnPreviewHoverStart.RemoveListener(OnHoverInitPawnPreview);
-            child.GetComponent<PawnHeadPreview>().OnPawnPreviewHoverEnd.RemoveListener(HandleEndHoverInitPawnPreview);
+            child.GetComponent<PawnPreview>().OnPawnPreviewHoverStart.RemoveListener(OnHoverInitPawnPreview);
+            child.GetComponent<PawnPreview>().OnPawnPreviewHoverEnd.RemoveListener(HandleEndHoverInitPawnPreview);
 
             // return to object pool
             child.gameObject.SetActive(false);
@@ -413,10 +413,10 @@ public class BattleManager : MonoBehaviour
             pawnPreview.transform.SetParent(_initStackParent);
             // for some reason, the pawn previews get really mega stretched out.
             pawnPreview.transform.localScale = Vector3.one;
-            pawnPreview.GetComponent<PawnHeadPreview>().SetData(p);
+            pawnPreview.GetComponent<PawnPreview>().SetData(p);
 
-            pawnPreview.GetComponent<PawnHeadPreview>().OnPawnPreviewHoverStart.AddListener(OnHoverInitPawnPreview);
-            pawnPreview.GetComponent<PawnHeadPreview>().OnPawnPreviewHoverEnd.AddListener(HandleEndHoverInitPawnPreview);
+            pawnPreview.GetComponent<PawnPreview>().OnPawnPreviewHoverStart.AddListener(OnHoverInitPawnPreview);
+            pawnPreview.GetComponent<PawnPreview>().OnPawnPreviewHoverEnd.AddListener(HandleEndHoverInitPawnPreview);
 
             newChildCount++;
         }

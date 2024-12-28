@@ -21,3 +21,5 @@ MonoBehaviour:
   maxInit: 5
   minHP: 30
   maxHP: 100
+  blueShirt: {fileID: 21300000, guid: a85206170700bc544a1a8e9ea5f03244, type: 3}
+  redShirt: {fileID: 21300000, guid: dd9116136e8cb408c92f464663fe2c9e, type: 3}
