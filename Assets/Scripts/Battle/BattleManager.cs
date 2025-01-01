@@ -474,6 +474,9 @@ public class BattleManager : MonoBehaviour
             actionButton1.SetSelected(false);
             actionButton2.SetSelected(false);
 
+            actionButton1.gameObject.SetActive(p.OnPlayerTeam);
+            actionButton2.gameObject.SetActive(p.OnPlayerTeam);
+
             if (p.OnPlayerTeam)
             {
                 if (actionButton1.Action != p.GameChar.WeaponItem.baseAction)
@@ -865,11 +868,6 @@ public class BattleManager : MonoBehaviour
             }
             else
             {
-                //if (_currentPawn.CurrentTile == null)
-                //{
-                //    yield return new WaitUntil(() => _currentPawn.CurrentTile != null);
-                //}
-
                 _currentPawn.HandleActivation();
                 UpdateUIForPawn(_currentPawn);
                 _currentPawn.OnEffectUpdate.AddListener(UpdateEffects);
@@ -878,12 +876,13 @@ public class BattleManager : MonoBehaviour
                 _endTurnButton.gameObject.SetActive(_currentPawn.OnPlayerTeam);
 
                 if (!_currentPawn.OnPlayerTeam)
-                //{
-                    //_selectionManager.SetSelectedTile(_currentPawn.CurrentTile);
-                //}
-                //else
                 {
                     _enemyAI.DoTurn(_currentPawn);
+                    _selectionManager.DisablePlayerControls();
+                }
+                else
+                {
+                    _selectionManager.EnablePlayerControls();
                 }
             }
         }
