@@ -111,14 +111,10 @@ public class BattleManager : MonoBehaviour
 
         gameOverButton.onClick.AddListener(ExitBattle);
 
-        int dudesToSpawn;
+        // if not started from Battle scene, spawn player's company and enemies in contract
         if (GameManager.Instance != null)
         {
-            dudesToSpawn = GameManager.Instance.GetNumOfEnemiesToSpawn();
-
-            Pawn playerPawn = Instantiate(pawnPrefab, friendlyParent).GetComponent<Pawn>();
-            _playerPawns.Add(playerPawn);
-            playerPawn.SetCharacter(GameManager.Instance.PlayerCharacter);
+            //dudesToSpawn = GameManager.Instance.GetNumOfEnemiesToSpawn();
 
             foreach (GameCharacter character in GameManager.Instance.PlayerFollowers)
             {
@@ -129,131 +125,28 @@ public class BattleManager : MonoBehaviour
                 MiniStatBar miniStats = Instantiate(_miniStatBarPrefab, _healthBarParent);
                 miniStats.SetData(newPawn);
             }
+
+            foreach(GameCharacter character in GameManager.Instance.GetEnemiesForContract())
+            {
+                Pawn newPawn = Instantiate(pawnPrefab, enemyParent).GetComponent<Pawn>();
+                newPawn.SetCharacter(character);
+
+                _enemyAI.RegisterPawn(newPawn);
+
+                MiniStatBar miniStats = Instantiate(_miniStatBarPrefab, _healthBarParent);
+                miniStats.SetData(newPawn);
+            }
         }
+        // otherwise, spawn a random assortment of friendly and enemy dudes
         else
         {
             // change game over button text to "restart"
             gameOverButton.GetComponentInChildren<TMP_Text>().text = "Restart";
 
             Debug.Log("No game manager, spawning default amount");
-            dudesToSpawn = Random.Range(DEFAULT_MIN_AMOUNT_TO_SPAWN, DEFAULT_MAX_AMOUNT_TO_SPAWN);
+            SpawnTestGuys(true);
 
-            // spawn some friendlies
-            for (int i = 0; i < dudesToSpawn; i++)
-            {
-                Pawn newPawn = Instantiate(pawnPrefab, friendlyParent).GetComponent<Pawn>();
-                _playerPawns.Add(newPawn);
-
-                GameCharacter guy = new GameCharacter(true);
-
-                if (GameManager.Instance == null)
-                {
-                    // pick random weapon
-                    int roll = Random.Range(0, 4);
-                    switch (roll)
-                    {
-                        case 0:
-                            guy.EquipItem(club);
-                            break;
-                        case 1:
-                            guy.EquipItem(sword);
-                            break;
-                        case 2:
-                            guy.EquipItem(spear);
-                            break;
-                        case 3:
-                            guy.EquipItem(axe);
-                            break;
-                    }
-
-                    // pick random armor
-                    roll = Random.Range(0, 4);
-                    switch (roll)
-                    {
-                        case 0:
-                            // no armor
-                            break;
-                        case 1:
-                            guy.EquipItem(lightHelm);
-                            break;
-                        case 2:
-                            guy.EquipItem(heavyHelm);
-                            break;
-                        case 3:
-                            guy.EquipItem(medHelm);
-                            break;
-                    }
-
-                }
-                else
-                {
-                    guy.EquipItem(club);
-                }
-
-                newPawn.SetCharacter(guy);
-
-                MiniStatBar miniStats = Instantiate(_miniStatBarPrefab, _healthBarParent);
-                miniStats.SetData(newPawn);
-            }
-        }
-
-        dudesToSpawn = Random.Range(DEFAULT_MIN_AMOUNT_TO_SPAWN, DEFAULT_MAX_AMOUNT_TO_SPAWN);
-        for (int i = 0; i < dudesToSpawn; i++)
-        {
-            Pawn newPawn = Instantiate(pawnPrefab, enemyParent).GetComponent<Pawn>();
-
-            GameCharacter guy = new(false);
-
-            if (GameManager.Instance == null)
-            {
-                // pick random weapon
-                int roll = Random.Range(0, 4);
-                switch(roll)
-                {
-                    case 0:
-                        guy.EquipItem(club);
-                        break;
-                    case 1:
-                        guy.EquipItem(sword);
-                        break;
-                    case 2:
-                        guy.EquipItem(spear);
-                        break;
-                    case 3:
-                        guy.EquipItem(axe);
-                        break;
-                }
-
-                // pick random armor
-                roll = Random.Range(0, 4);
-                switch (roll)
-                {
-                    case 0:
-                        // no armor
-                        break;
-                    case 1:
-                        guy.EquipItem(lightHelm);
-                        break;
-                    case 2:
-                        guy.EquipItem(heavyHelm);
-                        break;
-                    case 3:
-                        guy.EquipItem(medHelm);
-                        break;
-                }
-
-            }
-            else
-            {
-                guy.EquipItem(club);
-            }
-
-            newPawn.SetCharacter(guy);
-
-            _enemyAI.RegisterPawn(newPawn);
-
-            MiniStatBar miniStats = Instantiate(_miniStatBarPrefab, _healthBarParent);
-            miniStats.SetData(newPawn);
+            SpawnTestGuys(false);
         }
 
         Tile.OnTileHoverStart.AddListener(HandleTileHoverStart);
@@ -644,6 +537,76 @@ public class BattleManager : MonoBehaviour
     #endregion
 
     #region BattleManagement
+
+    public void SpawnTestGuys(bool friendly)
+    {
+        int numToSpawn = Random.Range(DEFAULT_MIN_AMOUNT_TO_SPAWN, DEFAULT_MAX_AMOUNT_TO_SPAWN);
+
+        for (int i = 0; i < numToSpawn; i++)
+        {
+            Pawn newPawn = Instantiate(pawnPrefab, friendly ? friendlyParent : enemyParent).GetComponent<Pawn>();
+
+            GameCharacter guy = new(friendly);
+
+            if (GameManager.Instance == null)
+            {
+                // pick random weapon
+                int roll = Random.Range(0, 4);
+                switch (roll)
+                {
+                    case 0:
+                        guy.EquipItem(club);
+                        break;
+                    case 1:
+                        guy.EquipItem(sword);
+                        break;
+                    case 2:
+                        guy.EquipItem(spear);
+                        break;
+                    case 3:
+                        guy.EquipItem(axe);
+                        break;
+                }
+
+                // pick random armor
+                roll = Random.Range(0, 4);
+                switch (roll)
+                {
+                    case 0:
+                        // no armor
+                        break;
+                    case 1:
+                        guy.EquipItem(lightHelm);
+                        break;
+                    case 2:
+                        guy.EquipItem(heavyHelm);
+                        break;
+                    case 3:
+                        guy.EquipItem(medHelm);
+                        break;
+                }
+
+            }
+            else
+            {
+                guy.EquipItem(club);
+            }
+
+            newPawn.SetCharacter(guy);
+
+            if (friendly)
+            {
+                _playerPawns.Add(newPawn);
+            }
+            else
+            {
+                _enemyAI.RegisterPawn(newPawn);
+            }
+
+            MiniStatBar miniStats = Instantiate(_miniStatBarPrefab, _healthBarParent);
+            miniStats.SetData(newPawn);
+        }
+    }
 
     public void ClearSelectedAction()
     {

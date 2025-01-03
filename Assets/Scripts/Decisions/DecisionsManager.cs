@@ -8,6 +8,7 @@ public class DecisionsManager : MonoBehaviour
 {
     [SerializeField] private Transform _contractsPanelParent;
     [SerializeField] private Transform _recruitPanelParent;
+    [SerializeField] private GameObject _winUI;
 
     [SerializeField] private TMP_Text _goldText;
     [SerializeField] private Button _recruitsButton;
@@ -62,7 +63,6 @@ public class DecisionsManager : MonoBehaviour
         // fill out warband
         if (GameManager.Instance != null)
         {
-            AddCharacterPanel(GameManager.Instance.PlayerCharacter);
             foreach (GameCharacter character in GameManager.Instance.PlayerFollowers)
             {
                 AddCharacterPanel(character);
@@ -90,6 +90,20 @@ public class DecisionsManager : MonoBehaviour
         UpdateGoldText();
 
         _disableCharPanelButton.onClick.AddListener(HideCharacterPanel);
+
+        CheckForGameVictory();
+    }
+
+    private void CheckForGameVictory()
+    {
+        // should this information even be stored in the game manager? I'm not so certain.
+        // the player gold isn't used mid-battle anyway. Perhaps should move this here later.
+        // I guess it's only there for the sake of persistence, but we can keep that information
+        // in a file anyway once we implement perisistence.
+        if (GameManager.Instance != null && GameManager.Instance.PlayerGold > GameManager.GOLD_WIN_AMOUNT)
+        {
+            _winUI.SetActive(true);
+        }
     }
 
     public void RefreshInventory()
@@ -141,6 +155,8 @@ public class DecisionsManager : MonoBehaviour
 
             // give the player money back
             GameManager.Instance.AddGold(itemUI.Item.itemPrice);
+
+            CheckForGameVictory();
 
             // move the item UI from Shop to Inventory
             itemUI.transform.SetParent(_shopGrid.transform);

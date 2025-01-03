@@ -26,6 +26,9 @@ public class DecisionPanel : MonoBehaviour
     [SerializeField] private PawnPreview _pawnPreview;
 
     int numOfEnemies;
+
+    private List<GameCharacter> _enemies;
+
     int goldAmount;
 
     private GameCharacter _recruit;
@@ -75,6 +78,9 @@ public class DecisionPanel : MonoBehaviour
     public void GenerateContractOption()
     {
         numOfEnemies = Random.Range(_minNumOfEnemies, _maxNumOfEnemies);
+
+        _enemies = GenerateEnemies(numOfEnemies);
+
         goldAmount = numOfEnemies * 25;
 
         _titleText.text = "Contract";
@@ -88,15 +94,63 @@ public class DecisionPanel : MonoBehaviour
         _pawnPreview.SetData(new GameCharacter(false));
     }
 
+    private List<GameCharacter> GenerateEnemies(int numToGenerate)
+    {
+        List<GameCharacter> enemies = new();
+        for (int i = 0; i < numToGenerate; i++)
+        {
+            GameCharacter guy = new(false);
+
+            // pick random weapon
+            int roll = Random.Range(0, 4);
+            switch (roll)
+            {
+                case 0:
+                    guy.EquipItem(GameManager.Instance.EquipmentList.club);
+                    break;
+                case 1:
+                    guy.EquipItem(GameManager.Instance.EquipmentList.sword);
+                    break;
+                case 2:
+                    guy.EquipItem(GameManager.Instance.EquipmentList.spear);
+                    break;
+                case 3:
+                    guy.EquipItem(GameManager.Instance.EquipmentList.axe);
+                    break;
+            }
+
+            // pick random armor
+            roll = Random.Range(0, 4);
+            switch (roll)
+            {
+                case 0:
+                    // no armor
+                    break;
+                case 1:
+                    guy.EquipItem(GameManager.Instance.EquipmentList.lightHelm);
+                    break;
+                case 2:
+                    guy.EquipItem(GameManager.Instance.EquipmentList.heavyHelm);
+                    break;
+                case 3:
+                    guy.EquipItem(GameManager.Instance.EquipmentList.medHelm);
+                    break;
+            }
+
+            enemies.Add(guy);
+        }
+
+        return enemies;
+    }
+
     private void HandleClick()
     {
-
         switch (_decisionType)
         {
             case DecisionType.Contract:
                 if (GameManager.Instance != null)
                 {
-                    GameManager.Instance.LoadBattle(numOfEnemies, goldAmount);
+                    GameManager.Instance.LoadBattle(_enemies, goldAmount);
                 }
                 else
                 {

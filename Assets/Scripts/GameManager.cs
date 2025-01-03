@@ -8,16 +8,15 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance => _instance;
     private static GameManager _instance;
 
+    public static int GOLD_WIN_AMOUNT = 1000;
+
     // these two buddies could be in a struct or something to keep
     // "current mission" stuff contained.
-    private int _enemiesToSpawn;
+    private List<GameCharacter> _enemiesForContract;
     private int _potentialRewardAmount;
 
     public int PlayerGold => _playerGold;
     private int _playerGold;
-
-    public GameCharacter PlayerCharacter => _playerCharacter;
-    private GameCharacter _playerCharacter;
 
     public List<GameCharacter> PlayerFollowers => _playerFollowers;
     private List<GameCharacter> _playerFollowers = new();
@@ -28,6 +27,9 @@ public class GameManager : MonoBehaviour
     public GameCharacterData GameCharData => _gameCharData;
     [SerializeField] private GameCharacterData _gameCharData;
 
+    public EquipmentListData EquipmentList => _equipmentListData;
+    [SerializeField] private EquipmentListData _equipmentListData;
+
     private void Awake()
     {
         _instance = this;
@@ -36,18 +38,22 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        SceneManager.LoadScene("MainMenu");
+        LoadMainMenu();
     }
 
-    public void StartNewGame(string playerCharName)
+    public void StartNewGame()//string playerCharName)
     {
-        _playerCharacter = new (playerCharName, true, (GameCharacter.CharVices) Random.Range(0, 3), Random.Range(_gameCharData.minVice, _gameCharData.maxVice), true);
-
 #if UNITY_EDITOR
-        _playerGold = 100;
+        _playerGold = 200;
 #else
         _playerGold = GameCharData.startingGold;
 #endif
+
+        // add 3 default characters for player
+        for (int i = 0; i < 3; i++)
+        {
+            TryAddFollower(0, new GameCharacter(true));
+        }
 
         SceneManager.LoadScene("DecisionsUI");
     }
@@ -102,26 +108,31 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void LoadBattle(int numOfEnemies, int rewardAmount)
+    public void LoadBattle(List<GameCharacter> enemies, int rewardAmount)
     {
-        _enemiesToSpawn = numOfEnemies;
+        _enemiesForContract = enemies;
         _potentialRewardAmount = rewardAmount;
 
         SceneManager.LoadScene("BattleScene");
     }
 
-    public int GetNumOfEnemiesToSpawn()
+    public List<GameCharacter> GetEnemiesForContract()
     {
-        return _enemiesToSpawn;
+        return _enemiesForContract;
+    }
+
+    public void LoadMainMenu()
+    {
+        SceneManager.LoadScene("MainMenu");
     }
 
     public void ExitBattle(bool playerWon)
     {
+        SceneManager.LoadScene("DecisionsUI");
+
         if (playerWon)
         {
-            _playerGold += _potentialRewardAmount;
+            AddGold(_potentialRewardAmount);
         }
-
-        SceneManager.LoadScene("DecisionsUI");
     }
 }

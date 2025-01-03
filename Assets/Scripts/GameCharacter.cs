@@ -15,8 +15,6 @@ public class GameCharacter
 
     public string CharName => _charName;
     private string _charName;
-    public bool IsPlayerChar => _isPlayerChar;
-    private bool _isPlayerChar;
 
     public CharVices Vice => _vice;
     private CharVices _vice;
@@ -50,10 +48,9 @@ public class GameCharacter
     //public Sprite FaceSprite => _faceSprite;
     //private Sprite _faceSprite;
 
-    public GameCharacter(string newName, bool isPlayerCharacter, CharVices newVice, int newViceValue, bool onPlayerTeam)
+    public GameCharacter(string newName, CharVices newVice, int newViceValue, bool onPlayerTeam)
     {
         _charName = newName;
-        _isPlayerChar = isPlayerCharacter;
         _vice = newVice;
         _charViceValue = newViceValue;
         _baseInitiative = Random.Range(GameManager.Instance.GameCharData.minInit, GameManager.Instance.GameCharData.maxInit);
@@ -104,7 +101,6 @@ public class GameCharacter
         };
 
         _charName = characterNameOptions[Random.Range(0, characterNameOptions.Count)];
-        _isPlayerChar = false;
 
         if (GameManager.Instance != null)
         {

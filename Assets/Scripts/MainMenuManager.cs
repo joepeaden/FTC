@@ -15,29 +15,29 @@ public class MainMenuManager : MonoBehaviour
 
     private void Awake()
     {
-        _newGameButton.onClick.AddListener(ShowCharacterCreation);
-        _startGameFromCharCreateButton.onClick.AddListener(StartGameFromCharCreation);
+        _newGameButton.onClick.AddListener(StartGame);//ShowCharacterCreation);
+        //_startGameFromCharCreateButton.onClick.AddListener(StartGameFromCharCreation);
     }
 
-    private void ShowCharacterCreation()
-    {
-        _mainMenuScreen.SetActive(false);
-        _characterCreationScreen.SetActive(true);
-    }
+    //private void ShowCharacterCreation()
+    //{
+    //    _mainMenuScreen.SetActive(false);
+    //    _characterCreationScreen.SetActive(true);
+    //}
 
-    private void StartGameFromCharCreation()
+    private void StartGame()
     {
-        if (_newCharNameInput.text == string.Empty)
-        {
-            return;
-        }
+        //if (_newCharNameInput.text == string.Empty)
+        //{
+        //    return;
+        //}
 
-        GameManager.Instance.StartNewGame(_newCharNameInput.text);
+        GameManager.Instance.StartNewGame();// _newCharNameInput.text);
     }
 
     private void OnDestroy()
     {
-        _newGameButton.onClick.RemoveListener(ShowCharacterCreation);
-        _startGameFromCharCreateButton.onClick.RemoveListener(StartGameFromCharCreation);
+        _newGameButton.onClick.RemoveListener(StartGame);//ShowCharacterCreation);
+        //_startGameFromCharCreateButton.onClick.RemoveListener(StartGame);
     }
 }
