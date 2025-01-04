@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f757fd94518b7401cb0591f111a72102, type: 3}
+  m_Name: BasicAttackAbility
+  m_EditorClassIdentifier: 
+  abilityName: Attack
+  description: Swing your weapon at the enemy
+  cost: 5
+  turnsDuration: 0
+  outDmgMod: 0
+  inDmgMod: 0
+  hitMod: 0
+  dodgeMod: 0
+  apCost: 3
+  range: 1
+  armorDamageMod: 0
+  penetrationDamageMod: 0
+  rangeForExtraDamage: 0
+  extraDmgMultiplier: -1
+  attackStyle: 0

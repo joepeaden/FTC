@@ -70,13 +70,13 @@ public class EquipmentTooltip : MonoBehaviour
             {
                 switch (armorItem.viceToMod)
                 {
-                    case GameCharacter.CharVices.Greed:
+                    case GameCharacter.CharMotivators.Greed:
                         viceModLabel.text = "GRD:";
                         break;
-                    case GameCharacter.CharVices.Honor:
+                    case GameCharacter.CharMotivators.Honor:
                         viceModLabel.text = "HNR:";
                         break;
-                    case GameCharacter.CharVices.Glory:
+                    case GameCharacter.CharMotivators.Glory:
                         viceModLabel.text = "GLY:";
                         break;
                 }
@@ -97,7 +97,7 @@ public class EquipmentTooltip : MonoBehaviour
         gameObject.SetActive(true);
         headerDiv.SetActive(true);
 
-        nameText.text = action.actionName;
+        nameText.text = action.abilityName;
         descriptionText.text = action.description;
 
         for (int i = 0; i < infoParent.childCount; i++)
@@ -106,16 +106,16 @@ public class EquipmentTooltip : MonoBehaviour
         }
 
         GameObject newLine = Instantiate(infoLine, infoParent);
-        newLine.GetComponent<InfoLine>().SetData("MOT Cost", action.motCost.ToString());
+        newLine.GetComponent<InfoLine>().SetData("MOT Cost", action.cost.ToString());
         newLine = Instantiate(infoLine, infoParent);
         newLine.GetComponent<InfoLine>().SetData("AP Cost", action.apCost.ToString());
         newLine = Instantiate(infoLine, infoParent);
         newLine.GetComponent<InfoLine>().SetData("Range", action.range.ToString());
 
-        if (action.damageMod > 0)
+        if (action.outDmgMod > 0)
         {
             newLine = Instantiate(infoLine, infoParent);
-            newLine.GetComponent<InfoLine>().SetData("DMG Mod", action.damageMod.ToString());
+            newLine.GetComponent<InfoLine>().SetData("DMG Mod", action.outDmgMod.ToString());
         }
 
         if (action.armorDamageMod > 0)
@@ -130,10 +130,10 @@ public class EquipmentTooltip : MonoBehaviour
             newLine.GetComponent<InfoLine>().SetData("AMR PEN Mod", (action.penetrationDamageMod * 100).ToString() + "%");
         }
 
-        if (action.accMod > 0)
+        if (action.hitMod > 0)
         {
             newLine = Instantiate(infoLine, infoParent);
-            newLine.GetComponent<InfoLine>().SetData("ACC Mod", (action.accMod * 100).ToString() + "%");
+            newLine.GetComponent<InfoLine>().SetData("ACC Mod", (action.hitMod * 100).ToString() + "%");
         }
     }
 

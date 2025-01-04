@@ -6,7 +6,7 @@ public class GameCharacter
 {
     private const int VICE_TO_MOT_MULTIPLIER = 10;
 
-    public enum CharVices
+    public enum CharMotivators
     {
         Greed,
         Honor,
@@ -16,9 +16,9 @@ public class GameCharacter
     public string CharName => _charName;
     private string _charName;
 
-    public CharVices Vice => _vice;
-    private CharVices _vice;
-    private int _charViceValue;
+    public CharMotivators Vice => _motivator;
+    private CharMotivators _motivator;
+    private int _charMotivatorValue;
 
     public int BaseInitiative => _baseInitiative;
     private int _baseInitiative;
@@ -48,11 +48,15 @@ public class GameCharacter
     //public Sprite FaceSprite => _faceSprite;
     //private Sprite _faceSprite;
 
-    public GameCharacter(string newName, CharVices newVice, int newViceValue, bool onPlayerTeam)
+    public List<Ability> Abilities => abilities;
+    private List<Ability> abilities = new ();
+
+    public GameCharacter(string newName, CharMotivators newMotivator, int newMotivatorValue, bool onPlayerTeam)
     {
         _charName = newName;
-        _vice = newVice;
-        _charViceValue = newViceValue;
+
+        SetMotivator(newMotivator, newMotivatorValue);
+
         _baseInitiative = Random.Range(GameManager.Instance.GameCharData.minInit, GameManager.Instance.GameCharData.maxInit);
         _hitPoints = Random.Range(GameManager.Instance.GameCharData.minHP, GameManager.Instance.GameCharData.maxHP);
 
@@ -105,16 +109,16 @@ public class GameCharacter
         if (GameManager.Instance != null)
         {
             GameCharacterData data = GameManager.Instance.GameCharData;
-            _vice = (CharVices) Random.Range(0, 3);
-            _charViceValue = Random.Range(data.minVice, data.maxVice);
+
+            SetMotivator((CharMotivators)Random.Range(0, 3), Random.Range(data.minVice, data.maxVice));
 
             _baseInitiative = Random.Range(GameManager.Instance.GameCharData.minInit, GameManager.Instance.GameCharData.maxInit);
             _hitPoints = Random.Range(GameManager.Instance.GameCharData.minHP, GameManager.Instance.GameCharData.maxHP);
         }
         else
         {
-            _vice = (CharVices)Random.Range(0, 3);
-            _charViceValue = Random.Range(2, 6);
+            _motivator = (CharMotivators)Random.Range(0, 3);
+            _charMotivatorValue = Random.Range(2, 6);
 
             _baseInitiative = Random.Range(0, 5);
             _hitPoints = Random.Range(30, 100);
@@ -136,6 +140,19 @@ public class GameCharacter
         _onPlayerTeam = onPlayerTeam;
     }
 
+    private void SetMotivator(CharMotivators newMotivator, int newMotivatorValue)
+    {
+        _motivator = newMotivator;
+        _charMotivatorValue = newMotivatorValue;
+
+        switch (_motivator)
+        {
+            case CharMotivators.Honor:
+                abilities.Add(new HonorProtect());
+                break;
+        }
+    }
+
     public float GetCharHitChance()
     {
         return _weaponItem.baseAccMod;
@@ -143,7 +160,7 @@ public class GameCharacter
 
     public int GetWeaponDamageForAction(ActionData action)
     {
-        return action.damageMod + _weaponItem.baseDamage;
+        return action.outDmgMod + _weaponItem.baseDamage;
     }
 
     public int GetWeaponArmorDamageForAction(ActionData action)
@@ -159,12 +176,12 @@ public class GameCharacter
     public int GetTotalViceValue()
     {
         int equipmentViceBonus = 0;
-        if (_helmItem != null && _helmItem.viceToMod == _vice)
+        if (_helmItem != null && _helmItem.viceToMod == _motivator)
         {
             equipmentViceBonus += _helmItem.viceMod;
         }
 
-        return _charViceValue + equipmentViceBonus;
+        return _charMotivatorValue + equipmentViceBonus;
     }
 
     public int GetInitiativeWithEquipment()

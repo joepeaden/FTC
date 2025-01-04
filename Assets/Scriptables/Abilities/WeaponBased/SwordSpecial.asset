@@ -10,17 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f757fd94518b7401cb0591f111a72102, type: 3}
-  m_Name: SpearBasic
+  m_Name: SwordSpecial
   m_EditorClassIdentifier: 
-  motCost: 5
+  abilityName: Slash
+  description: Slash the enemy, hitting two tiles in a clockwise fashion.
+  cost: 15
+  turnsDuration: 0
+  outDmgMod: 0
+  inDmgMod: 0
+  hitMod: 0
+  dodgeMod: 0
   apCost: 3
-  actionName: Poke
-  description: Thrust your spear at the enemy
-  range: 2
-  damageMod: 0
+  range: 1
   armorDamageMod: 0
   penetrationDamageMod: 0
-  accMod: 0
-  rangeForExtraDamage: 2
-  extraDmgMultiplier: 1.2
-  attackStyle: 0
+  rangeForExtraDamage: 0
+  extraDmgMultiplier: -1
+  attackStyle: 1

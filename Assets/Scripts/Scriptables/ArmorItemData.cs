@@ -9,6 +9,6 @@ public class ArmorItemData : ItemData
     public int protection;
     public int moveMod;
     public int initMod;
-    public GameCharacter.CharVices viceToMod;
+    public GameCharacter.CharMotivators viceToMod;
     public int viceMod;
 }

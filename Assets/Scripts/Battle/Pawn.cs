@@ -12,9 +12,10 @@ public class Pawn : MonoBehaviour
     public const int BASE_ACTION_POINTS = 6;
     public const int MOTIVATED_MOT_REGAIN_BUFF = 15;
 
-    public UnityEvent OnPawnHit = new();
+    public UnityEvent OnHit = new();
     private static UnityEvent UpdateMotivationEvent = new();
     public UnityEvent<List<EffectData>> OnEffectUpdate = new();
+    public UnityEvent OnActivation = new();
 
     public float baseHitChance;
     public float baseDodgeChance;
@@ -77,12 +78,17 @@ public class Pawn : MonoBehaviour
     [SerializeField]
     private PawnSprite _spriteController;
 
-    public GameCharacter.CharVices CurrentVice => _gameChar.Vice;
+    public GameCharacter.CharMotivators CurrentVice => _gameChar.Vice;
 
     private bool _hasMadeFreeAttack;
 
     private bool _isMoving;
     private Vector3 _lastPosition;
+
+    // if a pawn is guarding this pawn using an ability for example then this
+    // is the reference for that guy. This is set by the HonorProtect class when
+    // the ability is used.
+    public Pawn ProtectingPawn { get; set; }
 
     #region UnityEvents
 
@@ -142,7 +148,7 @@ public class Pawn : MonoBehaviour
 
     public int GetMTAfterAction(ActionData theAction)
     {
-        return Motivation - theAction.motCost;
+        return Motivation - theAction.cost;
     }
 
     public int GetAPAfterMove(Tile targetTile)
@@ -259,24 +265,24 @@ public class Pawn : MonoBehaviour
         float surroundHitBonus = (surroundingAllies - 1) * .05f;
 
         // greedy passive is increased hit bonus when surround
-        if (GameChar.Vice == GameCharacter.CharVices.Greed && _isMotivated)
+        if (GameChar.Vice == GameCharacter.CharMotivators.Greed && _isMotivated)
         {
             motivationHitBonus = surroundHitBonus;
         }
 
         // honor passive is big bonus to hit
-        if (GameChar.Vice == GameCharacter.CharVices.Honor && _isMotivated)
+        if (GameChar.Vice == GameCharacter.CharMotivators.Honor && _isMotivated)
         {
             motivationHitBonus = +.2f;
         }
 
         // honor passive is better dodge in 1v1
-        if (targetPawn.GameChar.Vice == GameCharacter.CharVices.Honor && targetPawn._isMotivated)
+        if (targetPawn.GameChar.Vice == GameCharacter.CharMotivators.Honor && targetPawn._isMotivated)
         {
             motivationHitBonus = -.2f;
         }
 
-        float hitChance = baseHitChance + motivationHitBonus + surroundHitBonus + GameChar.GetCharHitChance() + (BattleManager.Instance.CurrentAction != null ? BattleManager.Instance.CurrentAction.accMod : 0);
+        float hitChance = baseHitChance + motivationHitBonus + surroundHitBonus + GameChar.GetCharHitChance() + (BattleManager.Instance.CurrentAction != null ? BattleManager.Instance.CurrentAction.hitMod : 0);
         return hitChance;
     }
 
@@ -307,7 +313,7 @@ public class Pawn : MonoBehaviour
         }
 
 
-        if (_actionPoints < currentAction.apCost || _motivation < currentAction.motCost)
+        if (_actionPoints < currentAction.apCost || _motivation < currentAction.cost)
         {
             BattleManager.Instance.PawnActivated(this);
             return;
@@ -330,14 +336,14 @@ public class Pawn : MonoBehaviour
             AttackPawn(targetPawn, currentAction);
         }
 
-        if (GameChar.Vice == GameCharacter.CharVices.Glory && _isMotivated && !_hasMadeFreeAttack)
+        if (GameChar.Vice == GameCharacter.CharMotivators.Glory && _isMotivated && !_hasMadeFreeAttack)
         {
             _hasMadeFreeAttack = true;
         }
         else
         {
             _actionPoints -= currentAction.apCost;
-            _motivation -= currentAction.motCost;
+            _motivation -= currentAction.cost;
         }
 
         BattleManager.Instance.PawnActivated(this);
@@ -354,6 +360,12 @@ public class Pawn : MonoBehaviour
 
     private void AttackPawn(Pawn targetPawn, ActionData currentAction)
     {
+        // if this pawn has a protector, try to hit that one instead
+        if (targetPawn.ProtectingPawn != null)
+        {
+            targetPawn = ProtectingPawn;
+        }
+
         float hitChance = GetHitChance(targetPawn);
         float hitRoll = Random.Range(0f, 1f);
 
@@ -441,7 +453,7 @@ public class Pawn : MonoBehaviour
 
         _spriteController.HandleHit(_isDead, armorHit, armorHit && _armorPoints <= 0);
 
-        OnPawnHit.Invoke();
+        OnHit.Invoke();
     }
 
     private void Die()
@@ -480,7 +492,7 @@ public class Pawn : MonoBehaviour
     {
         if (theAction != null)
         {
-            if (_actionPoints >= theAction.apCost && _motivation >= theAction.motCost)
+            if (_actionPoints >= theAction.apCost && _motivation >= theAction.cost)
             {
                 return true;
             }
@@ -492,8 +504,8 @@ public class Pawn : MonoBehaviour
         else
         {
             // can still make an attack
-            if ((_actionPoints >= GameChar.WeaponItem.baseAction.apCost && _motivation >= GameChar.WeaponItem.baseAction.motCost)
-                || (GameChar.WeaponItem.specialAction != null && _actionPoints >= GameChar.WeaponItem.specialAction.apCost && _motivation >= GameChar.WeaponItem.specialAction.motCost))
+            if ((_actionPoints >= GameChar.WeaponItem.baseAction.apCost && _motivation >= GameChar.WeaponItem.baseAction.cost)
+                || (GameChar.WeaponItem.specialAction != null && _actionPoints >= GameChar.WeaponItem.specialAction.apCost && _motivation >= GameChar.WeaponItem.specialAction.cost))
             {
                 return true;
             }
@@ -530,6 +542,8 @@ public class Pawn : MonoBehaviour
         //_audioSource.Play();
         _spriteController.HandleTurnBegin();
         _actionPoints = BASE_ACTION_POINTS;
+
+        OnActivation.Invoke();
     }
 
     #region Movement
@@ -636,7 +650,7 @@ public class Pawn : MonoBehaviour
 
     public int GetInitBuff()
     {
-        if (GameChar.Vice == GameCharacter.CharVices.Glory && _isMotivated)
+        if (GameChar.Vice == GameCharacter.CharMotivators.Glory && _isMotivated)
         {
             return 100;
         }
@@ -705,17 +719,17 @@ public class Pawn : MonoBehaviour
 
             switch (GameChar.Vice)
             {
-                case GameCharacter.CharVices.Honor:
+                case GameCharacter.CharMotivators.Honor:
                     _isMotivated = in1v1;
                     effectGained = honorEffect;
                     break;
 
-                case GameCharacter.CharVices.Glory:
+                case GameCharacter.CharMotivators.Glory:
                     _isMotivated = isGangedUpOn;
                     effectGained = gloryEffect;
                     break;
 
-                case GameCharacter.CharVices.Greed:
+                case GameCharacter.CharMotivators.Greed:
                     _isMotivated = isGangingUp;
                     effectGained = greedEffect;
                     break;

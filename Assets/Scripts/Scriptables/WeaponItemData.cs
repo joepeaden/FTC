@@ -4,6 +4,15 @@ using System.Collections.Generic;
 [CreateAssetMenu(fileName = "WeaponItemData", menuName = "MyScriptables/WeaponItemData")]
 public class WeaponItemData : ItemData
 {
+    public enum WeaponType
+    {
+        Club,
+        Sword,
+        Spear,
+        Axe
+    }
+
+    public WeaponType weaponType;
     public int baseDamage;
     public float baseArmorDamage;
     public float basePenetrationDamage;

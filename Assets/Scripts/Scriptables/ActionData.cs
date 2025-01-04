@@ -2,7 +2,7 @@
 using System.Collections;
 
 [CreateAssetMenu(fileName = "ActionData", menuName = "MyScriptables/ActionData")]
-public class ActionData : ScriptableObject
+public class ActionData : AbilityData
 {
     public enum AttackStyle
     {
@@ -10,16 +10,14 @@ public class ActionData : ScriptableObject
         LShape
     }
 
-    public int motCost;
     public int apCost;
-    public string actionName;
-    public string description;
     public int range;
-    public int damageMod;
     public float armorDamageMod;
     public float penetrationDamageMod;
-    public float accMod;
     public int rangeForExtraDamage;
+    /// <summary>
+    /// -1 for no damage
+    /// </summary>
     public float extraDmgMultiplier = -1f;
     public AttackStyle attackStyle;
 }

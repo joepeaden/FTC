@@ -366,13 +366,16 @@ public class BattleManager : MonoBehaviour
 
             actionButton1.SetSelected(false);
             actionButton2.SetSelected(false);
+            actionButton3.SetSelected(false);
 
             actionButton1.gameObject.SetActive(p.OnPlayerTeam);
             actionButton2.gameObject.SetActive(p.OnPlayerTeam);
+            actionButton3.gameObject.SetActive(p.OnPlayerTeam);
 
+            // this needs to be cleaned up
             if (p.OnPlayerTeam)
             {
-                if (actionButton1.Action != p.GameChar.WeaponItem.baseAction)
+                if (actionButton1.TheAbility != p.GameChar.WeaponItem.baseAction)
                 {
                     actionButton1.SetDataButton(p.GameChar.WeaponItem.baseAction, HandleActionClicked, KeyCode.Alpha1);
                 }
@@ -384,7 +387,7 @@ public class BattleManager : MonoBehaviour
                         actionButton2.gameObject.SetActive(true);
                     }
 
-                    if (actionButton2.Action != p.GameChar.WeaponItem.specialAction)
+                    if (actionButton2.TheAbility != p.GameChar.WeaponItem.specialAction)
                     {
                         actionButton2.SetDataButton(p.GameChar.WeaponItem.specialAction, HandleActionClicked, KeyCode.Alpha2);
                     }
@@ -395,6 +398,12 @@ public class BattleManager : MonoBehaviour
                     {
                         actionButton2.gameObject.SetActive(false);
                     }
+                }
+
+                if (p.GameChar.Abilities.Count > 0)
+                {
+                    actionButton3.gameObject.SetActive(true);
+                    //actionButton3.SetDataButton(p.GameChar.Abilities[0]);
                 }
             }
 

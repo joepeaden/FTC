@@ -10,17 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f757fd94518b7401cb0591f111a72102, type: 3}
-  m_Name: SpearSpecial
+  m_Name: SpearBasic
   m_EditorClassIdentifier: 
-  motCost: 15
+  abilityName: Thrust
+  description: Thrust your spear at the enemy
+  cost: 5
+  turnsDuration: 0
+  outDmgMod: 0
+  inDmgMod: 0
+  hitMod: 0
+  dodgeMod: 0
   apCost: 3
-  actionName: Jab
-  description: Take an aimed strike at your enemy's weakpoints
   range: 2
-  damageMod: 0
   armorDamageMod: 0
-  penetrationDamageMod: 0.2
-  accMod: 0.3
+  penetrationDamageMod: 0
   rangeForExtraDamage: 2
   extraDmgMultiplier: 1.2
   attackStyle: 0

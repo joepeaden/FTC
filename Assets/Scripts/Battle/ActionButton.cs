@@ -14,8 +14,8 @@ public class ActionButton : MonoBehaviour
     private Image image;
 
     private Button _button;
-    public ActionData Action => _action;
-    private ActionData _action;
+    public ActionData TheAbility => _ability;
+    private ActionData _ability;
     private UnityAction<ActionData> _callback;
 
     private KeyCode _hotKey;
@@ -63,7 +63,7 @@ public class ActionButton : MonoBehaviour
 
     private void UpdateInteractivity()
     {
-        _button.interactable = BattleManager.Instance.CurrentPawn.HasResourcesForAction(_action);
+        _button.interactable = BattleManager.Instance.CurrentPawn.HasResourcesForAction(_ability);
 
         // don't look disabled in display mode.
         if (!_isButtonMode)
@@ -121,8 +121,8 @@ public class ActionButton : MonoBehaviour
     /// </summary>
     public void SetDataDisplay(ActionData action)
     {
-        _action = action;
-        displayText.text = action.actionName;
+        _ability = action;
+        displayText.text = action.abilityName;
     }
 
     private void HandleClick()
@@ -131,7 +131,7 @@ public class ActionButton : MonoBehaviour
 
         if (_isSelected)
         {
-            _callback(_action);
+            _callback(_ability);
             image.sprite = selectedImage;
         }
         else

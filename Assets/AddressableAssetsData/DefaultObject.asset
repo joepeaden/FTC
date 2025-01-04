@@ -9,14 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f757fd94518b7401cb0591f111a72102, type: 3}
-  m_Name: BasicAttack
+  m_Script: {fileID: 11500000, guid: 3a189bb168d8d90478a09ea08c2f3d72, type: 3}
+  m_Name: DefaultObject
   m_EditorClassIdentifier: 
-  motCost: 5
-  apCost: 3
-  actionName: Attack
-  description: Swing your weapon at the enemy
-  range: 1
-  damage: 1
-  armorDamage: 1
-  penetrationDamage: 1
+  m_AddressableAssetSettingsGuid: 7c8bf46af66d94c95b7860930c29ad14

@@ -10,17 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f757fd94518b7401cb0591f111a72102, type: 3}
-  m_Name: SwordBasic
+  m_Name: AxeSpecial
   m_EditorClassIdentifier: 
-  motCost: 5
-  apCost: 2
-  actionName: Stab
-  description: Strike the foe in a thrusting motion
+  abilityName: Brutal Chop
+  description: Attempt to slice your enemy from head to toe
+  cost: 25
+  turnsDuration: 0
+  outDmgMod: 20
+  inDmgMod: 0
+  hitMod: 0
+  dodgeMod: 0
+  apCost: 3
   range: 1
-  damageMod: 0
   armorDamageMod: 0
   penetrationDamageMod: 0
-  accMod: 0
   rangeForExtraDamage: 0
   extraDmgMultiplier: -1
   attackStyle: 0

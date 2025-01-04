@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc4f5e71cefc44923b07139785490d85, type: 3}
+  m_Name: HonorProtect
+  m_EditorClassIdentifier: 
+  abilityName: Oath of Loyalty
+  description: Any attacks directed at a selected ally will be directed at this character
+    instead.
+  cost: 1
+  turnsDuration: 1
+  outdmgMod: 0
+  inDmgMod: 0
+  hitMod: 0
+  dodgeMod: 0

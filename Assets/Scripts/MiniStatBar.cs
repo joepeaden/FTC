@@ -42,7 +42,7 @@ public class MiniStatBar : MonoBehaviour
 
     private void OnDestroy()
     {
-        _pawn.OnPawnHit.RemoveListener(UpdateBars);
+        _pawn.OnHit.RemoveListener(UpdateBars);
         _pawn.OnEffectUpdate.RemoveListener(UpdateEffects);
     }
 
@@ -89,7 +89,7 @@ public class MiniStatBar : MonoBehaviour
 
         //_classIcon.material.SetColor("_InnerOutlineColor", _classIcon.color);
 
-        p.OnPawnHit.AddListener(UpdateBars);
+        p.OnHit.AddListener(UpdateBars);
         p.OnEffectUpdate.AddListener(UpdateEffects);
     }
 
