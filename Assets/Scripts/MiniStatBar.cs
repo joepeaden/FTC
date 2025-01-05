@@ -113,24 +113,6 @@ public class MiniStatBar : MonoBehaviour
         _hpBar.SetBar(_pawn.MaxHitPoints, _pawn.HitPoints);
     }
 
-    private IEnumerator UpdateShineLocation()
-    {
-        float currentValue = 0f;
-        while (_pawn.IsMotivated)
-        {
-            currentValue += .01f;
-            _classIcon.material.SetFloat("_ShineLocation", currentValue);
-
-            if (currentValue >= 1f)
-            {
-                yield return new WaitForSeconds(1f);
-                currentValue = 0f;
-            }
-
-            yield return null;
-        }
-    }
-
     private void UpdateEffects(List<EffectData> effects)
     {
         for (int i = 0; i < _effectIconParent.childCount; i++)

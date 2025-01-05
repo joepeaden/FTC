@@ -24,7 +24,7 @@ public class CharacterTooltip : MonoBehaviour
         _tooltip.SetActive(true);
         hitChanceUI.SetActive(false);
         characterNameText.text = p.GameChar.CharName;
-        characterMotivatorText.text = p.CurrentVice.ToString();
+        characterMotivatorText.text = p.CurrentMotivator.ToString();
         armorBar.SetBar(p.MaxArmorPoints, p.ArmorPoints);
         healthBar.SetBar(p.MaxHitPoints, p.HitPoints);
         apBar.SetBar(Pawn.BASE_ACTION_POINTS, p.ActionPoints);

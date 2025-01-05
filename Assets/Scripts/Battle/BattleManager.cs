@@ -322,7 +322,7 @@ public class BattleManager : MonoBehaviour
         {
             bottomUIObjects.SetActive(true);
             characterNameText.text = p.GameChar.CharName;
-            characterMotivatorText.text = p.CurrentVice.ToString();
+            characterMotivatorText.text = p.CurrentMotivator.ToString();
             armorText.text = "AR: " + p.ArmorPoints + "/" + p.MaxArmorPoints;
             armorBar.SetBar(p.MaxArmorPoints, p.ArmorPoints);
             healthText.text = "HP: " + p.HitPoints + "/" + p.MaxHitPoints;

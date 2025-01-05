@@ -14,7 +14,6 @@ public class Pawn : MonoBehaviour
 
     public UnityEvent OnMoved = new();
     public UnityEvent OnHit = new();
-    private static UnityEvent UpdateMotivationEvent = new();
     public UnityEvent<List<EffectData>> OnEffectUpdate = new();
     public UnityEvent OnActivation = new();
 
@@ -43,15 +42,12 @@ public class Pawn : MonoBehaviour
     public int MaxMotivation => GameChar.GetBattleMotivationCap();
     public int Motivation;
 
-    public int Initiative => GetInit() + GetInitBuff();
+    public int Initiative => GetInit();
 
     public bool IsDead => _isDead;
     private bool _isDead;
 
     public bool EngagedInCombat => GetAdjacentEnemies().Count > 0;
-
-    public bool IsMotivated => _isMotivated;
-    private bool _isMotivated;
 
     #region Buffs / Debuffs
     // outgoing and incoming damage multipliers
@@ -67,15 +63,8 @@ public class Pawn : MonoBehaviour
     [SerializeField] private AudioClip hitSound;
     [SerializeField] private AudioClip armorHitSound;
     [SerializeField] private AudioClip dieSound;
-    [SerializeField] private AudioClip greedViceSound;
-    [SerializeField] private AudioClip gloryViceSound;
-    [SerializeField] private AudioClip honorViceSound;
     [SerializeField] private AudioSource _audioSource;
 
-    [Header("Character Effects")]
-    [SerializeField] private EffectData honorEffect;
-    [SerializeField] private EffectData greedEffect;
-    [SerializeField] private EffectData gloryEffect;
     public List<EffectData> CurrentEffects => currentEffects;
     private List<EffectData> currentEffects = new();
 
@@ -85,9 +74,7 @@ public class Pawn : MonoBehaviour
     [SerializeField]
     private PawnSprite _spriteController;
 
-    public GameCharacter.CharMotivators CurrentVice => _gameChar.Vice;
-
-    public bool HasMadeFreeAttack;
+    public GameCharacter.CharMotivators CurrentMotivator => _gameChar.Motivator;
 
     private bool _isMoving;
     private Vector3 _lastPosition;
@@ -102,8 +89,6 @@ public class Pawn : MonoBehaviour
     private void Awake()
     {
         pathfinder.OnDestinationReached.AddListener(HandleDestinationReached);
-        
-        UpdateMotivationEvent.AddListener(UpdateMotivatedStatus);
     }
 
     private void Start()
@@ -115,7 +100,6 @@ public class Pawn : MonoBehaviour
     private void OnDestroy()
     {
         pathfinder.OnDestinationReached.RemoveListener(HandleDestinationReached);
-        UpdateMotivationEvent.RemoveListener(UpdateMotivatedStatus);
     }
 
     private void Update()
@@ -138,9 +122,6 @@ public class Pawn : MonoBehaviour
 
         Motivation = GameChar.GetBattleMotivationCap();
         ActionPoints = BASE_ACTION_POINTS;
-
-
-        //_anim.SetInteger("Vice", (int)_gameChar.Vice);
     }
 
     public void SetTeam(bool onPlayerTeam)
@@ -177,20 +158,9 @@ public class Pawn : MonoBehaviour
         return Mathf.Max(ActionPoints - (tileDist * _gameChar.GetAPPerTileMoved()), -1);
     }
 
-    //public Sprite GetFaceSprite()
-    //{
-        // later, can return more than just a single sprite. For example wounds, current equipment, headgear,
-        // hair, etc. I'm not sure how that will work.
-
-        //if (GameChar.FaceSprite == null)
-        //{
-        //return _headSpriteRend.sprite;
-        //}
-    //}
-
     private void UpdateMotivationResource()
     {
-        Motivation = Mathf.Clamp(Motivation + MOT_REGAIN_RATE + (_isMotivated ? MOTIVATED_MOT_REGAIN_BUFF : 0), Motivation, GameChar.GetBattleMotivationCap());
+        Motivation = Mathf.Clamp(Motivation + MOT_REGAIN_RATE, Motivation, GameChar.GetBattleMotivationCap());
     }
 
     private void PickStartTile()
@@ -250,53 +220,14 @@ public class Pawn : MonoBehaviour
 
     public float GetHitChance(Pawn targetPawn)
     {
-        float motivationHitBonus = 0f;
-        //switch (_motivation)
-        //{
-        //    case 1:
-        //        motivationHitBonus = -0.1f;
-        //        break;
-        //    case 2:
-        //        motivationHitBonus = -0.05f;
-        //        break;
-        //    case 3:
-        //        motivationHitBonus = 0f;
-        //        break;
-        //    case 4:
-        //        motivationHitBonus = 0.05f;
-        //        break;
-        //    case 5:
-        //        motivationHitBonus = 0.1f;
-        //        break;
-        //    case 6:
-        //        motivationHitBonus = 0.15f;
-        //        break;
-        //}
-
         int surroundingAllies = targetPawn.GetAdjacentEnemies().Count;
 
         // don't wanna include yourself so - 1
-        float surroundHitBonus = (surroundingAllies - 1) * .05f;
+        float surroundHitMod = (surroundingAllies - 1) * .05f;
 
-        // greedy passive is increased hit bonus when surround
-        if (GameChar.Vice == GameCharacter.CharMotivators.Greed && _isMotivated)
-        {
-            motivationHitBonus = surroundHitBonus;
-        }
-
-        // honor passive is big bonus to hit
-        //if (GameChar.Vice == GameCharacter.CharMotivators.Honor && _isMotivated)
-        //{
-            motivationHitBonus = HitMod;
-        //}
-
-        // honor passive is better dodge in 1v1
-        //if (targetPawn.GameChar.Vice == GameCharacter.CharMotivators.Honor && targetPawn._isMotivated)
-        //{
-            motivationHitBonus = -targetPawn.DodgeMod;
-        //}
-
-        float hitChance = baseHitChance + motivationHitBonus + surroundHitBonus + GameChar.TheWeapon.Data.baseAccMod + (Ability.SelectedAbility != null ? Ability.SelectedAbility.GetData().hitMod : 0);
+        float abilityHitMod = HitMod - targetPawn.DodgeMod;
+        
+        float hitChance = baseHitChance + abilityHitMod + surroundHitMod + GameChar.TheWeapon.Data.baseAccMod + (Ability.SelectedAbility != null ? Ability.SelectedAbility.GetData().hitMod : 0);
         return hitChance;
     }
 
@@ -326,8 +257,6 @@ public class Pawn : MonoBehaviour
 
     public void HandleTurnEnded()
     {
-        HasMadeFreeAttack = false;
-
         _spriteController.HandleTurnEnd();
     }
 
@@ -442,7 +371,6 @@ public class Pawn : MonoBehaviour
 
         _isDead = true;
 
-        UpdateMotivationEvent.Invoke();
         CurrentTile.PawnExitTile();
         BattleManager.Instance.PawnKilled(this);
     }
@@ -540,8 +468,6 @@ public class Pawn : MonoBehaviour
     {
         UpdateMotivationResource();
 
-        //_audioSource.clip = greedViceSound;
-        //_audioSource.Play();
         _spriteController.HandleTurnBegin();
         ActionPoints = BASE_ACTION_POINTS;
 
@@ -608,8 +534,6 @@ public class Pawn : MonoBehaviour
         _spriteController.StopMoving();
         UpdateSpriteOnStop(true);
 
-        UpdateMotivationEvent.Invoke();
-
         BattleManager.Instance.PawnActivated(this);
 
         OnMoved.Invoke();
@@ -655,125 +579,6 @@ public class Pawn : MonoBehaviour
         int helmInit = ArmorPoints > 0 ? GameChar.HelmItem.initMod : 0;
 
         return baseInit + helmInit;
-    }
-
-    public int GetInitBuff()
-    {
-        if (GameChar.Vice == GameCharacter.CharMotivators.Glory && _isMotivated)
-        {
-            return 100;
-        }
-        else
-        {
-            return 0;
-        }
-    }
-
-    public void UpdateMotivatedStatus()
-    {
-        if (IsDead)
-        {
-            _isMotivated = false;
-            return;
-        }
-
-        //currentEffects.Clear();
-
-        bool wasInMotCondition = _isMotivated;
-
-        // get adjacent enemy pawns at that tile
-        List<Pawn> adjEnemyPawns = GetAdjacentEnemies();
-
-        EffectData effectGained = null;
-
-        // if there's no one adjacent, then just lose condition (all conditions
-        // are enemy adjacency based)
-        if (adjEnemyPawns.Count == 0)
-        {
-            _isMotivated = false;
-        }
-        else
-        {
-            bool in1v1 = false;
-            bool isGangedUpOn = false;
-            bool isGangingUp = false;
-
-            // only facing one enemy
-            if (adjEnemyPawns.Count == 1)
-            {
-                in1v1 = adjEnemyPawns[0].GetAdjacentEnemies().Count == 1;
-            }
-            else
-            {
-                isGangedUpOn = true;
-            }
-
-            foreach (Pawn p in adjEnemyPawns)
-            {
-                if (_currentTile == CurrentTile)
-                {
-                    if (p.GetAdjacentEnemies().Count > 1)
-                    {
-                        isGangingUp = true;
-                    }
-                }
-                else
-                {
-                    if (p.GetAdjacentEnemies().Count > 0)
-                    {
-                        isGangingUp = true;
-                    }
-                }
-            }
-
-            switch (GameChar.Vice)
-            {
-                case GameCharacter.CharMotivators.Honor:
-                    _isMotivated = in1v1;
-                    effectGained = honorEffect;
-                    break;
-
-                case GameCharacter.CharMotivators.Glory:
-                    _isMotivated = isGangedUpOn;
-                    effectGained = gloryEffect;
-                    break;
-
-                case GameCharacter.CharMotivators.Greed:
-                    _isMotivated = isGangingUp;
-                    effectGained = greedEffect;
-                    break;
-
-                default:
-                    effectGained = honorEffect;
-                    Debug.LogWarning("Unhandled vice in effect gained!");
-                    break;
-            }
-
-            if (_isMotivated && !wasInMotCondition)
-            {
-                //_audioSource.clip = greedViceSound;
-                //_audioSource.Play();
-
-                //_anim.Play("MotivatedGain");
-                //_anim.SetBool("IsMotivated", true);
-
-                BattleManager.Instance.AddTextNotification(transform.position, "+ " + effectGained.effectName);
-            }
-            else if (!_isMotivated && wasInMotCondition)
-            {
-                //_anim.Play("MotivatedLoss");
-                //_anim.SetBool("IsMotivated", false);
-
-                BattleManager.Instance.AddTextNotification(transform.position, "- " + effectGained.effectName);
-            }
-        }
-
-        //if (IsMotivated)
-        //{
-        //    currentEffects.Add(effectGained);
-        //}
-
-        //OnEffectUpdate.Invoke(currentEffects);
     }
 
     #endregion

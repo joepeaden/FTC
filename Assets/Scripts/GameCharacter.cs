@@ -17,7 +17,7 @@ public class GameCharacter
     public string CharName => _charName;
     private string _charName;
 
-    public CharMotivators Vice => _motivator;
+    public CharMotivators Motivator => _motivator;
     private CharMotivators _motivator;
     private int _charMotivatorValue;
 

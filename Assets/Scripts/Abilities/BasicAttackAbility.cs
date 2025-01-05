@@ -24,15 +24,8 @@ public class BasicAttackAbility : Ability
 
         activatedPawn.AttackPawn(targetPawn, attackAction);
 
-        if (activatedPawn.GameChar.Vice == GameCharacter.CharMotivators.Glory && activatedPawn.IsMotivated && !activatedPawn.HasMadeFreeAttack)
-        {
-            activatedPawn.HasMadeFreeAttack = true;
-        }
-        else
-        {
-            activatedPawn.ActionPoints -= attackAction.apCost;
-            activatedPawn.Motivation -= attackAction.cost;
-        }
+        activatedPawn.ActionPoints -= attackAction.apCost;
+        activatedPawn.Motivation -= attackAction.cost;
 
         BattleManager.Instance.PawnActivated(activatedPawn);
 

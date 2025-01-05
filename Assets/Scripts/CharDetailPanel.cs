@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class CharDetailPanel : MonoBehaviour
 {
@@ -15,8 +16,7 @@ public class CharDetailPanel : MonoBehaviour
     private DecisionsManager _decisions;
     [SerializeField] private ItemUI _helmUI;
     [SerializeField] private ItemUI _weaponUI;
-    [SerializeField] private Transform _actionsParent;
-    [SerializeField] private GameObject _actionsButtonPrefab;
+    [SerializeField] private List<ActionButton> _actionButtons = new();
 
     public void Setup(DecisionsManager decisions)
     {
@@ -28,7 +28,7 @@ public class CharDetailPanel : MonoBehaviour
         _currentCharacter = character;
         _charName.text = _currentCharacter.CharName;
         _healthText.text = _currentCharacter.HitPoints.ToString();
-        _viceText.text = _currentCharacter.Vice.ToString() + " (" + _currentCharacter.GetTotalViceValue().ToString() + ")";
+        _viceText.text = _currentCharacter.Motivator.ToString() + " (" + _currentCharacter.GetTotalViceValue().ToString() + ")";
         _motivText.text = _currentCharacter.GetBattleMotivationCap().ToString();
         _moveText.text = _currentCharacter.GetMoveRange().ToString();
         _initText.text = _currentCharacter.GetInitiativeWithEquipment().ToString();
@@ -54,18 +54,30 @@ public class CharDetailPanel : MonoBehaviour
             _weaponUI.Hide();
         }
 
-        for (int i = 0; i < _actionsParent.childCount; i++)
+        List<Ability> pawnAbilities = character.GetAbilities();
+        // there's currently only 4 ability buttons - will need to address that at some point,
+        // could cause problems.
+        int i = 0;
+        for (; i < pawnAbilities.Count; i++)
         {
-            Destroy(_actionsParent.GetChild(i).gameObject);
+            ActionButton actionButton = _actionButtons[i];
+
+            actionButton.SetSelected(false);
+            actionButton.gameObject.SetActive(true);
+
+            if (actionButton.TheAbility != pawnAbilities[i])
+            {
+                actionButton.SetDataDisplay(pawnAbilities[i]);
+            }
         }
 
-        //GameObject actionButtonGO = Instantiate(_actionsButtonPrefab, _actionsParent);
-        //actionButtonGO.GetComponent<ActionButton>().SetDataDisplay(character.TheWeapon.baseAction);
-        //if (character.TheWeapon.specialAction != null)
-        //{
-        //    actionButtonGO = Instantiate(_actionsButtonPrefab, _actionsParent);
-        //    actionButtonGO.GetComponent<ActionButton>().SetDataDisplay(character.TheWeapon.specialAction);
-        //}
+        // update the remaining buttons
+        for (; i < _actionButtons.Count; i++)
+        {
+            ActionButton actionButton = _actionButtons[i];
+            actionButton.SetSelected(false);
+            actionButton.gameObject.SetActive(false);
+        }
     }
 
     public void UnEquipItem(ItemUI itemUI)

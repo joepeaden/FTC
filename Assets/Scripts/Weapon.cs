@@ -12,8 +12,7 @@ public class Weapon
     public void SetData(WeaponItemData data)
     {
         _data = data;
-
-
+        _abilities.Clear();
 
         switch (data.weaponType)
         {

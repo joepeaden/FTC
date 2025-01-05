@@ -75,14 +75,4 @@ public class Ability
         aSource.clip = GetData().soundEffect;
         aSource.Play();
     }
-
-    /// <summary>
-    /// Needs to be called to release addressable data
-    /// Although I'm not sure when this actually is necessary...
-    /// only loading one instance of each scriptable...
-    /// </summary>
-    public void ReleaseDataReferences()
-    {
-        Addressables.Release(data[dataAddress]);
-    }
 }

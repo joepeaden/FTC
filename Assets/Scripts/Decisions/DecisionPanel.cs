@@ -55,7 +55,7 @@ public class DecisionPanel : MonoBehaviour
 
         _titleText.text = _recruit.CharName;
 
-        switch (_recruit.Vice)
+        switch (_recruit.Motivator)
         {
             case GameCharacter.CharMotivators.Greed:
                 _descriptionText.text = _recruit.CharName + " desires wealth and posessions above all other things.";

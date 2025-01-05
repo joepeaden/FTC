@@ -115,7 +115,7 @@ public class ActionButton : MonoBehaviour
                 break;
         }
 
-        hotKeyText.text = $"({GetKeyCodeDisplay(_hotkey)})";
+        hotKeyText.text = $"{GetKeyCodeDisplay(_hotkey)}";
 
         _callback = callback;
     }
