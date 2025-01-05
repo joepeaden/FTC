@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5198506769472283116}
   - component: {fileID: 1138299951920563462}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: Name
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -147,7 +147,7 @@ GameObject:
   - component: {fileID: 5781575445629955705}
   - component: {fileID: 2166264780722066597}
   m_Layer: 5
-  m_Name: Text (TMP) (1)
+  m_Name: Hotkey
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -342,8 +342,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 2707057d6fe99f24bb639c9e9d626032, type: 3}
-  m_Type: 0
+  m_Sprite: {fileID: 21300000, guid: afeb964f5f55ff54aab1717301202ee1, type: 3}
+  m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 0
   m_FillMethod: 4
@@ -425,14 +425,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 7439296077731324450}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 39e910fe078e543f88883005ac6344c8, type: 3}
+  m_Script: {fileID: 11500000, guid: 1db1e28e2bbf843ebb6201dd4b137aea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   displayText: {fileID: 1138299951920563462}
   hotKeyText: {fileID: 2166264780722066597}
   image: {fileID: 6243008292962265407}
-  defaultImage: {fileID: 21300000, guid: 2707057d6fe99f24bb639c9e9d626032, type: 3}
-  selectedImage: {fileID: 21300000, guid: e0d82bf37db7fc44b9278eed9cb5661b, type: 3}
+  defaultImage: {fileID: 21300000, guid: afeb964f5f55ff54aab1717301202ee1, type: 3}
+  selectedImage: {fileID: 21300000, guid: afeb964f5f55ff54aab1717301202ee1, type: 3}
 --- !u!114 &8232279706183565418
 MonoBehaviour:
   m_ObjectHideFlags: 0

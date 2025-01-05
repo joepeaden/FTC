@@ -84,12 +84,15 @@ public class EquipmentTooltip : MonoBehaviour
         }
     }
 
-    public void SetAction(ActionData action)
+    public void SetAction(AbilityData ability)
     {
-        if (action == null)
+        if (ability == null)
         {
             return;
         }
+
+        // eventually I gotta remove all this ActionData crap. But I don't have time to rework even more right now.
+        ActionData action = ability as ActionData;
 
         armorElements.SetActive(false);
         weaponElements.SetActive(false);
@@ -97,8 +100,8 @@ public class EquipmentTooltip : MonoBehaviour
         gameObject.SetActive(true);
         headerDiv.SetActive(true);
 
-        nameText.text = action.abilityName;
-        descriptionText.text = action.description;
+        nameText.text = ability.abilityName;
+        descriptionText.text = ability.description;
 
         for (int i = 0; i < infoParent.childCount; i++)
         {
@@ -106,34 +109,51 @@ public class EquipmentTooltip : MonoBehaviour
         }
 
         GameObject newLine = Instantiate(infoLine, infoParent);
-        newLine.GetComponent<InfoLine>().SetData("MOT Cost", action.cost.ToString());
-        newLine = Instantiate(infoLine, infoParent);
-        newLine.GetComponent<InfoLine>().SetData("AP Cost", action.apCost.ToString());
-        newLine = Instantiate(infoLine, infoParent);
-        newLine.GetComponent<InfoLine>().SetData("Range", action.range.ToString());
+        newLine.GetComponent<InfoLine>().SetData("MOT Cost", ability.cost.ToString());
 
-        if (action.outDmgMod > 0)
+        if (action)
         {
             newLine = Instantiate(infoLine, infoParent);
-            newLine.GetComponent<InfoLine>().SetData("DMG Mod", action.outDmgMod.ToString());
+            newLine.GetComponent<InfoLine>().SetData("AP Cost", action.apCost.ToString());
         }
 
-        if (action.armorDamageMod > 0)
+        newLine = Instantiate(infoLine, infoParent);
+        newLine.GetComponent<InfoLine>().SetData("Range", ability.range.ToString());
+
+        if (ability.outDmgMod > 0)
+        {
+            newLine = Instantiate(infoLine, infoParent);
+            newLine.GetComponent<InfoLine>().SetData("DMG Inflicted Mod", ability.outDmgMod.ToString());
+        }
+
+        if (ability.inDmgMod > 0)
+        {
+            newLine = Instantiate(infoLine, infoParent);
+            newLine.GetComponent<InfoLine>().SetData("DMG Taken Mod", ability.inDmgMod.ToString());
+        }
+
+        if (action != null && action.armorDamageMod > 0)
         {
             newLine = Instantiate(infoLine, infoParent);
             newLine.GetComponent<InfoLine>().SetData("AMR DMG Mod", (action.armorDamageMod * 100).ToString() + "%");
         }
 
-        if (action.penetrationDamageMod > 0)
+        if (action != null && action.penetrationDamageMod > 0)
         {
             newLine = Instantiate(infoLine, infoParent);
             newLine.GetComponent<InfoLine>().SetData("AMR PEN Mod", (action.penetrationDamageMod * 100).ToString() + "%");
         }
 
-        if (action.hitMod > 0)
+        if (ability.hitMod > 0)
         {
             newLine = Instantiate(infoLine, infoParent);
-            newLine.GetComponent<InfoLine>().SetData("ACC Mod", (action.hitMod * 100).ToString() + "%");
+            newLine.GetComponent<InfoLine>().SetData("Hit Mod", (ability.hitMod * 100).ToString() + "%");
+        }
+
+        if (ability.dodgeMod > 0)
+        {
+            newLine = Instantiate(infoLine, infoParent);
+            newLine.GetComponent<InfoLine>().SetData("Dodge Mod", (ability.dodgeMod * 100).ToString() + "%");
         }
     }
 
