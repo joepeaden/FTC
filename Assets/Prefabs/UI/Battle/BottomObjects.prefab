@@ -1093,6 +1093,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: SelectedCharacterUI
       objectReference: {fileID: 0}
+    - target: {fileID: 1018437474917694851, guid: 66ef5eb565cce4b91bbfb353bbeb2b17, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3446343056965991052, guid: 66ef5eb565cce4b91bbfb353bbeb2b17, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4160021372512802301, guid: 66ef5eb565cce4b91bbfb353bbeb2b17, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4583222773215231768, guid: 66ef5eb565cce4b91bbfb353bbeb2b17, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5222088072301441649, guid: 66ef5eb565cce4b91bbfb353bbeb2b17, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -1175,6 +1191,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5222088072301441649, guid: 66ef5eb565cce4b91bbfb353bbeb2b17, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6273627212400047669, guid: 66ef5eb565cce4b91bbfb353bbeb2b17, type: 3}
+      propertyPath: m_RaycastTarget
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

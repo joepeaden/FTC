@@ -54,9 +54,9 @@ public class PawnSprite : MonoBehaviour
     {
         _currentHelm = pawn.GameChar.HelmItem;
 
-        if (pawn.GameChar.WeaponItem != null)
+        if (pawn.GameChar.TheWeapon != null)
         {
-            _weaponSpriteRend.sprite = pawn.GameChar.WeaponItem.itemSprite;
+            _weaponSpriteRend.sprite = pawn.GameChar.TheWeapon.Data.itemSprite;
         }
 
         if (pawn.GameChar.HelmItem != null)

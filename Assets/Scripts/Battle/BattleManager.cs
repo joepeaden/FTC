@@ -75,10 +75,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private RectTransform _pawnPointer;
     [SerializeField] private Transform _pawnEffectsParent;
     [SerializeField] private Image _pawnEffectLargePrefab;
-    [SerializeField] private ActionButton actionButton1;
-    [SerializeField] private ActionButton actionButton2;
-    [SerializeField] private ActionButton actionButton3;
-    [SerializeField] private ActionButton actionButton4;
+    [SerializeField] private List<ActionButton> _actionButtons = new();
 
     [Header("Equipment")]
     [SerializeField] private ArmorItemData lightHelm;
@@ -92,11 +89,6 @@ public class BattleManager : MonoBehaviour
     public Pawn CurrentPawn => _currentPawn;
     private Pawn _currentPawn;
     private Tile _hoveredTile;
-
-    private List<ActionButton> actionButtons = new();
-
-    public ActionData CurrentAction => _currentAction;
-    private ActionData _currentAction;
 
     private Stack<Pawn> _initiativeStack = new ();
 
@@ -160,13 +152,6 @@ public class BattleManager : MonoBehaviour
 
         // show instructions
         _instructionsUI.SetActive(true);
-
-        // add action buttons to loop
-        // update the instantiation stuff in UpdatePawnUI whatever so it just uses the existing buttons
-        actionButtons.Add(actionButton1);
-        actionButtons.Add(actionButton2);
-        //actionButtons.Add(actionButton3);
-        //actionButtons.Add(actionButton4);
     }
 
     private void Start()
@@ -343,10 +328,10 @@ public class BattleManager : MonoBehaviour
             healthText.text = "HP: " + p.HitPoints + "/" + p.MaxHitPoints;
             healthBar.SetBar(p.MaxHitPoints, p.HitPoints);
 
-            if (_currentAction != null)
+            if (Ability.SelectedAbility != null)
             {
-                apBar.SetBar(Pawn.BASE_ACTION_POINTS, p.ActionPoints, p.GetAPAfterAction(_currentAction));
-                motBar.SetBar(p.GameChar.GetBattleMotivationCap(), p.Motivation, p.GetMTAfterAction(_currentAction));
+                apBar.SetBar(Pawn.BASE_ACTION_POINTS, p.ActionPoints, p.GetAPAfterAction());
+                motBar.SetBar(p.GameChar.GetBattleMotivationCap(), p.Motivation, p.GetMTAfterAction());
             }
             else
             {
@@ -357,54 +342,36 @@ public class BattleManager : MonoBehaviour
             }
 
             currentPawnPreview.SetData(p);
-            //currentPawnFace.sprite = p.GetFaceSprite();
-            //currentPawnHelm.sprite = p.GetFaceSprite();
 
             RefreshInitStackUI();
 
-            //actionButtons.Clear();
-
-            actionButton1.SetSelected(false);
-            actionButton2.SetSelected(false);
-            actionButton3.SetSelected(false);
-
-            actionButton1.gameObject.SetActive(p.OnPlayerTeam);
-            actionButton2.gameObject.SetActive(p.OnPlayerTeam);
-            actionButton3.gameObject.SetActive(p.OnPlayerTeam);
-
-            // this needs to be cleaned up
-            if (p.OnPlayerTeam)
+            List <Ability> pawnAbilities = CurrentPawn.GetAbilities();
+            // there's currently only 4 ability buttons - will need to address that at some point,
+            // could cause problems.
+            int i = 0;
+            for (; i < pawnAbilities.Count; i++)
             {
-                if (actionButton1.TheAbility != p.GameChar.WeaponItem.baseAction)
-                {
-                    actionButton1.SetDataButton(p.GameChar.WeaponItem.baseAction, HandleActionClicked, KeyCode.Alpha1);
-                }
+                ActionButton actionButton = _actionButtons[i];
 
-                if (p.GameChar.WeaponItem.specialAction != null)
-                {
-                    if (!actionButton2.gameObject.activeInHierarchy)
-                    {
-                        actionButton2.gameObject.SetActive(true);
-                    }
+                actionButton.SetSelected(false);
+                actionButton.gameObject.SetActive(p.OnPlayerTeam);
 
-                    if (actionButton2.TheAbility != p.GameChar.WeaponItem.specialAction)
+                if (p.OnPlayerTeam)
+                {
+                    if (actionButton.TheAbility != pawnAbilities[i])
                     {
-                        actionButton2.SetDataButton(p.GameChar.WeaponItem.specialAction, HandleActionClicked, KeyCode.Alpha2);
+                        actionButton.SetDataButton(pawnAbilities[i], HandleActionClicked, i+1);
                     }
                 }
-                else
-                {
-                    if (actionButton2.gameObject.activeInHierarchy)
-                    {
-                        actionButton2.gameObject.SetActive(false);
-                    }
-                }
+            }
 
-                if (p.GameChar.Abilities.Count > 0)
-                {
-                    actionButton3.gameObject.SetActive(true);
-                    //actionButton3.SetDataButton(p.GameChar.Abilities[0]);
-                }
+            // update the remaining buttons
+            for (; i < _actionButtons.Count; i++)
+            {
+                ActionButton actionButton = _actionButtons[i];
+
+                actionButton.SetSelected(false);
+                actionButton.gameObject.SetActive(false);
             }
 
             UpdateEffects(p.CurrentEffects);
@@ -418,20 +385,16 @@ public class BattleManager : MonoBehaviour
 
         if (_selectionManager.SelectedTile != null)
         {
-            //Pawn selectedPawn = _selectionManager.SelectedTile.GetPawn();    
-
             if (_currentPawn != null)
             {
-                if (_currentAction != null && targetTile.GetTileDistance(_currentPawn.CurrentTile) <= _currentAction.range)// ;// && targetPawn.OnPlayerTeam != _currentPawn.OnPlayerTeam && targetPawn.IsTargetInRange(_currentPawn, _currentAction))
+                if (Ability.SelectedAbility != null && targetTile.GetTileDistance(_currentPawn.CurrentTile) <= Ability.SelectedAbility.GetData().range)
                 {
                     tilesToHighlight.Clear();
                     tilesToHighlight.Add(targetTile);
-                    if (_currentAction != null)
+                    
+                    if ((ActionData)Ability.SelectedAbility.GetData() as ActionData != null && ((ActionData)Ability.SelectedAbility.GetData()).attackStyle == ActionData.AttackStyle.LShape)
                     {
-                        if (_currentAction.attackStyle == ActionData.AttackStyle.LShape)
-                        {
-                            tilesToHighlight.Add(_currentPawn.CurrentTile.GetClockwiseNextTile(targetTile));
-                        }
+                        tilesToHighlight.Add(_currentPawn.CurrentTile.GetClockwiseNextTile(targetTile));
                     }
 
                     foreach (Tile t in tilesToHighlight)
@@ -500,31 +463,31 @@ public class BattleManager : MonoBehaviour
 
         charTooltip.SetPawn(hoveredPawn);
 
-        if (CurrentAction != null && CurrentPawn.OnPlayerTeam && CurrentPawn.IsTargetInRange(hoveredPawn, CurrentAction))
-        {
-            float chance = CurrentPawn.GetHitChance(hoveredPawn);
+        //if ((ActionData)Ability.SelectedAbility.GetData() as ActionData)
+        //{
+        //    if (Ability.SelectedAbility != null && CurrentPawn.OnPlayerTeam && CurrentPawn.IsTargetInRange(hoveredPawn, Ability.SelectedAbility))
+        //    {
+        //        float chance = CurrentPawn.GetHitChance(hoveredPawn);
 
-            if (CurrentAction != null)
-            {
-                ActionData attackAction = CurrentAction;
+        //        ActionData attackAction = ((ActionData)Ability.SelectedAbility.GetData());
 
-                int arDamage;
-                int hpDamage;
-                if (hoveredPawn.ArmorPoints > 0)
-                {
-                    arDamage = CurrentPawn.GameChar.GetWeaponArmorDamageForAction(attackAction);
-                    hpDamage = CurrentPawn.GameChar.GetWeaponPenetrationDamageForAction(attackAction);
-                }
-                else
-                {
-                    arDamage = 0;
-                    hpDamage = CurrentPawn.GameChar.GetWeaponDamageForAction(attackAction);
-                }
+        //        int arDamage;
+        //        int hpDamage;
+        //        if (hoveredPawn.ArmorPoints > 0)
+        //        {
+        //            arDamage = CurrentPawn.GameChar.GetWeaponArmorDamageForAction(attackAction);
+        //            hpDamage = CurrentPawn.GameChar.GetWeaponPenetrationDamageForAction(attackAction);
+        //        }
+        //        else
+        //        {
+        //            arDamage = 0;
+        //            hpDamage = CurrentPawn.GameChar.GetWeaponDamageForAction(attackAction);
+        //        }
 
-                // have to account for armor too
-                charTooltip.ShowHitPreview(chance, hpDamage, arDamage);
-            }
-        }
+        //        // have to account for armor too
+        //        charTooltip.ShowHitPreview(chance, hpDamage, arDamage);
+        //    }
+        //}
     }
 
     #endregion
@@ -619,7 +582,7 @@ public class BattleManager : MonoBehaviour
 
     public void ClearSelectedAction()
     {
-        foreach (ActionButton abutton in actionButtons)
+        foreach (ActionButton abutton in _actionButtons)
         {
             if (abutton.IsSelected)
             {
@@ -627,10 +590,10 @@ public class BattleManager : MonoBehaviour
             }
         }
 
-        if (_currentAction != null)
+        if (Ability.SelectedAbility != null)
         {
             //CurrentPawn.CurrentTile.HighlightTilesInRange(_currentAction.range + 1, false, Tile.TileHighlightType.AttackRange);
-            _currentAction = null;
+            Ability.SelectedAbility = null;
 
             _selectionManager.SetIdleMode(true);
 
@@ -644,11 +607,11 @@ public class BattleManager : MonoBehaviour
         UpdateUIForPawn(_currentPawn);
     }
 
-    private void HandleActionClicked(ActionData action)
+    private void HandleActionClicked(Ability action)
     {
         ClearSelectedAction();
 
-        _currentAction = action;
+        Ability.SelectedAbility = action;
 
         _selectionManager.SetIdleMode(false);
 

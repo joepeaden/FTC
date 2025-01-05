@@ -9,16 +9,15 @@ public class HonorProtect : Ability
     public HonorProtect()
     {
         dataAddress = "Assets/Scriptables/Abilities/HonorProtect.asset";
-        if (!data.ContainsKey(dataAddress))
-        {
-            base.LoadData();
-        }
+        base.LoadData();
     }
 
+    // note... it may not be necessary to have the activated pawn param. Will the pawn that this
+    // ability instance belongs to ever change?
     public override bool Activate(Pawn activatedPawn, Pawn targetPawn)
     {
         // can't protect the same pawn with more than one pawn.
-        if (_targetPawn.ProtectingPawn != null)
+        if (targetPawn.ProtectingPawn != null || targetPawn.OnPlayerTeam != activatedPawn.OnPlayerTeam)
         {
             return false;
         }
@@ -26,12 +25,25 @@ public class HonorProtect : Ability
         _activatedPawn = activatedPawn;
         _targetPawn = targetPawn;
 
-        targetPawn.ProtectingPawn = activatedPawn;
+        _targetPawn.ProtectingPawn = _activatedPawn;
+        _turnsToProtect = GetData().turnsDuration;
 
-        activatedPawn.OnActivation.AddListener(HandleNewActivationForPawn);
-        activatedPawn.OnHit.AddListener(HandleDeath);
+        // on new activation, will want to check duration to see if stop protecting
+        _activatedPawn.OnActivation.AddListener(HandleNewActivationForPawn);
+        // obviously can't protect someone if we're dead can we?
+        _activatedPawn.OnHit.AddListener(HandleDeath);
+        // listen when the pawn moves to check if we're still in range to protect
+        _activatedPawn.OnMoved.AddListener(CheckAdjacencyForProtection);
+        _targetPawn.OnMoved.AddListener(CheckAdjacencyForProtection);
 
-        _turnsToProtect = data[dataAddress].turnsDuration;
+        // tell battle manager we acted
+        BattleManager.Instance.PawnActivated(_activatedPawn);
+        
+        // text display event
+        BattleManager.Instance.AddTextNotification(_targetPawn.transform.position, "+Protection");
+
+        // add icon to the character UI to show effect
+        _targetPawn.UpdateEffect(GetData().statusEffect, true);
 
         return true;
     }
@@ -61,10 +73,30 @@ public class HonorProtect : Ability
         }
     }
 
+    /// <summary>
+    /// Checks if the target pawn is still adjacent, if not, end protection
+    /// </summary>
+    private void CheckAdjacencyForProtection()
+    {
+        if (!_activatedPawn.GetAdjacentPawns().Contains(_targetPawn))
+        {
+            StopProtection();
+        }
+    }
+
+    /// <summary>
+    /// Stop the activated pawn from protecting the target pawn, and cleanup
+    /// </summary>
     private void StopProtection()
     {
+        BattleManager.Instance.AddTextNotification(_targetPawn.transform.position, "-Protection");
+
+        _targetPawn.UpdateEffect(GetData().statusEffect, false);
+
         _activatedPawn.OnActivation.RemoveListener(HandleNewActivationForPawn);
         _activatedPawn.OnHit.RemoveListener(HandleDeath);
+        _activatedPawn.OnMoved.RemoveListener(CheckAdjacencyForProtection);
+        _targetPawn.OnMoved.RemoveListener(CheckAdjacencyForProtection);
 
         _targetPawn.ProtectingPawn = null;
         _activatedPawn = null;

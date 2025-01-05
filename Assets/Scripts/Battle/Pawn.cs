@@ -12,6 +12,7 @@ public class Pawn : MonoBehaviour
     public const int BASE_ACTION_POINTS = 6;
     public const int MOTIVATED_MOT_REGAIN_BUFF = 15;
 
+    public UnityEvent OnMoved = new();
     public UnityEvent OnHit = new();
     private static UnityEvent UpdateMotivationEvent = new();
     public UnityEvent<List<EffectData>> OnEffectUpdate = new();
@@ -21,7 +22,7 @@ public class Pawn : MonoBehaviour
     public float baseDodgeChance;
     public float baseSurroundBonus;
 
-    public int MoveRange => _actionPoints / _gameChar.GetAPPerTileMoved();
+    public int MoveRange => ActionPoints / _gameChar.GetAPPerTileMoved();
 
     public Tile CurrentTile => _currentTile;
     private Tile _currentTile;
@@ -37,12 +38,10 @@ public class Pawn : MonoBehaviour
     public int ArmorPoints => _armorPoints;
     private int _armorPoints;
 
-    public int ActionPoints => _actionPoints;
-    private int _actionPoints;
+    public int ActionPoints;
 
     public int MaxMotivation => GameChar.GetBattleMotivationCap();
-    public int Motivation => _motivation;
-    private int _motivation;
+    public int Motivation;
 
     public int Initiative => GetInit() + GetInitBuff();
 
@@ -53,6 +52,14 @@ public class Pawn : MonoBehaviour
 
     public bool IsMotivated => _isMotivated;
     private bool _isMotivated;
+
+    #region Buffs / Debuffs
+    // outgoing and incoming damage multipliers
+    public int OutDamageMult;
+    public int InDamageMult;
+    public float DodgeMod;
+    public float HitMod;
+    #endregion
 
     [SerializeField] AIPathCustom pathfinder;
 
@@ -80,7 +87,7 @@ public class Pawn : MonoBehaviour
 
     public GameCharacter.CharMotivators CurrentVice => _gameChar.Vice;
 
-    private bool _hasMadeFreeAttack;
+    public bool HasMadeFreeAttack;
 
     private bool _isMoving;
     private Vector3 _lastPosition;
@@ -129,8 +136,8 @@ public class Pawn : MonoBehaviour
         _hitPoints = character.HitPoints;
         _armorPoints = character.GetTotalArmor();
 
-        _motivation = GameChar.GetBattleMotivationCap();
-        _actionPoints = BASE_ACTION_POINTS;
+        Motivation = GameChar.GetBattleMotivationCap();
+        ActionPoints = BASE_ACTION_POINTS;
 
 
         //_anim.SetInteger("Vice", (int)_gameChar.Vice);
@@ -141,14 +148,21 @@ public class Pawn : MonoBehaviour
         _onPlayerTeam = onPlayerTeam;
     }
 
-    public int GetAPAfterAction(ActionData theAction)
+    public int GetAPAfterAction()
     {
-        return ActionPoints - theAction.apCost;
+        if (Ability.SelectedAbility.GetData() as ActionData != null)
+        {
+            return ActionPoints - ((ActionData)Ability.SelectedAbility.GetData()).apCost;
+        }
+        else
+        {
+            return ActionPoints;
+        }
     }
 
-    public int GetMTAfterAction(ActionData theAction)
+    public int GetMTAfterAction()
     {
-        return Motivation - theAction.cost;
+        return Motivation - Ability.SelectedAbility.GetData().cost;
     }
 
     public int GetAPAfterMove(Tile targetTile)
@@ -160,7 +174,7 @@ public class Pawn : MonoBehaviour
         }
 
         int tileDist = _currentTile.GetTileDistance(targetTile);
-        return Mathf.Max(_actionPoints - (tileDist * _gameChar.GetAPPerTileMoved()), -1);
+        return Mathf.Max(ActionPoints - (tileDist * _gameChar.GetAPPerTileMoved()), -1);
     }
 
     //public Sprite GetFaceSprite()
@@ -176,7 +190,7 @@ public class Pawn : MonoBehaviour
 
     private void UpdateMotivationResource()
     {
-        _motivation = Mathf.Clamp(_motivation + MOT_REGAIN_RATE + (_isMotivated ? MOTIVATED_MOT_REGAIN_BUFF : 0), _motivation, GameChar.GetBattleMotivationCap());
+        Motivation = Mathf.Clamp(Motivation + MOT_REGAIN_RATE + (_isMotivated ? MOTIVATED_MOT_REGAIN_BUFF : 0), Motivation, GameChar.GetBattleMotivationCap());
     }
 
     private void PickStartTile()
@@ -271,24 +285,34 @@ public class Pawn : MonoBehaviour
         }
 
         // honor passive is big bonus to hit
-        if (GameChar.Vice == GameCharacter.CharMotivators.Honor && _isMotivated)
-        {
-            motivationHitBonus = +.2f;
-        }
+        //if (GameChar.Vice == GameCharacter.CharMotivators.Honor && _isMotivated)
+        //{
+            motivationHitBonus = HitMod;
+        //}
 
         // honor passive is better dodge in 1v1
-        if (targetPawn.GameChar.Vice == GameCharacter.CharMotivators.Honor && targetPawn._isMotivated)
-        {
-            motivationHitBonus = -.2f;
-        }
+        //if (targetPawn.GameChar.Vice == GameCharacter.CharMotivators.Honor && targetPawn._isMotivated)
+        //{
+            motivationHitBonus = -targetPawn.DodgeMod;
+        //}
 
-        float hitChance = baseHitChance + motivationHitBonus + surroundHitBonus + GameChar.GetCharHitChance() + (BattleManager.Instance.CurrentAction != null ? BattleManager.Instance.CurrentAction.hitMod : 0);
+        float hitChance = baseHitChance + motivationHitBonus + surroundHitBonus + GameChar.TheWeapon.Data.baseAccMod + (Ability.SelectedAbility != null ? Ability.SelectedAbility.GetData().hitMod : 0);
         return hitChance;
     }
 
-    public bool IsTargetInRange(Pawn targetPawn, ActionData currentAction)
+    public List<Ability> GetWeaponAbilities()
     {
-        bool isCloseEnough = targetPawn.CurrentTile.GetTileDistance(CurrentTile) <= currentAction.range;
+        return GameChar.TheWeapon.Abilities;
+    }
+
+    public List<Ability> GetAbilities()
+    {
+        return GameChar.GetAbilities();
+    }
+
+    public bool IsTargetInRange(Pawn targetPawn, Ability currentAction)
+    {
+        bool isCloseEnough = targetPawn.CurrentTile.GetTileDistance(CurrentTile) <= currentAction.GetData().range;
 
         if (isCloseEnough)
         {
@@ -300,70 +324,20 @@ public class Pawn : MonoBehaviour
         }
     }
 
-    public void AttackPawnIfResourcesAvailable(Pawn primaryTargetPawn)
-    {
-        ActionData currentAction;
-        if (primaryTargetPawn._onPlayerTeam)
-        {
-            currentAction = GameChar.WeaponItem.baseAction;
-        }
-        else
-        {
-            currentAction = BattleManager.Instance.CurrentAction;
-        }
-
-
-        if (_actionPoints < currentAction.apCost || _motivation < currentAction.cost)
-        {
-            BattleManager.Instance.PawnActivated(this);
-            return;
-        }
-
-        List<Pawn> targetPawns = new();
-        targetPawns.Add(primaryTargetPawn);
-
-        if (currentAction.attackStyle == ActionData.AttackStyle.LShape)
-        {
-            Tile clockwiseNextTile = _currentTile.GetClockwiseNextTile(primaryTargetPawn.CurrentTile);
-            if (clockwiseNextTile.GetPawn())
-            {
-                targetPawns.Add(clockwiseNextTile.GetPawn());
-            }
-        }
-
-        foreach (Pawn targetPawn in targetPawns)
-        {
-            AttackPawn(targetPawn, currentAction);
-        }
-
-        if (GameChar.Vice == GameCharacter.CharMotivators.Glory && _isMotivated && !_hasMadeFreeAttack)
-        {
-            _hasMadeFreeAttack = true;
-        }
-        else
-        {
-            _actionPoints -= currentAction.apCost;
-            _motivation -= currentAction.cost;
-        }
-
-        BattleManager.Instance.PawnActivated(this);
-
-        _spriteController.UpdateFacingAndSpriteOrder(transform.position, primaryTargetPawn.transform.position, CurrentTile);
-    }
-
     public void HandleTurnEnded()
     {
-        _hasMadeFreeAttack = false;
+        HasMadeFreeAttack = false;
 
         _spriteController.HandleTurnEnd();
     }
 
-    private void AttackPawn(Pawn targetPawn, ActionData currentAction)
+    // perhaps this stuff should all be moved to the AttackAbility classes...
+    public void AttackPawn(Pawn targetPawn, ActionData currentAction)
     {
         // if this pawn has a protector, try to hit that one instead
         if (targetPawn.ProtectingPawn != null)
         {
-            targetPawn = ProtectingPawn;
+            targetPawn = targetPawn.ProtectingPawn;
         }
 
         float hitChance = GetHitChance(targetPawn);
@@ -386,18 +360,18 @@ public class Pawn : MonoBehaviour
 
             if (targetPawn.IsDead)
             {
-                StartCoroutine(PlayAudioAfterDelay(0f, GameChar.WeaponItem.killSound));
+                StartCoroutine(PlayAudioAfterDelay(0f, GameChar.TheWeapon.Data.killSound));
             }
             else if (!targetHadArmor)
             {
-                StartCoroutine(PlayAudioAfterDelay(0f, GameChar.WeaponItem.hitSound));
+                StartCoroutine(PlayAudioAfterDelay(0f, GameChar.TheWeapon.Data.hitSound));
             }
         }
         else
         {
             targetPawn.TriggerDodge();
             BattleManager.Instance.AddTextNotification(transform.position, "Miss!");
-            StartCoroutine(PlayAudioAfterDelay(0.1f, GameChar.WeaponItem.missSound));
+            StartCoroutine(PlayAudioAfterDelay(0.1f, GameChar.TheWeapon.Data.missSound));
         }
 
     }
@@ -411,12 +385,17 @@ public class Pawn : MonoBehaviour
     {
         int hitPointsDmg;
         GameCharacter attackingCharacter = attackingPawn.GameChar;
-        float extraDmgMult = 1;
+        float extraDmgMult = InDamageMult + attackingPawn.OutDamageMult;
 
         if (actionUsed.rangeForExtraDamage > 0 && CurrentTile.GetTileDistance(attackingPawn.CurrentTile) == actionUsed.rangeForExtraDamage)
         {
             // this could just become critical hits later perhaps.
-            extraDmgMult = actionUsed.extraDmgMultiplier;
+            extraDmgMult += actionUsed.extraDmgMultiplier;
+        }
+
+        if (extraDmgMult <= 0)
+        {
+            extraDmgMult = 1;
         }
 
         bool armorHit = false;
@@ -484,31 +463,54 @@ public class Pawn : MonoBehaviour
 
     #endregion
 
+    public void UpdateEffect(EffectData statusEffect, bool isAdding)
+    {
+        if (isAdding)
+        {
+            currentEffects.Add(statusEffect);
+        }
+        else
+        {
+            currentEffects.Remove(statusEffect);
+        }
+
+        OnEffectUpdate.Invoke(currentEffects);
+    }
+
     /// <summary>
     /// Does the character have enough resources to make any action?
     /// </summary>
     /// <returns></returns>
-    public bool HasResourcesForAction(ActionData? theAction = null)
+    public bool HasResourcesForAction(Ability theAbility = null)
     {
-        if (theAction != null)
+        // this here needs cleanup. I need to remove the ActionData stuff basically alltogether.
+        if (theAbility != null)
         {
-            if (_actionPoints >= theAction.apCost && _motivation >= theAction.cost)
+            ActionData action = theAbility.GetData() as ActionData;
+            if (action != null)
+            {
+                if (ActionPoints >= action.apCost && Motivation >= action.cost)
+                {
+                    return true;
+                }
+            }
+            else if(Motivation >= theAbility.GetData().cost)
             {
                 return true;
             }
-            else
-            {
-                return false;
-            }
+            
+            return false;            
         }
         else
         {
-            // can still make an attack
-            if ((_actionPoints >= GameChar.WeaponItem.baseAction.apCost && _motivation >= GameChar.WeaponItem.baseAction.cost)
-                || (GameChar.WeaponItem.specialAction != null && _actionPoints >= GameChar.WeaponItem.specialAction.apCost && _motivation >= GameChar.WeaponItem.specialAction.cost))
+            foreach (Ability a in GameChar.TheWeapon.Abilities)
             {
-                return true;
+                if (Motivation >= a.GetData().cost && ActionPoints >= ((ActionData)a.GetData()).apCost)
+                {
+                    return true;
+                }
             }
+
             return false;
         }
     }
@@ -531,7 +533,7 @@ public class Pawn : MonoBehaviour
 
     public bool HasMovesLeft()
     {
-        return _actionPoints >= _gameChar.GetAPPerTileMoved();
+        return ActionPoints >= _gameChar.GetAPPerTileMoved();
     }
 
     public void HandleActivation()
@@ -541,7 +543,7 @@ public class Pawn : MonoBehaviour
         //_audioSource.clip = greedViceSound;
         //_audioSource.Play();
         _spriteController.HandleTurnBegin();
-        _actionPoints = BASE_ACTION_POINTS;
+        ActionPoints = BASE_ACTION_POINTS;
 
         OnActivation.Invoke();
     }
@@ -556,7 +558,7 @@ public class Pawn : MonoBehaviour
     /// <returns></returns>
     public void TryMoveToTile(Tile targetTile)
     {
-        if (_actionPoints < _gameChar.GetAPPerTileMoved())
+        if (ActionPoints < _gameChar.GetAPPerTileMoved())
         {
             return;
         }
@@ -575,11 +577,11 @@ public class Pawn : MonoBehaviour
         // use whole turn to get out of combat with someone
         if (EngagedInCombat)
         {
-            _actionPoints = 0;
+            ActionPoints = 0;
         }
         else
         {
-            _actionPoints -= _gameChar.GetAPPerTileMoved() * tileDistance;
+            ActionPoints -= _gameChar.GetAPPerTileMoved() * tileDistance;
         }
 
         _currentTile.PawnExitTile();
@@ -610,7 +612,14 @@ public class Pawn : MonoBehaviour
 
         BattleManager.Instance.PawnActivated(this);
 
+        OnMoved.Invoke();
+
         _isMoving = false;
+    }
+
+    public void SetSpriteFacing(Vector3 targetPos)
+    {
+        _spriteController.UpdateFacingAndSpriteOrder(transform.position, targetPos, CurrentTile);
     }
 
     public void UpdateSpriteOnStop(bool isFirst)
@@ -668,7 +677,7 @@ public class Pawn : MonoBehaviour
             return;
         }
 
-        currentEffects.Clear();
+        //currentEffects.Clear();
 
         bool wasInMotCondition = _isMotivated;
 
@@ -759,12 +768,12 @@ public class Pawn : MonoBehaviour
             }
         }
 
-        if (IsMotivated)
-        {
-            currentEffects.Add(effectGained);
-        }
+        //if (IsMotivated)
+        //{
+        //    currentEffects.Add(effectGained);
+        //}
 
-        OnEffectUpdate.Invoke(currentEffects);
+        //OnEffectUpdate.Invoke(currentEffects);
     }
 
     #endregion

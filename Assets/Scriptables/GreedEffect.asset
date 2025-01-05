@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 068988e82ac8d44a49d87f03a1dc82c2, type: 3}
   m_Name: GreedEffect
   m_EditorClassIdentifier: 
-  effectName: Advantage
-  description: When an adjacent enemy is adjacent to more than one ally, gain +10%
-    chance to hit instead of +5% for each ally surrounding said enemy.
-  effectSprite: {fileID: 21300000, guid: d605befd4bec61449b7a5c492aaf2361, type: 3}
+  effectName: Boosted
+  description: Increased dodge and hit chance.
+  effectSprite: {fileID: 21300000, guid: 95ffc4f28f629d045b5a5ded06e879fd, type: 3}

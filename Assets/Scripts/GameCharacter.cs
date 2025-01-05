@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class GameCharacter
@@ -42,14 +43,14 @@ public class GameCharacter
     public Sprite BodySprite => _bodySprite;
     private Sprite _bodySprite;
 
-    public WeaponItemData WeaponItem => _weaponItem;
-    private WeaponItemData _weaponItem;
+    public Weapon TheWeapon => _theWeapon;
+    private Weapon _theWeapon = new Weapon();
 
     //public Sprite FaceSprite => _faceSprite;
     //private Sprite _faceSprite;
 
-    public List<Ability> Abilities => abilities;
-    private List<Ability> abilities = new ();
+    public List<Ability> Abilities => _abilities;
+    private List<Ability> _abilities = new ();
 
     public GameCharacter(string newName, CharMotivators newMotivator, int newMotivatorValue, bool onPlayerTeam)
     {
@@ -117,8 +118,7 @@ public class GameCharacter
         }
         else
         {
-            _motivator = (CharMotivators)Random.Range(0, 3);
-            _charMotivatorValue = Random.Range(2, 6);
+            SetMotivator((CharMotivators)Random.Range(0, 3), Random.Range(2, 6));
 
             _baseInitiative = Random.Range(0, 5);
             _hitPoints = Random.Range(30, 100);
@@ -148,29 +148,40 @@ public class GameCharacter
         switch (_motivator)
         {
             case CharMotivators.Honor:
-                abilities.Add(new HonorProtect());
+                _abilities.Add(new HonorProtect());
+                break;
+            case CharMotivators.Glory:
+                _abilities.Add(new WildAbandon());
+                break;
+            case CharMotivators.Greed:
+                _abilities.Add(new BonusPay());
                 break;
         }
     }
 
-    public float GetCharHitChance()
+    /// <summary>
+    /// Return character abilities + weapon abilities
+    /// </summary>
+    /// <returns></returns>
+    public List<Ability> GetAbilities() 
     {
-        return _weaponItem.baseAccMod;
+        List<Ability> abilitiesToReturn = _theWeapon.Abilities;
+        return abilitiesToReturn.Concat(_abilities).ToList();
     }
 
     public int GetWeaponDamageForAction(ActionData action)
     {
-        return action.outDmgMod + _weaponItem.baseDamage;
+        return action.outDmgMod + _theWeapon.Data.baseDamage;
     }
 
     public int GetWeaponArmorDamageForAction(ActionData action)
     {
-        return Mathf.RoundToInt(GetWeaponDamageForAction(action) * (action.armorDamageMod + _weaponItem.baseArmorDamage));
+        return Mathf.RoundToInt(GetWeaponDamageForAction(action) * (action.armorDamageMod + _theWeapon.Data.baseArmorDamage));
     }
 
     public int GetWeaponPenetrationDamageForAction(ActionData action)
     {
-        return Mathf.RoundToInt(GetWeaponDamageForAction(action) * (action.penetrationDamageMod + _weaponItem.basePenetrationDamage));
+        return Mathf.RoundToInt(GetWeaponDamageForAction(action) * (action.penetrationDamageMod + _theWeapon.Data.basePenetrationDamage));
     }
 
     public int GetTotalViceValue()
@@ -221,7 +232,7 @@ public class GameCharacter
                 _bodyItem = null;
                 break;
             case ItemType.Weapon:
-                _weaponItem = GameManager.Instance.GameCharData.DefaultWeapon;
+                _theWeapon.SetData(GameManager.Instance.GameCharData.DefaultWeapon);
                 break;
         }
     }
@@ -241,8 +252,8 @@ public class GameCharacter
                 _bodyItem = (ArmorItemData) newItem;
                 break;
             case ItemType.Weapon:
-                oldItem = _weaponItem;
-                _weaponItem = (WeaponItemData) newItem;
+                oldItem = _theWeapon.Data;
+                _theWeapon.SetData((WeaponItemData) newItem);
                 break;
         }
 

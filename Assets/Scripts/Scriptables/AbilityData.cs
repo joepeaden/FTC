@@ -16,6 +16,9 @@ public class AbilityData : ScriptableObject
     /// Incoming Damage
     /// </summary>
     public int inDmgMod;
-    public int hitMod;
-    public int dodgeMod;
+    public float hitMod;
+    public float dodgeMod;
+    public int range;
+    public AudioClip soundEffect;
+    public EffectData statusEffect;
 }

@@ -11,7 +11,6 @@ public class ActionData : AbilityData
     }
 
     public int apCost;
-    public int range;
     public float armorDamageMod;
     public float penetrationDamageMod;
     public int rangeForExtraDamage;

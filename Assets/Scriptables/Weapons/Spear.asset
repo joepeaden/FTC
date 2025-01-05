@@ -16,9 +16,14 @@ MonoBehaviour:
   description: The ubiquitous stick with a pointy part on the end. Spears have long
     reach and are good at penetrating armor. They do extra damage at range 2.
   itemSprite: {fileID: 21300000, guid: 27ad3b3f1935eef47b6a7fd73b7265b8, type: 3}
+  SESprite: {fileID: 0}
+  SWSprite: {fileID: 0}
+  NWSprite: {fileID: 0}
+  NESprite: {fileID: 0}
   itemPrice: 10
   itemType: 2
   isDefault: 0
+  weaponType: 2
   baseDamage: 25
   baseArmorDamage: 0.2
   basePenetrationDamage: 0.7

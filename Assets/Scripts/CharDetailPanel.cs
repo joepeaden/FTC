@@ -45,9 +45,9 @@ public class CharDetailPanel : MonoBehaviour
             _helmUI.Hide();
         }
 
-        if (character.WeaponItem != null)
+        if (character.TheWeapon != null)
         {
-            _weaponUI.SetData(character.WeaponItem, _decisions, UnEquipItem);
+            _weaponUI.SetData(character.TheWeapon.Data, _decisions, UnEquipItem);
         }
         else if (_weaponUI != null)
         {
@@ -59,13 +59,13 @@ public class CharDetailPanel : MonoBehaviour
             Destroy(_actionsParent.GetChild(i).gameObject);
         }
 
-        GameObject actionButtonGO = Instantiate(_actionsButtonPrefab, _actionsParent);
-        actionButtonGO.GetComponent<ActionButton>().SetDataDisplay(character.WeaponItem.baseAction);
-        if (character.WeaponItem.specialAction != null)
-        {
-            actionButtonGO = Instantiate(_actionsButtonPrefab, _actionsParent);
-            actionButtonGO.GetComponent<ActionButton>().SetDataDisplay(character.WeaponItem.specialAction);
-        }
+        //GameObject actionButtonGO = Instantiate(_actionsButtonPrefab, _actionsParent);
+        //actionButtonGO.GetComponent<ActionButton>().SetDataDisplay(character.TheWeapon.baseAction);
+        //if (character.TheWeapon.specialAction != null)
+        //{
+        //    actionButtonGO = Instantiate(_actionsButtonPrefab, _actionsParent);
+        //    actionButtonGO.GetComponent<ActionButton>().SetDataDisplay(character.TheWeapon.specialAction);
+        //}
     }
 
     public void UnEquipItem(ItemUI itemUI)

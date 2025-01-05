@@ -16,9 +16,14 @@ MonoBehaviour:
   description: "Swords are well balanced, allowing for more attacks and can be used
     against a single or multiple opponents.\xDF"
   itemSprite: {fileID: 21300000, guid: a5072443420c241cfaa3621276b97435, type: 3}
+  SESprite: {fileID: 0}
+  SWSprite: {fileID: 0}
+  NWSprite: {fileID: 0}
+  NESprite: {fileID: 0}
   itemPrice: 20
   itemType: 2
   isDefault: 0
+  weaponType: 1
   baseDamage: 30
   baseArmorDamage: 0.5
   basePenetrationDamage: 0.5

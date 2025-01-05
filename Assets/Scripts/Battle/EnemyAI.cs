@@ -45,7 +45,7 @@ public class EnemyAI : MonoBehaviour
         Pawn adjacentPawn = GetAdjacentTarget(activePawn);
         if (adjacentPawn != null)
         {
-            activePawn.AttackPawnIfResourcesAvailable(adjacentPawn);
+            activePawn.GetWeaponAbilities()[0].Activate(activePawn, adjacentPawn);
         }
         // add comment
         else

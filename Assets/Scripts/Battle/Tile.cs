@@ -334,7 +334,7 @@ public class Tile : MonoBehaviour
 
     public void ClearActionHighlight()
     {
-        if (BattleManager.Instance.CurrentAction != null && BattleManager.Instance.CurrentPawn.CurrentTile.IsInRangeOf(this, BattleManager.Instance.CurrentAction.range))
+        if (Ability.SelectedAbility != null && BattleManager.Instance.CurrentPawn.CurrentTile.IsInRangeOf(this, ((ActionData)Ability.SelectedAbility.GetData()).range))
         {
             tileOverlayUI.sprite = attackHighlightSprite;
         }

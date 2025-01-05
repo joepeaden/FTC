@@ -14,9 +14,9 @@ public class ObjectPool : MonoBehaviour
     //public GameObject enemyPrefab;
     //public int enemyPoolSize;
 
-    //[Header("AudioSources")]
-    //public GameObject audioSourcePrefab;
-    //public int audioSourcePoolSize;
+    [Header("AudioSources")]
+    public GameObject audioSourcePrefab;
+    public int audioSourcePoolSize;
 
     //[Header("corpses")]
     //public GameObject corpsePrefab;
@@ -37,7 +37,7 @@ public class ObjectPool : MonoBehaviour
     private Transform objectPoolParent;
     private List<GameObject> pawnPreviews;
     //private List<GameObject> enemies;
-    //private List<GameObject> audioSources;
+    private List<GameObject> audioSources;
     //private List<GameObject> corpses;
     //private List<GameObject> textFloatUps;
     //private List<GameObject> samples;
@@ -54,6 +54,7 @@ public class ObjectPool : MonoBehaviour
         objectPoolParent = Instantiate(new GameObject()).GetComponent<Transform>();
         objectPoolParent.name = "ObjectPool";
 
+        audioSources = CreatePool(audioSourcePrefab, audioSources, audioSourcePoolSize);
         pawnPreviews = CreatePool(pawnPreviewPrefab, pawnPreviews, pawnPreviewPoolSize);
     }
 
@@ -89,5 +90,10 @@ public class ObjectPool : MonoBehaviour
     public GameObject GetPawnPreview()
     {
         return GetPooledObject(pawnPreviews, pawnPreviewPrefab);
+    }
+
+    public GameObject GetAudioSource()
+    {
+        return GetPooledObject(audioSources, audioSourcePrefab);
     }
 }

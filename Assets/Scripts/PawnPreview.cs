@@ -28,7 +28,7 @@ public class PawnPreview : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     public void SetData(GameCharacter g)
     {
         ArmorItemData helm = g.HelmItem;
-        WeaponItemData weapon = g.WeaponItem;
+        WeaponItemData weapon = g.TheWeapon.Data;
 
         SetupAppearance(helm, weapon, g.BodySprite);
     }
@@ -46,7 +46,7 @@ public class PawnPreview : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
             helm = null;
         }
 
-        WeaponItemData weapon = p.GameChar.WeaponItem;
+        WeaponItemData weapon = p.GameChar.TheWeapon.Data;
 
         SetupAppearance(helm, weapon, p.GameChar.BodySprite);
     }

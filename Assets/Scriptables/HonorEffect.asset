@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 068988e82ac8d44a49d87f03a1dc82c2, type: 3}
   m_Name: HonorEffect
   m_EditorClassIdentifier: 
-  effectName: Duel
-  description: If in 1 on 1 combat, gain +20% dodge and +20% to hit.
-  effectSprite: {fileID: 21300000, guid: 43358b703766fee4ebe64c7fbd583376, type: 3}
+  effectName: Protection
+  description: Another character is protecting this character.
+  effectSprite: {fileID: 21300000, guid: 1815ea71c4e799e45b0db8899c240c4a, type: 3}

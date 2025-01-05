@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f757fd94518b7401cb0591f111a72102, type: 3}
-  m_Name: SpearSpecial
+  m_Name: SlashAttackAbility
   m_EditorClassIdentifier: 
-  abilityName: Jab
-  description: Take an aimed strike at your enemy's weakpoints
+  abilityName: Slash
+  description: Slash the enemy, hitting two tiles in a clockwise fashion.
   cost: 15
   turnsDuration: 0
   outDmgMod: 0
@@ -21,9 +21,9 @@ MonoBehaviour:
   hitMod: 0
   dodgeMod: 0
   apCost: 3
-  range: 2
+  range: 1
   armorDamageMod: 0
-  penetrationDamageMod: 0.2
-  rangeForExtraDamage: 2
-  extraDmgMultiplier: 1.2
-  attackStyle: 0
+  penetrationDamageMod: 0
+  rangeForExtraDamage: 0
+  extraDmgMultiplier: -1
+  attackStyle: 1

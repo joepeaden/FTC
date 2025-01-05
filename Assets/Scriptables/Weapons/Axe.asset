@@ -16,9 +16,14 @@ MonoBehaviour:
   description: A common tool turned brutal weapon, axes have high damage and are
     best against a single target.
   itemSprite: {fileID: 21300000, guid: 50e72420994aa5c44a30b1424e783f5b, type: 3}
+  SESprite: {fileID: 0}
+  SWSprite: {fileID: 0}
+  NWSprite: {fileID: 0}
+  NESprite: {fileID: 0}
   itemPrice: 10
   itemType: 2
   isDefault: 0
+  weaponType: 3
   baseDamage: 40
   baseArmorDamage: 0.8
   basePenetrationDamage: 0.2

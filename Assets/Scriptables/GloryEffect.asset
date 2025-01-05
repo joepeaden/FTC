@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 068988e82ac8d44a49d87f03a1dc82c2, type: 3}
   m_Name: GloryEffect
   m_EditorClassIdentifier: 
-  effectName: Glorious Moment
-  description: When adjacent to more than one enemy, gain +100 initiative and 1 free
-    basic attack action.
-  effectSprite: {fileID: 21300000, guid: b6795c96fef3b01439d1de6a75d33651, type: 3}
+  effectName: Raging
+  description: This character does and takes double damage.
+  effectSprite: {fileID: 21300000, guid: 2820b2e4880bb924da42e15982d02033, type: 3}

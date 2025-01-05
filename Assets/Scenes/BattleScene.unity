@@ -4380,10 +4380,11 @@ MonoBehaviour:
   _pawnPointer: {fileID: 2068593145}
   _pawnEffectsParent: {fileID: 7576809738784867756}
   _pawnEffectLargePrefab: {fileID: 8370381676954603734, guid: 7fe1208fadbf7457fbc3f9b3c06e5ee4, type: 3}
-  actionButton1: {fileID: 1606847236}
-  actionButton2: {fileID: 937715829}
-  actionButton3: {fileID: 949347490}
-  actionButton4: {fileID: 1279358387}
+  _actionButtons:
+  - {fileID: 1606847236}
+  - {fileID: 937715829}
+  - {fileID: 949347490}
+  - {fileID: 1279358387}
   lightHelm: {fileID: 11400000, guid: 09bc3b809f61541ba816946baf191fa6, type: 2}
   medHelm: {fileID: 11400000, guid: 948a5120fb2ec4686bd785d02511ad58, type: 2}
   heavyHelm: {fileID: 11400000, guid: 9fecc5ccb3cea43869fed948286e28ac, type: 2}
@@ -4417,6 +4418,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pawnPreviewPrefab: {fileID: 2881012879661761195, guid: ba3d5154ba3cb452188b04104229f046, type: 3}
   pawnPreviewPoolSize: 15
+  audioSourcePrefab: {fileID: 8567179387656561764, guid: c5b47d9f5a6a1a04496b0f441bab48b9, type: 3}
+  audioSourcePoolSize: 5
 --- !u!1 &763875542
 GameObject:
   m_ObjectHideFlags: 0
@@ -7091,7 +7094,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1661674903
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7554,7 +7557,7 @@ MonoBehaviour:
   gridHeight: 10
   gridWidth: 10
   tileSize: 2
-  impassableChancePerTile: 0.5
+  impassableChancePerTile: 0.2
 --- !u!4 &1696927710
 Transform:
   m_ObjectHideFlags: 0

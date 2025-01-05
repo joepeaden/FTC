@@ -14,11 +14,11 @@ public class ActionButton : MonoBehaviour
     private Image image;
 
     private Button _button;
-    public ActionData TheAbility => _ability;
-    private ActionData _ability;
-    private UnityAction<ActionData> _callback;
+    public Ability TheAbility => _ability;
+    private Ability _ability;
+    private UnityAction<Ability> _callback;
 
-    private KeyCode _hotKey;
+    private KeyCode _hotkey;
     public bool IsSelected => _isSelected;
     private bool _isSelected = false;
 
@@ -82,8 +82,8 @@ public class ActionButton : MonoBehaviour
     /// </summary>
     /// <param name="action"></param>
     /// <param name="callback"></param>
-    public void SetDataButton(ActionData action, UnityAction<ActionData> callback, KeyCode hotkey)
-    {
+    public void SetDataButton(Ability action, UnityAction<Ability> callback, int hotkeyNum)
+    {        
         SetDataDisplay(action);
 
         if (_button == null)
@@ -94,13 +94,28 @@ public class ActionButton : MonoBehaviour
 
         UpdateInteractivity();
 
-        if (BattleManager.Instance.CurrentAction == action)
+        if (Ability.SelectedAbility == action)
         {
             image.sprite = selectedImage;
         }
 
-        _hotKey = hotkey;
-        hotKeyText.text = $"({GetKeyCodeDisplay(hotkey)})";
+        switch (hotkeyNum)
+        {
+            case 1:
+                _hotkey = KeyCode.Alpha1;
+                break;
+            case 2:
+                _hotkey = KeyCode.Alpha2;
+                break;
+            case 3:
+                _hotkey = KeyCode.Alpha3;
+                break;
+            case 4:
+                _hotkey = KeyCode.Alpha4;
+                break;
+        }
+
+        hotKeyText.text = $"({GetKeyCodeDisplay(_hotkey)})";
 
         _callback = callback;
     }
@@ -110,7 +125,7 @@ public class ActionButton : MonoBehaviour
         // hopefully
         // the weather is nice today
         // I'm craving a breakfast croissant
-        if (_isButtonMode && Input.GetKeyDown(_hotKey) && _button.interactable)
+        if (_isButtonMode && Input.GetKeyDown(_hotkey) && _button.interactable)
         {
             _button.onClick.Invoke();
         }
@@ -119,10 +134,10 @@ public class ActionButton : MonoBehaviour
     /// <summary>
     /// For Display
     /// </summary>
-    public void SetDataDisplay(ActionData action)
+    public void SetDataDisplay(Ability action)
     {
         _ability = action;
-        displayText.text = action.abilityName;
+        displayText.text = action.GetData().abilityName;
     }
 
     private void HandleClick()

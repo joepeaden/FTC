@@ -26,9 +26,9 @@ public class TooltipManager : MonoBehaviour
         }
 
         ActionButton actionButton = hoveredGO.GetComponent<ActionButton>();
-        if (actionButton != null)
+        if (actionButton != null && actionButton.TheAbility.GetData() as ActionData != null)
         {
-            _tooltip.SetAction(actionButton.TheAbility);
+            _tooltip.SetAction((ActionData)actionButton.TheAbility.GetData());
         }
 
         EffectIcon effectIcon = hoveredGO.GetComponent<EffectIcon>();

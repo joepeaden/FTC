@@ -73,11 +73,10 @@ public class SelectionManager : MonoBehaviour
     public void ClearHighlights()
     {
         Pawn currentPawn = BattleManager.Instance.CurrentPawn;
-        ActionData currentAction = BattleManager.Instance.CurrentAction;
 
-        if (currentAction != null)
+        if (Ability.SelectedAbility!= null)
         {
-            _selectedTile.HighlightTilesInRange(currentPawn, currentAction.range, false, Tile.TileHighlightType.AttackRange);
+            _selectedTile.HighlightTilesInRange(currentPawn, Ability.SelectedAbility.GetData().range, false, Tile.TileHighlightType.AttackRange);
         }
 
         _selectedTile.HighlightTilesInRange(currentPawn, currentPawn.MoveRange, false, Tile.TileHighlightType.Move);
@@ -86,7 +85,7 @@ public class SelectionManager : MonoBehaviour
     public void SetIdleMode(bool isIdle)
     {
         Pawn currentPawn = BattleManager.Instance.CurrentPawn;
-        ActionData currentAction = BattleManager.Instance.CurrentAction;
+        Ability currentAction = Ability.SelectedAbility;
 
         // already not in idle mode and maybe switching actions -
         // clear highlights.
@@ -99,7 +98,7 @@ public class SelectionManager : MonoBehaviour
 
         if (currentAction != null)
         {
-            _selectedTile.HighlightTilesInRange(currentPawn, currentAction.range, !isIdle, Tile.TileHighlightType.AttackRange);
+            _selectedTile.HighlightTilesInRange(currentPawn, Ability.SelectedAbility.GetData().range, !isIdle, Tile.TileHighlightType.AttackRange);
         }
         else
         {
@@ -112,7 +111,6 @@ public class SelectionManager : MonoBehaviour
         if (_playerControlsEnabled && Input.GetMouseButtonDown(0))
         {
             Pawn currentPawn = BattleManager.Instance.CurrentPawn;
-            ActionData currentAction = BattleManager.Instance.CurrentAction;
 
             Vector3 mousePos = CameraManager.MainCamera.ScreenToWorldPoint(Input.mousePosition);
             RaycastHit2D[] hits = Physics2D.RaycastAll(mousePos, -Vector3.forward);
@@ -133,12 +131,12 @@ public class SelectionManager : MonoBehaviour
                             if (currentPawn.OnPlayerTeam)
                             {
                                 Pawn targetPawn = newTile.GetPawn();
-                                if (currentAction != null && targetPawn != null && currentPawn.IsTargetInRange(targetPawn, currentAction) && targetPawn.OnPlayerTeam != currentPawn.OnPlayerTeam)
+                                if (Ability.SelectedAbility != null && targetPawn != null && currentPawn.IsTargetInRange(targetPawn, Ability.SelectedAbility))
                                 {
                                     ClearHighlights();
-                                    currentPawn.AttackPawnIfResourcesAvailable(targetPawn);
+                                    Ability.SelectedAbility.Activate(currentPawn, targetPawn);
                                 }
-                                else if (currentPawn.CurrentTile.GetTilesInMoveRange().Contains(newTile) && targetPawn == null && currentAction == null && _selectedTile != null)
+                                else if (currentPawn.CurrentTile.GetTilesInMoveRange().Contains(newTile) && targetPawn == null && Ability.SelectedAbility == null && _selectedTile != null)
                                 {
                                     ClearHighlights();
                                     currentPawn.TryMoveToTile(newTile);
