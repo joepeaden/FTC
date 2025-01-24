@@ -121,7 +121,7 @@ public class GameCharacter
             SetMotivator((CharMotivators)Random.Range(0, 3), Random.Range(2, 6));
 
             _baseInitiative = Random.Range(0, 5);
-            _hitPoints = Random.Range(30, 100);
+            _hitPoints = Random.Range(3, 8);
 
         }
         if (GameManager.Instance != null)
@@ -208,7 +208,7 @@ public class GameCharacter
 
     public int GetBattleMotivationCap()
     {
-        return GetTotalViceValue() * VICE_TO_MOT_MULTIPLIER;
+        return GetTotalViceValue();// * VICE_TO_MOT_MULTIPLIER;
     }
 
     public int GetTotalArmor()

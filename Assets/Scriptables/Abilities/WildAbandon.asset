@@ -23,3 +23,4 @@ MonoBehaviour:
   range: 0
   soundEffect: {fileID: 0}
   statusEffect: {fileID: 11400000, guid: 9309324bd5fc64e649b79b461626dbbb, type: 2}
+  sprite: {fileID: 21300000, guid: 04925fbf39cd4421893cc700bb44d9ea, type: 3}

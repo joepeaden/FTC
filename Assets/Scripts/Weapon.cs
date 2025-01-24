@@ -27,13 +27,13 @@ public class Weapon
                 _abilities.Add(abil);
                 break;
             case WeaponItemData.WeaponType.Spear:
-                abil = new BasicAttackAbility("Assets/Scriptables/Abilities/WeaponBased/BasicAttackAbility.asset");
+                abil = new BasicAttackAbility("Assets/Scriptables/Abilities/WeaponBased/SpearBasicAbility.asset");
                 _abilities.Add(abil);
                 abil = new BasicAttackAbility("Assets/Scriptables/Abilities/WeaponBased/SpearSpecialAbility.asset");
                 _abilities.Add(abil);
                 break;
             case WeaponItemData.WeaponType.Axe:
-                abil = new BasicAttackAbility("Assets/Scriptables/Abilities/WeaponBased/BasicAttackAbility.asset");
+                abil = new BasicAttackAbility("Assets/Scriptables/Abilities/WeaponBased/AxeBasicAbility.asset");
                 _abilities.Add(abil);
                 abil = new BasicAttackAbility("Assets/Scriptables/Abilities/WeaponBased/BrutalChopAbility.asset");
                 _abilities.Add(abil);

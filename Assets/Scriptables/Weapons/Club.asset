@@ -15,10 +15,15 @@ MonoBehaviour:
   itemName: Club
   description: A hefty stick. Nothing special here, it's just a stick.
   itemSprite: {fileID: 21300000, guid: e28b8f6f6cf28404eb455c6f677329ec, type: 3}
+  SESprite: {fileID: 0}
+  SWSprite: {fileID: 0}
+  NWSprite: {fileID: 0}
+  NESprite: {fileID: 0}
   itemPrice: 0
   itemType: 2
   isDefault: 1
-  baseDamage: 25
+  weaponType: 0
+  baseDamage: 2
   baseArmorDamage: 0.2
   basePenetrationDamage: 0.2
   baseAccMod: 0

@@ -5,11 +5,17 @@ using System.Collections.Generic;
 public class CharDetailPanel : MonoBehaviour
 {
     [SerializeField] private TMP_Text _charName;
-    [SerializeField] private TMP_Text _healthText;
-    [SerializeField] private TMP_Text _viceText;
-    [SerializeField] private TMP_Text _motivText;
+    //[SerializeField] private TMP_Text _healthText;
+    //[SerializeField] private TMP_Text _viceText;
+    //[SerializeField] private TMP_Text _motivText;
+
+    [SerializeField] private PipStatBar _healthStatBar;
+    [SerializeField] private PipStatBar _armorStatBar;
+    [SerializeField] private PipStatBar _motivStatBar;
+
     [SerializeField] private TMP_Text _moveText;
     [SerializeField] private TMP_Text _initText;
+    [SerializeField] private TMP_Text _dmgText;
     [SerializeField] private GameObject itemUIPrefab;
 
     private GameCharacter _currentCharacter;
@@ -27,11 +33,13 @@ public class CharDetailPanel : MonoBehaviour
     {
         _currentCharacter = character;
         _charName.text = _currentCharacter.CharName;
-        _healthText.text = _currentCharacter.HitPoints.ToString();
-        _viceText.text = _currentCharacter.Motivator.ToString() + " (" + _currentCharacter.GetTotalViceValue().ToString() + ")";
-        _motivText.text = _currentCharacter.GetBattleMotivationCap().ToString();
+        _healthStatBar.SetBar(_currentCharacter.HitPoints);
+        _armorStatBar.SetBar(_currentCharacter.GetTotalArmor()); ;
+        _motivStatBar.SetBar(_currentCharacter.GetBattleMotivationCap());
+
         _moveText.text = _currentCharacter.GetMoveRange().ToString();
         _initText.text = _currentCharacter.GetInitiativeWithEquipment().ToString();
+        _dmgText.text = _currentCharacter.TheWeapon.Data.baseDamage.ToString();
 
         _helmUI.RemoveCallbacks();
         _weaponUI.RemoveCallbacks();

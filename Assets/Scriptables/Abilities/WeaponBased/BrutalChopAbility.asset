@@ -14,14 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityName: Brutal Chop
   description: Attempt to slice your enemy from head to toe
-  cost: 25
+  cost: 1
   turnsDuration: 0
-  outDmgMod: 20
+  outDmgMod: 2
   inDmgMod: 0
   hitMod: 0
   dodgeMod: 0
-  apCost: 3
   range: 1
+  soundEffect: {fileID: 0}
+  statusEffect: {fileID: 0}
+  sprite: {fileID: 21300000, guid: 37f27f4eb8f4a486295cec51f0b77e60, type: 3}
+  apCost: 1
   armorDamageMod: 0
   penetrationDamageMod: 0
   rangeForExtraDamage: 0

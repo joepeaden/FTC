@@ -48,13 +48,13 @@ public class BattleManager : MonoBehaviour
     [SerializeField] TMP_Text characterMotivatorText;
     [SerializeField] PawnPreview currentPawnPreview;
     [SerializeField] TMP_Text armorText;
-    [SerializeField] StatBar armorBar;
+    [SerializeField] PipStatBar armorBar;
     [SerializeField] TMP_Text healthText;
-    [SerializeField] StatBar healthBar;
+    [SerializeField] PipStatBar healthBar;
     [SerializeField] TMP_Text apText;
-    [SerializeField] StatBar apBar;
+    [SerializeField] PipStatBar apBar;
     [SerializeField] TMP_Text motText;
-    [SerializeField] StatBar motBar;
+    [SerializeField] PipStatBar motBar;
     [SerializeField] private Transform _initStackParent;
     [SerializeField] private List<TextFloatUp> _floatingTexts = new();
     [SerializeField] private CharacterTooltip charTooltip;
@@ -324,21 +324,21 @@ public class BattleManager : MonoBehaviour
             characterNameText.text = p.GameChar.CharName;
             characterMotivatorText.text = p.CurrentMotivator.ToString();
             armorText.text = "AR: " + p.ArmorPoints + "/" + p.MaxArmorPoints;
-            armorBar.SetBar(p.MaxArmorPoints, p.ArmorPoints);
+            armorBar.SetBar(p.ArmorPoints);
             healthText.text = "HP: " + p.HitPoints + "/" + p.MaxHitPoints;
-            healthBar.SetBar(p.MaxHitPoints, p.HitPoints);
+            healthBar.SetBar(p.HitPoints);
 
             if (Ability.SelectedAbility != null)
             {
-                apBar.SetBar(Pawn.BASE_ACTION_POINTS, p.ActionPoints, p.GetAPAfterAction());
-                motBar.SetBar(p.GameChar.GetBattleMotivationCap(), p.Motivation, p.GetMTAfterAction());
+                apBar.SetBar(p.ActionPoints);
+                motBar.SetBar(p.Motivation);
             }
             else
             {
                 apText.text = "AP: " + p.ActionPoints + "/" + Pawn.BASE_ACTION_POINTS;
-                apBar.SetBar(Pawn.BASE_ACTION_POINTS, p.ActionPoints);
+                apBar.SetBar(p.ActionPoints);
                 motText.text = "MT: " + p.Motivation + "/" + p.MaxMotivation;
-                motBar.SetBar(p.MaxMotivation, p.Motivation);
+                motBar.SetBar(p.Motivation);
             }
 
             currentPawnPreview.SetData(p);
@@ -409,8 +409,8 @@ public class BattleManager : MonoBehaviour
                 if (hoveredPawn == null)
                 {
                     int expectedAPAfterMove = _currentPawn.GetAPAfterMove(targetTile);
-                    apBar.SetBar(Pawn.BASE_ACTION_POINTS, _currentPawn.ActionPoints, expectedAPAfterMove);
-                    motBar.SetBar(_currentPawn.GameChar.GetBattleMotivationCap(), _currentPawn.Motivation);
+                    apBar.SetBar(expectedAPAfterMove);
+                    motBar.SetBar(_currentPawn.Motivation);
                 }
             }
         }

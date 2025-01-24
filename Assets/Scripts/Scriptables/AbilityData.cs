@@ -21,4 +21,5 @@ public class AbilityData : ScriptableObject
     public int range;
     public AudioClip soundEffect;
     public EffectData statusEffect;
+    public Sprite sprite;
 }

@@ -40,7 +40,7 @@ public class ActionButton : MonoBehaviour
 
     public void SetInactive()
     {
-        image.sprite = defaultImage;
+        //image.sprite = defaultImage;
     }
 
     string GetKeyCodeDisplay(KeyCode keyCode)
@@ -96,7 +96,7 @@ public class ActionButton : MonoBehaviour
 
         if (Ability.SelectedAbility == action)
         {
-            image.sprite = selectedImage;
+            //image.sprite = selectedImage;
         }
 
         switch (hotkeyNum)
@@ -137,7 +137,10 @@ public class ActionButton : MonoBehaviour
     public void SetDataDisplay(Ability action)
     {
         _ability = action;
-        displayText.text = action.GetData().abilityName;
+
+        image.sprite = _ability.GetData().sprite;
+
+        //displayText.text = action.GetData().abilityName;
     }
 
     private void HandleClick()
@@ -147,7 +150,7 @@ public class ActionButton : MonoBehaviour
         if (_isSelected)
         {
             _callback(_ability);
-            image.sprite = selectedImage;
+            //image.sprite = selectedImage;
         }
         else
         {
