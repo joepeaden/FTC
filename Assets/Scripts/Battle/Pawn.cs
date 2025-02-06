@@ -49,6 +49,8 @@ public class Pawn : MonoBehaviour
 
     public bool EngagedInCombat => GetAdjacentEnemies().Count > 0;
 
+    public bool PendingLevelUp { get; set; }
+
     #region Buffs / Debuffs
     // outgoing and incoming damage multipliers
     public int OutDamageMult;
@@ -290,6 +292,11 @@ public class Pawn : MonoBehaviour
             if (targetPawn.IsDead)
             {
                 StartCoroutine(PlayAudioAfterDelay(0f, GameChar.TheWeapon.Data.killSound));
+
+                // need to just have it pending so that the BattleManager can regain control and
+                // pause itself to give time for the level up animation, then it triggers the animaiton
+                // via TriggerLevelUpVisuals.
+                PendingLevelUp = GameChar.AddXP(1);
             }
             else if (!targetHadArmor)
             {
@@ -302,7 +309,11 @@ public class Pawn : MonoBehaviour
             BattleManager.Instance.AddTextNotification(transform.position, "Miss!");
             StartCoroutine(PlayAudioAfterDelay(0.1f, GameChar.TheWeapon.Data.missSound));
         }
+    }
 
+    public void TriggerLevelUpVisuals()
+    {
+        _spriteController.SetLevelUp();
     }
 
     public void TriggerDodge()

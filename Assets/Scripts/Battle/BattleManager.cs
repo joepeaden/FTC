@@ -86,6 +86,11 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private WeaponItemData axe;
     [SerializeField] private WeaponItemData spear;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip _levelUpSound;
+
+    private GameObject pooledAudioSourceGO;
+
     public Pawn CurrentPawn => _currentPawn;
     private Pawn _currentPawn;
     private Tile _hoveredTile;
@@ -615,7 +620,7 @@ public class BattleManager : MonoBehaviour
 
         _selectionManager.SetIdleMode(false);
 
-        //_selectionManager.SetSelectedTile(CurrentPawn.CurrentTile);
+        //_selectionManager.SetSelectedTile(CurrentPawn.CurrentTile);s
 
         //CurrentPawn.CurrentTile.HighlightTilesInRange(_currentPawn.MoveRange+1, false, Tile.TileHighlightType.Move);
         //CurrentPawn.CurrentTile.HighlightTilesInRange(_currentAction.range+1, true, Tile.TileHighlightType.AttackRange);
@@ -637,6 +642,13 @@ public class BattleManager : MonoBehaviour
         if (GameManager.Instance != null)
         {
             bool playerWon = _battleResult == BattleResult.Win;
+
+            // distribute XP for participating in battle
+            for (int i = 0; i < _playerPawns.Count; i++)
+            {
+                _playerPawns[i].GameChar.AddXP(1);
+            }
+
             GameManager.Instance.ExitBattle(playerWon);
         }
         else
@@ -667,6 +679,42 @@ public class BattleManager : MonoBehaviour
     /// <param name="p"></param>
     public void PawnActivated(Pawn p)
     {
+        StartCoroutine(PawnActivatedCoroutine(p));
+    }
+
+    private void OnLevelUpAudioFinished()
+    {
+        // return to object pool
+        pooledAudioSourceGO.SetActive(false);
+    }
+
+    public IEnumerator PawnActivatedCoroutine(Pawn p)
+    {
+        // level up visuals & audio. Need pauses to allow the player time to
+        // process what's going on.
+        if (p.PendingLevelUp)
+        {
+            p.PendingLevelUp = false;
+
+            yield return new WaitForSeconds(.3f);
+
+            p.TriggerLevelUpVisuals();
+
+            yield return new WaitForSeconds(.5f);
+
+            pooledAudioSourceGO = ObjectPool.instance.GetAudioSource();
+            pooledAudioSourceGO.SetActive(true);
+            AudioSource audioSource = pooledAudioSourceGO.GetComponent<AudioSource>();
+            audioSource.clip = _levelUpSound;
+            audioSource.Play();
+
+            Invoke("OnLevelUpAudioFinished", _levelUpSound.length);
+
+            BattleManager.Instance.AddTextNotification(p.transform.position, "Level up!");
+
+            yield return new WaitForSeconds(.25f);
+        }
+
         UpdateUIForPawn(p);
         //_selectionManager.SetSelectedTile(p.CurrentTile);
 

@@ -5,7 +5,18 @@ using UnityEngine;
 
 public class GameCharacter
 {
-    private const int VICE_TO_MOT_MULTIPLIER = 10;
+    /// <summary>
+    /// Each of these corresponds to the XP cap to level up.
+    /// For example, index 0 is the XP needed to get from level
+    /// 0 to level 1.
+    /// </summary>
+    private static int[] _xpCaps = new int[]
+    {
+        2,
+        4,
+        6,
+        8
+    };
 
     public enum CharMotivators
     {
@@ -26,6 +37,9 @@ public class GameCharacter
 
     public int HitPoints => _hitPoints;
     private int _hitPoints;
+
+    public int AccRating => _accRating;
+    private int _accRating;
 
     public ArmorItemData HelmItem => _helmItem;
     private ArmorItemData _helmItem;
@@ -51,6 +65,12 @@ public class GameCharacter
 
     public List<Ability> Abilities => _abilities;
     private List<Ability> _abilities = new ();
+
+    public int Level => _level;
+    private int _level;
+
+    public int XP => _xp;
+    private int _xp;
 
     public GameCharacter(string newName, CharMotivators newMotivator, int newMotivatorValue, bool onPlayerTeam)
     {
@@ -160,6 +180,24 @@ public class GameCharacter
     }
 
     /// <summary>
+    /// Returns true if level up
+    /// </summary>
+    /// <returns></returns>
+    public bool AddXP(int xpToAdd)
+    {
+        _xp += xpToAdd;
+
+        if (_xp >= 1)//_xpCaps[_level])
+        {
+            _xp -= _xpCaps[_level];
+            _level++;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
     /// Return character abilities + weapon abilities
     /// </summary>
     /// <returns></returns>
@@ -208,7 +246,7 @@ public class GameCharacter
 
     public int GetBattleMotivationCap()
     {
-        return GetTotalViceValue();// * VICE_TO_MOT_MULTIPLIER;
+        return GetTotalViceValue();
     }
 
     public int GetTotalArmor()

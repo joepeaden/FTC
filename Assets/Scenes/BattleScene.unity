@@ -4392,6 +4392,7 @@ MonoBehaviour:
   sword: {fileID: 11400000, guid: 025279ef39ee34138ad771576ee830f3, type: 2}
   axe: {fileID: 11400000, guid: 3f9b368f6a59e4158b31a26846087db3, type: 2}
   spear: {fileID: 11400000, guid: edc95d4d67c154e75a73c0b5d49afce6, type: 2}
+  _levelUpSound: {fileID: 8300000, guid: 7efb69b5941154aaf82a7a816546399d, type: 3}
 --- !u!114 &756036164
 MonoBehaviour:
   m_ObjectHideFlags: 0

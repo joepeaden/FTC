@@ -15,6 +15,7 @@ Material:
   - GLOW_ON
   - HITEFFECT_ON
   - INNEROUTLINE_ON
+  - SHINE_ON
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -193,13 +194,13 @@ Material:
     - _RoundWaveSpeed: 2
     - _RoundWaveStrength: 0.7
     - _ShadowAlpha: 0.5
-    - _ShadowX: 0.1
+    - _ShadowX: -0.037
     - _ShadowY: -0.05
     - _ShakeUvSpeed: 2.5
     - _ShakeUvX: 1.5
     - _ShakeUvY: 1
     - _ShineGlow: 1
-    - _ShineLocation: 0.5
+    - _ShineLocation: 0
     - _ShineRotate: 0
     - _ShineWidth: 0.1
     - _TextureScrollXSpeed: 1

@@ -13,6 +13,8 @@ public class CharDetailPanel : MonoBehaviour
     [SerializeField] private PipStatBar _armorStatBar;
     [SerializeField] private PipStatBar _motivStatBar;
 
+    [SerializeField] private TMP_Text _levelText;
+    [SerializeField] private TMP_Text _xpText;
     [SerializeField] private TMP_Text _moveText;
     [SerializeField] private TMP_Text _initText;
     [SerializeField] private TMP_Text _dmgText;
@@ -37,6 +39,8 @@ public class CharDetailPanel : MonoBehaviour
         _armorStatBar.SetBar(_currentCharacter.GetTotalArmor()); ;
         _motivStatBar.SetBar(_currentCharacter.GetBattleMotivationCap());
 
+        _xpText.text = "XP: " + _currentCharacter.XP;
+        _levelText.text = "Level " + _currentCharacter.Level;
         _moveText.text = _currentCharacter.GetMoveRange().ToString();
         _initText.text = _currentCharacter.GetInitiativeWithEquipment().ToString();
         _dmgText.text = _currentCharacter.TheWeapon.Data.baseDamage.ToString();

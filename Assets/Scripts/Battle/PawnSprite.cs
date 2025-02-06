@@ -351,6 +351,31 @@ public class PawnSprite : MonoBehaviour
         }
     }
 
+    public void OnLevelUpAnimComplete()
+    {
+        _anim.SetBool("LevelUp", false);
+    }
+
+    public void SetLevelUp()
+    {
+        _anim.SetBool("LevelUp", true);
+        //switch (_facingDirection)
+        //{
+        //    case FacingDirection.NW:
+        //        _anim.Play("LevelUpNW");
+        //        break;
+        //    case FacingDirection.NE:
+        //        _anim.Play("LevelUpNE");
+        //        break;
+        //    case FacingDirection.SE:
+        //        _anim.Play("LevelUpSE");
+        //        break;
+        //    case FacingDirection.SW:
+        //        _anim.Play("LevelUpSW");
+        //        break;
+        //}
+    }
+
     public void TriggerDodge()
     {
         switch (_facingDirection)
