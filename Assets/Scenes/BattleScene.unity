@@ -7067,6 +7067,7 @@ GameObject:
   - component: {fileID: 1661674903}
   - component: {fileID: 1661674906}
   - component: {fileID: 1661674907}
+  - component: {fileID: 1661674908}
   m_Layer: 0
   m_Name: BattleSceneTestDependencies
   m_TagString: Untagged
@@ -7233,6 +7234,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _tooltip: {fileID: 2044631304}
+--- !u!114 &1661674908
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1661674902}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6887553a9cffd49188c8e0cac834a8ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1665964776
 GameObject:
   m_ObjectHideFlags: 0

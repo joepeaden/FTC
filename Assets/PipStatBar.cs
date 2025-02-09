@@ -2,11 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class PipStatBar : MonoBehaviour
 {
     [SerializeField] private Color fill;
     [SerializeField] private List<Image> statPips = new();
+    [SerializeField] private TMP_Text statValueText;
 
     private void Awake()
     {
@@ -23,6 +25,8 @@ public class PipStatBar : MonoBehaviour
     /// <param name="currentValue"></param>
     public void SetBar(int currentValue)
     {
+        statValueText.text = currentValue.ToString();
+
         // set currentValue num of pips to active
         int i = 0;
         for (; i < currentValue; i++)

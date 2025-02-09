@@ -1,7 +1,11 @@
 using TMPro;
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
+/// <summary>
+/// Handles character detail view and also the level up view
+/// </summary>
 public class CharDetailPanel : MonoBehaviour
 {
     [SerializeField] private TMP_Text _charName;
@@ -18,8 +22,10 @@ public class CharDetailPanel : MonoBehaviour
     [SerializeField] private TMP_Text _moveText;
     [SerializeField] private TMP_Text _initText;
     [SerializeField] private TMP_Text _dmgText;
+    [SerializeField] private TMP_Text accRating;
     [SerializeField] private GameObject itemUIPrefab;
 
+    public GameCharacter CurrentCharacter => _currentCharacter;
     private GameCharacter _currentCharacter;
     private DecisionsManager _decisions;
     [SerializeField] private ItemUI _helmUI;
@@ -44,6 +50,7 @@ public class CharDetailPanel : MonoBehaviour
         _moveText.text = _currentCharacter.GetMoveRange().ToString();
         _initText.text = _currentCharacter.GetInitiativeWithEquipment().ToString();
         _dmgText.text = _currentCharacter.TheWeapon.Data.baseDamage.ToString();
+        accRating.text = _currentCharacter.AccRating + "+";
 
         _helmUI.RemoveCallbacks();
         _weaponUI.RemoveCallbacks();

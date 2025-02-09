@@ -28,6 +28,8 @@ public class HonorProtect : Ability
         _targetPawn.ProtectingPawn = _activatedPawn;
         _turnsToProtect = GetData().turnsDuration;
 
+        _activatedPawn.Motivation -= GetData().cost;
+
         // on new activation, will want to check duration to see if stop protecting
         _activatedPawn.OnActivation.AddListener(HandleNewActivationForPawn);
         // obviously can't protect someone if we're dead can we?

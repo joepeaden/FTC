@@ -20,6 +20,7 @@ public class DecisionsManager : MonoBehaviour
     [SerializeField] private GameObject _troopsScreen;
     [SerializeField] private GameObject _shopScreen;
     [SerializeField] private GameObject _inventoryScreen;
+    [SerializeField] private GameObject _levelUpScreen;
     [SerializeField] private GameObject _troopsGrid;
     [SerializeField] private GameObject _shopGrid;
     [SerializeField] private GameObject _inventoryGrid;
@@ -32,12 +33,14 @@ public class DecisionsManager : MonoBehaviour
 
     [SerializeField] private CharDetailPanel _charDetail;
     [SerializeField] private Button _disableCharPanelButton;
+    [SerializeField] private Button _levelUpButton;
 
     private void Awake()
     {
         _recruitsButton.onClick.AddListener(ShowRecruitsScreen);
         _contractsButton.onClick.AddListener(ShowContractsScreen);
         _troopsButton.onClick.AddListener(ShowTroopsScreen);
+        _levelUpButton.onClick.AddListener(ShowLevelUpScreen);
         _shopButton.onClick.AddListener(ShowShopScreen);
 
         _charDetail.Setup(this);
@@ -195,13 +198,6 @@ public class DecisionsManager : MonoBehaviour
         panel.SetupPanel(character, ShowCharacterPanel);
     }
 
-    private void ShowCharacterPanel(GameCharacter character)
-    {
-        _charDetail.gameObject.SetActive(true);
-        _troopsScreen.SetActive(false);
-        _charDetail.SetCharacter(character);
-    }
-
     private void HideCharacterPanel()
     {
         _troopsScreen.SetActive(true);
@@ -226,6 +222,15 @@ public class DecisionsManager : MonoBehaviour
         }
     }
 
+    public void ShowCharacterPanel(GameCharacter character)
+    {
+        _charDetail.gameObject.SetActive(true);
+        _troopsScreen.SetActive(false);
+        _levelUpScreen.SetActive(false);
+        _inventoryScreen.SetActive(true);
+        _charDetail.SetCharacter(character);
+    }
+
     private void ShowRecruitsScreen()
     {
         _recruitsScreen.SetActive(true);
@@ -235,6 +240,7 @@ public class DecisionsManager : MonoBehaviour
         _troopsScreen.SetActive(false);
         _inventoryScreen.SetActive(false);
         _charDetail.gameObject.SetActive(false);
+        _levelUpScreen.gameObject.SetActive(false);
     }
 
     private void ShowContractsScreen()
@@ -246,6 +252,7 @@ public class DecisionsManager : MonoBehaviour
         _troopsScreen.SetActive(false);
         _inventoryScreen.SetActive(false);
         _charDetail.gameObject.SetActive(false);
+        _levelUpScreen.gameObject.SetActive(false);
     }
 
     private void ShowTroopsScreen()
@@ -256,6 +263,18 @@ public class DecisionsManager : MonoBehaviour
         _troopsScreen.SetActive(true);
         _inventoryScreen.SetActive(true);
         _charDetail.gameObject.SetActive(false);
+        _levelUpScreen.gameObject.SetActive(false);
+    }
+
+    private void ShowLevelUpScreen()
+    {
+        _recruitsScreen.SetActive(false);
+        _contractsScreen.SetActive(false);
+        _shopScreen.SetActive(false);
+        _troopsScreen.SetActive(false);
+        _inventoryScreen.SetActive(false);
+        _charDetail.gameObject.SetActive(true);
+        _levelUpScreen.gameObject.SetActive(true);
     }
 
     private void ShowShopScreen()
@@ -266,6 +285,7 @@ public class DecisionsManager : MonoBehaviour
         _troopsScreen.SetActive(false);
         _inventoryScreen.SetActive(true);
         _charDetail.gameObject.SetActive(false);
+        _levelUpScreen.gameObject.SetActive(false);
     }
 
     private void OnDestroy()
@@ -273,6 +293,7 @@ public class DecisionsManager : MonoBehaviour
         _recruitsButton.onClick.RemoveListener(ShowRecruitsScreen);
         _contractsButton.onClick.RemoveListener(ShowContractsScreen);
         _troopsButton.onClick.RemoveListener(ShowTroopsScreen);
+        _levelUpButton.onClick.RemoveListener(ShowLevelUpScreen);
         _shopButton.onClick.RemoveListener(ShowShopScreen);
         _disableCharPanelButton.onClick.RemoveListener(HideCharacterPanel);
     }

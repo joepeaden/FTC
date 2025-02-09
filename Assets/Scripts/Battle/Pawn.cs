@@ -323,32 +323,33 @@ public class Pawn : MonoBehaviour
 
     public void TakeDamage(Pawn attackingPawn, ActionData actionUsed)
     {
-        int hitPointsDmg;
+        int hitPointsDmg = 0;
         GameCharacter attackingCharacter = attackingPawn.GameChar;
-        float extraDmgMult = InDamageMult + attackingPawn.OutDamageMult;
+        //float extraDmgMult = InDamageMult + attackingPawn.OutDamageMult;
 
-        if (actionUsed.rangeForExtraDamage > 0 && CurrentTile.GetTileDistance(attackingPawn.CurrentTile) == actionUsed.rangeForExtraDamage)
-        {
-            // this could just become critical hits later perhaps.
-            extraDmgMult += actionUsed.extraDmgMultiplier;
-        }
+        //if (actionUsed.rangeForExtraDamage > 0 && CurrentTile.GetTileDistance(attackingPawn.CurrentTile) == actionUsed.rangeForExtraDamage)
+        //{
+        //    // this could just become critical hits later perhaps.
+        //    extraDmgMult += actionUsed.extraDmgMultiplier;
+        //}
 
-        if (extraDmgMult <= 0)
-        {
-            extraDmgMult = 1;
-        }
+        //if (extraDmgMult <= 0)
+        //{
+        //    extraDmgMult = 1;
+        //}
 
         bool armorHit = false;
         if (_armorPoints > 0)
         {
-            _armorPoints = Mathf.Max(0, (_armorPoints - Mathf.RoundToInt(attackingCharacter.GetWeaponArmorDamageForAction(actionUsed) * extraDmgMult)));
-            hitPointsDmg = Mathf.RoundToInt(attackingCharacter.GetWeaponPenetrationDamageForAction(actionUsed) * extraDmgMult);
-            
+            _armorPoints = Mathf.Max(0, (_armorPoints - attackingCharacter.GetWeaponArmorDamageForAction(actionUsed)));// * extraDmgMult)));
+            //hitPointsDmg = Mathf.RoundToInt(attackingCharacter.GetWeaponPenetrationDamageForAction(actionUsed));// * extraDmgMult);
+            //hitpoin
+
             armorHit = true;
         }
         else
         {
-            hitPointsDmg = Mathf.RoundToInt(attackingCharacter.GetWeaponDamageForAction(actionUsed) * extraDmgMult);
+            hitPointsDmg = Mathf.RoundToInt(attackingCharacter.GetWeaponDamageForAction(actionUsed));// * extraDmgMult);
         }
 
         _hitPoints -= Mathf.Max(0, hitPointsDmg);

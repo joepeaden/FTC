@@ -68,9 +68,10 @@ public class GameCharacter
 
     public int Level => _level;
     private int _level;
-
     public int XP => _xp;
     private int _xp;
+    public int PendingStatPoints => _pendingStatPoints;
+    private int _pendingStatPoints;
 
     public GameCharacter(string newName, CharMotivators newMotivator, int newMotivatorValue, bool onPlayerTeam)
     {
@@ -93,6 +94,7 @@ public class GameCharacter
         }
 
         _onPlayerTeam = onPlayerTeam;
+        _accRating = 6;
     }
 
     public GameCharacter(bool onPlayerTeam)
@@ -158,6 +160,17 @@ public class GameCharacter
         }
 
         _onPlayerTeam = onPlayerTeam;
+        _accRating = 6;
+    }
+
+    public void ChangeAccRating(int change)
+    {
+        _accRating += change;
+    }
+
+    public void ChangeHP(int change)
+    {
+        _hitPoints += change;
     }
 
     private void SetMotivator(CharMotivators newMotivator, int newMotivatorValue)
@@ -187,14 +200,20 @@ public class GameCharacter
     {
         _xp += xpToAdd;
 
-        if (_xp >= 1)//_xpCaps[_level])
+        if (_xp >= _xpCaps[_level])
         {
             _xp -= _xpCaps[_level];
             _level++;
+            _pendingStatPoints++;
             return true;
         }
 
         return false;
+    }
+
+    public void SpendStatPoint()
+    {
+        _pendingStatPoints--;
     }
 
     /// <summary>
@@ -209,12 +228,12 @@ public class GameCharacter
 
     public int GetWeaponDamageForAction(ActionData action)
     {
-        return action.outDmgMod + _theWeapon.Data.baseDamage;
+        return _theWeapon.Data.baseDamage;//action.outDmgMod + _theWeapon.Data.baseDamage;
     }
 
     public int GetWeaponArmorDamageForAction(ActionData action)
     {
-        return Mathf.RoundToInt(GetWeaponDamageForAction(action) * (action.armorDamageMod + _theWeapon.Data.baseArmorDamage));
+        return _theWeapon.Data.baseDamage;//Mathf.RoundToInt(GetWeaponDamageForAction(action) * (action.armorDamageMod + _theWeapon.Data.baseArmorDamage));
     }
 
     public int GetWeaponPenetrationDamageForAction(ActionData action)
