@@ -88,7 +88,16 @@ public class BattleManager : MonoBehaviour
 
     [Header("Audio")]
     [SerializeField] private AudioClip _levelUpSound;
-
+    /// <summary>
+    /// This is just a ref for audio sources retrieved from the object pooler.
+    /// It's needed because sometimes we want to disable the audio source after
+    /// an animation, which is probably out of the scope in which it was
+    /// retrieved.
+    /// </summary>
+    /// <remarks>
+    /// It may be worth creating a script for the audio source objects which
+    /// handles this.
+    /// </remarks>
     private GameObject pooledAudioSourceGO;
 
     public Pawn CurrentPawn => _currentPawn;

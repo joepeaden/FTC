@@ -325,6 +325,9 @@ public class Pawn : MonoBehaviour
     {
         int hitPointsDmg = 0;
         GameCharacter attackingCharacter = attackingPawn.GameChar;
+
+        // Damage multipliers, and armor, needs to be reworked for the recent change from % system to d12 scale.
+
         //float extraDmgMult = InDamageMult + attackingPawn.OutDamageMult;
 
         //if (actionUsed.rangeForExtraDamage > 0 && CurrentTile.GetTileDistance(attackingPawn.CurrentTile) == actionUsed.rangeForExtraDamage)

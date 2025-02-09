@@ -228,11 +228,15 @@ public class GameCharacter
 
     public int GetWeaponDamageForAction(ActionData action)
     {
+        // Damage multipliers, and armor, needs to be reworked for the recent change from % system to d12 scale.
+
         return _theWeapon.Data.baseDamage;//action.outDmgMod + _theWeapon.Data.baseDamage;
     }
 
     public int GetWeaponArmorDamageForAction(ActionData action)
     {
+        // Damage multipliers, and armor, needs to be reworked for the recent change from % system to d12 scale.
+
         return _theWeapon.Data.baseDamage;//Mathf.RoundToInt(GetWeaponDamageForAction(action) * (action.armorDamageMod + _theWeapon.Data.baseArmorDamage));
     }
 

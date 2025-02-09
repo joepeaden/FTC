@@ -4,6 +4,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+/// <summary>
+/// Handles UI for level up screen, and can apply changes and refresh
+/// CharDetailPanel UI.
+/// </summary>
 public class LevelUpPanel : MonoBehaviour
 {
     [SerializeField] private Button _increaseHP;
