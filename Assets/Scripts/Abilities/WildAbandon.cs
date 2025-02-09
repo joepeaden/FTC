@@ -24,6 +24,8 @@ public class WildAbandon : Ability
         
         turnsForEffect = GetData().turnsDuration;
 
+        _activatedPawn.Motivation -= GetData().cost;
+
         // on new activation, will want to check duration to see if end effect
         _activatedPawn.OnActivation.AddListener(HandleNewActivationForPawn);
         // ded. remove effect.

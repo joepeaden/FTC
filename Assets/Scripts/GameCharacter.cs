@@ -5,7 +5,18 @@ using UnityEngine;
 
 public class GameCharacter
 {
-    private const int VICE_TO_MOT_MULTIPLIER = 10;
+    /// <summary>
+    /// Each of these corresponds to the XP cap to level up.
+    /// For example, index 0 is the XP needed to get from level
+    /// 0 to level 1.
+    /// </summary>
+    private static int[] _xpCaps = new int[]
+    {
+        2,
+        4,
+        6,
+        8
+    };
 
     public enum CharMotivators
     {
@@ -26,6 +37,9 @@ public class GameCharacter
 
     public int HitPoints => _hitPoints;
     private int _hitPoints;
+
+    public int AccRating => _accRating;
+    private int _accRating;
 
     public ArmorItemData HelmItem => _helmItem;
     private ArmorItemData _helmItem;
@@ -52,6 +66,13 @@ public class GameCharacter
     public List<Ability> Abilities => _abilities;
     private List<Ability> _abilities = new ();
 
+    public int Level => _level;
+    private int _level;
+    public int XP => _xp;
+    private int _xp;
+    public int PendingStatPoints => _pendingStatPoints;
+    private int _pendingStatPoints;
+
     public GameCharacter(string newName, CharMotivators newMotivator, int newMotivatorValue, bool onPlayerTeam)
     {
         _charName = newName;
@@ -73,6 +94,7 @@ public class GameCharacter
         }
 
         _onPlayerTeam = onPlayerTeam;
+        _accRating = 6;
     }
 
     public GameCharacter(bool onPlayerTeam)
@@ -138,6 +160,17 @@ public class GameCharacter
         }
 
         _onPlayerTeam = onPlayerTeam;
+        _accRating = 6;
+    }
+
+    public void ChangeAccRating(int change)
+    {
+        _accRating += change;
+    }
+
+    public void ChangeHP(int change)
+    {
+        _hitPoints += change;
     }
 
     private void SetMotivator(CharMotivators newMotivator, int newMotivatorValue)
@@ -160,6 +193,30 @@ public class GameCharacter
     }
 
     /// <summary>
+    /// Returns true if level up
+    /// </summary>
+    /// <returns></returns>
+    public bool AddXP(int xpToAdd)
+    {
+        _xp += xpToAdd;
+
+        if (_xp >= _xpCaps[_level])
+        {
+            _xp -= _xpCaps[_level];
+            _level++;
+            _pendingStatPoints++;
+            return true;
+        }
+
+        return false;
+    }
+
+    public void SpendStatPoint()
+    {
+        _pendingStatPoints--;
+    }
+
+    /// <summary>
     /// Return character abilities + weapon abilities
     /// </summary>
     /// <returns></returns>
@@ -171,12 +228,16 @@ public class GameCharacter
 
     public int GetWeaponDamageForAction(ActionData action)
     {
-        return action.outDmgMod + _theWeapon.Data.baseDamage;
+        // Damage multipliers, and armor, needs to be reworked for the recent change from % system to d12 scale.
+
+        return _theWeapon.Data.baseDamage;//action.outDmgMod + _theWeapon.Data.baseDamage;
     }
 
     public int GetWeaponArmorDamageForAction(ActionData action)
     {
-        return Mathf.RoundToInt(GetWeaponDamageForAction(action) * (action.armorDamageMod + _theWeapon.Data.baseArmorDamage));
+        // Damage multipliers, and armor, needs to be reworked for the recent change from % system to d12 scale.
+
+        return _theWeapon.Data.baseDamage;//Mathf.RoundToInt(GetWeaponDamageForAction(action) * (action.armorDamageMod + _theWeapon.Data.baseArmorDamage));
     }
 
     public int GetWeaponPenetrationDamageForAction(ActionData action)
@@ -208,7 +269,7 @@ public class GameCharacter
 
     public int GetBattleMotivationCap()
     {
-        return GetTotalViceValue();// * VICE_TO_MOT_MULTIPLIER;
+        return GetTotalViceValue();
     }
 
     public int GetTotalArmor()

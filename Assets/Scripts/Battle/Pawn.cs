@@ -49,6 +49,8 @@ public class Pawn : MonoBehaviour
 
     public bool EngagedInCombat => GetAdjacentEnemies().Count > 0;
 
+    public bool PendingLevelUp { get; set; }
+
     #region Buffs / Debuffs
     // outgoing and incoming damage multipliers
     public int OutDamageMult;
@@ -290,6 +292,11 @@ public class Pawn : MonoBehaviour
             if (targetPawn.IsDead)
             {
                 StartCoroutine(PlayAudioAfterDelay(0f, GameChar.TheWeapon.Data.killSound));
+
+                // need to just have it pending so that the BattleManager can regain control and
+                // pause itself to give time for the level up animation, then it triggers the animaiton
+                // via TriggerLevelUpVisuals.
+                PendingLevelUp = GameChar.AddXP(1);
             }
             else if (!targetHadArmor)
             {
@@ -302,7 +309,11 @@ public class Pawn : MonoBehaviour
             BattleManager.Instance.AddTextNotification(transform.position, "Miss!");
             StartCoroutine(PlayAudioAfterDelay(0.1f, GameChar.TheWeapon.Data.missSound));
         }
+    }
 
+    public void TriggerLevelUpVisuals()
+    {
+        _spriteController.SetLevelUp();
     }
 
     public void TriggerDodge()
@@ -312,32 +323,36 @@ public class Pawn : MonoBehaviour
 
     public void TakeDamage(Pawn attackingPawn, ActionData actionUsed)
     {
-        int hitPointsDmg;
+        int hitPointsDmg = 0;
         GameCharacter attackingCharacter = attackingPawn.GameChar;
-        float extraDmgMult = InDamageMult + attackingPawn.OutDamageMult;
 
-        if (actionUsed.rangeForExtraDamage > 0 && CurrentTile.GetTileDistance(attackingPawn.CurrentTile) == actionUsed.rangeForExtraDamage)
-        {
-            // this could just become critical hits later perhaps.
-            extraDmgMult += actionUsed.extraDmgMultiplier;
-        }
+        // Damage multipliers, and armor, needs to be reworked for the recent change from % system to d12 scale.
 
-        if (extraDmgMult <= 0)
-        {
-            extraDmgMult = 1;
-        }
+        //float extraDmgMult = InDamageMult + attackingPawn.OutDamageMult;
+
+        //if (actionUsed.rangeForExtraDamage > 0 && CurrentTile.GetTileDistance(attackingPawn.CurrentTile) == actionUsed.rangeForExtraDamage)
+        //{
+        //    // this could just become critical hits later perhaps.
+        //    extraDmgMult += actionUsed.extraDmgMultiplier;
+        //}
+
+        //if (extraDmgMult <= 0)
+        //{
+        //    extraDmgMult = 1;
+        //}
 
         bool armorHit = false;
         if (_armorPoints > 0)
         {
-            _armorPoints = Mathf.Max(0, (_armorPoints - Mathf.RoundToInt(attackingCharacter.GetWeaponArmorDamageForAction(actionUsed) * extraDmgMult)));
-            hitPointsDmg = Mathf.RoundToInt(attackingCharacter.GetWeaponPenetrationDamageForAction(actionUsed) * extraDmgMult);
-            
+            _armorPoints = Mathf.Max(0, (_armorPoints - attackingCharacter.GetWeaponArmorDamageForAction(actionUsed)));// * extraDmgMult)));
+            //hitPointsDmg = Mathf.RoundToInt(attackingCharacter.GetWeaponPenetrationDamageForAction(actionUsed));// * extraDmgMult);
+            //hitpoin
+
             armorHit = true;
         }
         else
         {
-            hitPointsDmg = Mathf.RoundToInt(attackingCharacter.GetWeaponDamageForAction(actionUsed) * extraDmgMult);
+            hitPointsDmg = Mathf.RoundToInt(attackingCharacter.GetWeaponDamageForAction(actionUsed));// * extraDmgMult);
         }
 
         _hitPoints -= Mathf.Max(0, hitPointsDmg);

@@ -21,7 +21,7 @@ public class BasicAttackAbility : Ability
 
             return false;
         }
-
+         
         activatedPawn.AttackPawn(targetPawn, attackAction);
 
         activatedPawn.ActionPoints -= attackAction.apCost;

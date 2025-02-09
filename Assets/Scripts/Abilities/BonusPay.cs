@@ -21,6 +21,8 @@ public class BonusPay : Ability
 
         _activatedPawn.DodgeMod = GetData().dodgeMod;
         _activatedPawn.HitMod = GetData().hitMod;
+
+        _activatedPawn.Motivation -= GetData().cost;
         
         turnsForEffect = GetData().turnsDuration;
 
