@@ -171,13 +171,14 @@ public class BattleManager : MonoBehaviour
     private void Start()
     {
         _battleResult = BattleResult.Undecided;
+        StartBattle();
     }
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            ToggleInstructions();
+            //ToggleInstructions();
         }
 
         if (Input.GetKeyDown(KeyCode.F) && CurrentPawn.OnPlayerTeam)

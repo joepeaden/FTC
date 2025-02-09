@@ -15,7 +15,7 @@ MonoBehaviour:
   abilityName: Bonus Pay
   description: Pay for increased hit and dodge chance until this character's next
     turn.
-  cost: 10
+  cost: 1
   turnsDuration: 1
   outDmgMod: 0
   inDmgMod: 0

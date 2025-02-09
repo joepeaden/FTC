@@ -173,6 +173,11 @@ public class GameCharacter
         _hitPoints += change;
     }
 
+    public int GetXPToLevel()
+    {
+        return _xpCaps[_level];
+    }
+
     private void SetMotivator(CharMotivators newMotivator, int newMotivatorValue)
     {
         _motivator = newMotivator;

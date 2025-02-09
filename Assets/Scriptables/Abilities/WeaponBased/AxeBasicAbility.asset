@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityName: Attack
   description: Swing your weapon at the enemy
-  cost: 1
+  cost: 0
   turnsDuration: 0
   outDmgMod: 0
   inDmgMod: 0
@@ -24,7 +24,7 @@ MonoBehaviour:
   soundEffect: {fileID: 0}
   statusEffect: {fileID: 0}
   sprite: {fileID: 21300000, guid: 9a8b71c7fbca7466a975355eab5f6e32, type: 3}
-  apCost: 1
+  apCost: 3
   armorDamageMod: 0
   penetrationDamageMod: 0
   rangeForExtraDamage: 0

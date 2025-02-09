@@ -229,6 +229,15 @@ public class DecisionsManager : MonoBehaviour
         _levelUpScreen.SetActive(false);
         _inventoryScreen.SetActive(true);
         _charDetail.SetCharacter(character);
+
+        if (character.PendingStatPoints > 0)
+        {
+            _levelUpButton.gameObject.SetActive(true);
+        }
+        else
+        {
+            _levelUpButton.gameObject.SetActive(false);
+        }
     }
 
     private void ShowRecruitsScreen()

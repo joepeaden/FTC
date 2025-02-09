@@ -17,7 +17,6 @@ public class Pawn : MonoBehaviour
     public UnityEvent<List<EffectData>> OnEffectUpdate = new();
     public UnityEvent OnActivation = new();
 
-    public float baseHitChance;
     public float baseDodgeChance;
     public float baseSurroundBonus;
 
@@ -157,7 +156,7 @@ public class Pawn : MonoBehaviour
         }
 
         int tileDist = _currentTile.GetTileDistance(targetTile);
-        return Mathf.Max(ActionPoints - (tileDist * _gameChar.GetAPPerTileMoved()), -1);
+        return Mathf.Max(ActionPoints - (tileDist * _gameChar.GetAPPerTileMoved()), 0);
     }
 
     private void UpdateMotivationResource()
@@ -220,16 +219,17 @@ public class Pawn : MonoBehaviour
 
     #region Combat
 
-    public float GetHitChance(Pawn targetPawn)
+    public int GetRollToHit(Pawn targetPawn)
     {
         int surroundingAllies = targetPawn.GetAdjacentEnemies().Count;
 
         // don't wanna include yourself so - 1
-        float surroundHitMod = (surroundingAllies - 1) * .05f;
+        int surroundHitMod = (surroundingAllies - 1);
 
-        float abilityHitMod = HitMod - targetPawn.DodgeMod;
-        
-        float hitChance = baseHitChance + abilityHitMod + surroundHitMod + GameChar.TheWeapon.Data.baseAccMod + (Ability.SelectedAbility != null ? Ability.SelectedAbility.GetData().hitMod : 0);
+        // all the hit mods don't work currently - need to be updated to d12
+        //float abilityHitMod = HitMod - targetPawn.DodgeMod;
+
+        int hitChance = GameChar.AccRating + surroundHitMod; // + abilityHitMod + GameChar.TheWeapon.Data.baseAccMod + (Ability.SelectedAbility != null ? Ability.SelectedAbility.GetData().hitMod : 0);
         return hitChance;
     }
 
@@ -271,8 +271,8 @@ public class Pawn : MonoBehaviour
             targetPawn = targetPawn.ProtectingPawn;
         }
 
-        float hitChance = GetHitChance(targetPawn);
-        float hitRoll = Random.Range(0f, 1f);
+        float hitChance = GetRollToHit(targetPawn);
+        float hitRoll = Random.Range(1, 12);
 
         //BattleLogUI.Instance.AddLogEntry($"{GameChar.CharName} uses {currentAction.actionName} against {targetPawn.GameChar.CharName}!");
         //BattleLogUI.Instance.AddLogEntry($"Chance: {(int)(hitChance * 100)}, Rolled: {(int)(hitRoll * 100)}");
@@ -282,7 +282,7 @@ public class Pawn : MonoBehaviour
 
         _spriteController.PlayAttack(attackDirection);
 
-        if (hitRoll < hitChance)
+        if (hitRoll >= hitChance)
         {
             bool targetHadArmor = targetPawn.ArmorPoints > 0;
 
@@ -424,7 +424,7 @@ public class Pawn : MonoBehaviour
     /// Does the character have enough resources to make any action?
     /// </summary>
     /// <returns></returns>
-    public bool HasResourcesForAction(Ability theAbility = null)
+    public bool HasResourcesForAttackAction(Ability theAbility = null)
     {
         // this here needs cleanup. I need to remove the ActionData stuff basically alltogether.
         if (theAbility != null)
@@ -460,7 +460,7 @@ public class Pawn : MonoBehaviour
 
     public bool HasActionsRemaining()
     {
-        if (HasResourcesForAction())
+        if (EngagedInCombat && HasResourcesForAttackAction())
         {
             return true;
         }

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityName: Stab
   description: Strike the foe in a thrusting motion
-  cost: 1
+  cost: 0
   turnsDuration: 0
   outDmgMod: 0
   inDmgMod: 0
@@ -24,7 +24,7 @@ MonoBehaviour:
   soundEffect: {fileID: 0}
   statusEffect: {fileID: 0}
   sprite: {fileID: 21300000, guid: f3e651d3daa4844f9a42b28f6fe92729, type: 3}
-  apCost: 1
+  apCost: 2
   armorDamageMod: 0
   penetrationDamageMod: 0
   rangeForExtraDamage: 0

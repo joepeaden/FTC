@@ -23,19 +23,27 @@ public class TooltipManager : MonoBehaviour
         if (itemUI != null)
         {
             _tooltip.SetItem(itemUI.Item);
+            return;
         }
-
         ActionButton actionButton = hoveredGO.GetComponent<ActionButton>();
         if (actionButton != null)
         {
             _tooltip.SetAction(actionButton.TheAbility.GetData()) ;
+            return;
         }
-
         EffectIcon effectIcon = hoveredGO.GetComponent<EffectIcon>();
         if (effectIcon != null)
         {
             _tooltip.SetEffect(effectIcon.Effect);
+            return;
         }
+
+        TooltipTarget tt = hoveredGO.GetComponent<TooltipTarget>();
+        if (tt != null)
+        {
+            _tooltip.SetDescription(tt.displayTitle, tt.displayString);
+        }
+
     }
 
     public void HandleCloseTooltip()

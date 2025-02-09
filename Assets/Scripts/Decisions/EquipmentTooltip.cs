@@ -179,6 +179,23 @@ public class EquipmentTooltip : MonoBehaviour
         }
     }
 
+    public void SetDescription(string title, string description)
+    {
+        armorElements.SetActive(false);
+        weaponElements.SetActive(false);
+
+        gameObject.SetActive(true);
+        headerDiv.SetActive(false);
+
+        nameText.text = title;
+        descriptionText.text = description;
+
+        for (int i = 0; i < infoParent.childCount; i++)
+        {
+            Destroy(infoParent.GetChild(i).gameObject);
+        }
+    }
+
     private void UpdateModText(GameObject parentGO, TMP_Text valueText, int modifierValue)
     {
         if (modifierValue == 0)

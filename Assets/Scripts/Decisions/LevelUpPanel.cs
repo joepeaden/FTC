@@ -63,16 +63,11 @@ public class LevelUpPanel : MonoBehaviour
 
     private void CheckStatCapOrPointsSpent()
     {
-        if (_detailPanel.CurrentCharacter.HitPoints >= 8)
-        {
-            _increaseHP.gameObject.SetActive(false);
-        }
+        bool hpAtMaxVal = _detailPanel.CurrentCharacter.HitPoints >= 8;
+        bool charHasStatPoints = _detailPanel.CurrentCharacter.PendingStatPoints > 0;
 
-        if (_detailPanel.CurrentCharacter.PendingStatPoints <= 0)
-        {
-            _increaseAccRating.gameObject.SetActive(false);
-            _increaseHP.gameObject.SetActive(false);
-        }
+        _increaseAccRating.gameObject.SetActive(charHasStatPoints);
+        _increaseHP.gameObject.SetActive(hpAtMaxVal && charHasStatPoints);
 
         _statPoints.text = "Stat Points: " + _detailPanel.CurrentCharacter.PendingStatPoints;
 

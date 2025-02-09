@@ -9,15 +9,13 @@ using UnityEngine.UI;
 public class CharDetailPanel : MonoBehaviour
 {
     [SerializeField] private TMP_Text _charName;
-    //[SerializeField] private TMP_Text _healthText;
-    //[SerializeField] private TMP_Text _viceText;
-    //[SerializeField] private TMP_Text _motivText;
 
     [SerializeField] private PipStatBar _healthStatBar;
     [SerializeField] private PipStatBar _armorStatBar;
     [SerializeField] private PipStatBar _motivStatBar;
 
     [SerializeField] private TMP_Text _levelText;
+    [SerializeField] private TMP_Text _classText;
     [SerializeField] private TMP_Text _xpText;
     [SerializeField] private TMP_Text _moveText;
     [SerializeField] private TMP_Text _initText;
@@ -45,12 +43,14 @@ public class CharDetailPanel : MonoBehaviour
         _armorStatBar.SetBar(_currentCharacter.GetTotalArmor()); ;
         _motivStatBar.SetBar(_currentCharacter.GetBattleMotivationCap());
 
-        _xpText.text = "XP: " + _currentCharacter.XP;
+        _xpText.text = "XP: " + _currentCharacter.XP + "/" + _currentCharacter.GetXPToLevel();
         _levelText.text = "Level " + _currentCharacter.Level;
         _moveText.text = _currentCharacter.GetMoveRange().ToString();
         _initText.text = _currentCharacter.GetInitiativeWithEquipment().ToString();
         _dmgText.text = _currentCharacter.TheWeapon.Data.baseDamage.ToString();
         accRating.text = _currentCharacter.AccRating + "+";
+
+        _classText.text = _currentCharacter.Motivator.ToString();
 
         _helmUI.RemoveCallbacks();
         _weaponUI.RemoveCallbacks();

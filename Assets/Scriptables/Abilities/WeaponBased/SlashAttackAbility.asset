@@ -24,7 +24,7 @@ MonoBehaviour:
   soundEffect: {fileID: 0}
   statusEffect: {fileID: 0}
   sprite: {fileID: 21300000, guid: 2540382591bd34923af293cd6be583e4, type: 3}
-  apCost: 1
+  apCost: 3
   armorDamageMod: 0
   penetrationDamageMod: 0
   rangeForExtraDamage: 0

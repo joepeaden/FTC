@@ -63,7 +63,7 @@ public class ActionButton : MonoBehaviour
 
     private void UpdateInteractivity()
     {
-        _button.interactable = BattleManager.Instance.CurrentPawn.HasResourcesForAction(_ability);
+        _button.interactable = BattleManager.Instance.CurrentPawn.HasResourcesForAttackAction(_ability);
 
         // don't look disabled in display mode.
         if (!_isButtonMode)
