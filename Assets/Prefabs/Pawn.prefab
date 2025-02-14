@@ -445,7 +445,6 @@ MonoBehaviour:
   OnActivation:
     m_PersistentCalls:
       m_Calls: []
-  baseHitChance: 0.6
   baseDodgeChance: 0
   baseSurroundBonus: 0.2
   ActionPoints: 0
@@ -460,6 +459,7 @@ MonoBehaviour:
   dieSound: {fileID: 8300000, guid: 53defb0490f384700828806354f94976, type: 3}
   _audioSource: {fileID: 5720785191603622845}
   _spriteController: {fileID: 6364605892828976112}
+  _movingSound: {fileID: 8300000, guid: 8f45c196c3bb948449bf91c485626eef, type: 3}
 --- !u!114 &5116864122955787313
 MonoBehaviour:
   m_ObjectHideFlags: 0

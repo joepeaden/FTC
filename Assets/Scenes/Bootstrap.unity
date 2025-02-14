@@ -563,6 +563,7 @@ GameObject:
   - component: {fileID: 1966799576}
   - component: {fileID: 1966799577}
   - component: {fileID: 1966799578}
+  - component: {fileID: 1966799579}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -601,6 +602,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _gameCharData: {fileID: 11400000, guid: 2ffcd208c31b24b8d89ae7832606b8f1, type: 2}
   _equipmentListData: {fileID: 11400000, guid: 45ebae92ddc7f4eb09d9065cfbc49418, type: 2}
+  _clickSound: {fileID: 8300000, guid: 44655ac3e8d1745429020578a1c4698e, type: 3}
 --- !u!114 &1966799577
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -710,3 +712,19 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1966799579
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1966799574}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 546b705c7ddb94c89a0701cf4601f582, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pawnPreviewPrefab: {fileID: 2881012879661761195, guid: ba3d5154ba3cb452188b04104229f046, type: 3}
+  pawnPreviewPoolSize: 15
+  audioSourcePrefab: {fileID: 8567179387656561764, guid: c5b47d9f5a6a1a04496b0f441bab48b9, type: 3}
+  audioSourcePoolSize: 5

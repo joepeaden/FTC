@@ -67,7 +67,7 @@ public class LevelUpPanel : MonoBehaviour
         bool charHasStatPoints = _detailPanel.CurrentCharacter.PendingStatPoints > 0;
 
         _increaseAccRating.gameObject.SetActive(charHasStatPoints);
-        _increaseHP.gameObject.SetActive(hpAtMaxVal && charHasStatPoints);
+        _increaseHP.gameObject.SetActive(!hpAtMaxVal && charHasStatPoints);
 
         _statPoints.text = "Stat Points: " + _detailPanel.CurrentCharacter.PendingStatPoints;
 

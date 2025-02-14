@@ -30,6 +30,8 @@ public class GameManager : MonoBehaviour
     public EquipmentListData EquipmentList => _equipmentListData;
     [SerializeField] private EquipmentListData _equipmentListData;
 
+    [SerializeField] private AudioClip _clickSound;
+
     private void Awake()
     {
         _instance = this;
@@ -41,7 +43,7 @@ public class GameManager : MonoBehaviour
         LoadMainMenu();
     }
 
-    public void StartNewGame()//string playerCharName)
+    public void StartNewGame()
     {
 #if UNITY_EDITOR
         _playerGold = 200;
@@ -134,5 +136,14 @@ public class GameManager : MonoBehaviour
         {
             AddGold(_potentialRewardAmount);
         }
+    }
+
+    public void PlayClickEffect()
+    {
+        GameObject pooledAudioSourceGO = ObjectPool.instance.GetAudioSource();
+        pooledAudioSourceGO.SetActive(true);
+        AudioSource audioSource = pooledAudioSourceGO.GetComponent<AudioSource>();
+        audioSource.clip = _clickSound;
+        audioSource.Play();
     }
 }

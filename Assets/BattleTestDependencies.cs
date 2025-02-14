@@ -6,20 +6,20 @@ using UnityEngine;
 /// </summary>
 public class BattleTestDependencies : MonoBehaviour
 {
-    public static BattleTestDependencies Instance;
+//    public static BattleTestDependencies Instance;
 
-    private void Start()
-    {
-#if !UNITY_EDITOR
-        // never have this enabled for builds
-        gameObject.SetActive(false);
-#else
-        // if not in a build, may be testing.
-        if (GameObject.Find("GameManager") != null)
-        {
-            gameObject.SetActive(false);
-        }
-    }
-#endif
+//    private void Awake()
+//    {
+//#if !UNITY_EDITOR
+//        // never have this enabled for builds
+//        gameObject.SetActive(false);
+//#else
+//        // if not in a build, may be testing.
+//        if (GameObject.Find("GameManager") != null)
+//        {
+//            gameObject.SetActive(false);
+//        }
+//    }
+//#endif
 
 }

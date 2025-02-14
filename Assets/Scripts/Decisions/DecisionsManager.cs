@@ -35,6 +35,10 @@ public class DecisionsManager : MonoBehaviour
     [SerializeField] private Button _disableCharPanelButton;
     [SerializeField] private Button _levelUpButton;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip goldSound;
+    [SerializeField] private AudioClip equipSound;
+
     private void Awake()
     {
         _recruitsButton.onClick.AddListener(ShowRecruitsScreen);
@@ -51,7 +55,7 @@ public class DecisionsManager : MonoBehaviour
         // fill out contracts
         for (int i = 0; i < _contractsPanelParent.childCount; i++)
         {
-            DecisionPanel panel =_contractsPanelParent.GetChild(i).GetComponent<DecisionPanel>();
+            DecisionPanel panel = _contractsPanelParent.GetChild(i).GetComponent<DecisionPanel>();
             panel.GenerateContractOption();
         }
 
@@ -132,12 +136,14 @@ public class DecisionsManager : MonoBehaviour
     }
 
     public void HandleInventoryItemSelected(ItemUI itemUI)
-    {         
+    {
         // if we're in character detail view then it should equip the item
         if (_charDetail.gameObject.activeInHierarchy)
         {
             // equip character
             _charDetail.EquipItem(itemUI.Item);
+
+            PlaySound(equipSound);
 
             // remove the item ffrom plyer inventory
             GameManager.Instance.PlayerInventory.Remove(itemUI.Item);
@@ -159,6 +165,8 @@ public class DecisionsManager : MonoBehaviour
             // give the player money back
             GameManager.Instance.AddGold(itemUI.Item.itemPrice);
 
+            PlaySound(goldSound);
+
             CheckForGameVictory();
 
             // move the item UI from Shop to Inventory
@@ -171,6 +179,15 @@ public class DecisionsManager : MonoBehaviour
         }
     }
 
+    private void PlaySound(AudioClip clip)
+    {
+        GameObject audioGO = ObjectPool.instance.GetAudioSource();
+        audioGO.SetActive(true);
+        AudioSource aSource = audioGO.GetComponent<AudioSource>();
+        aSource.clip = clip;
+        aSource.Play();
+    }
+
     public void PurchaseItem(ItemUI itemUI)
     {
         // add item to player inventory data structure
@@ -181,6 +198,8 @@ public class DecisionsManager : MonoBehaviour
         {
             return;
         }
+
+        PlaySound(goldSound);
 
         // move the item UI from Shop to Inventory
         itemUI.transform.SetParent(_inventoryGrid.transform);
@@ -208,6 +227,7 @@ public class DecisionsManager : MonoBehaviour
     {
         UpdateGoldText();
         AddCharacterPanel(newChar);
+        PlaySound(goldSound);
     }
 
     private void UpdateGoldText()

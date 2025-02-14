@@ -2,6 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// The pool where all the objects like to hang out.
+/// There's barbecues on Saturdays.
+/// </summary>
 public class ObjectPool : MonoBehaviour
 {
     public static ObjectPool instance;
@@ -10,38 +14,13 @@ public class ObjectPool : MonoBehaviour
     public GameObject pawnPreviewPrefab;
     public int pawnPreviewPoolSize;
 
-    //[Header("Enemies")]
-    //public GameObject enemyPrefab;
-    //public int enemyPoolSize;
-
     [Header("AudioSources")]
     public GameObject audioSourcePrefab;
     public int audioSourcePoolSize;
 
-    //[Header("corpses")]
-    //public GameObject corpsePrefab;
-    //public int corpsePoolSize;
-
-    //[Header("TextFloatUp")]
-    //public GameObject textFloatUpPrefab;
-    //public int textFloatUpPoolSize;
-
-    //[Header("ShellCasings")]
-    //public GameObject shellPrefab;
-    //public int shellPoolSize;
-
-    //[Header("Smaples")]
-    //public GameObject samplePrefab;
-    //public int samplePoolSize;
-
     private Transform objectPoolParent;
     private List<GameObject> pawnPreviews;
-    //private List<GameObject> enemies;
     private List<GameObject> audioSources;
-    //private List<GameObject> corpses;
-    //private List<GameObject> textFloatUps;
-    //private List<GameObject> samples;
-    //private List<GameObject> shells;
 
     void Awake()
     {
@@ -50,10 +29,6 @@ public class ObjectPool : MonoBehaviour
 
     void Start()
     {
-        // just for organization
-        objectPoolParent = Instantiate(new GameObject()).GetComponent<Transform>();
-        objectPoolParent.name = "ObjectPool";
-
         audioSources = CreatePool(audioSourcePrefab, audioSources, audioSourcePoolSize);
         pawnPreviews = CreatePool(pawnPreviewPrefab, pawnPreviews, pawnPreviewPoolSize);
     }
@@ -64,7 +39,7 @@ public class ObjectPool : MonoBehaviour
         GameObject tmp;
         for (int i = 0; i < count; i++)
         {
-            tmp = Instantiate(prefab, objectPoolParent);
+            tmp = Instantiate(prefab, transform);
             tmp.SetActive(false);
             listToAssign.Add(tmp);
         }

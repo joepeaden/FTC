@@ -22,7 +22,7 @@ MonoBehaviour:
   itemPrice: 50
   itemType: 0
   isDefault: 0
-  protection: 7
+  protection: 8
   moveMod: -1
   initMod: -3
   viceToMod: 0
