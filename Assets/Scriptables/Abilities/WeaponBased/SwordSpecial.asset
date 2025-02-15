@@ -9,24 +9,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f757fd94518b7401cb0591f111a72102, type: 3}
-  m_Name: SlashAttackAbility
+  m_Script: {fileID: 11500000, guid: 9d5aa5c5c58f3514fa46ccd0fdce31f3, type: 3}
+  m_Name: SwordSpecial
   m_EditorClassIdentifier: 
   abilityName: Slash
   description: Slash the enemy, hitting two tiles in a clockwise fashion.
-  cost: 1
-  turnsDuration: 0
-  outDmgMod: 0
-  inDmgMod: 0
-  hitMod: 0
-  dodgeMod: 0
+  motCost: 1
   range: 1
-  soundEffect: {fileID: 0}
-  statusEffect: {fileID: 0}
   sprite: {fileID: 21300000, guid: 2540382591bd34923af293cd6be583e4, type: 3}
   apCost: 3
-  armorDamageMod: 0
-  penetrationDamageMod: 0
+  critChanceMod: 0
   rangeForExtraDamage: 0
-  extraDmgMultiplier: -1
+  bonusDmg: 0
   attackStyle: 1

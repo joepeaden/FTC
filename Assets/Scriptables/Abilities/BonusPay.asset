@@ -9,19 +9,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fc4f5e71cefc44923b07139785490d85, type: 3}
+  m_Script: {fileID: 11500000, guid: 5106310c19722ca41878781f486b6497, type: 3}
   m_Name: BonusPay
   m_EditorClassIdentifier: 
   abilityName: Bonus Pay
   description: Pay for increased hit and dodge chance until this character's next
     turn.
-  cost: 1
+  motCost: 1
+  range: 0
+  sprite: {fileID: 21300000, guid: 9d892c090be244501b9a80d511d7a5a4, type: 3}
   turnsDuration: 1
+  statusEffect: {fileID: 11400000, guid: a511b8c44e95c4aa7b80f10ecfd913be, type: 2}
   outDmgMod: 0
   inDmgMod: 0
-  hitMod: 0.2
-  dodgeMod: 0.2
-  range: 0
-  soundEffect: {fileID: 0}
-  statusEffect: {fileID: 11400000, guid: a511b8c44e95c4aa7b80f10ecfd913be, type: 2}
-  sprite: {fileID: 21300000, guid: 9d892c090be244501b9a80d511d7a5a4, type: 3}
+  hitMod: 1
+  dodgeMod: 1

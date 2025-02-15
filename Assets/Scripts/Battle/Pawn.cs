@@ -135,9 +135,9 @@ public class Pawn : MonoBehaviour
 
     public int GetAPAfterAction()
     {
-        if (Ability.SelectedAbility.GetData() as ActionData != null)
+        if (Ability.SelectedAbility.GetData() as WeaponAbilityData != null)
         {
-            return ActionPoints - ((ActionData)Ability.SelectedAbility.GetData()).apCost;
+            return ActionPoints - ((WeaponAbilityData)Ability.SelectedAbility.GetData()).apCost;
         }
         else
         {
@@ -147,7 +147,7 @@ public class Pawn : MonoBehaviour
 
     public int GetMTAfterAction()
     {
-        return Motivation - Ability.SelectedAbility.GetData().cost;
+        return Motivation - Ability.SelectedAbility.GetData().motCost;
     }
 
     public int GetAPAfterMove(Tile targetTile)
@@ -227,13 +227,20 @@ public class Pawn : MonoBehaviour
         int surroundingAllies = targetPawn.GetAdjacentEnemies().Count;
 
         // don't wanna include yourself so - 1
-        int surroundHitMod = (surroundingAllies - 1);
+        int surroundHitMod = (surroundingAllies - 1) * 2;
 
         // all the hit mods don't work currently - need to be updated to d12
         //float abilityHitMod = HitMod - targetPawn.DodgeMod;
 
-        int hitChance = GameChar.AccRating + surroundHitMod; // + abilityHitMod + GameChar.TheWeapon.Data.baseAccMod + (Ability.SelectedAbility != null ? Ability.SelectedAbility.GetData().hitMod : 0);
-        return hitChance;
+        int toHit = GameChar.AccRating - surroundHitMod; // + abilityHitMod + GameChar.TheWeapon.Data.baseAccMod + (Ability.SelectedAbility != null ? Ability.SelectedAbility.GetData().hitMod : 0);
+
+        // don't allow guaranteed hit here
+        if (toHit >= 12)
+        {
+            toHit = 11;
+        }
+
+        return toHit;
     }
 
     public List<Ability> GetWeaponAbilities()
@@ -266,7 +273,7 @@ public class Pawn : MonoBehaviour
     }
 
     // perhaps this stuff should all be moved to the AttackAbility classes...
-    public void AttackPawn(Pawn targetPawn, ActionData currentAction)
+    public void AttackPawn(Pawn targetPawn, WeaponAbilityData currentAction)
     {
         // if this pawn has a protector, try to hit that one instead
         if (targetPawn.ProtectingPawn != null)
@@ -274,23 +281,36 @@ public class Pawn : MonoBehaviour
             targetPawn = targetPawn.ProtectingPawn;
         }
 
-        float hitChance = GetRollToHit(targetPawn);
-        float hitRoll = Random.Range(1, 12);
+        int toHit = GetRollToHit(targetPawn);
+        int hitRoll = Random.Range(1, 12);
 
-        //BattleLogUI.Instance.AddLogEntry($"{GameChar.CharName} uses {currentAction.actionName} against {targetPawn.GameChar.CharName}!");
-        //BattleLogUI.Instance.AddLogEntry($"Chance: {(int)(hitChance * 100)}, Rolled: {(int)(hitRoll * 100)}");
+        BattleLogUI.Instance.AddLogEntry($"{GameChar.CharName} uses {currentAction.abilityName} against {targetPawn.GameChar.CharName}!");
+        BattleLogUI.Instance.AddLogEntry($"Needs: {toHit}, Rolled: {hitRoll}");
 
         Vector2 attackDirection = transform.position - targetPawn.transform.position;
         attackDirection.Normalize();
-
         _spriteController.PlayAttack(attackDirection);
 
-        if (hitRoll >= hitChance)
+        if (hitRoll >= toHit)
         {
             bool targetHadArmor = targetPawn.ArmorPoints > 0;
 
-            targetPawn.TakeDamage(this, currentAction);
-            BattleManager.Instance.AddTextNotification(transform.position, "Hit!");
+            bool isCrit = false;
+            if (hitRoll >= GameChar.CritChance - currentAction.critChanceMod)
+            {
+                isCrit = true;
+            }
+
+            targetPawn.TakeDamage(this, currentAction, isCrit);
+
+            if (isCrit)
+            {
+                BattleManager.Instance.AddTextNotification(transform.position, "Critical Hit!");
+            }
+            else
+            {
+                BattleManager.Instance.AddTextNotification(transform.position, "Hit!");
+            }
 
             if (targetPawn.IsDead)
             {
@@ -324,14 +344,10 @@ public class Pawn : MonoBehaviour
         _spriteController.TriggerDodge();
     }
 
-    public void TakeDamage(Pawn attackingPawn, ActionData actionUsed)
+    public void TakeDamage(Pawn attackingPawn, WeaponAbilityData actionUsed, bool isCrit)
     {
         int hitPointsDmg = 0;
         GameCharacter attackingCharacter = attackingPawn.GameChar;
-
-        // Damage multipliers, and armor, needs to be reworked for the recent change from % system to d12 scale.
-
-        //float extraDmgMult = InDamageMult + attackingPawn.OutDamageMult;
 
         //if (actionUsed.rangeForExtraDamage > 0 && CurrentTile.GetTileDistance(attackingPawn.CurrentTile) == actionUsed.rangeForExtraDamage)
         //{
@@ -339,23 +355,31 @@ public class Pawn : MonoBehaviour
         //    extraDmgMult += actionUsed.extraDmgMultiplier;
         //}
 
-        //if (extraDmgMult <= 0)
-        //{
-        //    extraDmgMult = 1;
-        //}
-
         bool armorHit = false;
         if (_armorPoints > 0)
         {
-            _armorPoints = Mathf.Max(0, (_armorPoints - attackingCharacter.GetWeaponArmorDamageForAction(actionUsed)));// * extraDmgMult)));
-            //hitPointsDmg = Mathf.RoundToInt(attackingCharacter.GetWeaponPenetrationDamageForAction(actionUsed));// * extraDmgMult);
-            //hitpoin
+            // crits against armor do full damage to armor and hp
+            if (isCrit)
+            {
+                _armorPoints = Mathf.Max(0, (_armorPoints - attackingCharacter.GetWeaponDamageForAction(actionUsed)) + actionUsed.bonusDmg);
+                hitPointsDmg = attackingCharacter.GetWeaponDamageForAction(actionUsed) + actionUsed.bonusDmg;
+            }
+            else
+            {
+                _armorPoints = Mathf.Max(0, (_armorPoints - attackingCharacter.GetWeaponDamageForAction(actionUsed)) + actionUsed.bonusDmg);
+            }
 
             armorHit = true;
         }
         else
         {
-            hitPointsDmg = Mathf.RoundToInt(attackingCharacter.GetWeaponDamageForAction(actionUsed));// * extraDmgMult);
+            hitPointsDmg = attackingCharacter.GetWeaponDamageForAction(actionUsed) + actionUsed.bonusDmg;
+
+            // crits against HP do double damage
+            if (isCrit)
+            {
+                hitPointsDmg *= 2;
+            }
         }
 
         _hitPoints -= Mathf.Max(0, hitPointsDmg);
@@ -432,15 +456,15 @@ public class Pawn : MonoBehaviour
         // this here needs cleanup. I need to remove the ActionData stuff basically alltogether.
         if (theAbility != null)
         {
-            ActionData action = theAbility.GetData() as ActionData;
+            WeaponAbilityData action = theAbility.GetData() as WeaponAbilityData;
             if (action != null)
             {
-                if (ActionPoints >= action.apCost && Motivation >= action.cost)
+                if (ActionPoints >= action.apCost && Motivation >= action.motCost)
                 {
                     return true;
                 }
             }
-            else if(Motivation >= theAbility.GetData().cost)
+            else if(Motivation >= theAbility.GetData().motCost)
             {
                 return true;
             }
@@ -451,7 +475,7 @@ public class Pawn : MonoBehaviour
         {
             foreach (Ability a in GameChar.TheWeapon.Abilities)
             {
-                if (Motivation >= a.GetData().cost && ActionPoints >= ((ActionData)a.GetData()).apCost)
+                if (Motivation >= a.GetData().motCost && ActionPoints >= ((WeaponAbilityData)a.GetData()).apCost)
                 {
                     return true;
                 }

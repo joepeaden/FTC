@@ -1,32 +1,29 @@
 using UnityEngine;
 using TMPro;
+using System.Collections.Generic;
 
+/// <summary>
+/// An ungodly amalgamation of different tooltips, brought into one being by eldritch rituals
+/// </summary>
 public class EquipmentTooltip : MonoBehaviour
 {
     [SerializeField] TMP_Text nameText;
     [SerializeField] TMP_Text descriptionText;
     [SerializeField] GameObject headerDiv;
 
-    [SerializeField] GameObject armorElements;
-    [SerializeField] TMP_Text protValue;
-    [SerializeField] GameObject moveModElements;
-    [SerializeField] TMP_Text moveModValue;
-    [SerializeField] GameObject initModElements;
-    [SerializeField] TMP_Text initModValue;
-    [SerializeField] GameObject viceModElements;
-    [SerializeField] TMP_Text viceModLabel;
-    [SerializeField] TMP_Text viceModValue;
-    [SerializeField] TMP_Text armorDmgValue;
-    [SerializeField] TMP_Text penDmgValue;
     [SerializeField] GameObject infoLine;
     [SerializeField] Transform infoParent;
 
-    [SerializeField] GameObject weaponElements;
-    [SerializeField] TMP_Text dmgValue;
+    private List<InfoLine> _infoLines = new();
 
     private void Awake()
     {
         DontDestroyOnLoad(gameObject);
+
+        for (int i = 0; i < infoParent.childCount; i++)
+        {
+            _infoLines.Add(infoParent.GetChild(i).gameObject.GetComponent<InfoLine>());
+        } 
     }
 
     public void SetItem(ItemData item)
@@ -42,45 +39,36 @@ public class EquipmentTooltip : MonoBehaviour
         nameText.text = item.itemName;
         descriptionText.text = item.description;
 
-        for (int i = 0; i < infoParent.childCount; i++)
-        {
-            Destroy(infoParent.GetChild(i).gameObject);
-        }
+        HideInfoLines();
 
         if (item.itemType == ItemType.Weapon)
         {
-            weaponElements.SetActive(true);
-            armorElements.SetActive(false);
             WeaponItemData weaponItem = (WeaponItemData)item;
-            dmgValue.text = weaponItem.baseDamage.ToString();
-            armorDmgValue.text = (weaponItem.baseArmorDamage * 100).ToString() + "%";
-            penDmgValue.text = (weaponItem.basePenetrationDamage * 100).ToString() + "%";
+            SetLine("Damage", weaponItem.baseDamage.ToString());
         }
         else
         {
-            weaponElements.SetActive(false);
-            armorElements.SetActive(true);
             ArmorItemData armorItem = (ArmorItemData)item;
-            protValue.text = armorItem.protection.ToString();
-
-            UpdateModText(moveModElements, moveModValue, armorItem.moveMod);
-            UpdateModText(initModElements, initModValue, armorItem.initMod);
-            UpdateModText(viceModElements, viceModValue, armorItem.viceMod);
-            if (armorItem.viceMod != 0)
-            {
-                switch (armorItem.viceToMod)
-                {
-                    case GameCharacter.CharMotivators.Greed:
-                        viceModLabel.text = "GRD:";
-                        break;
-                    case GameCharacter.CharMotivators.Honor:
-                        viceModLabel.text = "HNR:";
-                        break;
-                    case GameCharacter.CharMotivators.Glory:
-                        viceModLabel.text = "GLY:";
-                        break;
-                }
-            }
+            SetLine("Armor", armorItem.protection.ToString());
+            SetLine("Move", armorItem.moveMod.ToString());
+            SetLine("Initiative", armorItem.initMod.ToString());
+            
+            //UpdateModText(viceModElements, viceModValue, armorItem.viceMod);
+            //if (armorItem.viceMod != 0)
+            //{
+            //    switch (armorItem.viceToMod)
+            //    {
+            //        case GameCharacter.CharMotivators.Greed:
+            //            viceModLabel.text = "GRD:";
+            //            break;
+            //        case GameCharacter.CharMotivators.Honor:
+            //            viceModLabel.text = "HNR:";
+            //            break;
+            //        case GameCharacter.CharMotivators.Glory:
+            //            viceModLabel.text = "GLY:";
+            //            break;
+            //    }
+            //}
         }
     }
 
@@ -91,69 +79,54 @@ public class EquipmentTooltip : MonoBehaviour
             return;
         }
 
-        // eventually I gotta remove all this ActionData crap. But I don't have time to rework even more right now.
-        ActionData action = ability as ActionData;
-
-        armorElements.SetActive(false);
-        weaponElements.SetActive(false);
-
         gameObject.SetActive(true);
         headerDiv.SetActive(true);
 
         nameText.text = ability.abilityName;
         descriptionText.text = ability.description;
 
-        for (int i = 0; i < infoParent.childCount; i++)
+        HideInfoLines();
+
+        SetLine("MOT Cost", ability.motCost.ToString());
+
+        WeaponAbilityData weaponAbility = ability as WeaponAbilityData;
+        if (weaponAbility)
         {
-            Destroy(infoParent.GetChild(i).gameObject);
+            SetLine("AP Cost", weaponAbility.apCost.ToString());
+            SetLine("Range", ability.range.ToString());
+
+            if (weaponAbility.bonusDmg > 0)
+            {
+                SetLine("Damage Boost", "+" + weaponAbility.bonusDmg.ToString());
+            }
+
+            if (weaponAbility.critChanceMod > 0)
+            {
+                SetLine("Crit Roll Bonus", (weaponAbility.critChanceMod).ToString());
+            }
         }
 
-        GameObject newLine = Instantiate(infoLine, infoParent);
-        newLine.GetComponent<InfoLine>().SetData("MOT Cost", ability.cost.ToString());
-
-        if (action)
+        SupportAbilityData supportAbility = ability as SupportAbilityData;
+        if (supportAbility)
         {
-            newLine = Instantiate(infoLine, infoParent);
-            newLine.GetComponent<InfoLine>().SetData("AP Cost", action.apCost.ToString());
-        }
+            SetLine("Range", ability.range.ToString());
 
-        newLine = Instantiate(infoLine, infoParent);
-        newLine.GetComponent<InfoLine>().SetData("Range", ability.range.ToString());
-
-        if (ability.outDmgMod > 0)
-        {
-            newLine = Instantiate(infoLine, infoParent);
-            newLine.GetComponent<InfoLine>().SetData("DMG Inflicted Mod", ability.outDmgMod.ToString());
-        }
-
-        if (ability.inDmgMod > 0)
-        {
-            newLine = Instantiate(infoLine, infoParent);
-            newLine.GetComponent<InfoLine>().SetData("DMG Taken Mod", ability.inDmgMod.ToString());
-        }
-
-        if (action != null && action.armorDamageMod > 0)
-        {
-            newLine = Instantiate(infoLine, infoParent);
-            newLine.GetComponent<InfoLine>().SetData("AMR DMG Mod", (action.armorDamageMod * 100).ToString() + "%");
-        }
-
-        if (action != null && action.penetrationDamageMod > 0)
-        {
-            newLine = Instantiate(infoLine, infoParent);
-            newLine.GetComponent<InfoLine>().SetData("AMR PEN Mod", (action.penetrationDamageMod * 100).ToString() + "%");
-        }
-
-        if (ability.hitMod > 0)
-        {
-            newLine = Instantiate(infoLine, infoParent);
-            newLine.GetComponent<InfoLine>().SetData("Hit Mod", (ability.hitMod * 100).ToString() + "%");
-        }
-
-        if (ability.dodgeMod > 0)
-        {
-            newLine = Instantiate(infoLine, infoParent);
-            newLine.GetComponent<InfoLine>().SetData("Dodge Mod", (ability.dodgeMod * 100).ToString() + "%");
+            if (supportAbility.outDmgMod > 0)
+            {
+                SetLine("Damage Boost", supportAbility.outDmgMod.ToString());
+            }
+            if (supportAbility.inDmgMod > 0)
+            {
+                SetLine("Frailty", supportAbility.inDmgMod.ToString());
+            }
+            if (supportAbility.hitMod > 0)
+            {
+                SetLine("Hit Boost", "+" + supportAbility.hitMod);
+            }
+            if (supportAbility.dodgeMod > 0)
+            {
+                SetLine("Dodge Boost", supportAbility.dodgeMod.ToString());
+            }
         }
     }
 
@@ -164,52 +137,54 @@ public class EquipmentTooltip : MonoBehaviour
             return;
         }
 
-        armorElements.SetActive(false);
-        weaponElements.SetActive(false);
-
         gameObject.SetActive(true);
         headerDiv.SetActive(false);
 
         nameText.text = effect.effectName;
         descriptionText.text = effect.description;
 
-        for (int i = 0; i < infoParent.childCount; i++)
-        {
-            Destroy(infoParent.GetChild(i).gameObject);
-        }
+        HideInfoLines();
     }
 
     public void SetDescription(string title, string description)
     {
-        armorElements.SetActive(false);
-        weaponElements.SetActive(false);
-
         gameObject.SetActive(true);
         headerDiv.SetActive(false);
 
         nameText.text = title;
         descriptionText.text = description;
 
-        for (int i = 0; i < infoParent.childCount; i++)
+        HideInfoLines();
+    }
+
+    private void HideInfoLines()
+    {
+        foreach (InfoLine line in _infoLines)
         {
-            Destroy(infoParent.GetChild(i).gameObject);
+            line.Hide();
         }
     }
 
-    private void UpdateModText(GameObject parentGO, TMP_Text valueText, int modifierValue)
+    private void SetLine(string label, string value)
     {
-        if (modifierValue == 0)
+        if (int.TryParse(value, out int result))
         {
-            valueText.gameObject.SetActive(false);
-            parentGO.gameObject.SetActive(false);
+            // don't show zero values (negative values probably should be shown)
+            if (result == 0)
+            {
+                return;
+            }
         }
-        else
+        
+        foreach (InfoLine line in _infoLines)
         {
-            valueText.gameObject.SetActive(true);
-            parentGO.gameObject.SetActive(true);
-            valueText.text = modifierValue > 0 ? "+" + modifierValue.ToString() : modifierValue.ToString();
+            if (line.isHidden)
+            {
+                line.SetData(label, value);
+                return;
+            }
         }
-    }    
+    }
 
     public void Hide()
     {

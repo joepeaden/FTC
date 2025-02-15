@@ -9,24 +9,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f757fd94518b7401cb0591f111a72102, type: 3}
-  m_Name: AxeBasicAbility
+  m_Script: {fileID: 11500000, guid: 9d5aa5c5c58f3514fa46ccd0fdce31f3, type: 3}
+  m_Name: AxeBasic
   m_EditorClassIdentifier: 
-  abilityName: Attack
-  description: Swing your weapon at the enemy
-  cost: 0
-  turnsDuration: 0
-  outDmgMod: 0
-  inDmgMod: 0
-  hitMod: 0
-  dodgeMod: 0
+  abilityName: Cut
+  description: Swing your axe at your opponent.
+  motCost: 0
   range: 1
-  soundEffect: {fileID: 0}
-  statusEffect: {fileID: 0}
   sprite: {fileID: 21300000, guid: 9a8b71c7fbca7466a975355eab5f6e32, type: 3}
   apCost: 3
-  armorDamageMod: 0
-  penetrationDamageMod: 0
+  critChanceMod: 0
   rangeForExtraDamage: 0
-  extraDmgMultiplier: -1
+  bonusDmg: 0
   attackStyle: 0

@@ -3,19 +3,15 @@ using System.Collections;
 
 public class ItemData : ScriptableObject
 {
+    [Header("Descriptive")]
     public string itemName;
     public string description;
-    /// <summary>
-    /// display sprite.
-    /// </summary>
-    public Sprite itemSprite;
-    public Sprite SESprite;
-    public Sprite SWSprite;
-    public Sprite NWSprite;
-    public Sprite NESprite;
     public int itemPrice;
     public ItemType itemType;
     public bool isDefault;
+
+    [Header("Display")]
+    public Sprite itemSprite;
 }
 
 public enum ItemType

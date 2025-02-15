@@ -66,13 +66,4 @@ public class Ability
     {
         return data[dataAddress];
     }
-
-    public void PlaySound()
-    {
-        GameObject audioGO = ObjectPool.instance.GetAudioSource();
-        audioGO.SetActive(true);
-        AudioSource aSource = audioGO.GetComponent<AudioSource>();
-        aSource.clip = GetData().soundEffect;
-        aSource.Play();
-    }
 }

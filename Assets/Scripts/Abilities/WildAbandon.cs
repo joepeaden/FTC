@@ -5,11 +5,13 @@ public class WildAbandon : Ability
     private int turnsForEffect;
     private Pawn _activatedPawn;
     private Pawn _targetPawn;
+    private SupportAbilityData _ability;
 
     public WildAbandon()
     {
         dataAddress = "Assets/Scriptables/Abilities/WildAbandon.asset";
         base.LoadData();
+        _ability = GetData() as SupportAbilityData;
     }
 
     // note... it may not be necessary to have the activated pawn param. Will the pawn that this
@@ -19,12 +21,12 @@ public class WildAbandon : Ability
         _activatedPawn = activatedPawn;
         _targetPawn = targetPawn;
 
-        _activatedPawn.OutDamageMult = GetData().outDmgMod;
-        _activatedPawn.InDamageMult = GetData().inDmgMod;
+        _activatedPawn.OutDamageMult = _ability.outDmgMod;
+        _activatedPawn.InDamageMult = _ability.inDmgMod;
         
-        turnsForEffect = GetData().turnsDuration;
+        turnsForEffect = _ability.turnsDuration;
 
-        _activatedPawn.Motivation -= GetData().cost;
+        _activatedPawn.Motivation -= _ability.motCost;
 
         // on new activation, will want to check duration to see if end effect
         _activatedPawn.OnActivation.AddListener(HandleNewActivationForPawn);
@@ -38,7 +40,7 @@ public class WildAbandon : Ability
         BattleManager.Instance.AddTextNotification(_targetPawn.transform.position, "+Raging");
 
         // add icon to the character UI to show effect
-        _targetPawn.UpdateEffect(GetData().statusEffect, true);
+        _targetPawn.UpdateEffect(_ability.statusEffect, true);
 
         return true;
     }
@@ -75,7 +77,7 @@ public class WildAbandon : Ability
     {
         BattleManager.Instance.AddTextNotification(_targetPawn.transform.position, "-Raging");
 
-        _targetPawn.UpdateEffect(GetData().statusEffect, false);
+        _targetPawn.UpdateEffect(_ability.statusEffect, false);
 
         _activatedPawn.OnActivation.RemoveListener(HandleNewActivationForPawn);
         _activatedPawn.OnHit.RemoveListener(HandleDeath);

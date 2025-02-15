@@ -12,13 +12,11 @@ public class WeaponItemData : ItemData
         Axe
     }
 
+    [Header("Weapon Info")]
     public WeaponType weaponType;
     public int baseDamage;
-    public float baseArmorDamage;
-    public float basePenetrationDamage;
-    public float baseAccMod;
-    public ActionData baseAction;
-    public ActionData specialAction;
+
+    [Header("Weapon Audio")]
     public AudioClip hitSound;
     public AudioClip killSound;
     public AudioClip missSound;

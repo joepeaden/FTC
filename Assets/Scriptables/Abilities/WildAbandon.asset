@@ -9,18 +9,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fc4f5e71cefc44923b07139785490d85, type: 3}
+  m_Script: {fileID: 11500000, guid: 5106310c19722ca41878781f486b6497, type: 3}
   m_Name: WildAbandon
   m_EditorClassIdentifier: 
   abilityName: Wild Abandon
   description: Deal, and take, double damage until this character's next turn.
-  cost: 1
+  motCost: 1
+  range: 0
+  sprite: {fileID: 21300000, guid: 04925fbf39cd4421893cc700bb44d9ea, type: 3}
   turnsDuration: 1
-  outDmgMod: 2
-  inDmgMod: 2
+  statusEffect: {fileID: 11400000, guid: 9309324bd5fc64e649b79b461626dbbb, type: 2}
+  outDmgMod: 1
+  inDmgMod: 1
   hitMod: 0
   dodgeMod: 0
-  range: 0
-  soundEffect: {fileID: 0}
-  statusEffect: {fileID: 11400000, guid: 9309324bd5fc64e649b79b461626dbbb, type: 2}
-  sprite: {fileID: 21300000, guid: 04925fbf39cd4421893cc700bb44d9ea, type: 3}

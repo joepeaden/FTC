@@ -388,7 +388,7 @@ public class BattleManager : MonoBehaviour
                     tilesToHighlight.Clear();
                     tilesToHighlight.Add(targetTile);
                     
-                    if ((ActionData)Ability.SelectedAbility.GetData() as ActionData != null && ((ActionData)Ability.SelectedAbility.GetData()).attackStyle == ActionData.AttackStyle.LShape)
+                    if ((WeaponAbilityData)Ability.SelectedAbility.GetData() as WeaponAbilityData != null && ((WeaponAbilityData)Ability.SelectedAbility.GetData()).attackStyle == WeaponAbilityData.AttackStyle.LShape)
                     {
                         tilesToHighlight.Add(_currentPawn.CurrentTile.GetClockwiseNextTile(targetTile));
                     }

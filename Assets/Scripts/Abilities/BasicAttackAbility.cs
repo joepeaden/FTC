@@ -11,9 +11,9 @@ public class BasicAttackAbility : Ability
 
     public override bool Activate(Pawn activatedPawn, Pawn targetPawn)
     {
-        ActionData attackAction = GetData() as ActionData;
+        WeaponAbilityData attackAction = GetData() as WeaponAbilityData;
 
-        if (activatedPawn.ActionPoints < attackAction.apCost || activatedPawn.Motivation < attackAction.cost)
+        if (activatedPawn.ActionPoints < attackAction.apCost || activatedPawn.Motivation < attackAction.motCost)
         {
             // why is PawnActivated called here? That seems pretty wierd. Doesn't seem necessary.
             // The pawn isn't acting, it can't because there's not enough resources.
@@ -25,7 +25,7 @@ public class BasicAttackAbility : Ability
         activatedPawn.AttackPawn(targetPawn, attackAction);
 
         activatedPawn.ActionPoints -= attackAction.apCost;
-        activatedPawn.Motivation -= attackAction.cost;
+        activatedPawn.Motivation -= attackAction.motCost;
 
         BattleManager.Instance.PawnActivated(activatedPawn);
 
