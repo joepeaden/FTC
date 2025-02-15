@@ -135,9 +135,9 @@ public class Pawn : MonoBehaviour
 
     public int GetAPAfterAction()
     {
-        if (Ability.SelectedAbility.GetData() as ActionData != null)
+        if (Ability.SelectedAbility.GetData() as WeaponAbilityData != null)
         {
-            return ActionPoints - ((ActionData)Ability.SelectedAbility.GetData()).apCost;
+            return ActionPoints - ((WeaponAbilityData)Ability.SelectedAbility.GetData()).apCost;
         }
         else
         {
@@ -147,7 +147,7 @@ public class Pawn : MonoBehaviour
 
     public int GetMTAfterAction()
     {
-        return Motivation - Ability.SelectedAbility.GetData().cost;
+        return Motivation - Ability.SelectedAbility.GetData().motCost;
     }
 
     public int GetAPAfterMove(Tile targetTile)
@@ -273,7 +273,7 @@ public class Pawn : MonoBehaviour
     }
 
     // perhaps this stuff should all be moved to the AttackAbility classes...
-    public void AttackPawn(Pawn targetPawn, ActionData currentAction)
+    public void AttackPawn(Pawn targetPawn, WeaponAbilityData currentAction)
     {
         // if this pawn has a protector, try to hit that one instead
         if (targetPawn.ProtectingPawn != null)
@@ -344,7 +344,7 @@ public class Pawn : MonoBehaviour
         _spriteController.TriggerDodge();
     }
 
-    public void TakeDamage(Pawn attackingPawn, ActionData actionUsed, bool isCrit)
+    public void TakeDamage(Pawn attackingPawn, WeaponAbilityData actionUsed, bool isCrit)
     {
         int hitPointsDmg = 0;
         GameCharacter attackingCharacter = attackingPawn.GameChar;
@@ -456,15 +456,15 @@ public class Pawn : MonoBehaviour
         // this here needs cleanup. I need to remove the ActionData stuff basically alltogether.
         if (theAbility != null)
         {
-            ActionData action = theAbility.GetData() as ActionData;
+            WeaponAbilityData action = theAbility.GetData() as WeaponAbilityData;
             if (action != null)
             {
-                if (ActionPoints >= action.apCost && Motivation >= action.cost)
+                if (ActionPoints >= action.apCost && Motivation >= action.motCost)
                 {
                     return true;
                 }
             }
-            else if(Motivation >= theAbility.GetData().cost)
+            else if(Motivation >= theAbility.GetData().motCost)
             {
                 return true;
             }
@@ -475,7 +475,7 @@ public class Pawn : MonoBehaviour
         {
             foreach (Ability a in GameChar.TheWeapon.Abilities)
             {
-                if (Motivation >= a.GetData().cost && ActionPoints >= ((ActionData)a.GetData()).apCost)
+                if (Motivation >= a.GetData().motCost && ActionPoints >= ((WeaponAbilityData)a.GetData()).apCost)
                 {
                     return true;
                 }

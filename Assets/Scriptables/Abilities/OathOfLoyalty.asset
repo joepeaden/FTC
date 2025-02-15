@@ -9,19 +9,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fc4f5e71cefc44923b07139785490d85, type: 3}
-  m_Name: HonorProtect
+  m_Script: {fileID: 11500000, guid: 5106310c19722ca41878781f486b6497, type: 3}
+  m_Name: OathOfLoyalty
   m_EditorClassIdentifier: 
   abilityName: Oath of Loyalty
   description: Any attacks directed at a selected ally will be directed at this character
     instead.
-  cost: 1
+  motCost: 1
+  range: 1
+  sprite: {fileID: 21300000, guid: 2fc2588497f9d4acaad3d1c7807ee0bb, type: 3}
   turnsDuration: 1
+  statusEffect: {fileID: 11400000, guid: 92a3ee2f6f05b457d892b4dc41103e74, type: 2}
   outDmgMod: 0
   inDmgMod: 0
   hitMod: 0
   dodgeMod: 0
-  range: 1
-  soundEffect: {fileID: 8300000, guid: 79583bfe2f93448b1a562ce657902064, type: 3}
-  statusEffect: {fileID: 11400000, guid: 92a3ee2f6f05b457d892b4dc41103e74, type: 2}
-  sprite: {fileID: 21300000, guid: 2fc2588497f9d4acaad3d1c7807ee0bb, type: 3}

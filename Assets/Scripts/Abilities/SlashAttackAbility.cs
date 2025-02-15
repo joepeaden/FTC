@@ -5,15 +5,15 @@ public class SlashAttackAbility : Ability
 {
     public SlashAttackAbility()
     {
-        dataAddress = "Assets/Scriptables/Abilities/WeaponBased/SlashAttackAbility.asset";
+        dataAddress = "Assets/Scriptables/Abilities/WeaponBased/SwordSpecial.asset";
         base.LoadData();
     }
 
     public override bool Activate(Pawn activatedPawn, Pawn primaryTargetPawn)
     {
-        ActionData attackAction = GetData() as ActionData;
+        WeaponAbilityData attackAction = GetData() as WeaponAbilityData;
 
-        if (activatedPawn.ActionPoints < attackAction.apCost || activatedPawn.Motivation < attackAction.cost)
+        if (activatedPawn.ActionPoints < attackAction.apCost || activatedPawn.Motivation < attackAction.motCost)
         {
             // why is PawnActivated called here? That seems pretty wierd. Doesn't seem necessary.
             // The pawn isn't acting, it can't because there's not enough resources.
@@ -25,7 +25,7 @@ public class SlashAttackAbility : Ability
         List<Pawn> targetPawns = new();
         targetPawns.Add(primaryTargetPawn);
 
-        if (attackAction.attackStyle == ActionData.AttackStyle.LShape)
+        if (attackAction.attackStyle == WeaponAbilityData.AttackStyle.LShape)
         {
             Tile clockwiseNextTile = activatedPawn.CurrentTile.GetClockwiseNextTile(primaryTargetPawn.CurrentTile);
             if (clockwiseNextTile.GetPawn())
@@ -40,7 +40,7 @@ public class SlashAttackAbility : Ability
         }
 
         activatedPawn.ActionPoints -= attackAction.apCost;
-        activatedPawn.Motivation -= attackAction.cost;
+        activatedPawn.Motivation -= attackAction.motCost;
         
         BattleManager.Instance.PawnActivated(activatedPawn);
 

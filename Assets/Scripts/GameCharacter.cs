@@ -236,14 +236,14 @@ public class GameCharacter
         return abilitiesToReturn.Concat(_abilities).ToList();
     }
 
-    public int GetWeaponDamageForAction(ActionData action)
+    public int GetWeaponDamageForAction(WeaponAbilityData action)
     {
         // Damage multipliers, and armor, needs to be reworked for the recent change from % system to d12 scale.
 
         return _theWeapon.Data.baseDamage;//action.outDmgMod + _theWeapon.Data.baseDamage;
     }
 
-    public int GetWeaponArmorDamageForAction(ActionData action)
+    public int GetWeaponArmorDamageForAction(WeaponAbilityData action)
     {
         // Damage multipliers, and armor, needs to be reworked for the recent change from % system to d12 scale.
 

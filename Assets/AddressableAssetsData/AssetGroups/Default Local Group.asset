@@ -17,53 +17,53 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: 4bb1c285f07b9463aa037833afdfcca8
   m_SerializeEntries:
-  - m_GUID: e8a0a26eaeb2940348dabc177611cabd
-    m_Address: Assets/Scriptables/Abilities/HonorProtect.asset
+  - m_GUID: b853d2157a6bae44c88b19a8a12e3861
+    m_Address: Assets/Scriptables/Abilities/OathOfLoyalty.asset
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 0bebf10a2b08f4755bcb0c88580ac075
-    m_Address: Assets/Scriptables/Abilities/WeaponBased/BasicAttackAbility.asset
+  - m_GUID: b160f905cba87174094846d30f86aff6
+    m_Address: Assets/Scriptables/Abilities/WeaponBased/ClubBasic.asset
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 62a8535b402d74570ad3fe8b8bbeb699
-    m_Address: Assets/Scriptables/Abilities/WeaponBased/SlashAttackAbility.asset
+  - m_GUID: 75bc10c1cd872b94baae2eeed719d9e2
+    m_Address: Assets/Scriptables/Abilities/WeaponBased/SwordSpecial.asset
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: b602727b4000747b880ef0d1227e1d1e
-    m_Address: Assets/Scriptables/Abilities/WeaponBased/BrutalChopAbility.asset
+  - m_GUID: bace5efdc70edc0458ca571e59a26b88
+    m_Address: Assets/Scriptables/Abilities/WeaponBased/AxeBasic.asset
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: c9883d60b42ef4f27b565e2cb529408e
-    m_Address: Assets/Scriptables/Abilities/WeaponBased/SpearBasicAbility.asset
+  - m_GUID: b3874ed04cc5b344faffc3517627c414
+    m_Address: Assets/Scriptables/Abilities/WeaponBased/SpearBasic.asset
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: c5c11da93a8724b40979c6f2e458ea9b
-    m_Address: Assets/Scriptables/Abilities/WeaponBased/SpearSpecialAbility.asset
+  - m_GUID: c9521778936124b4ea7100241ac48c39
+    m_Address: Assets/Scriptables/Abilities/WeaponBased/SpearSpecial.asset
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: f0478d39a81c64b70b4981268b3b2e00
-    m_Address: Assets/Scriptables/Abilities/WeaponBased/SwordBasicAbility.asset
+  - m_GUID: a734a08c4178c53449ccc6bd200e887c
+    m_Address: Assets/Scriptables/Abilities/WeaponBased/SwordBasic.asset
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 7b19216625880d04d8c1e54da5085d99
+  - m_GUID: b44886a610a815841a4231a9abacd962
     m_Address: Assets/Scriptables/Abilities/WildAbandon.asset
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: ac8c46f92019f6b4ea3500f2e12fcc4f
+  - m_GUID: 6970f9f66de34af468c41b8abd044a25
     m_Address: Assets/Scriptables/Abilities/BonusPay.asset
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: f14d37614be3b4a0ca96d70df3d28008
-    m_Address: Assets/Scriptables/Abilities/WeaponBased/AxeBasicAbility.asset
+  - m_GUID: 271dc709e9326a54f9900e33941ccbff
+    m_Address: Assets/Scriptables/Abilities/WeaponBased/AxeSpecial.asset
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

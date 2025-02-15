@@ -5,11 +5,13 @@ public class HonorProtect : Ability
     private int _turnsToProtect;
     private Pawn _activatedPawn;
     private Pawn _targetPawn;
+    private SupportAbilityData ability;
 
     public HonorProtect()
     {
-        dataAddress = "Assets/Scriptables/Abilities/HonorProtect.asset";
+        dataAddress = "Assets/Scriptables/Abilities/OathOfLoyalty.asset";
         base.LoadData();
+        ability = GetData() as SupportAbilityData;
     }
 
     // note... it may not be necessary to have the activated pawn param. Will the pawn that this
@@ -26,9 +28,9 @@ public class HonorProtect : Ability
         _targetPawn = targetPawn;
 
         _targetPawn.ProtectingPawn = _activatedPawn;
-        _turnsToProtect = GetData().turnsDuration;
+        _turnsToProtect = ability.turnsDuration;
 
-        _activatedPawn.Motivation -= GetData().cost;
+        _activatedPawn.Motivation -= GetData().motCost;
 
         // on new activation, will want to check duration to see if stop protecting
         _activatedPawn.OnActivation.AddListener(HandleNewActivationForPawn);
@@ -45,7 +47,7 @@ public class HonorProtect : Ability
         BattleManager.Instance.AddTextNotification(_targetPawn.transform.position, "+Protection");
 
         // add icon to the character UI to show effect
-        _targetPawn.UpdateEffect(GetData().statusEffect, true);
+        _targetPawn.UpdateEffect(ability.statusEffect, true);
 
         return true;
     }
@@ -93,7 +95,7 @@ public class HonorProtect : Ability
     {
         BattleManager.Instance.AddTextNotification(_targetPawn.transform.position, "-Protection");
 
-        _targetPawn.UpdateEffect(GetData().statusEffect, false);
+        _targetPawn.UpdateEffect(ability.statusEffect, false);
 
         _activatedPawn.OnActivation.RemoveListener(HandleNewActivationForPawn);
         _activatedPawn.OnHit.RemoveListener(HandleDeath);

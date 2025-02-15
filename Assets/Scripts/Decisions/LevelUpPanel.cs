@@ -45,7 +45,7 @@ public class LevelUpPanel : MonoBehaviour
 
     private void ImproveAccRating()
     {
-        _detailPanel.CurrentCharacter.ChangeAccRating(1);
+        _detailPanel.CurrentCharacter.ChangeAccRating(-1);
         _accLevelUpText.text = _detailPanel.CurrentCharacter.AccRating + "+";
         _detailPanel.CurrentCharacter.SpendStatPoint();
 
