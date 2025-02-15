@@ -15,8 +15,6 @@ public class WeaponItemData : ItemData
     public WeaponType weaponType;
     public int baseDamage;
     public float baseArmorDamage;
-    public float basePenetrationDamage;
-    public float baseAccMod;
     public ActionData baseAction;
     public ActionData specialAction;
     public AudioClip hitSound;

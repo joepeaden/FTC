@@ -54,7 +54,6 @@ public class EquipmentTooltip : MonoBehaviour
             WeaponItemData weaponItem = (WeaponItemData)item;
             dmgValue.text = weaponItem.baseDamage.ToString();
             armorDmgValue.text = (weaponItem.baseArmorDamage * 100).ToString() + "%";
-            penDmgValue.text = (weaponItem.basePenetrationDamage * 100).ToString() + "%";
         }
         else
         {
@@ -132,16 +131,10 @@ public class EquipmentTooltip : MonoBehaviour
             newLine.GetComponent<InfoLine>().SetData("DMG Taken Mod", ability.inDmgMod.ToString());
         }
 
-        if (action != null && action.armorDamageMod > 0)
+        if (action != null && action.critChanceMod > 0)
         {
             newLine = Instantiate(infoLine, infoParent);
-            newLine.GetComponent<InfoLine>().SetData("AMR DMG Mod", (action.armorDamageMod * 100).ToString() + "%");
-        }
-
-        if (action != null && action.penetrationDamageMod > 0)
-        {
-            newLine = Instantiate(infoLine, infoParent);
-            newLine.GetComponent<InfoLine>().SetData("AMR PEN Mod", (action.penetrationDamageMod * 100).ToString() + "%");
+            newLine.GetComponent<InfoLine>().SetData("Crit Roll Bonus", (action.critChanceMod).ToString());
         }
 
         if (ability.hitMod > 0)

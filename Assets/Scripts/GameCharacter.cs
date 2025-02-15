@@ -41,6 +41,9 @@ public class GameCharacter
     public int AccRating => _accRating;
     private int _accRating;
 
+    public int CritChance => _critChance;
+    private int _critChance;
+
     public ArmorItemData HelmItem => _helmItem;
     private ArmorItemData _helmItem;
 
@@ -94,7 +97,8 @@ public class GameCharacter
         }
 
         _onPlayerTeam = onPlayerTeam;
-        _accRating = 6;
+        _accRating = Random.Range(GameManager.Instance.GameCharData.minAcc, GameManager.Instance.GameCharData.maxAcc);
+        _critChance = 11;
     }
 
     public GameCharacter(bool onPlayerTeam)
@@ -160,7 +164,8 @@ public class GameCharacter
         }
 
         _onPlayerTeam = onPlayerTeam;
-        _accRating = 6;
+        _accRating = Random.Range(GameManager.Instance.GameCharData.minAcc, GameManager.Instance.GameCharData.maxAcc);
+        _critChance = 11;
     }
 
     public void ChangeAccRating(int change)
@@ -243,11 +248,6 @@ public class GameCharacter
         // Damage multipliers, and armor, needs to be reworked for the recent change from % system to d12 scale.
 
         return _theWeapon.Data.baseDamage;//Mathf.RoundToInt(GetWeaponDamageForAction(action) * (action.armorDamageMod + _theWeapon.Data.baseArmorDamage));
-    }
-
-    public int GetWeaponPenetrationDamageForAction(ActionData action)
-    {
-        return Mathf.RoundToInt(GetWeaponDamageForAction(action) * (action.penetrationDamageMod + _theWeapon.Data.basePenetrationDamage));
     }
 
     public int GetTotalViceValue()

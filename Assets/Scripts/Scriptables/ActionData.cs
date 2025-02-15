@@ -10,13 +10,17 @@ public class ActionData : AbilityData
         LShape
     }
 
+    [Header("Resources")]
     public int apCost;
-    public float armorDamageMod;
-    public float penetrationDamageMod;
+
+    [Header("Mods")]
+    public int critChanceMod;
     public int rangeForExtraDamage;
     /// <summary>
     /// -1 for no damage
     /// </summary>
-    public float extraDmgMultiplier = -1f;
+    public int bonusDmg = -1;
+
+    [Header("Style")]
     public AttackStyle attackStyle;
 }

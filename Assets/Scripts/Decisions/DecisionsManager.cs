@@ -28,8 +28,8 @@ public class DecisionsManager : MonoBehaviour
     [SerializeField] private GameObject _itemPrefab;
 
     [SerializeField] private List<ItemData> possibleShopItems = new();
-    [SerializeField] private int maxNumOfShopItems;
-    [SerializeField] private int minNumOfShopItems;
+    private int _maxNumOfShopItems = 10;
+    private int _minNumOfShopItems = 6;
 
     [SerializeField] private CharDetailPanel _charDetail;
     [SerializeField] private Button _disableCharPanelButton;
@@ -84,7 +84,7 @@ public class DecisionsManager : MonoBehaviour
         }
 
         // fill out shop
-        int shopItemsCount = Random.Range(minNumOfShopItems, maxNumOfShopItems);
+        int shopItemsCount = Random.Range(_minNumOfShopItems, _maxNumOfShopItems);
         for (int i = 0; i < shopItemsCount; i++)
         {
             ItemData item = possibleShopItems[Random.Range(0, possibleShopItems.Count)];

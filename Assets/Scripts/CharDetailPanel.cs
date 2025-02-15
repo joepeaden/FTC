@@ -20,7 +20,8 @@ public class CharDetailPanel : MonoBehaviour
     [SerializeField] private TMP_Text _moveText;
     [SerializeField] private TMP_Text _initText;
     [SerializeField] private TMP_Text _dmgText;
-    [SerializeField] private TMP_Text accRating;
+    [SerializeField] private TMP_Text _accRating;
+    [SerializeField] private TMP_Text _critText;
     [SerializeField] private GameObject itemUIPrefab;
 
     public GameCharacter CurrentCharacter => _currentCharacter;
@@ -48,7 +49,8 @@ public class CharDetailPanel : MonoBehaviour
         _moveText.text = _currentCharacter.GetMoveRange().ToString();
         _initText.text = _currentCharacter.GetInitiativeWithEquipment().ToString();
         _dmgText.text = _currentCharacter.TheWeapon.Data.baseDamage.ToString();
-        accRating.text = _currentCharacter.AccRating + "+";
+        _accRating.text = _currentCharacter.AccRating + "+";
+        _critText.text = _currentCharacter.CritChance + "+";
 
         _classText.text = _currentCharacter.Motivator.ToString();
 

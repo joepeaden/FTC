@@ -26,7 +26,7 @@ MonoBehaviour:
   sprite: {fileID: 21300000, guid: 9a8b71c7fbca7466a975355eab5f6e32, type: 3}
   apCost: 3
   armorDamageMod: 0
-  penetrationDamageMod: 0
+  critChanceMod: 0
   rangeForExtraDamage: 0
   extraDmgMultiplier: -1
   attackStyle: 0
