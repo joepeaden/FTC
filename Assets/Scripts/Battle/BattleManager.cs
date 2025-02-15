@@ -318,8 +318,6 @@ public class BattleManager : MonoBehaviour
 
     private void UpdateUIForPawn(Pawn p)
     {
-
-        Debug.Log("Updating UI!");
         if (p != null)
         {
             bottomUIObjects.SetActive(true);
@@ -373,9 +371,6 @@ public class BattleManager : MonoBehaviour
             }
 
             UpdateEffects(p.CurrentEffects);
-
-
-            Debug.Log("UI Updated!");
         }
     }
 
@@ -782,7 +777,6 @@ public class BattleManager : MonoBehaviour
     {
         _turnNumber = 0;
         _instructionsUI.SetActive(false);
-        Debug.Log("Next Activation!");
         StartCoroutine(NextActivation());
     }
 
@@ -818,7 +812,7 @@ public class BattleManager : MonoBehaviour
     public IEnumerator NextActivation()
     {
         // pause a little bit so the player can keep track of what the heck is happening
-        //await Task.Delay(250);
+        // was using await here to avoid coroutine, but web builds can't use await.
         yield return new WaitForSeconds(.25f);
 
         if (_currentPawn != null)
@@ -832,8 +826,6 @@ public class BattleManager : MonoBehaviour
         if (CheckEnemyWipedOut())
         {
             HandleBattleResult(BattleResult.Win);
-
-            Debug.Log("Player won!");
         }
         else
         {
@@ -843,8 +835,6 @@ public class BattleManager : MonoBehaviour
             }
             else
             {
-
-                Debug.Log("Actiavting pawn!!");
                 _currentPawn.HandleActivation();
                 UpdateUIForPawn(_currentPawn);
                 _currentPawn.OnEffectUpdate.AddListener(UpdateEffects);
@@ -877,9 +867,6 @@ public class BattleManager : MonoBehaviour
         }
 
         Pawn p = _initiativeStack.Pop();
-
-
-        Debug.Log("Pawn is not null: " + p != null);
 
         while (p.IsDead)
         {

@@ -1,13 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Singleton instance for opening and closing tooltip. Contains reference
+/// to tooltip instance. There should only ever be one of these.
+/// </summary>
 public class TooltipManager : MonoBehaviour
 {
     public static TooltipManager Instance => _instance;
     private static TooltipManager _instance;
 
-    //[SerializeField] private EquipmentTooltip _tooltipPrefab;
     [SerializeField] private EquipmentTooltip _tooltip;
 
     void Awake()
@@ -20,7 +21,6 @@ public class TooltipManager : MonoBehaviour
         {
             gameObject.SetActive(false);
         }
-        //_tooltip = Instantiate(_tooltipPrefab);
     }
 
     public void HandleOpenTooltip(GameObject hoveredGO)
