@@ -85,6 +85,9 @@ public class Pawn : MonoBehaviour
     // the ability is used.
     public Pawn ProtectingPawn { get; set; }
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip _movingSound;
+
     #region UnityEvents
 
     private void Awake()
@@ -528,6 +531,10 @@ public class Pawn : MonoBehaviour
         _currentTile.PawnExitTile();
 
         _isMoving = true;
+
+        _audioSource.clip = _movingSound;
+        _audioSource.loop = true;
+        _audioSource.Play();
     }
 
     public void HandleDestinationReached()
@@ -554,6 +561,9 @@ public class Pawn : MonoBehaviour
         OnMoved.Invoke();
 
         _isMoving = false;
+
+        _audioSource.loop = false;
+        _audioSource.Stop();
     }
 
     public void SetSpriteFacing(Vector3 targetPos)

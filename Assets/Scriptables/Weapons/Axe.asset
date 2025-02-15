@@ -24,7 +24,7 @@ MonoBehaviour:
   itemType: 2
   isDefault: 0
   weaponType: 3
-  baseDamage: 4
+  baseDamage: 3
   baseArmorDamage: 0.8
   basePenetrationDamage: 0.2
   baseAccMod: 0

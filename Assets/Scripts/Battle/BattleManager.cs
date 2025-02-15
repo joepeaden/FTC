@@ -47,13 +47,9 @@ public class BattleManager : MonoBehaviour
     [SerializeField] TMP_Text characterNameText;
     [SerializeField] TMP_Text characterMotivatorText;
     [SerializeField] PawnPreview currentPawnPreview;
-    [SerializeField] TMP_Text armorText;
     [SerializeField] PipStatBar armorBar;
-    [SerializeField] TMP_Text healthText;
     [SerializeField] PipStatBar healthBar;
-    [SerializeField] TMP_Text apText;
     [SerializeField] PipStatBar apBar;
-    [SerializeField] TMP_Text motText;
     [SerializeField] PipStatBar motBar;
     [SerializeField] private Transform _initStackParent;
     [SerializeField] private List<TextFloatUp> _floatingTexts = new();
@@ -88,17 +84,6 @@ public class BattleManager : MonoBehaviour
 
     [Header("Audio")]
     [SerializeField] private AudioClip _levelUpSound;
-    /// <summary>
-    /// This is just a ref for audio sources retrieved from the object pooler.
-    /// It's needed because sometimes we want to disable the audio source after
-    /// an animation, which is probably out of the scope in which it was
-    /// retrieved.
-    /// </summary>
-    /// <remarks>
-    /// It may be worth creating a script for the audio source objects which
-    /// handles this.
-    /// </remarks>
-    private GameObject pooledAudioSourceGO;
 
     public Pawn CurrentPawn => _currentPawn;
     private Pawn _currentPawn;
@@ -165,7 +150,7 @@ public class BattleManager : MonoBehaviour
         _showInstructionsButton.onClick.AddListener(ToggleInstructions);
 
         // show instructions
-        _instructionsUI.SetActive(true);
+        //_instructionsUI.SetActive(true);
     }
 
     private void Start()
@@ -338,9 +323,7 @@ public class BattleManager : MonoBehaviour
             bottomUIObjects.SetActive(true);
             characterNameText.text = p.GameChar.CharName;
             characterMotivatorText.text = p.CurrentMotivator.ToString();
-            armorText.text = "AR: " + p.ArmorPoints + "/" + p.MaxArmorPoints;
             armorBar.SetBar(p.ArmorPoints);
-            healthText.text = "HP: " + p.HitPoints + "/" + p.MaxHitPoints;
             healthBar.SetBar(p.HitPoints);
 
             if (Ability.SelectedAbility != null)
@@ -350,9 +333,7 @@ public class BattleManager : MonoBehaviour
             }
             else
             {
-                apText.text = "AP: " + p.ActionPoints + "/" + Pawn.BASE_ACTION_POINTS;
                 apBar.SetBar(p.ActionPoints);
-                motText.text = "MT: " + p.Motivation + "/" + p.MaxMotivation;
                 motBar.SetBar(p.Motivation);
             }
 
@@ -680,7 +661,7 @@ public class BattleManager : MonoBehaviour
             _selectionManager.SelectedTile.SetSelected(false);
         }
 
-        NextActivation();
+        StartCoroutine(NextActivation());
     }
 
     /// <summary>
@@ -690,12 +671,6 @@ public class BattleManager : MonoBehaviour
     public void PawnActivated(Pawn p)
     {
         StartCoroutine(PawnActivatedCoroutine(p));
-    }
-
-    private void OnLevelUpAudioFinished()
-    {
-        // return to object pool
-        pooledAudioSourceGO.SetActive(false);
     }
 
     public IEnumerator PawnActivatedCoroutine(Pawn p)
@@ -712,13 +687,11 @@ public class BattleManager : MonoBehaviour
 
             yield return new WaitForSeconds(.5f);
 
-            pooledAudioSourceGO = ObjectPool.instance.GetAudioSource();
+            GameObject pooledAudioSourceGO = ObjectPool.instance.GetAudioSource();
             pooledAudioSourceGO.SetActive(true);
             AudioSource audioSource = pooledAudioSourceGO.GetComponent<AudioSource>();
             audioSource.clip = _levelUpSound;
             audioSource.Play();
-
-            Invoke("OnLevelUpAudioFinished", _levelUpSound.length);
 
             BattleManager.Instance.AddTextNotification(p.transform.position, "Level up!");
 
@@ -804,7 +777,7 @@ public class BattleManager : MonoBehaviour
     {
         _turnNumber = 0;
         _instructionsUI.SetActive(false);
-        NextActivation();
+        StartCoroutine(NextActivation());
     }
 
     private void HandleBattleResult(BattleResult battleResult)
@@ -836,10 +809,11 @@ public class BattleManager : MonoBehaviour
         return alivePawns <= 0;
     }
 
-    public async void NextActivation()
+    public IEnumerator NextActivation()
     {
         // pause a little bit so the player can keep track of what the heck is happening
-        await Task.Delay(250);
+        // was using await here to avoid coroutine, but web builds can't use await.
+        yield return new WaitForSeconds(.25f);
 
         if (_currentPawn != null)
         {
@@ -893,6 +867,7 @@ public class BattleManager : MonoBehaviour
         }
 
         Pawn p = _initiativeStack.Pop();
+
         while (p.IsDead)
         {
             if (_initiativeStack.Count != 0)
