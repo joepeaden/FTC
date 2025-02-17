@@ -1,8 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
+/// <summary>
+/// Just for displaying simple lines of text. Has a label, value, and ability to
+/// show / hide.
+/// </summary>
 public class InfoLine : MonoBehaviour
 {
     [SerializeField] TMP_Text infoLabel;
@@ -21,8 +23,12 @@ public class InfoLine : MonoBehaviour
         isHidden = false;
 
         gameObject.SetActive(true);
-        
-        infoLabel.text = infoLabelString;
+
+        if (infoLabel != null)
+        {
+            infoLabel.text = infoLabelString;
+        }
+
         infoValue.text = infoValueString;
     }
 }

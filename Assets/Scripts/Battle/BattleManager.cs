@@ -71,7 +71,8 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private RectTransform _pawnPointer;
     [SerializeField] private Transform _pawnEffectsParent;
     [SerializeField] private Image _pawnEffectLargePrefab;
-    [SerializeField] private List<ActionButton> _actionButtons = new();
+    [SerializeField] private List<ActionButton> _actionButtons = new(); 
+    [SerializeField] private List<InfoLine> _motivationConditionDisplay = new();
 
     [Header("Equipment")]
     [SerializeField] private ArmorItemData lightHelm;
@@ -371,6 +372,19 @@ public class BattleManager : MonoBehaviour
             }
 
             UpdateEffects(p.CurrentEffects);
+
+            //List<MotCondition> motConditions = character.GetMotConditions();
+            //int i = 0;
+            for (; i < 3; i++)//motConditions.Count; i++)
+            {
+                _motivationConditionDisplay[i].SetData("", "Info about the condition");
+            }
+
+            // update the remaining buttons
+            for (; i < _motivationConditionDisplay.Count; i++)
+            {
+                _motivationConditionDisplay[i].Hide();
+            }
         }
     }
 

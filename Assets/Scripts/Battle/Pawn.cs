@@ -14,8 +14,14 @@ public class Pawn : MonoBehaviour
 
     public UnityEvent OnMoved = new();
     public UnityEvent OnHit = new();
+    /// <summary>
+    /// very specific here. lol. This is for the associated oath.
+    /// </summary>
+    public static UnityEvent<Pawn> OnTook3Damage = new();
     public UnityEvent<List<EffectData>> OnEffectUpdate = new();
     public UnityEvent OnActivation = new();
+    private UnityEvent OnKillEnemy = new();
+    private UnityEvent OnDisengage = new();
 
     public float baseDodgeChance;
     public float baseSurroundBonus;
@@ -88,6 +94,11 @@ public class Pawn : MonoBehaviour
     [Header("Audio")]
     [SerializeField] private AudioClip _movingSound;
 
+    /// <summary>
+    /// Motivation conditions that have been fulfilled during this battle.
+    /// </summary>
+    private HashSet<MotCondData> _fulfilledBattleMotConds = new();
+
     #region UnityEvents
 
     private void Awake()
@@ -126,6 +137,60 @@ public class Pawn : MonoBehaviour
 
         Motivation = GameChar.GetBattleMotivationCap();
         ActionPoints = BASE_ACTION_POINTS;
+
+        // set up listeners motivation conditions
+        SetupMotConds();
+    }
+
+    private void SetupMotConds()
+    {
+        foreach (MotCondData motCond in GameChar.GetMotCondsForBattle())
+        {
+            switch (motCond.condType)
+            {
+                case MotCondData.ConditionType.KillOneEnemy:
+                    OnKillEnemy.AddListener(UpdateMotCondOnEnemyKilled);
+                    break;
+                case MotCondData.ConditionType.DoNotDisengage:
+                    // this one starts off fulfilled but is removed if
+                    // it happens
+                    _fulfilledBattleMotConds.Add(motCond);
+                    OnDisengage.AddListener(HandleDisengage);
+                    break;
+                case MotCondData.ConditionType.AlliesCantTakeDamage:
+                    // this one starts off fulfilled but is removed if
+                    // it happens
+                    _fulfilledBattleMotConds.Add(motCond);
+                    OnTook3Damage.AddListener(HandlePawnTaken3Damage);
+                    break;
+                default:
+                    Debug.Log("Unhandled condition!");
+                    break;
+            }
+        }
+    }
+
+    private void HandleDisengage()
+    {
+        if (_fulfilledBattleMotConds.Contains(DataLoader.motConds["NoRetreat"]))
+        {
+            _fulfilledBattleMotConds.Remove(DataLoader.motConds["NoRetreat"]);
+        }
+    }
+
+    private void HandlePawnTaken3Damage(Pawn p)
+    {
+        if (p != this && p.OnPlayerTeam == OnPlayerTeam && _fulfilledBattleMotConds.Contains(DataLoader.motConds["AllyNoDmg"]))
+        {
+            _fulfilledBattleMotConds.Remove(DataLoader.motConds["AllyNoDmg"]);
+        }
+    }
+
+    private void UpdateMotCondOnEnemyKilled()
+    {
+        // ew string parameters.
+        // whatever.
+        _fulfilledBattleMotConds.Add(DataLoader.motConds["Kill1"]);
     }
 
     public void SetTeam(bool onPlayerTeam)
@@ -320,6 +385,8 @@ public class Pawn : MonoBehaviour
                 // pause itself to give time for the level up animation, then it triggers the animaiton
                 // via TriggerLevelUpVisuals.
                 PendingLevelUp = GameChar.AddXP(1);
+
+                OnKillEnemy.Invoke();
             }
             else if (!targetHadArmor)
             {
@@ -383,6 +450,12 @@ public class Pawn : MonoBehaviour
         }
 
         _hitPoints -= Mathf.Max(0, hitPointsDmg);
+
+        // if took 3 damage, alert via event in case ally has associated oath
+        if (_hitPoints <= _gameChar.HitPoints - 3)
+        {
+            OnTook3Damage.Invoke(this);
+        }
 
         if (_hitPoints <= 0)
         {
@@ -546,6 +619,7 @@ public class Pawn : MonoBehaviour
         if (EngagedInCombat)
         {
             ActionPoints = 0;
+            OnDisengage.Invoke();
         }
         else
         {

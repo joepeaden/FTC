@@ -76,30 +76,13 @@ public class GameCharacter
     public int PendingStatPoints => _pendingStatPoints;
     private int _pendingStatPoints;
 
-    public GameCharacter(string newName, CharMotivators newMotivator, int newMotivatorValue, bool onPlayerTeam)
-    {
-        _charName = newName;
+    /// <summary>
+    /// MotConds - short for motivation conditions. Oaths for example.
+    /// </summary>
+    public List<MotCondData> MotConds => _motConds;
+    private List<MotCondData> _motConds = new ();
 
-        SetMotivator(newMotivator, newMotivatorValue);
-
-        _baseInitiative = Random.Range(GameManager.Instance.GameCharData.minInit, GameManager.Instance.GameCharData.maxInit);
-        _hitPoints = Random.Range(GameManager.Instance.GameCharData.minHP, GameManager.Instance.GameCharData.maxHP);
-
-        EquipItem(GameManager.Instance.GameCharData.DefaultWeapon);
-
-        if (onPlayerTeam)
-        {
-            _bodySprite = GameManager.Instance.GameCharData.blueShirt;
-        }
-        else
-        {
-            _bodySprite = GameManager.Instance.GameCharData.redShirt;
-        }
-
-        _onPlayerTeam = onPlayerTeam;
-        _accRating = Random.Range(GameManager.Instance.GameCharData.minAcc, GameManager.Instance.GameCharData.maxAcc);
-        _critChance = 11;
-    }
+    private HashSet<MotCondData> _fulfilledMotConds = new();
 
     public GameCharacter(bool onPlayerTeam)
     {
@@ -166,6 +149,25 @@ public class GameCharacter
         _onPlayerTeam = onPlayerTeam;
         _accRating = Random.Range(GameManager.Instance.GameCharData.minAcc, GameManager.Instance.GameCharData.maxAcc);
         _critChance = 11;
+
+        _motConds.Add(DataLoader.motConds["KillOneEnemy"]);
+    }
+
+    /// <summary>
+    /// Get the motivation conditions that are appropriate to be fulfilled
+    /// during battle (Oaths, but not equipment Desires, for example, or
+    /// previously achieved Feats/Achievements)
+    /// </summary>
+    public List<MotCondData> GetMotCondsForBattle()
+    {
+        switch(_motivator)
+        {
+            case CharMotivators.Honor:
+                return _motConds;
+            default:
+                Debug.Log("Class not yet supported!");
+                return _motConds;
+        }    
     }
 
     public void ChangeAccRating(int change)

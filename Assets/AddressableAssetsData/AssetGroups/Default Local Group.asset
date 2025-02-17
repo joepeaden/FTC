@@ -67,6 +67,24 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 73487471e3a3642baa450c5f4ec85564
+    m_Address: Assets/Scriptables/MotConds/DoNotDisengage.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - mot_conditions
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7012a0c5f04f643d3aafc5c2594a4085
+    m_Address: Assets/Scriptables/MotConds/AlliesCantTakeDamage.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - mot_conditions
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ea69e8142750c4417bef33e89b21b675
+    m_Address: Assets/Scriptables/MotConds/KillOneEnemyOath.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - mot_conditions
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 7c8bf46af66d94c95b7860930c29ad14, type: 2}
   m_SchemaSet:

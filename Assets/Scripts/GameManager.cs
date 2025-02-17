@@ -24,6 +24,9 @@ public class GameManager : MonoBehaviour
     public List<ItemData> PlayerInventory => _playerInventory;
     private List<ItemData> _playerInventory = new();
 
+    // for scriptable asset loading and access
+    private DataLoader _dataLoader;
+
     public GameCharacterData GameCharData => _gameCharData;
     [SerializeField] private GameCharacterData _gameCharData;
 
@@ -40,6 +43,9 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        _dataLoader = new DataLoader();
+        _dataLoader.LoadData();
+
         LoadMainMenu();
     }
 

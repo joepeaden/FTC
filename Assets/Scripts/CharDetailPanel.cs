@@ -30,6 +30,7 @@ public class CharDetailPanel : MonoBehaviour
     [SerializeField] private ItemUI _helmUI;
     [SerializeField] private ItemUI _weaponUI;
     [SerializeField] private List<ActionButton> _actionButtons = new();
+    [SerializeField] private List<InfoLine> _motivationConditionDisplay = new();
 
     public void Setup(DecisionsManager decisions)
     {
@@ -98,6 +99,19 @@ public class CharDetailPanel : MonoBehaviour
             ActionButton actionButton = _actionButtons[i];
             actionButton.SetSelected(false);
             actionButton.gameObject.SetActive(false);
+        }
+
+        //List<MotCondition> motConditions = character.GetMotConditions();
+        //int i = 0;
+        for (; i < 3; i++)//motConditions.Count; i++)
+        {
+            _motivationConditionDisplay[i].SetData("", "Info about the condition");
+        }
+
+        // update the remaining buttons
+        for (; i < _motivationConditionDisplay.Count; i++)
+        {
+            _motivationConditionDisplay[i].Hide();
         }
     }
 
