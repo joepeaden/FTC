@@ -149,19 +149,19 @@ public class Pawn : MonoBehaviour
             switch (motCond.condType)
             {
                 case MotCondData.ConditionType.KillOneEnemy:
-                    OnKillEnemy.AddListener(UpdateMotCondOnEnemyKilled);
+                    OnKillEnemy.AddListener(FulfillEnemyKilledOath);
                     break;
                 case MotCondData.ConditionType.DoNotDisengage:
                     // this one starts off fulfilled but is removed if
                     // it happens
                     _fulfilledBattleMotConds.Add(motCond);
-                    OnDisengage.AddListener(HandleDisengage);
+                    OnDisengage.AddListener(BreakNoRetreatOath);
                     break;
                 case MotCondData.ConditionType.AlliesCantTakeDamage:
                     // this one starts off fulfilled but is removed if
                     // it happens
                     _fulfilledBattleMotConds.Add(motCond);
-                    OnTook3Damage.AddListener(HandlePawnTaken3Damage);
+                    OnTook3Damage.AddListener(HandlePawnTaken3DamageBrokenOath);
                     break;
                 default:
                     Debug.Log("Unhandled condition!");
@@ -170,7 +170,7 @@ public class Pawn : MonoBehaviour
         }
     }
 
-    private void HandleDisengage()
+    private void BreakNoRetreatOath()
     {
         if (_fulfilledBattleMotConds.Contains(DataLoader.motConds["NoRetreat"]))
         {
@@ -178,7 +178,7 @@ public class Pawn : MonoBehaviour
         }
     }
 
-    private void HandlePawnTaken3Damage(Pawn p)
+    private void HandlePawnTaken3DamageBrokenOath(Pawn p)
     {
         if (p != this && p.OnPlayerTeam == OnPlayerTeam && _fulfilledBattleMotConds.Contains(DataLoader.motConds["AllyNoDmg"]))
         {
@@ -186,11 +186,20 @@ public class Pawn : MonoBehaviour
         }
     }
 
-    private void UpdateMotCondOnEnemyKilled()
+    private void FulfillEnemyKilledOath()
     {
         // ew string parameters.
         // whatever.
         _fulfilledBattleMotConds.Add(DataLoader.motConds["Kill1"]);
+    }
+
+    /// <summary>
+    /// Mostly updating the GameChar with battle results, like XP and
+    /// fulfilled/failed oaths
+    /// </summary>
+    public void HandleBattleEnd()
+    {
+        GameChar.HandleBattleEnd(_fulfilledBattleMotConds);
     }
 
     public void SetTeam(bool onPlayerTeam)

@@ -30,7 +30,7 @@ public class GameCharacter
 
     public CharMotivators Motivator => _motivator;
     private CharMotivators _motivator;
-    private int _charMotivatorValue;
+    private int _charMotivation;
 
     public int BaseInitiative => _baseInitiative;
     private int _baseInitiative;
@@ -120,14 +120,14 @@ public class GameCharacter
         {
             GameCharacterData data = GameManager.Instance.GameCharData;
 
-            SetMotivator((CharMotivators)Random.Range(0, 3), Random.Range(data.minVice, data.maxVice));
+            SetMotivator((CharMotivators)Random.Range(0, 3));
 
             _baseInitiative = Random.Range(GameManager.Instance.GameCharData.minInit, GameManager.Instance.GameCharData.maxInit);
             _hitPoints = Random.Range(GameManager.Instance.GameCharData.minHP, GameManager.Instance.GameCharData.maxHP);
         }
         else
         {
-            SetMotivator((CharMotivators)Random.Range(0, 3), Random.Range(2, 6));
+            SetMotivator((CharMotivators)Random.Range(0, 3));
 
             _baseInitiative = Random.Range(0, 5);
             _hitPoints = Random.Range(3, 8);
@@ -150,7 +150,7 @@ public class GameCharacter
         _accRating = Random.Range(GameManager.Instance.GameCharData.minAcc, GameManager.Instance.GameCharData.maxAcc);
         _critChance = 11;
 
-        _motConds.Add(DataLoader.motConds["KillOneEnemy"]);
+        _motConds.Add(DataLoader.motConds["Kill1"]);
     }
 
     /// <summary>
@@ -170,6 +170,54 @@ public class GameCharacter
         }    
     }
 
+    public void HandleBattleEnd(HashSet<MotCondData> _fulfilledConditions)
+    {
+        // +1 XP for just participating in the battle
+        AddXP(1);
+
+        bool failedSomething = false;
+        // update motivation conditions being fulfilled or not if necessary
+        switch (Motivator)
+        {
+            case CharMotivators.Honor:
+                foreach (MotCondData condition in _fulfilledConditions)
+                {
+                    if (!GetMotCondsForBattle().Contains(condition))
+                    {
+                        FailOath(condition);
+                        failedSomething = true;
+                    }
+                }
+                break;
+        }
+
+        // if didn't fail any conditions, then add one motivation, up to the
+        // max, which is based on the level of the character.
+        if (!failedSomething)
+        {
+            _charMotivation += Mathf.Clamp(_charMotivation + 1, 0, _level+1);
+        }
+    }
+
+    private void FailOath(MotCondData failedCondition)
+    {
+        // will need to implement something here to alert the player of the failure
+        // but for now, just immediately dish out consequences.
+
+        // remove the failed condition, and all conditions of greater tier.
+        _motConds.Remove(failedCondition);
+        foreach (MotCondData condition in _motConds)
+        {
+            if (failedCondition.tier <= condition.tier)
+            {
+                _motConds.Remove(condition);
+            }    
+        }
+
+        //zero out the motivation - ouch
+        _charMotivation = 0;
+    }
+
     public void ChangeAccRating(int change)
     {
         _accRating += change;
@@ -185,10 +233,10 @@ public class GameCharacter
         return _xpCaps[_level];
     }
 
-    private void SetMotivator(CharMotivators newMotivator, int newMotivatorValue)
+    private void SetMotivator(CharMotivators newMotivator)
     {
         _motivator = newMotivator;
-        _charMotivatorValue = newMotivatorValue;
+        _charMotivation = 1;
 
         switch (_motivator)
         {
@@ -260,7 +308,7 @@ public class GameCharacter
             equipmentViceBonus += _helmItem.viceMod;
         }
 
-        return _charMotivatorValue + equipmentViceBonus;
+        return _charMotivation + equipmentViceBonus;
     }
 
     public int GetInitiativeWithEquipment()

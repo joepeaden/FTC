@@ -10,7 +10,7 @@ public class DataLoader
 
     public void LoadData()
     {
-        Addressables.LoadAssetsAsync<MotCondData>("mot_conds", OnLoadDataCompleted);
+        Addressables.LoadAssetsAsync<MotCondData>("mot_conditions", OnLoadDataCompleted);
     }
 
     private void OnLoadDataCompleted(MotCondData result)

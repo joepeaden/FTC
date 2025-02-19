@@ -101,11 +101,14 @@ public class CharDetailPanel : MonoBehaviour
             actionButton.gameObject.SetActive(false);
         }
 
-        //List<MotCondition> motConditions = character.GetMotConditions();
-        //int i = 0;
-        for (; i < 3; i++)//motConditions.Count; i++)
+        List<MotCondData> motConditions = character.GetMotCondsForBattle();
+        i = 0;
+        for (; i < motConditions.Count; i++)
         {
-            _motivationConditionDisplay[i].SetData("", "Info about the condition");
+            MotCondData condition = motConditions[i];
+
+            _motivationConditionDisplay[i].SetData("", condition.description);
+
         }
 
         // update the remaining buttons

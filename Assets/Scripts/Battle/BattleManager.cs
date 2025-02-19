@@ -373,11 +373,16 @@ public class BattleManager : MonoBehaviour
 
             UpdateEffects(p.CurrentEffects);
 
-            //List<MotCondition> motConditions = character.GetMotConditions();
-            //int i = 0;
-            for (; i < 3; i++)//motConditions.Count; i++)
+            // this conditions list could be its own class and prefab, such that
+            // it can just be dragged and dropped anywhere. Right now identical
+            // code is found in CharDetailPanel.
+            List<MotCondData> motConditions = p.GameChar.GetMotCondsForBattle();
+            i = 0;
+            for (; i < motConditions.Count; i++)
             {
-                _motivationConditionDisplay[i].SetData("", "Info about the condition");
+                MotCondData condition = motConditions[i];
+
+                _motivationConditionDisplay[i].SetData("", condition.description);
             }
 
             // update the remaining buttons
@@ -651,7 +656,7 @@ public class BattleManager : MonoBehaviour
             // distribute XP for participating in battle
             for (int i = 0; i < _playerPawns.Count; i++)
             {
-                _playerPawns[i].GameChar.AddXP(1);
+                _playerPawns[i].HandleBattleEnd();
             }
 
             GameManager.Instance.ExitBattle(playerWon);

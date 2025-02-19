@@ -3343,6 +3343,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 484118322}
   m_CullTransparentMesh: 1
+--- !u!114 &495885189 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7323829362687514107, guid: b5f851303c915465fba09d10fe49c38d, type: 3}
+  m_PrefabInstance: {fileID: 7576809738784867755}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a47b21ed9c29048abbdf1e8c23e8dc07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &495885190 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5132173260420126390, guid: b5f851303c915465fba09d10fe49c38d, type: 3}
+  m_PrefabInstance: {fileID: 7576809738784867755}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a47b21ed9c29048abbdf1e8c23e8dc07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &495885191 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4964136611182186739, guid: b5f851303c915465fba09d10fe49c38d, type: 3}
+  m_PrefabInstance: {fileID: 7576809738784867755}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a47b21ed9c29048abbdf1e8c23e8dc07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &495885192 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5899892165690869744, guid: b5f851303c915465fba09d10fe49c38d, type: 3}
+  m_PrefabInstance: {fileID: 7576809738784867755}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a47b21ed9c29048abbdf1e8c23e8dc07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -4358,6 +4402,11 @@ MonoBehaviour:
   - {fileID: 937715829}
   - {fileID: 949347490}
   - {fileID: 1279358387}
+  _motivationConditionDisplay:
+  - {fileID: 495885192}
+  - {fileID: 495885191}
+  - {fileID: 495885190}
+  - {fileID: 495885189}
   lightHelm: {fileID: 11400000, guid: 09bc3b809f61541ba816946baf191fa6, type: 2}
   medHelm: {fileID: 11400000, guid: 948a5120fb2ec4686bd785d02511ad58, type: 2}
   heavyHelm: {fileID: 11400000, guid: 9fecc5ccb3cea43869fed948286e28ac, type: 2}
