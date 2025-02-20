@@ -60,11 +60,16 @@ public class GameCharacter
     public Sprite BodySprite => _bodySprite;
     private Sprite _bodySprite;
 
+    // detail data objects - basically different sprites that make up the face
+    public FaceDetailData HairDetail => _hairDetail;
+    private FaceDetailData _hairDetail;
+    public FaceDetailData FacialHairDetail => _facialHairDetail;
+    private FaceDetailData _facialHairDetail;
+    public FaceDetailData BrowDetail => _browDetail;
+    private FaceDetailData _browDetail;
+
     public Weapon TheWeapon => _theWeapon;
     private Weapon _theWeapon = new Weapon();
-
-    //public Sprite FaceSprite => _faceSprite;
-    //private Sprite _faceSprite;
 
     public List<Ability> Abilities => _abilities;
     private List<Ability> _abilities = new ();
@@ -144,6 +149,8 @@ public class GameCharacter
             {
                 _bodySprite = GameManager.Instance.GameCharData.redShirt;
             }
+
+            GenerateFace();
         }
 
         _onPlayerTeam = onPlayerTeam;
@@ -151,6 +158,19 @@ public class GameCharacter
         _critChance = 11;
 
         _motConds.Add(DataLoader.motConds["Kill1"]);
+    }
+
+    private void GenerateFace()
+    {
+        // hell yeah bruther.
+
+        Dictionary<string, FaceDetailData> hairDetails = DataLoader.hairDetail;
+        Dictionary<string, FaceDetailData> fHairDetails = DataLoader.facialHairDetail;
+        Dictionary<string, FaceDetailData> browDetails = DataLoader.browDetail;
+
+        _hairDetail = hairDetails.Values.ToList()[Random.Range(0, hairDetails.Count)];
+        _facialHairDetail = fHairDetails.Values.ToList()[Random.Range(0, fHairDetails.Count)];
+        _browDetail = browDetails.Values.ToList()[Random.Range(0, browDetails.Count)];
     }
 
     /// <summary>

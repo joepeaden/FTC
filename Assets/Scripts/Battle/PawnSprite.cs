@@ -4,11 +4,16 @@ using UnityEngine;
 
 public class PawnSprite : MonoBehaviour
 {
-    //[Header("Visuals")]
     [SerializeField] private Animator _anim;
 
     [SerializeField]
-    private SpriteRenderer _faceSpriteRend;
+    private SpriteRenderer _eyesSpriteRend;
+    [SerializeField]
+    private SpriteRenderer _browSpriteRend;
+    [SerializeField]
+    private SpriteRenderer _hairSpriteRend;
+    [SerializeField]
+    private SpriteRenderer _fhairSpriteRend;
     [SerializeField]
     private SpriteRenderer _headSpriteRend;
     [SerializeField]
@@ -26,6 +31,23 @@ public class PawnSprite : MonoBehaviour
     private Sprite _SWFace;
     [SerializeField]
     private Sprite _SEFace;
+
+    private Sprite _NEHair;
+    private Sprite _NWHair;
+    private Sprite _SWHair;
+    private Sprite _SEHair;
+
+    private Sprite _NEBrow;
+    private Sprite _NWBrow;
+    private Sprite _SWBrow;
+    private Sprite _SEBrow;
+
+    private Sprite _NEFacialHair;
+    private Sprite _NWFacialHair;
+    private Sprite _SWFacialHair;
+    private Sprite _SEFacialHair;
+
+
 
     [SerializeField] 
     private ParticleSystem _moveDust;
@@ -62,8 +84,23 @@ public class PawnSprite : MonoBehaviour
         if (pawn.GameChar.HelmItem != null)
         {
             _helmSpriteRend.sprite = _currentHelm.SWSprite;
+            _hairSpriteRend.gameObject.SetActive(false);
         }
 
+        _NEHair = pawn.GameChar.HairDetail.NESprite;
+        _NWHair = pawn.GameChar.HairDetail.NWSprite;
+        _SWHair = pawn.GameChar.HairDetail.SWSprite;
+        _SEHair = pawn.GameChar.HairDetail.SESprite;
+
+        _NEBrow = pawn.GameChar.BrowDetail.NESprite;
+        _NWBrow = pawn.GameChar.BrowDetail.NWSprite;
+        _SWBrow = pawn.GameChar.BrowDetail.SWSprite;
+        _SEBrow = pawn.GameChar.BrowDetail.SESprite;
+
+        _NEFacialHair = pawn.GameChar.FacialHairDetail.NESprite;
+        _NWFacialHair = pawn.GameChar.FacialHairDetail.NWSprite;
+        _SWFacialHair = pawn.GameChar.FacialHairDetail.SWSprite;
+        _SEFacialHair = pawn.GameChar.FacialHairDetail.SESprite;
 
         if (pawn.OnPlayerTeam)
         {
@@ -74,6 +111,11 @@ public class PawnSprite : MonoBehaviour
         {
             UpdateFacingAndSpriteOrder(Vector3.zero, new Vector3(-1, -1), pawn.CurrentTile);
             _anim.Play("IdleSW", 0, Random.Range(0f, 1f));
+        }
+
+        if (pawn.GameChar.BodySprite != null)
+        {
+            _bodySpriteRend.sprite = pawn.GameChar.BodySprite;
         }
 
         if (pawn.GameChar.BodySprite != null)
@@ -129,6 +171,43 @@ public class PawnSprite : MonoBehaviour
         _anim.SetBool(newFacing, true);
     }
 
+    private void UpdateFace(int newOrder)
+    {
+        switch (_facingDirection)
+        {
+            case FacingDirection.NE:
+                _eyesSpriteRend.sprite = _NEFace;
+                _hairSpriteRend.sprite = _NEHair;
+                _fhairSpriteRend.sprite = _NEFacialHair;
+                _browSpriteRend.sprite = _NEBrow;
+                break;
+            case FacingDirection.SE:
+                _eyesSpriteRend.sprite = _SEFace;
+                _hairSpriteRend.sprite = _SEHair;
+                _fhairSpriteRend.sprite = _SEFacialHair;
+                _browSpriteRend.sprite = _SEBrow;
+                break;
+            case FacingDirection.SW:
+                _eyesSpriteRend.sprite = _SWFace;
+                _hairSpriteRend.sprite = _SWHair;
+                _fhairSpriteRend.sprite = _SWFacialHair;
+                _browSpriteRend.sprite = _SWBrow;
+                break;
+            case FacingDirection.NW:
+                _eyesSpriteRend.sprite = _NWFace;
+                _hairSpriteRend.sprite = _NWHair;
+                _fhairSpriteRend.sprite = _NWFacialHair;
+                _browSpriteRend.sprite = _NWBrow;
+                break;
+        }
+        
+        _eyesSpriteRend.sortingOrder = newOrder + 0;
+        _browSpriteRend.sortingOrder = newOrder + 0;
+        // same level as helm
+        _hairSpriteRend.sortingOrder = newOrder + 4;
+        _fhairSpriteRend.sortingOrder = newOrder + 0;
+    }
+
     /// <summary>
     /// Update based on last position / new position
     /// </summary>
@@ -153,64 +232,48 @@ public class PawnSprite : MonoBehaviour
         {
             _facingDirection = FacingDirection.NE;
             SetNewFacingAnimParam("NE");
-            _faceSpriteRend.sprite = _NEFace;
             if (_currentHelm != null)
             {
                 _helmSpriteRend.sprite = _currentHelm.NESprite;
             }
             _bodySpriteRend.sortingOrder = totalSpriteOrder + 2;
-            _faceSpriteRend.sortingOrder = totalSpriteOrder + 0;
-
-            //_weaponSpriteRend.transform.localPosition = new Vector3(0.4f, 0.37f, 0);
-            //_weaponSpriteRend.transform.rotation = Quaternion.Euler(new Vector3(0, 180, 20));
+            UpdateFace(totalSpriteOrder + 0);
         }
         // going NW
         else if (facingPosition.x < originPosition.x && facingPosition.y > originPosition.y)
         {
             _facingDirection = FacingDirection.NW;
             SetNewFacingAnimParam("NW");
-            _faceSpriteRend.sprite = _NWFace;
             if (_currentHelm != null)
             {
                 _helmSpriteRend.sprite = _currentHelm.NWSprite;
             }
             _bodySpriteRend.sortingOrder = totalSpriteOrder + 2;
-            _faceSpriteRend.sortingOrder = totalSpriteOrder + 0;
-
-            //_weaponSpriteRend.transform.localPosition = new Vector3(-0.4f, 0.37f, 0);
-            //_weaponSpriteRend.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 20));
+            UpdateFace(totalSpriteOrder + 0);
         }
         // going SE
         else if (facingPosition.x > originPosition.x && facingPosition.y < originPosition.y)
         {
             _facingDirection = FacingDirection.SE;
             SetNewFacingAnimParam("SE");
-            _faceSpriteRend.sprite = _SEFace;
             if (_currentHelm != null)
             {
                 _helmSpriteRend.sprite = _currentHelm.SESprite;
             }
             _bodySpriteRend.sortingOrder = totalSpriteOrder + 0;
-            _faceSpriteRend.sortingOrder = totalSpriteOrder + 2;
-
-            //_weaponSpriteRend.transform.localPosition = new Vector3(0.4f, 0.37f, 0);
-            //_weaponSpriteRend.transform.rotation = Quaternion.Euler(new Vector3(0, 180, 20));
+            UpdateFace(totalSpriteOrder + 2);
         }
         // going SW
         else
         {
             _facingDirection = FacingDirection.SW;
             SetNewFacingAnimParam("SW");
-            _faceSpriteRend.sprite = _SWFace; 
             if (_currentHelm != null)
             {
                 _helmSpriteRend.sprite = _currentHelm.SWSprite;
             }
             _bodySpriteRend.sortingOrder = totalSpriteOrder + 0;
-            _faceSpriteRend.sortingOrder = totalSpriteOrder + 2;
-
-            //_weaponSpriteRend.transform.localPosition = new Vector3(-0.4f, 0.37f, 0);
-            //_weaponSpriteRend.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 20));
+            UpdateFace(totalSpriteOrder + 2);
         }
 
         _headSpriteRend.sortingOrder = 1 + totalSpriteOrder;
@@ -289,7 +352,7 @@ public class PawnSprite : MonoBehaviour
     public void Die()
     {
         StartCoroutine(PlayAnimationAfterDelay(.2f, "Die"));
-        _faceSpriteRend.sortingLayerName = "DeadCharacters";
+        _eyesSpriteRend.sortingLayerName = "DeadCharacters";
         _bodySpriteRend.sortingLayerName = "DeadCharacters";
         _headSpriteRend.sortingLayerName = "DeadCharacters";
         _helmSpriteRend.sortingLayerName = "DeadCharacters";

@@ -35,10 +35,15 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private AudioClip _clickSound;
 
+    private AudioSource _musicPlayer;
+    [SerializeField] private AudioClip _menuMusic;
+    [SerializeField] private AudioClip _battleMusic;
+
     private void Awake()
     {
         _instance = this;
         DontDestroyOnLoad(gameObject);
+        _musicPlayer = GetComponent<AudioSource>();
     }
 
     private void Start()
@@ -122,6 +127,9 @@ public class GameManager : MonoBehaviour
         _potentialRewardAmount = rewardAmount;
 
         SceneManager.LoadScene("BattleScene");
+
+        _musicPlayer.clip = _battleMusic;
+        _musicPlayer.Play();
     }
 
     public List<GameCharacter> GetEnemiesForContract()
@@ -142,6 +150,9 @@ public class GameManager : MonoBehaviour
         {
             AddGold(_potentialRewardAmount);
         }
+
+        _musicPlayer.clip = _menuMusic;
+        _musicPlayer.Play();
     }
 
     public void PlayClickEffect()

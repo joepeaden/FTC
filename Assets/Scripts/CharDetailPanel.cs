@@ -29,6 +29,9 @@ public class CharDetailPanel : MonoBehaviour
     private DecisionsManager _decisions;
     [SerializeField] private ItemUI _helmUI;
     [SerializeField] private ItemUI _weaponUI;
+
+    [SerializeField] private PawnPreview _pawnPreview;
+
     [SerializeField] private List<ActionButton> _actionButtons = new();
     [SerializeField] private List<InfoLine> _motivationConditionDisplay = new();
 
@@ -116,6 +119,8 @@ public class CharDetailPanel : MonoBehaviour
         {
             _motivationConditionDisplay[i].Hide();
         }
+
+        _pawnPreview.SetData(character);
     }
 
     public void UnEquipItem(ItemUI itemUI)

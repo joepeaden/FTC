@@ -71,19 +71,85 @@ MonoBehaviour:
     m_Address: Assets/Scriptables/MotConds/DoNotDisengage.asset
     m_ReadOnly: 0
     m_SerializedLabels:
-    - mot_conditions
+    - motConditions
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 7012a0c5f04f643d3aafc5c2594a4085
     m_Address: Assets/Scriptables/MotConds/AlliesCantTakeDamage.asset
     m_ReadOnly: 0
     m_SerializedLabels:
-    - mot_conditions
+    - motConditions
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: ea69e8142750c4417bef33e89b21b675
     m_Address: Assets/Scriptables/MotConds/KillOneEnemyOath.asset
     m_ReadOnly: 0
     m_SerializedLabels:
-    - mot_conditions
+    - motConditions
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3f5a7c9ad3d9f4a2aab2f104d01c71ab
+    m_Address: Assets/Scriptables/FaceDetail/FHair1.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - facialHairDetail
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 934f420e5c61d4fdbb040a420d31e20c
+    m_Address: Assets/Scriptables/FaceDetail/FHair2.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - facialHairDetail
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 98d0e21553f284887a2b7f5463f36b18
+    m_Address: Assets/Scriptables/FaceDetail/FHair3.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - facialHairDetail
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 67522f6011b634b8f84805613801c8d1
+    m_Address: Assets/Scriptables/FaceDetail/Brow1.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - browDetail
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1c625511e23494f19a1ab4dd8b9adc9e
+    m_Address: Assets/Scriptables/FaceDetail/Brow2.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - browDetail
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1e94d0760f33c4c0ca41ff16bdc4213f
+    m_Address: Assets/Scriptables/FaceDetail/Brow3.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - browDetail
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a7415a9ea61d244759be2d637439835c
+    m_Address: Assets/Scriptables/FaceDetail/Hair1.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hairDetail
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 24a25ebaea2e047be812738e6f1a4b49
+    m_Address: Assets/Scriptables/FaceDetail/Hair4.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hairDetail
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a51d28b9c4f274aa6b2b9c86f820f9c4
+    m_Address: Assets/Scriptables/FaceDetail/Hair2.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hairDetail
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1252bf6c2b2ca403d83dc770b5df2f63
+    m_Address: Assets/Scriptables/FaceDetail/Hair3.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hairDetail
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cd586f5eef7c843fc9088d5525590f0a
+    m_Address: Assets/Scriptables/FaceDetail/FHair4.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - facialHairDetail
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 7c8bf46af66d94c95b7860930c29ad14, type: 2}

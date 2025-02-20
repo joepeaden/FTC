@@ -16,6 +16,9 @@ public class PawnPreview : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     [SerializeField] private Image helmRend;
     [SerializeField] private Image weaponRend;
     [SerializeField] private Image bodyRend;
+    [SerializeField] private Image hairRend;
+    [SerializeField] private Image fHairRend;
+    [SerializeField] private Image browRend;
 
     private Pawn _pawn;
 
@@ -30,7 +33,7 @@ public class PawnPreview : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         ArmorItemData helm = g.HelmItem;
         WeaponItemData weapon = g.TheWeapon.Data;
 
-        SetupAppearance(helm, weapon, g.BodySprite);
+        SetupAppearance(helm, weapon, g.BodySprite, g.HairDetail.SWSprite, g.FacialHairDetail.SWSprite, g.BrowDetail.SWSprite);
     }
 
     public void SetData(Pawn p)
@@ -48,18 +51,20 @@ public class PawnPreview : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
         WeaponItemData weapon = p.GameChar.TheWeapon.Data;
 
-        SetupAppearance(helm, weapon, p.GameChar.BodySprite);
+        SetupAppearance(helm, weapon, p.GameChar.BodySprite, p.GameChar.HairDetail.SWSprite, p.GameChar.FacialHairDetail.SWSprite, p.GameChar.BrowDetail.SWSprite);
     }
 
-    private void SetupAppearance(ArmorItemData helm, WeaponItemData weapon, Sprite bodySprite)
+    private void SetupAppearance(ArmorItemData helm, WeaponItemData weapon, Sprite bodySprite, Sprite hairSprite, Sprite fHairSprite, Sprite browSprite)
     {
         if (helm != null)
         {
             helmRend.gameObject.SetActive(true);
             helmRend.sprite = helm.itemSprite;
+            hairRend.gameObject.SetActive(false);
         }
         else
         {
+            hairRend.gameObject.SetActive(true);
             helmRend.gameObject.SetActive(false);
         }
 
@@ -77,6 +82,10 @@ public class PawnPreview : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         {
             bodyRend.sprite = bodySprite;
         }
+
+        hairRend.sprite = hairSprite;
+        fHairRend.sprite = fHairSprite;
+        browRend.sprite = browSprite;
     }
 
     public void OnPointerEnter(PointerEventData eventData)

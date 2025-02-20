@@ -603,6 +603,8 @@ MonoBehaviour:
   _gameCharData: {fileID: 11400000, guid: 2ffcd208c31b24b8d89ae7832606b8f1, type: 2}
   _equipmentListData: {fileID: 11400000, guid: 45ebae92ddc7f4eb09d9065cfbc49418, type: 2}
   _clickSound: {fileID: 8300000, guid: 44655ac3e8d1745429020578a1c4698e, type: 3}
+  _menuMusic: {fileID: 8300000, guid: 8e702df844c674287a983489dd6f0edf, type: 3}
+  _battleMusic: {fileID: 8300000, guid: 6bb5cb1baeaa848e5aecd0492fe1b89f, type: 3}
 --- !u!114 &1966799577
 MonoBehaviour:
   m_ObjectHideFlags: 0

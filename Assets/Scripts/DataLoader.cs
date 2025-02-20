@@ -1,20 +1,45 @@
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.AddressableAssets;
 
 /// <summary>
-/// For loading scriptables and access to them.
+/// For loading adressable stuff and access to them.
 /// </summary>
 public class DataLoader
-{ 
+{
+    // motivation condition scriptables
     public static Dictionary<string, MotCondData> motConds = new ();
+
+    // sprites
+    public static Dictionary<string, FaceDetailData> hairDetail = new();
+    public static Dictionary<string, FaceDetailData> browDetail = new();
+    public static Dictionary<string, FaceDetailData> facialHairDetail = new();
 
     public void LoadData()
     {
-        Addressables.LoadAssetsAsync<MotCondData>("mot_conditions", OnLoadDataCompleted);
+        Addressables.LoadAssetsAsync<MotCondData>("motConditions", OnLoadDataCompleted);
+        Addressables.LoadAssetsAsync<FaceDetailData>("hairDetail", OnLoadHairDetailCompleted);
+        Addressables.LoadAssetsAsync<FaceDetailData>("browDetail", OnLoadBrowDetailCompleted);
+        Addressables.LoadAssetsAsync<FaceDetailData>("facialHairDetail", OnLoadFacialHairDetailCompleted);
     }
 
     private void OnLoadDataCompleted(MotCondData result)
     {
         motConds[result.condId] = result;
+    }
+
+    private void OnLoadHairDetailCompleted(FaceDetailData result)
+    {
+        hairDetail[result.name] = result;
+    }
+
+    private void OnLoadBrowDetailCompleted(FaceDetailData result)
+    {
+        facialHairDetail[result.name] = result;
+    }
+
+    private void OnLoadFacialHairDetailCompleted(FaceDetailData result)
+    {
+        browDetail[result.name] = result;
     }
 }
