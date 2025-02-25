@@ -31,6 +31,13 @@ public class ObjectPool : MonoBehaviour
     {
         audioSources = CreatePool(audioSourcePrefab, audioSources, audioSourcePoolSize);
         pawnPreviews = CreatePool(pawnPreviewPrefab, pawnPreviews, pawnPreviewPoolSize);
+
+        // some of these are re-parented (the pawn previews) so they need to
+        // be individually set like this.
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            DontDestroyOnLoad(transform.GetChild(i).gameObject);
+        }
     }
 
     private List<GameObject> CreatePool(GameObject prefab, List<GameObject> listToAssign, int count)

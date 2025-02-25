@@ -91,6 +91,7 @@ MonoBehaviour:
     - hairDetail
     - facialHairDetail
     - browDetail
+    - characterEffects
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: b7ac138f21e874c598474dc0cd4b2e72, type: 2}

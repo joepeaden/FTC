@@ -653,11 +653,7 @@ public class BattleManager : MonoBehaviour
         {
             bool playerWon = _battleResult == BattleResult.Win;
 
-            // distribute XP for participating in battle
-            for (int i = 0; i < _playerPawns.Count; i++)
-            {
-                _playerPawns[i].HandleBattleEnd();
-            }
+            Cleanup();
 
             GameManager.Instance.ExitBattle(playerWon);
         }
@@ -665,6 +661,18 @@ public class BattleManager : MonoBehaviour
         {
             // easy reload for testing
             SceneManager.LoadScene("BattleScene");
+        }
+    }
+
+    private void Cleanup()
+    {
+        // return pooled objects to the object pool parent so they
+        // aren't destroyed
+        for (int i = 0; i < _initStackParent.childCount; i++)
+        {
+            Transform p = _initStackParent.GetChild(i);
+            p.transform.SetParent(GameManager.Instance.transform);
+            p.gameObject.SetActive(false);
         }
     }
 
@@ -801,10 +809,17 @@ public class BattleManager : MonoBehaviour
 
     private void HandleBattleResult(BattleResult battleResult)
     {
+        // distribute XP for participating in battle
+        for (int i = 0; i < _playerPawns.Count; i++)
+        {
+            _playerPawns[i].HandleBattleEnd();
+        }
+
         turnUI.SetActive(false);
         winLoseUI.SetActive(true);
         bottomUIObjects.SetActive(false);
         winLoseText.text = battleResult == BattleResult.Win ? "Victory!" : "Defeat!" ;
+
         _battleResult = battleResult;
     }
 

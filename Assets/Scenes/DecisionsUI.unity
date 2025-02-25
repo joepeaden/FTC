@@ -645,6 +645,9 @@ MonoBehaviour:
   helmRend: {fileID: 1730296244}
   weaponRend: {fileID: 1342691691}
   bodyRend: {fileID: 1198558584}
+  hairRend: {fileID: 0}
+  fHairRend: {fileID: 0}
+  browRend: {fileID: 0}
 --- !u!114 &41156956
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -734,6 +737,9 @@ MonoBehaviour:
   helmRend: {fileID: 2106702504}
   weaponRend: {fileID: 1545137588}
   bodyRend: {fileID: 1570224830}
+  hairRend: {fileID: 0}
+  fHairRend: {fileID: 0}
+  browRend: {fileID: 0}
 --- !u!114 &60880454
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4481,6 +4487,9 @@ MonoBehaviour:
   helmRend: {fileID: 1516193308}
   weaponRend: {fileID: 1581883776}
   bodyRend: {fileID: 957584054}
+  hairRend: {fileID: 0}
+  fHairRend: {fileID: 0}
+  browRend: {fileID: 0}
 --- !u!114 &565092800
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5018,6 +5027,9 @@ MonoBehaviour:
   helmRend: {fileID: 874357973}
   weaponRend: {fileID: 1448140001}
   bodyRend: {fileID: 1973206573}
+  hairRend: {fileID: 0}
+  fHairRend: {fileID: 0}
+  browRend: {fileID: 0}
 --- !u!114 &630981725
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5401,6 +5413,9 @@ MonoBehaviour:
   helmRend: {fileID: 1774703820}
   weaponRend: {fileID: 978407087}
   bodyRend: {fileID: 423764057}
+  hairRend: {fileID: 0}
+  fHairRend: {fileID: 0}
+  browRend: {fileID: 0}
 --- !u!114 &672391206
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6278,6 +6293,9 @@ MonoBehaviour:
   helmRend: {fileID: 1692918088}
   weaponRend: {fileID: 1103042963}
   bodyRend: {fileID: 884770504}
+  hairRend: {fileID: 0}
+  fHairRend: {fileID: 0}
+  browRend: {fileID: 0}
 --- !u!114 &780837417
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8998,6 +9016,9 @@ MonoBehaviour:
   helmRend: {fileID: 795163500}
   weaponRend: {fileID: 364617727}
   bodyRend: {fileID: 1769896947}
+  hairRend: {fileID: 0}
+  fHairRend: {fileID: 0}
+  browRend: {fileID: 0}
 --- !u!114 &1086484728
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9191,6 +9212,9 @@ MonoBehaviour:
   helmRend: {fileID: 350658471}
   weaponRend: {fileID: 1074888021}
   bodyRend: {fileID: 1744206898}
+  hairRend: {fileID: 0}
+  fHairRend: {fileID: 0}
+  browRend: {fileID: 0}
 --- !u!114 &1100627863
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11003,6 +11027,9 @@ MonoBehaviour:
   helmRend: {fileID: 141658243}
   weaponRend: {fileID: 562887507}
   bodyRend: {fileID: 1496738261}
+  hairRend: {fileID: 0}
+  fHairRend: {fileID: 0}
+  browRend: {fileID: 0}
 --- !u!114 &1438332509
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11688,6 +11715,9 @@ MonoBehaviour:
   helmRend: {fileID: 17112949}
   weaponRend: {fileID: 2053441933}
   bodyRend: {fileID: 1381401568}
+  hairRend: {fileID: 0}
+  fHairRend: {fileID: 0}
+  browRend: {fileID: 0}
 --- !u!114 &1548661573
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15178,6 +15208,9 @@ MonoBehaviour:
   helmRend: {fileID: 637084770}
   weaponRend: {fileID: 1033317621}
   bodyRend: {fileID: 1562478879}
+  hairRend: {fileID: 0}
+  fHairRend: {fileID: 0}
+  browRend: {fileID: 0}
 --- !u!114 &2055411086
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15480,6 +15513,9 @@ MonoBehaviour:
   helmRend: {fileID: 869062136}
   weaponRend: {fileID: 591018140}
   bodyRend: {fileID: 172517352}
+  hairRend: {fileID: 0}
+  fHairRend: {fileID: 0}
+  browRend: {fileID: 0}
 --- !u!114 &2074352214
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15782,6 +15818,9 @@ MonoBehaviour:
   helmRend: {fileID: 2057416497}
   weaponRend: {fileID: 80785666}
   bodyRend: {fileID: 991381308}
+  hairRend: {fileID: 0}
+  fHairRend: {fileID: 0}
+  browRend: {fileID: 0}
 --- !u!114 &2109520219
 MonoBehaviour:
   m_ObjectHideFlags: 0

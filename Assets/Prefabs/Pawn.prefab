@@ -183,6 +183,8 @@ MonoBehaviour:
   _NWFace: {fileID: 21300000, guid: 77636eecde00cbb47a050427ae2e923f, type: 3}
   _SWFace: {fileID: 21300000, guid: 26ef5e718aeec4c8bb8971b45c7a468c, type: 3}
   _SEFace: {fileID: 21300000, guid: 3e2493cfa88614e389c508b1c4fc9055, type: 3}
+  _SWDeadFace: {fileID: 21300000, guid: b434ab0f1218845c79e652b3cd0bb2f9, type: 3}
+  _SEDeadFace: {fileID: 21300000, guid: 3ddf166c1e3ad40bfb98cc82a588c011, type: 3}
   _moveDust: {fileID: 0}
 --- !u!1 &3055745519342092786
 GameObject:
@@ -413,7 +415,7 @@ Transform:
   m_GameObject: {fileID: 4498588154513329865}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.15, y: 1.15, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8273687440872540238}
@@ -769,6 +771,8 @@ MonoBehaviour:
   _audioSource: {fileID: 5720785191603622845}
   _spriteController: {fileID: 6364605892828976112}
   _movingSound: {fileID: 8300000, guid: 8f45c196c3bb948449bf91c485626eef, type: 3}
+  BattleKills: 0
+  DmgInflicted: 0
 --- !u!114 &5116864122955787313
 MonoBehaviour:
   m_ObjectHideFlags: 0

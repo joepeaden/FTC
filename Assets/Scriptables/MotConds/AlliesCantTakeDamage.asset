@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 437c11bc2d2aa4449bac73810de3f76b, type: 3}
   m_Name: AlliesCantTakeDamage
   m_EditorClassIdentifier: 
-  condId: AllyNoDmg
-  condName: Oath of the Protector
+  effectID: AllyNoDmg
+  effectName: Oath of the Protector
   description: No ally may take more than 3 damage in a battle.
+  effectSprite: {fileID: 21300000, guid: 1815ea71c4e799e45b0db8899c240c4a, type: 3}
   tier: 1
   condType: 0

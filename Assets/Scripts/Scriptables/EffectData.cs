@@ -4,6 +4,7 @@ using System.Collections;
 [CreateAssetMenu(fileName = "EffectItemData", menuName = "MyScriptables/EffectItemData")]
 public class EffectData : ScriptableObject
 {
+    public string effectID;
     public string effectName;
     public string description;
     public Sprite effectSprite;

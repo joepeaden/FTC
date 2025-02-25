@@ -151,6 +151,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - facialHairDetail
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d61966ac83435437bad8e25bf7c74c30
+    m_Address: Assets/Scriptables/Effects/OathBroken.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - characterEffects
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 7c8bf46af66d94c95b7860930c29ad14, type: 2}
   m_SchemaSet:

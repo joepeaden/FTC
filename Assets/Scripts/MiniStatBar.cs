@@ -89,6 +89,8 @@ public class MiniStatBar : MonoBehaviour
 
         //_classIcon.material.SetColor("_InnerOutlineColor", _classIcon.color);
 
+        UpdateEffects(p.CurrentEffects);
+
         p.OnHit.AddListener(UpdateBars);
         p.OnEffectUpdate.AddListener(UpdateEffects);
     }

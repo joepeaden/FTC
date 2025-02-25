@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 437c11bc2d2aa4449bac73810de3f76b, type: 3}
   m_Name: DoNotDisengage
   m_EditorClassIdentifier: 
-  condId: NoRetreat
-  condName: No Retreat
+  effectID: NoRetreat
+  effectName: No Retreat
   description: Never disengage from combat while your opponent still lives.
+  effectSprite: {fileID: 21300000, guid: 5dec73e9ae51f4f449835068fa42ab0e, type: 3}
   tier: 1
   condType: 2

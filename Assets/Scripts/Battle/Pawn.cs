@@ -99,6 +99,9 @@ public class Pawn : MonoBehaviour
     /// </summary>
     private HashSet<MotCondData> _fulfilledBattleMotConds = new();
 
+    public int BattleKills = 0;
+    public int DmgInflicted = 0;
+
     #region UnityEvents
 
     private void Awake()
@@ -167,6 +170,8 @@ public class Pawn : MonoBehaviour
                     Debug.Log("Unhandled condition!");
                     break;
             }
+
+            UpdateEffect(motCond, true);
         }
     }
 
@@ -175,6 +180,8 @@ public class Pawn : MonoBehaviour
         if (_fulfilledBattleMotConds.Contains(DataLoader.motConds["NoRetreat"]))
         {
             _fulfilledBattleMotConds.Remove(DataLoader.motConds["NoRetreat"]);
+
+            BattleManager.Instance.AddTextNotification(transform.position, "Oath Broken!");
         }
     }
 
@@ -183,6 +190,8 @@ public class Pawn : MonoBehaviour
         if (p != this && p.OnPlayerTeam == OnPlayerTeam && _fulfilledBattleMotConds.Contains(DataLoader.motConds["AllyNoDmg"]))
         {
             _fulfilledBattleMotConds.Remove(DataLoader.motConds["AllyNoDmg"]);
+
+            BattleManager.Instance.AddTextNotification(transform.position, "Oath Broken!");
         }
     }
 
@@ -191,6 +200,7 @@ public class Pawn : MonoBehaviour
         // ew string parameters.
         // whatever.
         _fulfilledBattleMotConds.Add(DataLoader.motConds["Kill1"]);
+        BattleManager.Instance.AddTextNotification(transform.position, "Oath Fufilled!");
     }
 
     /// <summary>
@@ -394,7 +404,7 @@ public class Pawn : MonoBehaviour
                 // pause itself to give time for the level up animation, then it triggers the animaiton
                 // via TriggerLevelUpVisuals.
                 PendingLevelUp = GameChar.AddXP(1);
-
+                BattleKills++;
                 OnKillEnemy.Invoke();
             }
             else if (!targetHadArmor)
@@ -423,6 +433,7 @@ public class Pawn : MonoBehaviour
     public void TakeDamage(Pawn attackingPawn, WeaponAbilityData actionUsed, bool isCrit)
     {
         int hitPointsDmg = 0;
+        int armorDmg = 0;
         GameCharacter attackingCharacter = attackingPawn.GameChar;
 
         //if (actionUsed.rangeForExtraDamage > 0 && CurrentTile.GetTileDistance(attackingPawn.CurrentTile) == actionUsed.rangeForExtraDamage)
@@ -434,15 +445,13 @@ public class Pawn : MonoBehaviour
         bool armorHit = false;
         if (_armorPoints > 0)
         {
+            armorDmg = attackingCharacter.GetWeaponDamageForAction(actionUsed) + actionUsed.bonusDmg;
+            _armorPoints = Mathf.Max(0, _armorPoints - armorDmg);
+
             // crits against armor do full damage to armor and hp
             if (isCrit)
             {
-                _armorPoints = Mathf.Max(0, (_armorPoints - attackingCharacter.GetWeaponDamageForAction(actionUsed)) + actionUsed.bonusDmg);
                 hitPointsDmg = attackingCharacter.GetWeaponDamageForAction(actionUsed) + actionUsed.bonusDmg;
-            }
-            else
-            {
-                _armorPoints = Mathf.Max(0, (_armorPoints - attackingCharacter.GetWeaponDamageForAction(actionUsed)) + actionUsed.bonusDmg);
             }
 
             armorHit = true;
@@ -459,6 +468,8 @@ public class Pawn : MonoBehaviour
         }
 
         _hitPoints -= Mathf.Max(0, hitPointsDmg);
+
+        attackingPawn.DmgInflicted += hitPointsDmg + armorDmg;
 
         // if took 3 damage, alert via event in case ally has associated oath
         if (_hitPoints <= _gameChar.HitPoints - 3)

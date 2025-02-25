@@ -31,6 +31,10 @@ public class PawnSprite : MonoBehaviour
     private Sprite _SWFace;
     [SerializeField]
     private Sprite _SEFace;
+    [SerializeField]
+    private Sprite _SWDeadFace;
+    [SerializeField]
+    private Sprite _SEDeadFace;
 
     private Sprite _NEHair;
     private Sprite _NWHair;
@@ -351,6 +355,15 @@ public class PawnSprite : MonoBehaviour
 
     public void Die()
     {
+        if (_facingDirection == FacingDirection.SE)
+        {
+            _eyesSpriteRend.sprite = _SEDeadFace;
+        }
+        else if (_facingDirection == FacingDirection.SW)
+        {
+            _eyesSpriteRend.sprite = _SWDeadFace;
+        }
+
         StartCoroutine(PlayAnimationAfterDelay(.2f, "Die"));
         _eyesSpriteRend.sortingLayerName = "DeadCharacters";
         _bodySpriteRend.sortingLayerName = "DeadCharacters";

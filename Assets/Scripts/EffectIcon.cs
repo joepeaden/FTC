@@ -9,6 +9,12 @@ public class EffectIcon : MonoBehaviour
 
     public void SetData(EffectData newEffect)
     {
+        gameObject.SetActive(true);
         _effect = newEffect;
+    }
+
+    public void Hide()
+    {
+        gameObject.SetActive(false);
     }
 }

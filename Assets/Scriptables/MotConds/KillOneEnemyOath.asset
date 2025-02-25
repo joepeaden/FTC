@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 437c11bc2d2aa4449bac73810de3f76b, type: 3}
   m_Name: KillOneEnemyOath
   m_EditorClassIdentifier: 
-  condId: Kill1
-  condName: Oath of Vengance
+  effectID: Kill1
+  effectName: Oath of Vengance
   description: Kill at least one enemy per battle.
+  effectSprite: {fileID: 21300000, guid: a59d6029d282ea148bf57966b0c2401e, type: 3}
   tier: 1
   condType: 1

@@ -4,7 +4,7 @@
 /// Scriptable for Motivation Conditions, like Oaths.
 /// </summary>
 [CreateAssetMenu(fileName = "MotCondData", menuName = "MyScriptables/MotCondData")]
-public class MotCondData : ScriptableObject
+public class MotCondData : EffectData
 {
     public enum ConditionType
     {
@@ -13,12 +13,6 @@ public class MotCondData : ScriptableObject
         DoNotDisengage
     }
 
-    /// <summary>
-    /// Unique ID for conditions
-    /// </summary>
-    public string condId;
-    public string condName;
-    public string description;
     public int tier;
     public ConditionType condType;
 }

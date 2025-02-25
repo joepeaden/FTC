@@ -89,6 +89,10 @@ public class GameCharacter
 
     private HashSet<MotCondData> _fulfilledMotConds = new();
 
+    // long term effects on a character, like a broken oath (injuries?)
+    public List<EffectData> Effects => _effects;
+    private List<EffectData> _effects = new();
+
     public GameCharacter(bool onPlayerTeam)
     {
         List<string> characterNameOptions = new()
@@ -156,8 +160,6 @@ public class GameCharacter
         _onPlayerTeam = onPlayerTeam;
         _accRating = Random.Range(GameManager.Instance.GameCharData.minAcc, GameManager.Instance.GameCharData.maxAcc);
         _critChance = 11;
-
-        _motConds.Add(DataLoader.motConds["Kill1"]);
     }
 
     private void GenerateFace()
@@ -200,22 +202,39 @@ public class GameCharacter
         switch (Motivator)
         {
             case CharMotivators.Honor:
-                foreach (MotCondData condition in _fulfilledConditions)
+                List<MotCondData> motCondsForBattle = GetMotCondsForBattle();
+                for (int i = 0; i < motCondsForBattle.Count; i++)
                 {
-                    if (!GetMotCondsForBattle().Contains(condition))
+                    MotCondData condition = motCondsForBattle[i];
+                    if (!_fulfilledConditions.Contains(condition))
                     {
                         FailOath(condition);
+
+                        // add effect for display to alert the player
+                        _effects.Add(DataLoader._effects["oathbroken"]);
+
                         failedSomething = true;
                     }
                 }
-                break;
-        }
 
-        // if didn't fail any conditions, then add one motivation, up to the
-        // max, which is based on the level of the character.
-        if (!failedSomething)
-        {
-            _charMotivation += Mathf.Clamp(_charMotivation + 1, 0, _level+1);
+                // if didn't fail any conditions
+                if (!failedSomething)
+                {
+                    //add one motivation, up to the max, which is based on the level
+                    //of the character.
+                    _charMotivation = Mathf.Clamp(_charMotivation + 1, 0, _level + 1);
+
+                    // take a new oath if not at max.
+                    if (_motConds.Count < _level)
+                    {
+                        AddNewOath();
+                    }
+                }
+
+                break;
+            default:
+                Debug.Log("Battle End: Class not supported!");
+                break;
         }
     }
 
@@ -253,6 +272,28 @@ public class GameCharacter
         return _xpCaps[_level];
     }
 
+    private void SetHonorable()
+    {
+        _abilities.Add(new HonorProtect());
+        AddNewOath();
+    }
+
+    private void AddNewOath()
+    {
+        switch (_level)
+        {
+            case 0:
+                _motConds.Add(DataLoader.motConds["Kill1"]);
+                break;
+            case 1:
+                _motConds.Add(DataLoader.motConds["NoRetreat"]);
+                break;
+            case 2:
+                _motConds.Add(DataLoader.motConds["AllyNoDmg"]);
+                break;
+        }
+    }
+
     private void SetMotivator(CharMotivators newMotivator)
     {
         _motivator = newMotivator;
@@ -261,7 +302,7 @@ public class GameCharacter
         switch (_motivator)
         {
             case CharMotivators.Honor:
-                _abilities.Add(new HonorProtect());
+                SetHonorable();
                 break;
             case CharMotivators.Glory:
                 _abilities.Add(new WildAbandon());
@@ -285,6 +326,7 @@ public class GameCharacter
             _xp -= _xpCaps[_level];
             _level++;
             _pendingStatPoints++;
+
             return true;
         }
 

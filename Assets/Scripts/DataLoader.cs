@@ -15,17 +15,26 @@ public class DataLoader
     public static Dictionary<string, FaceDetailData> browDetail = new();
     public static Dictionary<string, FaceDetailData> facialHairDetail = new();
 
+    // effects a character could endure
+    public static Dictionary<string, EffectData> _effects = new();
+
     public void LoadData()
     {
-        Addressables.LoadAssetsAsync<MotCondData>("motConditions", OnLoadDataCompleted);
+        Addressables.LoadAssetsAsync<MotCondData>("motConditions", OnLoadMotCondDataCompleted);
         Addressables.LoadAssetsAsync<FaceDetailData>("hairDetail", OnLoadHairDetailCompleted);
         Addressables.LoadAssetsAsync<FaceDetailData>("browDetail", OnLoadBrowDetailCompleted);
         Addressables.LoadAssetsAsync<FaceDetailData>("facialHairDetail", OnLoadFacialHairDetailCompleted);
+        Addressables.LoadAssetsAsync<EffectData>("characterEffects", OnLoadCharEffectsCompleted);
     }
 
-    private void OnLoadDataCompleted(MotCondData result)
+    private void OnLoadCharEffectsCompleted(EffectData result)
     {
-        motConds[result.condId] = result;
+        _effects[result.effectID] = result;
+    }
+
+    private void OnLoadMotCondDataCompleted(MotCondData result)
+    {
+        motConds[result.effectID] = result;
     }
 
     private void OnLoadHairDetailCompleted(FaceDetailData result)
