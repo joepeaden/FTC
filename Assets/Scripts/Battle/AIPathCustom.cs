@@ -29,6 +29,7 @@ public class AIPathCustom : AIPath
         _pawnActionPoints = _pawn.ActionPoints;
     }
 
+    // Initial setup for the move
     private void OnPathCalculated(Path p)
     {
         _pathToFollow = new List<Vector3> (p.vectorPath);
@@ -40,9 +41,10 @@ public class AIPathCustom : AIPath
 
         // if not enough AP to move the total distance to goal,
         // remove unreachable nodes
-        if (totalTilesToMove * apPerTileMoved > _pawnActionPoints)
+        if ((totalTilesToMove - _pawn.SprintBonusMoves) * apPerTileMoved > _pawnActionPoints)
         {
-            Vector3 finalPosition = _pathToFollow[_pawnActionPoints / apPerTileMoved];
+            // get the max we can move with our AP + the bonus moves from sprint
+            Vector3 finalPosition = _pathToFollow[Mathf.Clamp( _pawnActionPoints / apPerTileMoved + _pawn.SprintBonusMoves, 0, _pathToFollow.Count)];
             int finalIndex = _pathToFollow.IndexOf(finalPosition);
             _pathToFollow.RemoveRange(finalIndex+1, (_pathToFollow.Count - (finalIndex + 1)));
         }
@@ -75,7 +77,14 @@ public class AIPathCustom : AIPath
 
         if (_currentPathIndex > 0)
         {
-            _pawnActionPoints -= _pawn.GameChar.GetAPPerTileMoved();
+            if (_pawnActionPoints > 0)
+            {
+                _pawnActionPoints -= _pawn.GameChar.GetAPPerTileMoved();
+            }
+            else if (_pawn.SprintBonusMoves > 0)
+            {
+                _pawn.SprintBonusMoves--;
+            }
         }
     }
 
@@ -103,7 +112,7 @@ public class AIPathCustom : AIPath
             //}
 
             if (_currentPathIndex >= _pathToFollow.Count
-                || _pawnActionPoints <= 0)
+                || (_pawnActionPoints <= 0 && _pawn.SprintBonusMoves <= 0))
             {
                 OnDestinationReached.Invoke();
                 enabled = false;

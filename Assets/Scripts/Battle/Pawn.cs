@@ -26,7 +26,9 @@ public class Pawn : MonoBehaviour
     public float baseDodgeChance;
     public float baseSurroundBonus;
 
-    public int MoveRange => ActionPoints / _gameChar.GetAPPerTileMoved();
+    public int MoveRange => (ActionPoints / _gameChar.GetAPPerTileMoved()) + SprintBonusMoves;
+    // set from the Sprint ability
+    public int SprintBonusMoves { get; set; }
 
     public Tile CurrentTile => _currentTile;
     private Tile _currentTile;
@@ -619,7 +621,7 @@ public class Pawn : MonoBehaviour
     /// <returns></returns>
     public void TryMoveToTile(Tile targetTile)
     {
-        if (ActionPoints < _gameChar.GetAPPerTileMoved())
+        if (ActionPoints < _gameChar.GetAPPerTileMoved() && SprintBonusMoves <= 0)
         {
             return;
         }
@@ -674,7 +676,7 @@ public class Pawn : MonoBehaviour
         _spriteController.StopMoving();
         UpdateSpriteOnStop(true);
 
-        BattleManager.Instance.PawnActivated(this);
+        BattleManager.Instance.PawnActed(this);
 
         OnMoved.Invoke();
 

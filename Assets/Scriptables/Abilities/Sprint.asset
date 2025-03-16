@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5106310c19722ca41878781f486b6497, type: 3}
+  m_Name: Sprint
+  m_EditorClassIdentifier: 
+  abilityName: Sprint
+  description: Use motivation to increase your movement range.
+  motCost: 1
+  range: 2
+  sprite: {fileID: 21300000, guid: c5c867e9976dc5d4a8803e01578752f5, type: 3}
+  turnsDuration: 0
+  statusEffect: {fileID: 0}
+  outDmgMod: 0
+  inDmgMod: 0
+  hitMod: 0
+  dodgeMod: 0
+  isMoveAbility: 1

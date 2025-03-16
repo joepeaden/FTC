@@ -402,7 +402,7 @@ public class BattleManager : MonoBehaviour
         {
             if (_currentPawn != null)
             {
-                if (Ability.SelectedAbility != null && targetTile.GetTileDistance(_currentPawn.CurrentTile) <= Ability.SelectedAbility.GetData().range)
+                if (Ability.SelectedAbility != null && !Ability.SelectedAbility.GetData().isMoveAbility && targetTile.GetTileDistance(_currentPawn.CurrentTile) <= Ability.SelectedAbility.GetData().range)
                 {
                     tilesToHighlight.Clear();
                     tilesToHighlight.Add(targetTile);
@@ -622,11 +622,18 @@ public class BattleManager : MonoBehaviour
         UpdateUIForPawn(_currentPawn);
     }
 
-    private void HandleActionClicked(Ability action)
+    private void HandleActionClicked(Ability ability)
     {
         ClearSelectedAction();
 
-        Ability.SelectedAbility = action;
+        Ability.SelectedAbility = ability;
+
+        if (ability.GetData().immediateActivate)
+        {
+            // for now, there are no immediate activate abilities
+            // that target another pawn.
+            ability.Activate(_currentPawn, _currentPawn);
+        }
 
         _selectionManager.SetIdleMode(false);
 
@@ -695,12 +702,12 @@ public class BattleManager : MonoBehaviour
     /// When a pawn acts but not necessarily when it's finished
     /// </summary>
     /// <param name="p"></param>
-    public void PawnActivated(Pawn p)
+    public void PawnActed(Pawn p)
     {
-        StartCoroutine(PawnActivatedCoroutine(p));
+        StartCoroutine(PawnActedCoroutine(p));
     }
 
-    public IEnumerator PawnActivatedCoroutine(Pawn p)
+    public IEnumerator PawnActedCoroutine(Pawn p)
     {
         // level up visuals & audio. Need pauses to allow the player time to
         // process what's going on.

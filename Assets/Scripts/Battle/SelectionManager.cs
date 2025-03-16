@@ -85,7 +85,6 @@ public class SelectionManager : MonoBehaviour
     public void SetIdleMode(bool isIdle)
     {
         Pawn currentPawn = BattleManager.Instance.CurrentPawn;
-        Ability currentAction = Ability.SelectedAbility;
 
         // already not in idle mode and maybe switching actions -
         // clear highlights.
@@ -96,7 +95,8 @@ public class SelectionManager : MonoBehaviour
 
         _inIdleMode = isIdle;
 
-        if (currentAction != null)
+
+        if (Ability.SelectedAbility != null && !Ability.SelectedAbility.GetData().isMoveAbility)
         {
             _selectedTile.HighlightTilesInRange(currentPawn, Ability.SelectedAbility.GetData().range, !isIdle, Tile.TileHighlightType.AttackRange);
         }

@@ -17,7 +17,7 @@ public class SlashAttackAbility : Ability
         {
             // why is PawnActivated called here? That seems pretty wierd. Doesn't seem necessary.
             // The pawn isn't acting, it can't because there's not enough resources.
-            BattleManager.Instance.PawnActivated(activatedPawn);
+            BattleManager.Instance.PawnActed(activatedPawn);
 
             return false;
         }
@@ -42,7 +42,7 @@ public class SlashAttackAbility : Ability
         activatedPawn.ActionPoints -= attackAction.apCost;
         activatedPawn.Motivation -= attackAction.motCost;
         
-        BattleManager.Instance.PawnActivated(activatedPawn);
+        BattleManager.Instance.PawnActed(activatedPawn);
 
         activatedPawn.SetSpriteFacing(primaryTargetPawn.transform.position);
 

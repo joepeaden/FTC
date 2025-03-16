@@ -129,14 +129,15 @@ public class GameCharacter
         {
             GameCharacterData data = GameManager.Instance.GameCharData;
 
-            SetMotivator((CharMotivators)Random.Range(0, 3));
+            SetMotivator(CharMotivators.Honor);//(CharMotivators)Random.Range(0, 3));
 
             _baseInitiative = Random.Range(GameManager.Instance.GameCharData.minInit, GameManager.Instance.GameCharData.maxInit);
             _hitPoints = Random.Range(GameManager.Instance.GameCharData.minHP, GameManager.Instance.GameCharData.maxHP);
         }
         else
         {
-            SetMotivator((CharMotivators)Random.Range(0, 3));
+            SetMotivator(CharMotivators.Honor);
+            //SetMotivator((CharMotivators)Random.Range(0, 3));
 
             _baseInitiative = Random.Range(0, 5);
             _hitPoints = Random.Range(3, 8);
@@ -160,6 +161,9 @@ public class GameCharacter
         _onPlayerTeam = onPlayerTeam;
         _accRating = Random.Range(GameManager.Instance.GameCharData.minAcc, GameManager.Instance.GameCharData.maxAcc);
         _critChance = 11;
+
+        // add basic abilities
+        _abilities.Add(new SprintAbility());
     }
 
     private void GenerateFace()

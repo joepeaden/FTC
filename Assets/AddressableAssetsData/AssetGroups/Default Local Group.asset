@@ -157,6 +157,11 @@ MonoBehaviour:
     m_SerializedLabels:
     - characterEffects
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d2491b6e962e7484aa273384a8ead0d3
+    m_Address: Assets/Scriptables/Abilities/Sprint.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 7c8bf46af66d94c95b7860930c29ad14, type: 2}
   m_SchemaSet:
