@@ -119,23 +119,25 @@ public class DecisionPanel : MonoBehaviour
                     break;
             }
 
+            guy.EquipItem(GameManager.Instance.EquipmentList.badHelm1);
+
             // pick random armor
-            roll = Random.Range(0, 4);
-            switch (roll)
-            {
-                case 0:
-                    // no armor
-                    break;
-                case 1:
-                    guy.EquipItem(GameManager.Instance.EquipmentList.lightHelm);
-                    break;
-                case 2:
-                    guy.EquipItem(GameManager.Instance.EquipmentList.heavyHelm);
-                    break;
-                case 3:
-                    guy.EquipItem(GameManager.Instance.EquipmentList.medHelm);
-                    break;
-            }
+            //roll = Random.Range(0, 4);
+            //switch (roll)
+            //{
+            //    case 0:
+            //        // no armor
+            //        break;
+            //    case 1:
+            //        guy.EquipItem(GameManager.Instance.EquipmentList.lightHelm);
+            //        break;
+            //    case 2:
+            //        guy.EquipItem(GameManager.Instance.EquipmentList.heavyHelm);
+            //        break;
+            //    case 3:
+            //        guy.EquipItem(GameManager.Instance.EquipmentList.medHelm);
+            //        break;
+            //}
 
             enemies.Add(guy);
         }

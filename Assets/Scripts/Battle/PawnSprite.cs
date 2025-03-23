@@ -24,13 +24,11 @@ public class PawnSprite : MonoBehaviour
     private SpriteRenderer _weaponSpriteRend;
 
     [SerializeField]
-    private Sprite _NEFace;
-    [SerializeField]
-    private Sprite _NWFace;
-    [SerializeField]
+    private Sprite _blankSprite;
+
     private Sprite _SWFace;
-    [SerializeField]
     private Sprite _SEFace;
+
     [SerializeField]
     private Sprite _SWDeadFace;
     [SerializeField]
@@ -106,6 +104,13 @@ public class PawnSprite : MonoBehaviour
         _SWFacialHair = pawn.GameChar.FacialHairDetail.SWSprite;
         _SEFacialHair = pawn.GameChar.FacialHairDetail.SESprite;
 
+        if (pawn.GameChar.BodySprite != null)
+        {
+            _bodySpriteRend.sprite = pawn.GameChar.BodySprite;
+            _SWFace = pawn.GameChar.SWEyesSprite;
+            _SEFace = pawn.GameChar.SEEyesSprite;
+        }
+
         if (pawn.OnPlayerTeam)
         {
             UpdateFacingAndSpriteOrder(Vector3.zero, new Vector3(1, 1), pawn.CurrentTile);
@@ -115,16 +120,6 @@ public class PawnSprite : MonoBehaviour
         {
             UpdateFacingAndSpriteOrder(Vector3.zero, new Vector3(-1, -1), pawn.CurrentTile);
             _anim.Play("IdleSW", 0, Random.Range(0f, 1f));
-        }
-
-        if (pawn.GameChar.BodySprite != null)
-        {
-            _bodySpriteRend.sprite = pawn.GameChar.BodySprite;
-        }
-
-        if (pawn.GameChar.BodySprite != null)
-        {
-            _bodySpriteRend.sprite = pawn.GameChar.BodySprite;
         }
     }
 
@@ -180,7 +175,7 @@ public class PawnSprite : MonoBehaviour
         switch (_facingDirection)
         {
             case FacingDirection.NE:
-                _eyesSpriteRend.sprite = _NEFace;
+                _eyesSpriteRend.sprite = _blankSprite;
                 _hairSpriteRend.sprite = _NEHair;
                 _fhairSpriteRend.sprite = _NEFacialHair;
                 _browSpriteRend.sprite = _NEBrow;
@@ -198,7 +193,7 @@ public class PawnSprite : MonoBehaviour
                 _browSpriteRend.sprite = _SWBrow;
                 break;
             case FacingDirection.NW:
-                _eyesSpriteRend.sprite = _NWFace;
+                _eyesSpriteRend.sprite = _blankSprite;
                 _hairSpriteRend.sprite = _NWHair;
                 _fhairSpriteRend.sprite = _NWFacialHair;
                 _browSpriteRend.sprite = _NWBrow;

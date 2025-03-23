@@ -18,6 +18,7 @@ MonoBehaviour:
   greedHelm: {fileID: 11400000, guid: 31f65f6bc6c324ccba0d3a2b5fddafd1, type: 2}
   honorHelm: {fileID: 11400000, guid: 78ca02cd9ffa44ef38a957f5115cc867, type: 2}
   gloryHelm: {fileID: 11400000, guid: 71b52fbc9bdf34acda204a6cb64dc1d2, type: 2}
+  badHelm1: {fileID: 11400000, guid: 0b431dce146d34dfab68902568ff9584, type: 2}
   club: {fileID: 11400000, guid: 10bfb3287a43940979f35f88999d4de9, type: 2}
   sword: {fileID: 11400000, guid: 025279ef39ee34138ad771576ee830f3, type: 2}
   axe: {fileID: 11400000, guid: 3f9b368f6a59e4158b31a26846087db3, type: 2}

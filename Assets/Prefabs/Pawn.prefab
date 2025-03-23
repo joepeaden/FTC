@@ -179,10 +179,7 @@ MonoBehaviour:
   _bodySpriteRend: {fileID: 1970687130719823551}
   _helmSpriteRend: {fileID: 523573614248301957}
   _weaponSpriteRend: {fileID: 3673270242807775494}
-  _NEFace: {fileID: 21300000, guid: 77636eecde00cbb47a050427ae2e923f, type: 3}
-  _NWFace: {fileID: 21300000, guid: 77636eecde00cbb47a050427ae2e923f, type: 3}
-  _SWFace: {fileID: 21300000, guid: 26ef5e718aeec4c8bb8971b45c7a468c, type: 3}
-  _SEFace: {fileID: 21300000, guid: 3e2493cfa88614e389c508b1c4fc9055, type: 3}
+  _blankSprite: {fileID: 21300000, guid: 77636eecde00cbb47a050427ae2e923f, type: 3}
   _SWDeadFace: {fileID: 21300000, guid: b434ab0f1218845c79e652b3cd0bb2f9, type: 3}
   _SEDeadFace: {fileID: 21300000, guid: 3ddf166c1e3ad40bfb98cc82a588c011, type: 3}
   _moveDust: {fileID: 0}

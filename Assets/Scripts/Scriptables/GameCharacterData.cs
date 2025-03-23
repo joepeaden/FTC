@@ -18,4 +18,8 @@ public class GameCharacterData : ScriptableObject
 
     public Sprite blueShirt;
     public Sprite redShirt;
+    public Sprite goodEyesSE;
+    public Sprite goodEyesSW;
+    public Sprite badEyesSE;
+    public Sprite badEyesSW;
 }

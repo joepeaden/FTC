@@ -60,6 +60,11 @@ public class GameCharacter
     public Sprite BodySprite => _bodySprite;
     private Sprite _bodySprite;
 
+    public Sprite SEEyesSprite => _seEyesSprite;
+    private Sprite _seEyesSprite;
+    public Sprite SWEyesSprite => _swEyesSprite;
+    private Sprite _swEyesSprite;
+
     // detail data objects - basically different sprites that make up the face
     public FaceDetailData HairDetail => _hairDetail;
     private FaceDetailData _hairDetail;
@@ -147,10 +152,14 @@ public class GameCharacter
             EquipItem(GameManager.Instance.GameCharData.DefaultWeapon);
             if (onPlayerTeam)
             {
+                _seEyesSprite = GameManager.Instance.GameCharData.goodEyesSE;
+                _swEyesSprite = GameManager.Instance.GameCharData.goodEyesSW;
                 _bodySprite = GameManager.Instance.GameCharData.blueShirt;
             }
             else
             {
+                _seEyesSprite = GameManager.Instance.GameCharData.badEyesSE;
+                _swEyesSprite = GameManager.Instance.GameCharData.badEyesSW;
                 _bodySprite = GameManager.Instance.GameCharData.redShirt;
             }
 
@@ -299,18 +308,18 @@ public class GameCharacter
         _motivator = newMotivator;
         _charMotivation = 1;
 
-        switch (_motivator)
-        {
-            case CharMotivators.Honor:
+        //switch (_motivator)
+        //{
+        //    case CharMotivators.Honor:
                 SetHonorable();
-                break;
-            case CharMotivators.Glory:
-                _abilities.Add(new WildAbandon());
-                break;
-            case CharMotivators.Greed:
-                _abilities.Add(new BonusPay());
-                break;
-        }
+        //        break;
+        //    case CharMotivators.Glory:
+        //        _abilities.Add(new WildAbandon());
+        //        break;
+        //    case CharMotivators.Greed:
+        //        _abilities.Add(new BonusPay());
+        //        break;
+        //}
     }
 
     /// <summary>

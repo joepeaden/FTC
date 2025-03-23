@@ -10,6 +10,7 @@ public class EquipmentListData : ScriptableObject
     public ArmorItemData greedHelm;
     public ArmorItemData honorHelm;
     public ArmorItemData gloryHelm;
+    public ArmorItemData badHelm1;
     public WeaponItemData club;
     public WeaponItemData sword;
     public WeaponItemData axe;

@@ -242,6 +242,7 @@ MonoBehaviour:
   weaponRend: {fileID: 2194946971119067045}
   bodyRend: {fileID: 8573871576212199048}
   hairRend: {fileID: 7756823032458385680}
+  eyesRend: {fileID: 5135323402627781651}
   fHairRend: {fileID: 4124970822281038957}
   browRend: {fileID: 1739311485625647004}
 --- !u!1 &3162013808165083379
