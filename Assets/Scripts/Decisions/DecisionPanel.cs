@@ -40,7 +40,7 @@ public class DecisionPanel : MonoBehaviour
 
     public void GenerateRecruitOption()
     {
-        _recruit = new(true);
+        _recruit = new(DataLoader.charTypes["player"]);
 
         if (GameManager.Instance != null)
         {
@@ -91,7 +91,7 @@ public class DecisionPanel : MonoBehaviour
 
         _decisionType = DecisionType.Contract;
 
-        _pawnPreview.SetData(new GameCharacter(false));
+        _pawnPreview.SetData(new GameCharacter(DataLoader.charTypes["thrall"]));
     }
 
     private List<GameCharacter> GenerateEnemies(int numToGenerate)
@@ -99,27 +99,7 @@ public class DecisionPanel : MonoBehaviour
         List<GameCharacter> enemies = new();
         for (int i = 0; i < numToGenerate; i++)
         {
-            GameCharacter guy = new(false);
-
-            // pick random weapon
-            int roll = Random.Range(0, 4);
-            switch (roll)
-            {
-                case 0:
-                    guy.EquipItem(GameManager.Instance.EquipmentList.club);
-                    break;
-                case 1:
-                    guy.EquipItem(GameManager.Instance.EquipmentList.sword);
-                    break;
-                case 2:
-                    guy.EquipItem(GameManager.Instance.EquipmentList.spear);
-                    break;
-                case 3:
-                    guy.EquipItem(GameManager.Instance.EquipmentList.axe);
-                    break;
-            }
-
-            guy.EquipItem(GameManager.Instance.EquipmentList.badHelm1);
+            GameCharacter guy = new(DataLoader.charTypes["thrall"]);
 
             // pick random armor
             //roll = Random.Range(0, 4);

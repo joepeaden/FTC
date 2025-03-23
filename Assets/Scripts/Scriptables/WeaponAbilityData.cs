@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [CreateAssetMenu(fileName = "WeaponAbilityData", menuName = "MyScriptables/WeaponAbilityData")]
-public class WeaponAbilityData : AbilityData
+public class WeaponAbilityData : Ability
 {
     public enum AttackStyle
     {

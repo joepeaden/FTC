@@ -72,7 +72,7 @@ public class EquipmentTooltip : MonoBehaviour
         }
     }
 
-    public void SetAction(AbilityData ability)
+    public void SetAction(Ability ability)
     {
         if (ability == null)
         {

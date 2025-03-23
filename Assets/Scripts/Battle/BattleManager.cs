@@ -533,7 +533,7 @@ public class BattleManager : MonoBehaviour
         {
             Pawn newPawn = Instantiate(pawnPrefab, friendly ? friendlyParent : enemyParent).GetComponent<Pawn>();
 
-            GameCharacter guy = new(friendly);
+            GameCharacter guy = new(friendly ? DataLoader.charTypes["player"] : DataLoader.charTypes["thrall"]);
 
             if (GameManager.Instance == null)
             {

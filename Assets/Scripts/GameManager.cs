@@ -65,7 +65,7 @@ public class GameManager : MonoBehaviour
         // add 3 default characters for player
         for (int i = 0; i < 3; i++)
         {
-            TryAddFollower(0, new GameCharacter(true));
+            TryAddFollower(0, new GameCharacter(DataLoader.charTypes["player"]));
         }
 
         SceneManager.LoadScene("DecisionsUI");

@@ -2,7 +2,7 @@
 using System.Collections;
 
 [CreateAssetMenu(fileName = "SupportAbilityData", menuName = "MyScriptables/SupportAbilityData")]
-public class SupportAbilityData : AbilityData
+public class SupportAbilityData : Ability
 {
     [Header("Support Info")]
     public int turnsDuration;

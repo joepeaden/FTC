@@ -98,7 +98,7 @@ public class GameCharacter
     public List<EffectData> Effects => _effects;
     private List<EffectData> _effects = new();
 
-    public GameCharacter(bool onPlayerTeam)
+    public GameCharacter(GameCharacterData charData)
     {
         List<string> characterNameOptions = new()
         {
@@ -130,44 +130,32 @@ public class GameCharacter
 
         _charName = characterNameOptions[Random.Range(0, characterNameOptions.Count)];
 
-        if (GameManager.Instance != null)
+        foreach (Ability ab in charData.abilityList)
         {
-            GameCharacterData data = GameManager.Instance.GameCharData;
-
-            SetMotivator((CharMotivators)Random.Range(0, 3));
-
-            _baseInitiative = Random.Range(GameManager.Instance.GameCharData.minInit, GameManager.Instance.GameCharData.maxInit);
-            _hitPoints = Random.Range(GameManager.Instance.GameCharData.minHP, GameManager.Instance.GameCharData.maxHP);
-        }
-        else
-        {
-            SetMotivator((CharMotivators)Random.Range(0, 3));
-
-            _baseInitiative = Random.Range(0, 5);
-            _hitPoints = Random.Range(3, 8);
-
-        }
-        if (GameManager.Instance != null)
-        {
-            EquipItem(GameManager.Instance.GameCharData.DefaultWeapon);
-            if (onPlayerTeam)
-            {
-                _seEyesSprite = GameManager.Instance.GameCharData.goodEyesSE;
-                _swEyesSprite = GameManager.Instance.GameCharData.goodEyesSW;
-                _bodySprite = GameManager.Instance.GameCharData.blueShirt;
-            }
-            else
-            {
-                _seEyesSprite = GameManager.Instance.GameCharData.badEyesSE;
-                _swEyesSprite = GameManager.Instance.GameCharData.badEyesSW;
-                _bodySprite = GameManager.Instance.GameCharData.redShirt;
-            }
-
-            GenerateFace();
+            _abilities.Add(ab);
         }
 
-        _onPlayerTeam = onPlayerTeam;
-        _accRating = Random.Range(GameManager.Instance.GameCharData.minAcc, GameManager.Instance.GameCharData.maxAcc);
+        SetMotivator((CharMotivators)Random.Range(0, 3));
+
+        _baseInitiative = Random.Range(charData.minInit, charData.maxInit);
+        _hitPoints = Random.Range(charData.minHP, charData.maxHP);
+
+        WeaponItemData startingWeapon = charData.defaultWeaponOptions[Random.Range(0, charData.defaultWeaponOptions.Count)];
+        EquipItem(startingWeapon);
+
+        if (charData.defaultArmorOptions.Count > 0)
+        {
+            ArmorItemData startingArmor = charData.defaultArmorOptions[Random.Range(0, charData.defaultArmorOptions.Count)];
+            EquipItem(startingArmor);
+        }
+
+        _seEyesSprite = charData.eyesSE;
+        _swEyesSprite = charData.eyesSW;
+        _bodySprite = charData.shirt;
+        GenerateFace();
+
+        _onPlayerTeam = charData.onPlayerTeam;
+        _accRating = Random.Range(charData.minAcc, charData.maxAcc);
         _critChance = 11;
     }
 
@@ -419,13 +407,18 @@ public class GameCharacter
                 _bodyItem = null;
                 break;
             case ItemType.Weapon:
-                _theWeapon.SetData(GameManager.Instance.GameCharData.DefaultWeapon);
+                _theWeapon.SetData(GameManager.Instance.GameCharData.fallbackWeapon);
                 break;
         }
     }
 
     public ItemData EquipItem(ItemData newItem)
     {
+        if (newItem == null)
+        {
+            return null;
+        }
+
         ItemData oldItem = null;
 
         switch (newItem.itemType)

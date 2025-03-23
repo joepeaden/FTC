@@ -157,6 +157,18 @@ MonoBehaviour:
     m_SerializedLabels:
     - characterEffects
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 21cefe0998bf844d483bace1e1e02377
+    m_Address: Assets/Scriptables/EnemyThrall.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - charTypes
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2ffcd208c31b24b8d89ae7832606b8f1
+    m_Address: Assets/Scriptables/GameCharacterData.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - charTypes
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 7c8bf46af66d94c95b7860930c29ad14, type: 2}
   m_SchemaSet:

@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08423bf94f3ec4f97b843abe2c28ede4, type: 3}
+  m_Name: EnemyThrallChar
+  m_EditorClassIdentifier: 
+  charTypeID: thrall
+  onPlayerTeam: 0
+  startingGold: 100
+  recruitPrice: 20
+  minInit: 0
+  maxInit: 5
+  minHP: 2
+  maxHP: 4
+  minAcc: 6
+  maxAcc: 9
+  fallbackWeapon: {fileID: 11400000, guid: 10bfb3287a43940979f35f88999d4de9, type: 2}
+  defaultWeaponOptions:
+  - {fileID: 11400000, guid: 10bfb3287a43940979f35f88999d4de9, type: 2}
+  - {fileID: 11400000, guid: 3f9b368f6a59e4158b31a26846087db3, type: 2}
+  defaultArmorOptions:
+  - {fileID: 0}
+  - {fileID: 11400000, guid: 0b431dce146d34dfab68902568ff9584, type: 2}
+  abilityList: []
+  shirt: {fileID: 21300000, guid: dd9116136e8cb408c92f464663fe2c9e, type: 3}
+  eyesSE: {fileID: 21300000, guid: f539a1235c160469e8b3011753af3c0d, type: 3}
+  eyesSW: {fileID: 21300000, guid: f8503b20c65d54b9a949ee0a6f73a241, type: 3}

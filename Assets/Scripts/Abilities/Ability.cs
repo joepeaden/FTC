@@ -4,8 +4,21 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
-public class Ability
+// TIL you can use scriptable objects in such a way. I always just used them for
+// data storage alone - but you can actually just use them the same way you use
+// other scripts. Super cool. Cold brew baby. Let's go.
+
+[CreateAssetMenu(fileName = "Ability", menuName = "MyScriptables/Ability")]
+public class Ability : ScriptableObject
 {
+    // scriptable info - define the data for the ability
+    [Header("Descriptive")]
+    public string abilityName;
+    public string description;
+    public int motCost;
+    public int range;
+    public Sprite sprite;
+
     /// <summary>
     /// The current ability a pawn is about to use.
     /// </summary>
@@ -21,7 +34,7 @@ public class Ability
 
     // static so that we don't load more addressable references than necessary
     // (i.e. multiple honorable characters will use the same data) 
-    protected static Dictionary<string, AbilityData> data = new ();
+    protected static Dictionary<string, Ability> data = new ();
 
     /// <summary>
     /// Activate the ability. Should be overridden by subclass for the
@@ -38,6 +51,11 @@ public class Ability
     /// <summary>
     /// Should be called by subclass, not externals, to load the addressable data
     /// </summary>
+    /// <remarks>
+    /// The ability is instantiated, and then later loads the scriptable instance
+    /// of itself for the data values.... a little weird here. But, it works for
+    /// now. Sorry future me if this is confusing.
+    /// </remarks>
     public void LoadData()
     {
         if (!data.ContainsKey(dataAddress))
@@ -46,11 +64,11 @@ public class Ability
             // LoadAssetAsync method is async, so it might get called alot before it's actually in the
             // dictionary to stop another call.
             data[dataAddress] = null;
-            Addressables.LoadAssetAsync<AbilityData>(dataAddress).Completed += OnLoadDataCompleted;
+            Addressables.LoadAssetAsync<Ability>(dataAddress).Completed += OnLoadDataCompleted;
         }
     }
 
-    private void OnLoadDataCompleted(AsyncOperationHandle<AbilityData> result)
+    private void OnLoadDataCompleted(AsyncOperationHandle<Ability> result)
     {
         if (result.Status == AsyncOperationStatus.Succeeded)
         {
@@ -62,7 +80,7 @@ public class Ability
         }
     }
 
-    public AbilityData GetData()
+    public Ability GetData()
     {
         return data[dataAddress];
     }

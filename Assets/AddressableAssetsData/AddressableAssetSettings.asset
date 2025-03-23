@@ -15,7 +15,7 @@ MonoBehaviour:
   m_DefaultGroup: 4bb1c285f07b9463aa037833afdfcca8
   m_currentHash:
     serializedVersion: 2
-    Hash: 00000000000000000000000000000000
+    Hash: f5e9cc2f32fe32076fd5dd723437e933
   m_OptimizeCatalogSize: 0
   m_BuildRemoteCatalog: 0
   m_BundleLocalCatalog: 0
@@ -92,6 +92,7 @@ MonoBehaviour:
     - facialHairDetail
     - browDetail
     - characterEffects
+    - charTypes
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: b7ac138f21e874c598474dc0cd4b2e72, type: 2}

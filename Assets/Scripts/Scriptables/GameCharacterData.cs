@@ -1,14 +1,17 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 
 [CreateAssetMenu(fileName = "GameCharacterData", menuName = "MyScriptables/GameCharacterData")]
 public class GameCharacterData : ScriptableObject
 {
-    public WeaponItemData DefaultWeapon;
+    public string charTypeID;
 
+    [Header("Strategic Stats")]
+    public bool onPlayerTeam;
     public int startingGold;
     public int recruitPrice;
 
+    [Header("Combat Stats")]
     public int minInit;
     public int maxInit;
     public int minHP;
@@ -16,10 +19,14 @@ public class GameCharacterData : ScriptableObject
     public int minAcc;
     public int maxAcc;
 
-    public Sprite blueShirt;
-    public Sprite redShirt;
-    public Sprite goodEyesSE;
-    public Sprite goodEyesSW;
-    public Sprite badEyesSE;
-    public Sprite badEyesSW;
+    [Header("Equipment and Abilities")]
+    public WeaponItemData fallbackWeapon;
+    public List<WeaponItemData> defaultWeaponOptions;
+    public List<ArmorItemData> defaultArmorOptions;
+    public List<Ability> abilityList;
+
+    [Header("Appearance")]
+    public Sprite shirt;
+    public Sprite eyesSE;
+    public Sprite eyesSW;
 }

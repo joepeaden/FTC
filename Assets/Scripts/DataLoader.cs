@@ -7,6 +7,9 @@ using UnityEngine.AddressableAssets;
 /// </summary>
 public class DataLoader
 {
+    // character types
+    public static Dictionary<string, GameCharacterData> charTypes = new();
+
     // motivation condition scriptables
     public static Dictionary<string, MotCondData> motConds = new ();
 
@@ -20,11 +23,17 @@ public class DataLoader
 
     public void LoadData()
     {
+        Addressables.LoadAssetsAsync<GameCharacterData>("charTypes", OnLoadCharTypesCompleted);
         Addressables.LoadAssetsAsync<MotCondData>("motConditions", OnLoadMotCondDataCompleted);
         Addressables.LoadAssetsAsync<FaceDetailData>("hairDetail", OnLoadHairDetailCompleted);
         Addressables.LoadAssetsAsync<FaceDetailData>("browDetail", OnLoadBrowDetailCompleted);
         Addressables.LoadAssetsAsync<FaceDetailData>("facialHairDetail", OnLoadFacialHairDetailCompleted);
         Addressables.LoadAssetsAsync<EffectData>("characterEffects", OnLoadCharEffectsCompleted);
+    }
+
+    private void OnLoadCharTypesCompleted(GameCharacterData result)
+    {
+        charTypes[result.charTypeID] = result;
     }
 
     private void OnLoadCharEffectsCompleted(EffectData result)
