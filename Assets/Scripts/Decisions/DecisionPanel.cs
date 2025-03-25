@@ -55,18 +55,18 @@ public class DecisionPanel : MonoBehaviour
 
         _titleText.text = _recruit.CharName;
 
-        switch (_recruit.Motivator)
-        {
-            case GameCharacter.CharMotivators.Greed:
-                _descriptionText.text = _recruit.CharName + " desires wealth and posessions above all other things.";
-                break;
-            case GameCharacter.CharMotivators.Honor:
-                _descriptionText.text = _recruit.CharName + " is righteous and honorable - and full of arrogance.";
-                break;
-            case GameCharacter.CharMotivators.Glory:
-                _descriptionText.text = _recruit.CharName + " wishes the crowds to know his name, be it by amazing deed or brutal death.";
-                break;
-        }
+        //switch (_recruit.Motivator)
+        //{
+        //    case GameCharacter.CharMotivators.Greed:
+        //        _descriptionText.text = _recruit.CharName + " desires wealth and posessions above all other things.";
+        //        break;
+        //    case GameCharacter.CharMotivators.Honor:
+        //        _descriptionText.text = _recruit.CharName + " is righteous and honorable - and full of arrogance.";
+        //        break;
+        //    case GameCharacter.CharMotivators.Glory:
+        //        _descriptionText.text = _recruit.CharName + " wishes the crowds to know his name, be it by amazing deed or brutal death.";
+        //        break;
+        //}
 
         _goldAmountText.text = "Cost: " + goldAmount + " gold";
 

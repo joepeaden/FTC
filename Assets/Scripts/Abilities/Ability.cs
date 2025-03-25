@@ -37,6 +37,11 @@ public class Ability : ScriptableObject
     protected static Dictionary<string, Ability> data = new ();
 
     /// <summary>
+    /// Used to check if the scriptable data has been loaded yet for this ability.
+    /// </summary>
+    public bool IsInitialized => data.ContainsKey(dataAddress) && data[dataAddress] != null;
+
+    /// <summary>
     /// Activate the ability. Should be overridden by subclass for the
     /// actual behavior.
     /// </summary>

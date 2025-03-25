@@ -7,6 +7,7 @@ public class GameCharacterData : ScriptableObject
     public string charTypeID;
 
     [Header("Strategic Stats")]
+    public string characterTypeName;
     public bool onPlayerTeam;
     public int startingGold;
     public int recruitPrice;

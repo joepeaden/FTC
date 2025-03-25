@@ -100,42 +100,51 @@ public class GameCharacter
 
     public GameCharacter(GameCharacterData charData)
     {
-        List<string> characterNameOptions = new()
+        if (charData.onPlayerTeam)
         {
-            "Ealdred",
-            "Cynric",
-            "Leofward",
-            "Eadgarth",
-            "Wulfstan",
-            "Hrothgar",
-            "Aldhelm",
-            "Eadmund",
-            "Leofric",
-            "Osbruh",
-            "Offa",
-            "Godwin",
-            "Beorthric",
-            "Eadmer",
-            "Godric",
-            "Aldhelm",
-            "Wigstan",
-            "Beorn",
-            "Eadric",
-            "Alfwold",
-            "Eadred",
-            "Wulfrun",
-            "Wulfric",
-            "Arthur"
-        };
-
-        _charName = characterNameOptions[Random.Range(0, characterNameOptions.Count)];
+            List<string> characterNameOptions = new()
+            {
+                "Ealdred",
+                "Cynric",
+                "Leofward",
+                "Eadgarth",
+                "Wulfstan",
+                "Hrothgar",
+                "Aldhelm",
+                "Eadmund",
+                "Leofric",
+                "Osbruh",
+                "Offa",
+                "Godwin",
+                "Beorthric",
+                "Eadmer",
+                "Godric",
+                "Aldhelm",
+                "Wigstan",
+                "Beorn",
+                "Eadric",
+                "Alfwold",
+                "Eadred",
+                "Wulfrun",
+                "Wulfric",
+                "Arthur"
+            };
+            _charName = characterNameOptions[Random.Range(0, characterNameOptions.Count)];
+        }
+        else
+        {
+            _charName = charData.characterTypeName;
+        }
 
         foreach (Ability ab in charData.abilityList)
         {
             _abilities.Add(ab);
         }
 
-        SetMotivator((CharMotivators)Random.Range(0, 3));
+        if (charData.onPlayerTeam)
+        {
+            SetMotivator((CharMotivators)Random.Range(0, 3));
+        }
 
         _baseInitiative = Random.Range(charData.minInit, charData.maxInit);
         _hitPoints = Random.Range(charData.minHP, charData.maxHP);
@@ -196,9 +205,9 @@ public class GameCharacter
 
         bool failedSomething = false;
         // update motivation conditions being fulfilled or not if necessary
-        switch (Motivator)
-        {
-            case CharMotivators.Honor:
+        //switch (Motivator)
+        //{
+        //    case CharMotivators.Honor:
                 List<MotCondData> motCondsForBattle = GetMotCondsForBattle();
                 for (int i = 0; i < motCondsForBattle.Count; i++)
                 {
@@ -228,11 +237,11 @@ public class GameCharacter
                     }
                 }
 
-                break;
-            default:
-                Debug.Log("Battle End: Class not supported!");
-                break;
-        }
+                //break;
+            //default:
+            //    Debug.Log("Battle End: Class not supported!");
+            //    break;
+        //}
     }
 
     private void FailOath(MotCondData failedCondition)
@@ -361,13 +370,13 @@ public class GameCharacter
 
     public int GetTotalViceValue()
     {
-        int equipmentViceBonus = 0;
-        if (_helmItem != null && _helmItem.viceToMod == _motivator)
-        {
-            equipmentViceBonus += _helmItem.viceMod;
-        }
+        //int equipmentViceBonus = 0;
+        //if (_helmItem != null && _helmItem.viceToMod == _motivator)
+        //{
+        //    equipmentViceBonus += _helmItem.viceMod;
+        //}
 
-        return _charMotivation + equipmentViceBonus;
+        return _charMotivation;// + equipmentViceBonus;
     }
 
     public int GetInitiativeWithEquipment()

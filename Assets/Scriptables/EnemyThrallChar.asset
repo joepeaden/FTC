@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: EnemyThrallChar
   m_EditorClassIdentifier: 
   charTypeID: thrall
+  characterTypeName: Thrall
   onPlayerTeam: 0
   startingGold: 100
   recruitPrice: 20
