@@ -10,6 +10,9 @@ public class DataLoader
     // character types
     public static Dictionary<string, GameCharacterData> charTypes = new();
 
+    // contract types
+    public static Dictionary<string, ContractData> contracts = new();
+
     // motivation condition scriptables
     public static Dictionary<string, MotCondData> motConds = new ();
 
@@ -19,7 +22,7 @@ public class DataLoader
     public static Dictionary<string, FaceDetailData> facialHairDetail = new();
 
     // effects a character could endure
-    public static Dictionary<string, EffectData> _effects = new();
+    public static Dictionary<string, EffectData> effects = new();
 
     public void LoadData()
     {
@@ -29,6 +32,12 @@ public class DataLoader
         Addressables.LoadAssetsAsync<FaceDetailData>("browDetail", OnLoadBrowDetailCompleted);
         Addressables.LoadAssetsAsync<FaceDetailData>("facialHairDetail", OnLoadFacialHairDetailCompleted);
         Addressables.LoadAssetsAsync<EffectData>("characterEffects", OnLoadCharEffectsCompleted);
+        Addressables.LoadAssetsAsync<ContractData>("contracts", OnLoadContractsCompleted);
+    }
+
+    private void OnLoadContractsCompleted(ContractData result)
+    {
+        contracts[result.contractID] = result;
     }
 
     private void OnLoadCharTypesCompleted(GameCharacterData result)
@@ -38,7 +47,7 @@ public class DataLoader
 
     private void OnLoadCharEffectsCompleted(EffectData result)
     {
-        _effects[result.effectID] = result;
+        effects[result.effectID] = result;
     }
 
     private void OnLoadMotCondDataCompleted(MotCondData result)

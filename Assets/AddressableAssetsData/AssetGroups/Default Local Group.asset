@@ -158,16 +158,40 @@ MonoBehaviour:
     - characterEffects
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 21cefe0998bf844d483bace1e1e02377
-    m_Address: Assets/Scriptables/EnemyThrall.asset
+    m_Address: Assets/Scriptables/CharacterTypes/EnemyThrall.asset
     m_ReadOnly: 0
     m_SerializedLabels:
     - charTypes
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 2ffcd208c31b24b8d89ae7832606b8f1
-    m_Address: Assets/Scriptables/GameCharacterData.asset
+    m_Address: Assets/Scriptables/CharacterTypes/PlayerChar.asset
     m_ReadOnly: 0
     m_SerializedLabels:
     - charTypes
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 565e3200803ed45c981d208fa1d1503b
+    m_Address: Assets/Scriptables/Contracts/KillRaiders.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - contracts
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 95b50a0b0c01b40f9b125047a0eff355
+    m_Address: Assets/Scriptables/Contracts/KillRaiders2.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - contracts
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3b0378d2413974a19b171b6236873f30
+    m_Address: Assets/Scriptables/CharacterTypes/EnemyWarrior.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - charTypes
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c0c616618bd0b4e759a367a292fd44c7
+    m_Address: Assets/Scriptables/Contracts/KillRaiders3.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - contracts
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 7c8bf46af66d94c95b7860930c29ad14, type: 2}

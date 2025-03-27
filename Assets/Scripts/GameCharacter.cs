@@ -98,8 +98,13 @@ public class GameCharacter
     public List<EffectData> Effects => _effects;
     private List<EffectData> _effects = new();
 
+    public GameCharacterData Data => _data;
+    private GameCharacterData _data;
+
     public GameCharacter(GameCharacterData charData)
     {
+        _data = charData;
+
         if (charData.onPlayerTeam)
         {
             List<string> characterNameOptions = new()
@@ -217,7 +222,7 @@ public class GameCharacter
                         FailOath(condition);
 
                         // add effect for display to alert the player
-                        _effects.Add(DataLoader._effects["oathbroken"]);
+                        _effects.Add(DataLoader.effects["oathbroken"]);
 
                         failedSomething = true;
                     }

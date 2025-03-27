@@ -15,6 +15,7 @@ public class DecisionsManager : MonoBehaviour
     [SerializeField] private Button _contractsButton;
     [SerializeField] private Button _troopsButton;
     [SerializeField] private Button _shopButton;
+    [SerializeField] private Button _restButton;
     [SerializeField] private GameObject _recruitsScreen;
     [SerializeField] private GameObject _contractsScreen;
     [SerializeField] private GameObject _troopsScreen;
@@ -46,11 +47,24 @@ public class DecisionsManager : MonoBehaviour
         _troopsButton.onClick.AddListener(ShowTroopsScreen);
         _levelUpButton.onClick.AddListener(ShowLevelUpScreen);
         _shopButton.onClick.AddListener(ShowShopScreen);
+        _restButton.onClick.AddListener(Rest);
+        _disableCharPanelButton.onClick.AddListener(HideCharacterPanel);
 
         _charDetail.Setup(this);
     }
 
     private void OnEnable()
+    {
+        for (int i = 0; i < _recruitPanelParent.childCount; i++)
+        {
+            DecisionPanel panel = _recruitPanelParent.GetChild(i).GetComponent<DecisionPanel>();
+            panel.OnRecruit.AddListener(HandleRecruit);
+        }
+
+        Refresh();
+    }
+
+    private void Refresh()
     {
         // fill out contracts
         for (int i = 0; i < _contractsPanelParent.childCount; i++)
@@ -64,7 +78,12 @@ public class DecisionsManager : MonoBehaviour
         {
             DecisionPanel panel = _recruitPanelParent.GetChild(i).GetComponent<DecisionPanel>();
             panel.GenerateRecruitOption();
-            panel.OnRecruit.AddListener(HandleRecruit);
+        }
+
+        // clear warband stuff
+        for (int i = 0; i < _troopsGrid.transform.childCount; i++)
+        {
+            Destroy(_troopsGrid.transform.GetChild(i).gameObject);
         }
 
         // fill out warband
@@ -83,6 +102,12 @@ public class DecisionsManager : MonoBehaviour
             }
         }
 
+        // clear shop items
+        for (int i = 0; i < _shopGrid.transform.childCount; i++)
+        {
+            Destroy(_shopGrid.transform.GetChild(i).gameObject);
+        }
+
         // fill out shop
         int shopItemsCount = Random.Range(_minNumOfShopItems, _maxNumOfShopItems);
         for (int i = 0; i < shopItemsCount; i++)
@@ -93,11 +118,7 @@ public class DecisionsManager : MonoBehaviour
         }
 
         RefreshInventory();
-
         UpdateGoldText();
-
-        _disableCharPanelButton.onClick.AddListener(HideCharacterPanel);
-
         CheckForGameVictory();
     }
 
@@ -111,6 +132,11 @@ public class DecisionsManager : MonoBehaviour
         {
             _winUI.SetActive(true);
         }
+    }
+
+    private void Rest()
+    {
+        Refresh();
     }
 
     public void RefreshInventory()
@@ -325,5 +351,6 @@ public class DecisionsManager : MonoBehaviour
         _levelUpButton.onClick.RemoveListener(ShowLevelUpScreen);
         _shopButton.onClick.RemoveListener(ShowShopScreen);
         _disableCharPanelButton.onClick.RemoveListener(HideCharacterPanel);
+        _restButton.onClick.RemoveListener(Rest);
     }
 }

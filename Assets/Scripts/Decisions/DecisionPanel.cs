@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.Events;
+using System.Linq;
 
 public class DecisionPanel : MonoBehaviour
 {
@@ -17,17 +18,14 @@ public class DecisionPanel : MonoBehaviour
 
     public UnityEvent<GameCharacter> OnRecruit = new();
 
-    [SerializeField] private int _maxNumOfEnemies;
-    [SerializeField] private int _minNumOfEnemies;
-    [SerializeField] private TMP_Text _numOfEnemiesTxt;
     [SerializeField] private TMP_Text _goldAmountText;
     [SerializeField] private TMP_Text _descriptionText;
     [SerializeField] private TMP_Text _titleText;
     [SerializeField] private PawnPreview _pawnPreview;
 
-    int numOfEnemies;
+    [SerializeField] private List<EnemyTypePreview> enemyPreviews = new();
 
-    private List<GameCharacter> _enemies;
+    private List<GameCharacter> _enemies = new();
 
     int goldAmount;
 
@@ -42,16 +40,9 @@ public class DecisionPanel : MonoBehaviour
     {
         _recruit = new(DataLoader.charTypes["player"]);
 
-        if (GameManager.Instance != null)
-        {
-            goldAmount = GameManager.Instance.GameCharData.recruitPrice;
-        }
-        else
-        {
-            goldAmount = 100;
-        }
 
-        _numOfEnemiesTxt.gameObject.SetActive(false);
+
+        //_numOfEnemiesTxt.gameObject.SetActive(false);
 
         _titleText.text = _recruit.CharName;
 
@@ -68,61 +59,60 @@ public class DecisionPanel : MonoBehaviour
         //        break;
         //}
 
-        _goldAmountText.text = "Cost: " + goldAmount + " gold";
+        _goldAmountText.text = "Cost: " + _recruit.Data.price + " gold";
 
         _decisionType = DecisionType.Recruit;
 
+        _pawnPreview.gameObject.SetActive(true);
         _pawnPreview.SetData(_recruit);
     }
 
     public void GenerateContractOption()
     {
-        numOfEnemies = Random.Range(_minNumOfEnemies, _maxNumOfEnemies);
+        Dictionary<string, ContractData> contracts = DataLoader.contracts;
+        ContractData contract = contracts.Values.ToList()[Random.Range(0, DataLoader.contracts.Count)];
 
-        _enemies = GenerateEnemies(numOfEnemies);
+        int numOfEnemies = Random.Range(contract.minEnemyCount, contract.maxEnemyCount);
 
-        goldAmount = numOfEnemies * 25;
+        Dictionary<GameCharacterData, int> enemyTypes = new();
 
-        _titleText.text = "Contract";
-        _descriptionText.text = "Here here! Local ruffians have disturbed m'lord's lands and terrorized the people of this here village. A group of men is hereby requested to deal with them.";
-        _numOfEnemiesTxt.gameObject.SetActive(true);
-        _numOfEnemiesTxt.text = "x " + numOfEnemies;
+        _enemies.Clear();
+
+        int i;
+        for (i = 0; i < numOfEnemies; i++)
+        {
+            GameCharacter guy = new(contract.possibleEnemyTypes[Random.Range(0, contract.possibleEnemyTypes.Count)]);
+            _enemies.Add(guy);
+            goldAmount += guy.Data.price;
+
+            if (enemyTypes.Keys.Contains(guy.Data))
+            {
+                enemyTypes[guy.Data] += 1;
+            }
+            else
+            {
+                enemyTypes[guy.Data] = 1;
+            }
+        }
+
+        _titleText.text = contract.contractTitle;
+        _descriptionText.text = contract.description;
         _goldAmountText.text = "Reward: " + goldAmount + " gold";
 
         _decisionType = DecisionType.Contract;
 
-        _pawnPreview.SetData(new GameCharacter(DataLoader.charTypes["thrall"]));
-    }
-
-    private List<GameCharacter> GenerateEnemies(int numToGenerate)
-    {
-        List<GameCharacter> enemies = new();
-        for (int i = 0; i < numToGenerate; i++)
+        i = 0;
+        foreach (GameCharacterData enemyType in enemyTypes.Keys)
         {
-            GameCharacter guy = new(DataLoader.charTypes["thrall"]);
-
-            // pick random armor
-            //roll = Random.Range(0, 4);
-            //switch (roll)
-            //{
-            //    case 0:
-            //        // no armor
-            //        break;
-            //    case 1:
-            //        guy.EquipItem(GameManager.Instance.EquipmentList.lightHelm);
-            //        break;
-            //    case 2:
-            //        guy.EquipItem(GameManager.Instance.EquipmentList.heavyHelm);
-            //        break;
-            //    case 3:
-            //        guy.EquipItem(GameManager.Instance.EquipmentList.medHelm);
-            //        break;
-            //}
-
-            enemies.Add(guy);
+            enemyPreviews[i].gameObject.SetActive(true);
+            enemyPreviews[i].SetData(enemyType, enemyTypes[enemyType]);
+            i++;
         }
 
-        return enemies;
+        for (; i < enemyPreviews.Count; i++)
+        {
+            enemyPreviews[i].gameObject.SetActive(false);
+        }
     }
 
     private void HandleClick()

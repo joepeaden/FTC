@@ -13,6 +13,12 @@ public class PawnPreview : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     [HideInInspector]
     public UnityEvent OnPawnPreviewHoverEnd = new();
 
+    [Header("Simple Preview")]
+    [SerializeField] private GameObject simplePreview;
+    [SerializeField] private Image simplePreviewImage;
+
+    [Header("Detailed Preview")]
+    [SerializeField] private GameObject detailedPreview;
     [SerializeField] private Image helmRend;
     [SerializeField] private Image weaponRend;
     [SerializeField] private Image bodyRend;
@@ -29,8 +35,19 @@ public class PawnPreview : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         OnPawnPreviewHoverEnd.RemoveAllListeners();
     }
 
+    public void SetData(Sprite displaySprite)
+    {
+        simplePreview.SetActive(true);
+        detailedPreview.SetActive(false);
+
+        simplePreviewImage.sprite = displaySprite;
+    }
+
     public void SetData(GameCharacter g)
     {
+        simplePreview.SetActive(false);
+        detailedPreview.SetActive(true);
+
         ArmorItemData helm = g.HelmItem;
         WeaponItemData weapon = g.TheWeapon.Data;
 
@@ -39,6 +56,9 @@ public class PawnPreview : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     public void SetData(Pawn p)
     {
+        simplePreview.SetActive(false);
+        detailedPreview.SetActive(true);
+
         _pawn = p;
 
         //headRend.sprite = p.GetFaceSprite();

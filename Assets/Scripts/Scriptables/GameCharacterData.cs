@@ -10,7 +10,7 @@ public class GameCharacterData : ScriptableObject
     public string characterTypeName;
     public bool onPlayerTeam;
     public int startingGold;
-    public int recruitPrice;
+    public int price;
 
     [Header("Combat Stats")]
     public int minInit;
@@ -30,4 +30,5 @@ public class GameCharacterData : ScriptableObject
     public Sprite shirt;
     public Sprite eyesSE;
     public Sprite eyesSW;
+    public Sprite contractDisplaySprite;
 }
