@@ -604,7 +604,7 @@ MonoBehaviour:
   _equipmentListData: {fileID: 11400000, guid: 45ebae92ddc7f4eb09d9065cfbc49418, type: 2}
   _clickSound: {fileID: 8300000, guid: 44655ac3e8d1745429020578a1c4698e, type: 3}
   _menuMusic: {fileID: 8300000, guid: 8e702df844c674287a983489dd6f0edf, type: 3}
-  _battleMusic: {fileID: 8300000, guid: 6bb5cb1baeaa848e5aecd0492fe1b89f, type: 3}
+  _battleMusic: {fileID: 8300000, guid: 590146107f25b42d4af12f70b316a631, type: 3}
 --- !u!114 &1966799577
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -729,4 +729,4 @@ MonoBehaviour:
   pawnPreviewPrefab: {fileID: 2881012879661761195, guid: ba3d5154ba3cb452188b04104229f046, type: 3}
   pawnPreviewPoolSize: 15
   audioSourcePrefab: {fileID: 8567179387656561764, guid: c5b47d9f5a6a1a04496b0f441bab48b9, type: 3}
-  audioSourcePoolSize: 5
+  audioSourcePoolSize: 10

@@ -49,7 +49,7 @@ public class DecisionPanel : MonoBehaviour
         //switch (_recruit.Motivator)
         //{
         //    case GameCharacter.CharMotivators.Greed:
-        //        _descriptionText.text = _recruit.CharName + " desires wealth and posessions above all other things.";
+                _descriptionText.text = _recruit.CharName + " is a young man looking for work with a company.";
         //        break;
         //    case GameCharacter.CharMotivators.Honor:
         //        _descriptionText.text = _recruit.CharName + " is righteous and honorable - and full of arrogance.";
@@ -60,6 +60,7 @@ public class DecisionPanel : MonoBehaviour
         //}
 
         _goldAmountText.text = "Cost: " + _recruit.Data.price + " gold";
+        goldAmount = _recruit.Data.price;
 
         _decisionType = DecisionType.Recruit;
 

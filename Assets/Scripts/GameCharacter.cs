@@ -330,6 +330,12 @@ public class GameCharacter
     /// <returns></returns>
     public bool AddXP(int xpToAdd)
     {
+        if (!OnPlayerTeam)
+        {
+            // no exp for enemies!
+            return false;
+        }
+
         _xp += xpToAdd;
 
         if (_xp >= _xpCaps[_level])

@@ -19,4 +19,4 @@ MonoBehaviour:
   possibleEnemyTypes:
   - {fileID: 11400000, guid: 3b0378d2413974a19b171b6236873f30, type: 2}
   maxEnemyCount: 8
-  minEnemyCount: 10
+  minEnemyCount: 6

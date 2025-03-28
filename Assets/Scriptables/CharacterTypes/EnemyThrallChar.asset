@@ -21,8 +21,8 @@ MonoBehaviour:
   maxInit: 5
   minHP: 3
   maxHP: 5
-  minAcc: 4
-  maxAcc: 7
+  minAcc: 8
+  maxAcc: 10
   fallbackWeapon: {fileID: 11400000, guid: 10bfb3287a43940979f35f88999d4de9, type: 2}
   defaultWeaponOptions:
   - {fileID: 11400000, guid: 10bfb3287a43940979f35f88999d4de9, type: 2}
@@ -32,6 +32,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 0b431dce146d34dfab68902568ff9584, type: 2}
   abilityList: []
   shirt: {fileID: 21300000, guid: dd9116136e8cb408c92f464663fe2c9e, type: 3}
-  eyesSE: {fileID: 21300000, guid: f539a1235c160469e8b3011753af3c0d, type: 3}
-  eyesSW: {fileID: 21300000, guid: f8503b20c65d54b9a949ee0a6f73a241, type: 3}
+  eyesSE: {fileID: 21300000, guid: 3e2493cfa88614e389c508b1c4fc9055, type: 3}
+  eyesSW: {fileID: 21300000, guid: 26ef5e718aeec4c8bb8971b45c7a468c, type: 3}
   contractDisplaySprite: {fileID: 21300000, guid: 44a758cd03ade4281b7392edc68256f8, type: 3}

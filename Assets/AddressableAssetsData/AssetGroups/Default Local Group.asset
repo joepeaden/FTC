@@ -193,6 +193,24 @@ MonoBehaviour:
     m_SerializedLabels:
     - contracts
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8d029cf86b179414dafff09c5bc61202
+    m_Address: Assets/Scriptables/CharacterTypes/EnemyBerserker.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - charTypes
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5c740e5fb88bc4d838ae22bec7707af8
+    m_Address: Assets/Scriptables/Contracts/KillRaiders4.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - contracts
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4c6919aee02884cdeac40874da9ab806
+    m_Address: Assets/Scriptables/Contracts/KillRaiders5.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - contracts
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 7c8bf46af66d94c95b7860930c29ad14, type: 2}
   m_SchemaSet:

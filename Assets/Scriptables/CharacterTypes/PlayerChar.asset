@@ -13,9 +13,10 @@ MonoBehaviour:
   m_Name: PlayerChar
   m_EditorClassIdentifier: 
   charTypeID: player
+  characterTypeName: 
   onPlayerTeam: 1
   startingGold: 100
-  recruitPrice: 20
+  price: 20
   minInit: 0
   maxInit: 5
   minHP: 3
@@ -25,7 +26,9 @@ MonoBehaviour:
   fallbackWeapon: {fileID: 11400000, guid: 10bfb3287a43940979f35f88999d4de9, type: 2}
   defaultWeaponOptions:
   - {fileID: 11400000, guid: 10bfb3287a43940979f35f88999d4de9, type: 2}
+  defaultArmorOptions: []
   abilityList: []
   shirt: {fileID: 21300000, guid: a85206170700bc544a1a8e9ea5f03244, type: 3}
   eyesSE: {fileID: 21300000, guid: 3e2493cfa88614e389c508b1c4fc9055, type: 3}
   eyesSW: {fileID: 21300000, guid: 26ef5e718aeec4c8bb8971b45c7a468c, type: 3}
+  contractDisplaySprite: {fileID: 0}
