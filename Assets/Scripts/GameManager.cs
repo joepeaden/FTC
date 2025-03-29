@@ -57,7 +57,8 @@ public class GameManager : MonoBehaviour
     public void StartNewGame()
     {
 #if UNITY_EDITOR
-        _playerGold = 2000;
+        _playerGold = GameCharData.startingGold;
+        //_playerGold = 2000;
 #else
         _playerGold = GameCharData.startingGold;
 #endif
