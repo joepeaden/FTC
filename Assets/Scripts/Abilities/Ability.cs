@@ -13,6 +13,7 @@ public class Ability : ScriptableObject
 {
     // scriptable info - define the data for the ability
     [Header("Descriptive")]
+    public string abilityID;
     public string abilityName;
     public string description;
     public int motCost;

@@ -10,6 +10,9 @@ public class DataLoader
     // character types
     public static Dictionary<string, GameCharacterData> charTypes = new();
 
+    // abilities that aren't tied to weapons
+    public static Dictionary<string, Ability> abilities = new();
+
     // contract types
     public static Dictionary<string, ContractData> contracts = new();
 
@@ -33,6 +36,16 @@ public class DataLoader
         Addressables.LoadAssetsAsync<FaceDetailData>("facialHairDetail", OnLoadFacialHairDetailCompleted);
         Addressables.LoadAssetsAsync<EffectData>("characterEffects", OnLoadCharEffectsCompleted);
         Addressables.LoadAssetsAsync<ContractData>("contracts", OnLoadContractsCompleted);
+        Addressables.LoadAssetsAsync<Ability>("charAbilities", OnLoadCharacterAbilities);
+    }
+
+    /// <summary>
+    /// Load character specific abilities - results should not contain weapon-tied abilities!
+    /// </summary>
+    /// <param name="result"></param>
+    private void OnLoadCharacterAbilities(Ability result)
+    {
+        abilities[result.abilityID] = result;
     }
 
     private void OnLoadContractsCompleted(ContractData result)

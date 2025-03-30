@@ -84,7 +84,7 @@ public class GameCharacter
     public int XP => _xp;
     private int _xp;
     public int PendingStatPoints => _pendingStatPoints;
-    private int _pendingStatPoints;
+    private int _pendingStatPoints = 8;
 
     /// <summary>
     /// MotConds - short for motivation conditions. Oaths for example.

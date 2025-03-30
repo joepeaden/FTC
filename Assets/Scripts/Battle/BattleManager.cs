@@ -132,13 +132,7 @@ public class BattleManager : MonoBehaviour
         // otherwise, spawn a random assortment of friendly and enemy dudes
         else
         {
-            // change game over button text to "restart"
-            gameOverButton.GetComponentInChildren<TMP_Text>().text = "Restart";
-
-            Debug.Log("No game manager, spawning default amount");
-            SpawnTestGuys(true);
-
-            SpawnTestGuys(false);
+            StartCoroutine(TestModeOnDataLoadedStart());
         }
 
         Tile.OnTileHoverStart.AddListener(HandleTileHoverStart);
@@ -154,10 +148,36 @@ public class BattleManager : MonoBehaviour
         //_instructionsUI.SetActive(true);
     }
 
-    private void Start()
+    /// <summary>
+    /// Start for when just testing battles. Not very secure but it's just for testing. 
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator TestModeOnDataLoadedStart()
     {
+        // instantiate data loader
+        DataLoader dataLoader = new DataLoader();
+        dataLoader.LoadData();
+
+        // wait for data to load. 
+        yield return new WaitForSeconds(3f);
+        // change game over button text to "restart"
+        gameOverButton.GetComponentInChildren<TMP_Text>().text = "Restart";
+
+        Debug.Log("No game manager, spawning default amount");
+        SpawnTestGuys(true);
+        SpawnTestGuys(false);
+
         _battleResult = BattleResult.Undecided;
         StartBattle();
+    }
+
+    private void Start()
+    {
+        if (GameManager.Instance != null)
+        {
+            _battleResult = BattleResult.Undecided;
+            StartBattle();
+        }
     }
 
     private void Update()
@@ -533,50 +553,14 @@ public class BattleManager : MonoBehaviour
         {
             Pawn newPawn = Instantiate(pawnPrefab, friendly ? friendlyParent : enemyParent).GetComponent<Pawn>();
 
-            GameCharacter guy = new(friendly ? DataLoader.charTypes["player"] : DataLoader.charTypes["thrall"]);
+            GameCharacter guy = new(friendly ? DataLoader.charTypes["player"] : DataLoader.charTypes["warrior"]);
 
-            if (GameManager.Instance == null)
+            if (friendly)
             {
-                // pick random weapon
-                int roll = Random.Range(0, 4);
-                switch (roll)
-                {
-                    case 0:
-                        guy.EquipItem(club);
-                        break;
-                    case 1:
-                        guy.EquipItem(sword);
-                        break;
-                    case 2:
-                        guy.EquipItem(spear);
-                        break;
-                    case 3:
-                        guy.EquipItem(axe);
-                        break;
-                }
+                guy.EquipItem(sword);
+                guy.EquipItem(medHelm);
 
-                // pick random armor
-                roll = Random.Range(0, 4);
-                switch (roll)
-                {
-                    case 0:
-                        // no armor
-                        break;
-                    case 1:
-                        guy.EquipItem(lightHelm);
-                        break;
-                    case 2:
-                        guy.EquipItem(heavyHelm);
-                        break;
-                    case 3:
-                        guy.EquipItem(medHelm);
-                        break;
-                }
-
-            }
-            else
-            {
-                guy.EquipItem(club);
+                guy.Abilities.Add(new WildAbandon());
             }
 
             newPawn.SetCharacter(guy);

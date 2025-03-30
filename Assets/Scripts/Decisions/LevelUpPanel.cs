@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Linq;
 
 /// <summary>
 /// Handles UI for level up screen, and can apply changes and refresh
@@ -21,6 +22,8 @@ public class LevelUpPanel : MonoBehaviour
     [SerializeField] private CharDetailPanel _detailPanel;
     [SerializeField] private DecisionsManager _decisionsManager;
 
+    [SerializeField] private List<LevelUpCard> _cards = new();
+
     private void Start()
     {
         _increaseAccRating.onClick.AddListener(ImproveAccRating);
@@ -37,10 +40,18 @@ public class LevelUpPanel : MonoBehaviour
 
     private void OnEnable()
     {
-        CheckStatCapOrPointsSpent();
+        //_detailPanel
 
-        _hpLevelUpStatBar.SetBar(_detailPanel.CurrentCharacter.HitPoints);
-        _accLevelUpText.text = _detailPanel.CurrentCharacter.AccRating + "+";
+        foreach (LevelUpCard card in _cards)
+        {
+            Ability cardAbility = DataLoader.abilities.Values.ToList()[Random.Range(0, DataLoader.abilities.Count)];
+            card.SetData(cardAbility, this);
+        }
+
+        //CheckStatCapOrPointsSpent();
+
+        //_hpLevelUpStatBar.SetBar(_detailPanel.CurrentCharacter.HitPoints);
+        //_accLevelUpText.text = _detailPanel.CurrentCharacter.AccRating + "+";
     }
 
     private void ImproveAccRating()
@@ -71,6 +82,12 @@ public class LevelUpPanel : MonoBehaviour
 
         _statPoints.text = "Stat Points: " + _detailPanel.CurrentCharacter.PendingStatPoints;
 
+    }
+
+    public void HandleLvlUpCardSelected(Ability a)
+    {
+        _detailPanel.CurrentCharacter.Abilities.Add(a);
+        ApplyChanges();
     }
 
     private void ApplyChanges()

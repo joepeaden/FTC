@@ -18,7 +18,6 @@ public class ObjectPool : MonoBehaviour
     public GameObject audioSourcePrefab;
     public int audioSourcePoolSize;
 
-    private Transform objectPoolParent;
     private List<GameObject> pawnPreviews;
     private List<GameObject> audioSources;
 

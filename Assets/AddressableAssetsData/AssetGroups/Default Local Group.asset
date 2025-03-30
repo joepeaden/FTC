@@ -20,7 +20,8 @@ MonoBehaviour:
   - m_GUID: b853d2157a6bae44c88b19a8a12e3861
     m_Address: Assets/Scriptables/Abilities/OathOfLoyalty.asset
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - charAbilities
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b160f905cba87174094846d30f86aff6
     m_Address: Assets/Scriptables/Abilities/WeaponBased/ClubBasic.asset
@@ -55,12 +56,14 @@ MonoBehaviour:
   - m_GUID: b44886a610a815841a4231a9abacd962
     m_Address: Assets/Scriptables/Abilities/WildAbandon.asset
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - charAbilities
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 6970f9f66de34af468c41b8abd044a25
     m_Address: Assets/Scriptables/Abilities/BonusPay.asset
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - charAbilities
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 271dc709e9326a54f9900e33941ccbff
     m_Address: Assets/Scriptables/Abilities/WeaponBased/AxeSpecial.asset
