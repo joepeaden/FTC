@@ -7,6 +7,13 @@ using System.Collections;
 [CreateAssetMenu(fileName = "FaceDetailData", menuName = "MyScriptables/FaceDetailData")]
 public class FaceDetailData : ScriptableObject
 {
+    public enum HairColor
+    {
+        Brown,
+        Blonde
+    }
+
+    public HairColor hairColor;
     public Sprite SESprite;
     public Sprite SWSprite;
     public Sprite NWSprite;

@@ -15,7 +15,7 @@ MonoBehaviour:
   charTypeID: player
   characterTypeName: 
   onPlayerTeam: 1
-  startingGold: 100
+  startingGold: 1000
   price: 20
   minInit: 0
   maxInit: 5

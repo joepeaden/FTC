@@ -178,12 +178,17 @@ public class GameCharacter
         // hell yeah bruther.
 
         Dictionary<string, FaceDetailData> hairDetails = DataLoader.hairDetail;
-        Dictionary<string, FaceDetailData> fHairDetails = DataLoader.facialHairDetail;
-        Dictionary<string, FaceDetailData> browDetails = DataLoader.browDetail;
-
         _hairDetail = hairDetails.Values.ToList()[Random.Range(0, hairDetails.Count)];
-        _facialHairDetail = fHairDetails.Values.ToList()[Random.Range(0, fHairDetails.Count)];
-        _browDetail = browDetails.Values.ToList()[Random.Range(0, browDetails.Count)];
+        
+
+        Dictionary<string, FaceDetailData> fHairDetails = DataLoader.facialHairDetail;
+        List<FaceDetailData> hairDetailOptions = fHairDetails.Values.Where(x => x.hairColor == _hairDetail.hairColor).ToList(); 
+        _facialHairDetail = hairDetailOptions[Random.Range(0, hairDetailOptions.Count)];
+    
+        Dictionary<string, FaceDetailData> browDetails = DataLoader.browDetail;
+        hairDetailOptions.Clear();
+        hairDetailOptions = browDetails.Values.Where(x => x.hairColor == _hairDetail.hairColor).ToList(); 
+        _browDetail = hairDetailOptions[Random.Range(0, hairDetailOptions.Count)];
     }
 
     /// <summary>
