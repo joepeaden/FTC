@@ -17,58 +17,17 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: 4bb1c285f07b9463aa037833afdfcca8
   m_SerializeEntries:
-  - m_GUID: b853d2157a6bae44c88b19a8a12e3861
-    m_Address: Assets/Scriptables/Abilities/OathOfLoyalty.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - charAbilities
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: b160f905cba87174094846d30f86aff6
-    m_Address: Assets/Scriptables/Abilities/WeaponBased/ClubBasic.asset
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 75bc10c1cd872b94baae2eeed719d9e2
-    m_Address: Assets/Scriptables/Abilities/WeaponBased/SwordSpecial.asset
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: bace5efdc70edc0458ca571e59a26b88
-    m_Address: Assets/Scriptables/Abilities/WeaponBased/AxeBasic.asset
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: b3874ed04cc5b344faffc3517627c414
-    m_Address: Assets/Scriptables/Abilities/WeaponBased/SpearBasic.asset
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: c9521778936124b4ea7100241ac48c39
-    m_Address: Assets/Scriptables/Abilities/WeaponBased/SpearSpecial.asset
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: a734a08c4178c53449ccc6bd200e887c
-    m_Address: Assets/Scriptables/Abilities/WeaponBased/SwordBasic.asset
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: b44886a610a815841a4231a9abacd962
+  - m_GUID: efd033a143379436f83f51bf31063a51
     m_Address: Assets/Scriptables/Abilities/WildAbandon.asset
     m_ReadOnly: 0
     m_SerializedLabels:
     - charAbilities
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 6970f9f66de34af468c41b8abd044a25
+  - m_GUID: 27baa4c7220654096a60b6a41521cc6e
     m_Address: Assets/Scriptables/Abilities/BonusPay.asset
     m_ReadOnly: 0
     m_SerializedLabels:
     - charAbilities
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 271dc709e9326a54f9900e33941ccbff
-    m_Address: Assets/Scriptables/Abilities/WeaponBased/AxeSpecial.asset
-    m_ReadOnly: 0
-    m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 73487471e3a3642baa450c5f4ec85564
     m_Address: Assets/Scriptables/MotConds/DoNotDisengage.asset
@@ -213,6 +172,12 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - contracts
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a01e2d5a38c3c46759ec378e50a71213
+    m_Address: Assets/Scriptables/Abilities/OathOfLoyalty.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - charAbilities
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 7c8bf46af66d94c95b7860930c29ad14, type: 2}

@@ -1,18 +1,12 @@
 ﻿using System;
+using UnityEngine;
 
-public class BonusPay : Ability
+[CreateAssetMenu(fileName = "BonusPay", menuName = "MyScriptables/Abilities/BonusPay")]
+public class BonusPay : SupportAbilityData
 {
     private int turnsForEffect;
     private Pawn _activatedPawn;
     private Pawn _targetPawn;
-    private SupportAbilityData _ability;
-
-    public BonusPay()
-    {
-        dataAddress = "Assets/Scriptables/Abilities/BonusPay.asset";
-        base.LoadData();
-        _ability = GetData() as SupportAbilityData;
-    }
 
     // note... it may not be necessary to have the activated pawn param. Will the pawn that this
     // ability instance belongs to ever change?
@@ -21,12 +15,12 @@ public class BonusPay : Ability
         _activatedPawn = activatedPawn;
         _targetPawn = targetPawn;
 
-        _activatedPawn.DodgeMod = _ability.dodgeMod;
-        _activatedPawn.HitMod = _ability.hitMod;
+        _activatedPawn.DodgeMod = dodgeMod;
+        _activatedPawn.HitMod = hitMod;
 
-        _activatedPawn.Motivation -= _ability.motCost;
+        _activatedPawn.Motivation -= motCost;
         
-        turnsForEffect = _ability.turnsDuration;
+        turnsForEffect = turnsDuration;
 
         // on new activation, will want to check duration to see if end effect
         _activatedPawn.OnActivation.AddListener(HandleNewActivationForPawn);
@@ -40,7 +34,7 @@ public class BonusPay : Ability
         BattleManager.Instance.AddTextNotification(_targetPawn.transform.position, "+Boosted");
 
         // add icon to the character UI to show effect
-        _targetPawn.UpdateEffect(_ability.statusEffect, true);
+        _targetPawn.UpdateEffect(statusEffect, true);
 
         return true;
     }
@@ -77,7 +71,7 @@ public class BonusPay : Ability
     {
         BattleManager.Instance.AddTextNotification(_targetPawn.transform.position, "-Boosted");
 
-        _targetPawn.UpdateEffect(_ability.statusEffect, false);
+        _targetPawn.UpdateEffect(statusEffect, false);
 
         _activatedPawn.OnActivation.RemoveListener(HandleNewActivationForPawn);
         _activatedPawn.OnHit.RemoveListener(HandleDeath);

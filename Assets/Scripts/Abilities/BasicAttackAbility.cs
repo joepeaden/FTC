@@ -1,19 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
-public class BasicAttackAbility : Ability
+[CreateAssetMenu(fileName = "BasicAttackAbility", menuName = "MyScriptables/Abilities/BasicAttackAbility")]
+public class BasicAttackAbility : WeaponAbilityData
 {
-    public BasicAttackAbility(string newDataAddress)
-    {
-        dataAddress = newDataAddress;
-        base.LoadData();
-    }
-
     public override bool Activate(Pawn activatedPawn, Pawn targetPawn)
     {
-        WeaponAbilityData attackAction = GetData() as WeaponAbilityData;
-
-        if (activatedPawn.ActionPoints < attackAction.apCost || activatedPawn.Motivation < attackAction.motCost)
+        if (activatedPawn.ActionPoints < apCost || activatedPawn.Motivation < motCost)
         {
             // why is PawnActivated called here? That seems pretty wierd. Doesn't seem necessary.
             // The pawn isn't acting, it can't because there's not enough resources.
@@ -22,10 +16,10 @@ public class BasicAttackAbility : Ability
             return false;
         }
          
-        activatedPawn.AttackPawn(targetPawn, attackAction);
+        activatedPawn.AttackPawn(targetPawn, this);
 
-        activatedPawn.ActionPoints -= attackAction.apCost;
-        activatedPawn.Motivation -= attackAction.motCost;
+        activatedPawn.ActionPoints -= apCost;
+        activatedPawn.Motivation -= motCost;
 
         BattleManager.Instance.PawnActivated(activatedPawn);
 

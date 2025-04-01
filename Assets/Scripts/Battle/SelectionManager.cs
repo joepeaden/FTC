@@ -76,7 +76,7 @@ public class SelectionManager : MonoBehaviour
 
         if (Ability.SelectedAbility!= null)
         {
-            _selectedTile.HighlightTilesInRange(currentPawn, Ability.SelectedAbility.GetData().range, false, Tile.TileHighlightType.AttackRange);
+            _selectedTile.HighlightTilesInRange(currentPawn, Ability.SelectedAbility.range, false, Tile.TileHighlightType.AttackRange);
         }
 
         _selectedTile.HighlightTilesInRange(currentPawn, currentPawn.MoveRange, false, Tile.TileHighlightType.Move);
@@ -98,7 +98,7 @@ public class SelectionManager : MonoBehaviour
 
         if (currentAction != null)
         {
-            _selectedTile.HighlightTilesInRange(currentPawn, Ability.SelectedAbility.GetData().range, !isIdle, Tile.TileHighlightType.AttackRange);
+            _selectedTile.HighlightTilesInRange(currentPawn, Ability.SelectedAbility.range, !isIdle, Tile.TileHighlightType.AttackRange);
         }
         else
         {

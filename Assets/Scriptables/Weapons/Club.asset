@@ -14,21 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Club
   description: A hefty stick. Nothing special here, it's just a stick.
-  itemSprite: {fileID: 21300000, guid: e28b8f6f6cf28404eb455c6f677329ec, type: 3}
-  SESprite: {fileID: 0}
-  SWSprite: {fileID: 0}
-  NWSprite: {fileID: 0}
-  NESprite: {fileID: 0}
   itemPrice: 0
   itemType: 2
   isDefault: 1
+  itemSprite: {fileID: 21300000, guid: e28b8f6f6cf28404eb455c6f677329ec, type: 3}
   weaponType: 0
   baseDamage: 1
-  baseArmorDamage: 0.2
-  basePenetrationDamage: 0.2
-  baseAccMod: 0
-  baseAction: {fileID: 11400000, guid: 0bebf10a2b08f4755bcb0c88580ac075, type: 2}
-  specialAction: {fileID: 0}
+  abilities:
+  - {fileID: 11400000, guid: 048eae1a93afc4e42bc14b36427ca584, type: 2}
   hitSound: {fileID: 8300000, guid: 1743c49a91e64cd49898fbbf3ee42e25, type: 3}
   killSound: {fileID: 8300000, guid: d77745c563c4c5c46ac5a7598571c9cf, type: 3}
   missSound: {fileID: 8300000, guid: 89998cf45320f974ea4c9a4fcb2e668b, type: 3}

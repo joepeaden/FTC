@@ -1,18 +1,12 @@
 ﻿using System;
+using UnityEngine;
 
-public class WildAbandon : Ability
+[CreateAssetMenu(fileName = "WildAbandon", menuName = "MyScriptables/Abilities/WildAbandon")]
+public class WildAbandon : SupportAbilityData
 {
     private int turnsForEffect;
     private Pawn _activatedPawn;
     private Pawn _targetPawn;
-    private SupportAbilityData _ability;
-
-    public WildAbandon()
-    {
-        dataAddress = "Assets/Scriptables/Abilities/WildAbandon.asset";
-        base.LoadData();
-        _ability = GetData() as SupportAbilityData;
-    }
 
     // note... it may not be necessary to have the activated pawn param. Will the pawn that this
     // ability instance belongs to ever change?
@@ -21,12 +15,12 @@ public class WildAbandon : Ability
         _activatedPawn = activatedPawn;
         _targetPawn = targetPawn;
 
-        _activatedPawn.OutDamageMult = _ability.outDmgMod;
-        _activatedPawn.InDamageMult = _ability.inDmgMod;
+        _activatedPawn.OutDamageMult = outDmgMod;
+        _activatedPawn.InDamageMult = inDmgMod;
         
-        turnsForEffect = _ability.turnsDuration;
+        turnsForEffect = turnsDuration;
 
-        _activatedPawn.Motivation -= _ability.motCost;
+        _activatedPawn.Motivation -= motCost;
 
         // on new activation, will want to check duration to see if end effect
         _activatedPawn.OnActivation.AddListener(HandleNewActivationForPawn);
@@ -40,7 +34,7 @@ public class WildAbandon : Ability
         BattleManager.Instance.AddTextNotification(_targetPawn.transform.position, "+Raging");
 
         // add icon to the character UI to show effect
-        _targetPawn.UpdateEffect(_ability.statusEffect, true);
+        _targetPawn.UpdateEffect(statusEffect, true);
 
         return true;
     }
@@ -77,7 +71,7 @@ public class WildAbandon : Ability
     {
         BattleManager.Instance.AddTextNotification(_targetPawn.transform.position, "-Raging");
 
-        _targetPawn.UpdateEffect(_ability.statusEffect, false);
+        _targetPawn.UpdateEffect(statusEffect, false);
 
         _activatedPawn.OnActivation.RemoveListener(HandleNewActivationForPawn);
         _activatedPawn.OnHit.RemoveListener(HandleDeath);

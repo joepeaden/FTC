@@ -219,9 +219,9 @@ public class Pawn : MonoBehaviour
 
     public int GetAPAfterAction()
     {
-        if (Ability.SelectedAbility.GetData() as WeaponAbilityData != null)
+        if (Ability.SelectedAbility as WeaponAbilityData != null)
         {
-            return ActionPoints - ((WeaponAbilityData)Ability.SelectedAbility.GetData()).apCost;
+            return ActionPoints - ((WeaponAbilityData)Ability.SelectedAbility).apCost;
         }
         else
         {
@@ -231,7 +231,7 @@ public class Pawn : MonoBehaviour
 
     public int GetMTAfterAction()
     {
-        return Motivation - Ability.SelectedAbility.GetData().motCost;
+        return Motivation - Ability.SelectedAbility.motCost;
     }
 
     public int GetAPAfterMove(Tile targetTile)
@@ -316,7 +316,7 @@ public class Pawn : MonoBehaviour
         // all the hit mods don't work currently - need to be updated to d12
         //float abilityHitMod = HitMod - targetPawn.DodgeMod;
 
-        int toHit = GameChar.AccRating - surroundHitMod; // + abilityHitMod + GameChar.TheWeapon.Data.baseAccMod + (Ability.SelectedAbility != null ? Ability.SelectedAbility.GetData().hitMod : 0);
+        int toHit = GameChar.AccRating - surroundHitMod; // + abilityHitMod + GameChar.TheWeapon.Data.baseAccMod + (Ability.SelectedAbility != null ? Ability.SelectedAbility.hitMod : 0);
 
         // don't allow guaranteed hit here
         if (toHit >= 12)
@@ -339,7 +339,7 @@ public class Pawn : MonoBehaviour
 
     public bool IsTargetInRange(Pawn targetPawn, Ability currentAction)
     {
-        bool isCloseEnough = targetPawn.CurrentTile.GetTileDistance(CurrentTile) <= currentAction.GetData().range;
+        bool isCloseEnough = targetPawn.CurrentTile.GetTileDistance(CurrentTile) <= currentAction.range;
 
         if (isCloseEnough)
         {
@@ -549,7 +549,7 @@ public class Pawn : MonoBehaviour
         // this here needs cleanup. I need to remove the ActionData stuff basically alltogether.
         if (theAbility != null)
         {
-            WeaponAbilityData action = theAbility.GetData() as WeaponAbilityData;
+            WeaponAbilityData action = theAbility as WeaponAbilityData;
             if (action != null)
             {
                 if (ActionPoints >= action.apCost && Motivation >= action.motCost)
@@ -557,7 +557,7 @@ public class Pawn : MonoBehaviour
                     return true;
                 }
             }
-            else if(Motivation >= theAbility.GetData().motCost)
+            else if(Motivation >= theAbility.motCost)
             {
                 return true;
             }
@@ -568,7 +568,7 @@ public class Pawn : MonoBehaviour
         {
             foreach (Ability a in GameChar.TheWeapon.Abilities)
             {
-                if (Motivation >= a.GetData().motCost && ActionPoints >= ((WeaponAbilityData)a.GetData()).apCost)
+                if (Motivation >= a.motCost && ActionPoints >= ((WeaponAbilityData)a).apCost)
                 {
                     return true;
                 }

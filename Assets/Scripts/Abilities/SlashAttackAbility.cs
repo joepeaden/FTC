@@ -1,19 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
-public class SlashAttackAbility : Ability
+[CreateAssetMenu(fileName = "SlashAttackAbility", menuName = "MyScriptables/Abilities/SlashAttackAbility")]
+public class SlashAttackAbility : WeaponAbilityData
 {
-    public SlashAttackAbility()
-    {
-        dataAddress = "Assets/Scriptables/Abilities/WeaponBased/SwordSpecial.asset";
-        base.LoadData();
-    }
-
     public override bool Activate(Pawn activatedPawn, Pawn primaryTargetPawn)
     {
-        WeaponAbilityData attackAction = GetData() as WeaponAbilityData;
-
-        if (activatedPawn.ActionPoints < attackAction.apCost || activatedPawn.Motivation < attackAction.motCost)
+        if (activatedPawn.ActionPoints < apCost || activatedPawn.Motivation < motCost)
         {
             // why is PawnActivated called here? That seems pretty wierd. Doesn't seem necessary.
             // The pawn isn't acting, it can't because there's not enough resources.
@@ -25,7 +19,7 @@ public class SlashAttackAbility : Ability
         List<Pawn> targetPawns = new();
         targetPawns.Add(primaryTargetPawn);
 
-        if (attackAction.attackStyle == WeaponAbilityData.AttackStyle.LShape)
+        if (attackStyle == WeaponAbilityData.AttackStyle.LShape)
         {
             Tile clockwiseNextTile = activatedPawn.CurrentTile.GetClockwiseNextTile(primaryTargetPawn.CurrentTile);
             if (clockwiseNextTile.GetPawn())
@@ -36,11 +30,11 @@ public class SlashAttackAbility : Ability
 
         foreach (Pawn targetPawn in targetPawns)
         {
-            activatedPawn.AttackPawn(targetPawn, attackAction);
+            activatedPawn.AttackPawn(targetPawn, this);
         }
 
-        activatedPawn.ActionPoints -= attackAction.apCost;
-        activatedPawn.Motivation -= attackAction.motCost;
+        activatedPawn.ActionPoints -= apCost;
+        activatedPawn.Motivation -= motCost;
         
         BattleManager.Instance.PawnActivated(activatedPawn);
 

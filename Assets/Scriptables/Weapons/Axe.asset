@@ -15,21 +15,15 @@ MonoBehaviour:
   itemName: Axe
   description: A common tool turned brutal weapon, axes have high damage and are
     best against a single target.
-  itemSprite: {fileID: 21300000, guid: 50e72420994aa5c44a30b1424e783f5b, type: 3}
-  SESprite: {fileID: 0}
-  SWSprite: {fileID: 0}
-  NWSprite: {fileID: 0}
-  NESprite: {fileID: 0}
   itemPrice: 10
   itemType: 2
   isDefault: 0
+  itemSprite: {fileID: 21300000, guid: 50e72420994aa5c44a30b1424e783f5b, type: 3}
   weaponType: 3
   baseDamage: 3
-  baseArmorDamage: 0.8
-  basePenetrationDamage: 0.2
-  baseAccMod: 0
-  baseAction: {fileID: 11400000, guid: 0bebf10a2b08f4755bcb0c88580ac075, type: 2}
-  specialAction: {fileID: 11400000, guid: b602727b4000747b880ef0d1227e1d1e, type: 2}
+  abilities:
+  - {fileID: 11400000, guid: 44abbab1a81a844698561ab662c7a5d9, type: 2}
+  - {fileID: 11400000, guid: 112e003ba616a4dcc885314b0cd7ef48, type: 2}
   hitSound: {fileID: 8300000, guid: 58c7bb3c6e2d7ab4fa3caf53cda142a9, type: 3}
   killSound: {fileID: 8300000, guid: adc6d09285586c34895cca876ccd1897, type: 3}
   missSound: {fileID: 8300000, guid: 89998cf45320f974ea4c9a4fcb2e668b, type: 3}

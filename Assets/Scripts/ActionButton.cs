@@ -63,12 +63,14 @@ public class ActionButton : MonoBehaviour
 
     private void UpdateInteractivity()
     {
-        _button.interactable = BattleManager.Instance.CurrentPawn.HasResourcesForAttackAction(_ability);
+        _button.interactable = _isButtonMode && BattleManager.Instance.CurrentPawn.HasResourcesForAttackAction(_ability);
 
         // don't look disabled in display mode.
         if (!_isButtonMode)
         {
-            _button.GetComponent<Image>().color = Color.white;
+            ColorBlock colors = _button.colors;
+            colors.disabledColor = Color.white;
+            _button.colors = colors;
         }
     }
 
@@ -137,10 +139,9 @@ public class ActionButton : MonoBehaviour
     public void SetDataDisplay(Ability action)
     {
         _ability = action;
-
-        image.sprite = _ability.GetData().sprite;
-
-        //displayText.text = action.GetData().abilityName;
+        image.sprite = _ability.sprite;
+        _isButtonMode = false;
+        UpdateInteractivity();
     }
 
     private void HandleClick()

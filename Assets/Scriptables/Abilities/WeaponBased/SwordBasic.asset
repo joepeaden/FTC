@@ -9,9 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9d5aa5c5c58f3514fa46ccd0fdce31f3, type: 3}
+  m_Script: {fileID: 11500000, guid: 98b38de6611cb4ad78b3f48309ca1b2a, type: 3}
   m_Name: SwordBasic
   m_EditorClassIdentifier: 
+  abilityID: stab
   abilityName: Stab
   description: Strike the foe in a thrusting motion
   motCost: 0

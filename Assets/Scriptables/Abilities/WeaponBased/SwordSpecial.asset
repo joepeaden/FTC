@@ -9,9 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9d5aa5c5c58f3514fa46ccd0fdce31f3, type: 3}
+  m_Script: {fileID: 11500000, guid: 33c32ef43dff82d4bad56d3e5d27e736, type: 3}
   m_Name: SwordSpecial
   m_EditorClassIdentifier: 
+  abilityID: slash
   abilityName: Slash
   description: Slash the enemy, hitting two tiles in a clockwise fashion.
   motCost: 1

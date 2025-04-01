@@ -285,7 +285,7 @@ public class GameCharacter
 
     private void SetHonorable()
     {
-        _abilities.Add(new HonorProtect());
+        // _abilities.Add(new HonorProtect());
         AddNewOath();
     }
 

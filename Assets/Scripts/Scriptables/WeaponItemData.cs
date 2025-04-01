@@ -15,6 +15,7 @@ public class WeaponItemData : ItemData
     [Header("Weapon Info")]
     public WeaponType weaponType;
     public int baseDamage;
+    public List<Ability> abilities;
 
     [Header("Weapon Audio")]
     public AudioClip hitSound;

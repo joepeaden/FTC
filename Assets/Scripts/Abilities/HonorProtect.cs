@@ -1,18 +1,12 @@
 ﻿using System;
+using UnityEngine;
 
-public class HonorProtect : Ability
+[CreateAssetMenu(fileName = "HonorProtect", menuName = "MyScriptables/Abilities/HonorProtect")]
+public class HonorProtect : SupportAbilityData
 {
     private int _turnsToProtect;
     private Pawn _activatedPawn;
     private Pawn _targetPawn;
-    private SupportAbilityData ability;
-
-    public HonorProtect()
-    {
-        dataAddress = "Assets/Scriptables/Abilities/OathOfLoyalty.asset";
-        base.LoadData();
-        ability = GetData() as SupportAbilityData;
-    }
 
     // note... it may not be necessary to have the activated pawn param. Will the pawn that this
     // ability instance belongs to ever change?
@@ -28,9 +22,9 @@ public class HonorProtect : Ability
         _targetPawn = targetPawn;
 
         _targetPawn.ProtectingPawn = _activatedPawn;
-        _turnsToProtect = ability.turnsDuration;
+        _turnsToProtect = turnsDuration;
 
-        _activatedPawn.Motivation -= GetData().motCost;
+        _activatedPawn.Motivation -= motCost;
 
         // on new activation, will want to check duration to see if stop protecting
         _activatedPawn.OnActivation.AddListener(HandleNewActivationForPawn);
@@ -47,7 +41,7 @@ public class HonorProtect : Ability
         BattleManager.Instance.AddTextNotification(_targetPawn.transform.position, "+Protection");
 
         // add icon to the character UI to show effect
-        _targetPawn.UpdateEffect(ability.statusEffect, true);
+        _targetPawn.UpdateEffect(statusEffect, true);
 
         return true;
     }
@@ -95,7 +89,7 @@ public class HonorProtect : Ability
     {
         BattleManager.Instance.AddTextNotification(_targetPawn.transform.position, "-Protection");
 
-        _targetPawn.UpdateEffect(ability.statusEffect, false);
+        _targetPawn.UpdateEffect(statusEffect, false);
 
         _activatedPawn.OnActivation.RemoveListener(HandleNewActivationForPawn);
         _activatedPawn.OnHit.RemoveListener(HandleDeath);

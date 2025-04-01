@@ -422,12 +422,12 @@ public class BattleManager : MonoBehaviour
         {
             if (_currentPawn != null)
             {
-                if (Ability.SelectedAbility != null && targetTile.GetTileDistance(_currentPawn.CurrentTile) <= Ability.SelectedAbility.GetData().range)
+                if (Ability.SelectedAbility != null && targetTile.GetTileDistance(_currentPawn.CurrentTile) <= Ability.SelectedAbility.range)
                 {
                     tilesToHighlight.Clear();
                     tilesToHighlight.Add(targetTile);
                     
-                    if ((WeaponAbilityData)Ability.SelectedAbility.GetData() as WeaponAbilityData != null && ((WeaponAbilityData)Ability.SelectedAbility.GetData()).attackStyle == WeaponAbilityData.AttackStyle.LShape)
+                    if ((WeaponAbilityData)Ability.SelectedAbility as WeaponAbilityData != null && ((WeaponAbilityData)Ability.SelectedAbility).attackStyle == WeaponAbilityData.AttackStyle.LShape)
                     {
                         tilesToHighlight.Add(_currentPawn.CurrentTile.GetClockwiseNextTile(targetTile));
                     }

@@ -80,40 +80,13 @@ public class CharDetailPanel : MonoBehaviour
             _weaponUI.Hide();
         }
 
-        StartCoroutine(UpdateAbilities());
-
-        List<MotCondData> motConditions = character.GetMotCondsForBattle();
-        int i = 0;
-        for (; i < motConditions.Count; i++)
-        {
-            MotCondData condition = motConditions[i];
-
-            _motivationConditionDisplay[i].SetData("", condition.description);
-
-        }
-
-        // update the remaining buttons
-        for (; i < _motivationConditionDisplay.Count; i++)
-        {
-            _motivationConditionDisplay[i].Hide();
-        }
-
-        _pawnPreview.SetData(character);
-    }
-
-    private IEnumerator UpdateAbilities()
-    {
-        List<Ability> pawnAbilities = _currentCharacter.GetAbilities();
+        // update abilities
+         List<Ability> pawnAbilities = _currentCharacter.GetAbilities();
         // there's currently only 4 ability buttons - will need to address that at some point,
         // could cause problems.
         int i = 0;
         for (; i < pawnAbilities.Count; i++)
         {
-            if (!pawnAbilities[i].IsInitialized)
-            {
-                yield return new WaitUntil(() => pawnAbilities[i].IsInitialized);
-            }
-
             ActionButton actionButton = _actionButtons[i];
 
             actionButton.SetSelected(false);
@@ -132,6 +105,23 @@ public class CharDetailPanel : MonoBehaviour
             actionButton.SetSelected(false);
             actionButton.gameObject.SetActive(false);
         }
+
+        List<MotCondData> motConditions = character.GetMotCondsForBattle();
+        for (i = 0; i < motConditions.Count; i++)
+        {
+            MotCondData condition = motConditions[i];
+
+            _motivationConditionDisplay[i].SetData("", condition.description);
+
+        }
+
+        // update the remaining buttons
+        for (i = 0; i < _motivationConditionDisplay.Count; i++)
+        {
+            _motivationConditionDisplay[i].Hide();
+        }
+
+        _pawnPreview.SetData(character);
     }
 
     public void UnEquipItem(ItemUI itemUI)

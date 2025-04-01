@@ -15,21 +15,15 @@ MonoBehaviour:
   itemName: Sword
   description: "Swords are well balanced, allowing for more attacks and can be used
     against a single or multiple opponents.\xDF"
-  itemSprite: {fileID: 21300000, guid: a5072443420c241cfaa3621276b97435, type: 3}
-  SESprite: {fileID: 0}
-  SWSprite: {fileID: 0}
-  NWSprite: {fileID: 0}
-  NESprite: {fileID: 0}
   itemPrice: 20
   itemType: 2
   isDefault: 0
+  itemSprite: {fileID: 21300000, guid: a5072443420c241cfaa3621276b97435, type: 3}
   weaponType: 1
   baseDamage: 2
-  baseArmorDamage: 0.5
-  basePenetrationDamage: 0.5
-  baseAccMod: 0.1
-  baseAction: {fileID: 11400000, guid: f0478d39a81c64b70b4981268b3b2e00, type: 2}
-  specialAction: {fileID: 11400000, guid: 62a8535b402d74570ad3fe8b8bbeb699, type: 2}
+  abilities:
+  - {fileID: 11400000, guid: 90b25c87f54274061819de0b9a6b1efa, type: 2}
+  - {fileID: 11400000, guid: dbe5bb4f5f44b424ba13fe032cbe32f9, type: 2}
   hitSound: {fileID: 8300000, guid: 1cbea69ffad026c448fbdf47f4d34f3b, type: 3}
   killSound: {fileID: 8300000, guid: d1256636b10306449b7a8bf6f5295a0c, type: 3}
   missSound: {fileID: 8300000, guid: 89998cf45320f974ea4c9a4fcb2e668b, type: 3}
