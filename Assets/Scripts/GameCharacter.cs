@@ -76,6 +76,9 @@ public class GameCharacter
     public Weapon TheWeapon => _theWeapon;
     private Weapon _theWeapon = new Weapon();
 
+    public List<Ability> Passives => _passives;
+    private List<Ability> _passives = new ();
+
     public List<Ability> Abilities => _abilities;
     private List<Ability> _abilities = new ();
 
