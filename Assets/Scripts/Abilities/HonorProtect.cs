@@ -38,7 +38,7 @@ public class HonorProtect : SupportAbilityData
         BattleManager.Instance.PawnActivated(_activatedPawn);
         
         // text display event
-        BattleManager.Instance.AddTextNotification(_targetPawn.transform.position, "+Protection");
+        // BattleManager.Instance.AddTextNotification(_targetPawn.transform.position, "+Protection");
 
         // add icon to the character UI to show effect
         _targetPawn.UpdateEffect(statusEffect, true);
@@ -87,7 +87,7 @@ public class HonorProtect : SupportAbilityData
     /// </summary>
     private void StopProtection()
     {
-        BattleManager.Instance.AddTextNotification(_targetPawn.transform.position, "-Protection");
+        // BattleManager.Instance.AddTextNotification(_targetPawn.transform.position, "-Protection");
 
         _targetPawn.UpdateEffect(statusEffect, false);
 

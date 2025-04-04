@@ -76,8 +76,8 @@ public class GameCharacter
     public Weapon TheWeapon => _theWeapon;
     private Weapon _theWeapon = new Weapon();
 
-    public List<Ability> Passives => _passives;
-    private List<Ability> _passives = new ();
+    public List<PassiveData> Passives => _passives;
+    private List<PassiveData> _passives = new ();
 
     public List<Ability> Abilities => _abilities;
     private List<Ability> _abilities = new ();
@@ -375,17 +375,22 @@ public class GameCharacter
 
     public int GetWeaponDamageForAction(WeaponAbilityData action)
     {
-        // Damage multipliers, and armor, needs to be reworked for the recent change from % system to d12 scale.
+        int totalPassivesBuff = 0; 
+        foreach (PassiveData passive in _passives)
+        {
+            totalPassivesBuff += passive.damageOutModifier;
+        }
 
-        return _theWeapon.Data.baseDamage;//action.outDmgMod + _theWeapon.Data.baseDamage;
+        // don't ever output less than 1 damage because, come on man
+        return Mathf.Max(1, _theWeapon.Data.baseDamage + action.bonusDmg + totalPassivesBuff);
     }
 
-    public int GetWeaponArmorDamageForAction(WeaponAbilityData action)
-    {
+    // public int GetWeaponArmorDamageForAction(WeaponAbilityData action)
+    // {
         // Damage multipliers, and armor, needs to be reworked for the recent change from % system to d12 scale.
 
-        return _theWeapon.Data.baseDamage;//Mathf.RoundToInt(GetWeaponDamageForAction(action) * (action.armorDamageMod + _theWeapon.Data.baseArmorDamage));
-    }
+    //     return _theWeapon.Data.baseDamage;//Mathf.RoundToInt(GetWeaponDamageForAction(action) * (action.armorDamageMod + _theWeapon.Data.baseArmorDamage));
+    // }
 
     public int GetTotalViceValue()
     {

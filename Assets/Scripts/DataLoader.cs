@@ -10,8 +10,11 @@ public class DataLoader
     // character types
     public static Dictionary<string, GameCharacterData> charTypes = new();
 
-    // abilities that aren't tied to weapons
+    // active abilities that aren't tied to weapons
     public static Dictionary<string, Ability> abilities = new();
+    
+    // passive abilities for characters
+    public static Dictionary<string, PassiveData> passives = new();
 
     // contract types
     public static Dictionary<string, ContractData> contracts = new();
@@ -37,6 +40,12 @@ public class DataLoader
         Addressables.LoadAssetsAsync<EffectData>("characterEffects", OnLoadCharEffectsCompleted);
         Addressables.LoadAssetsAsync<ContractData>("contracts", OnLoadContractsCompleted);
         Addressables.LoadAssetsAsync<Ability>("charAbilities", OnLoadCharacterAbilities);
+        Addressables.LoadAssetsAsync<PassiveData>("passives", OnLoadPassives);
+    }
+
+    private void OnLoadPassives(PassiveData result)
+    {
+        passives[result.passiveID] = result;
     }
 
     /// <summary>

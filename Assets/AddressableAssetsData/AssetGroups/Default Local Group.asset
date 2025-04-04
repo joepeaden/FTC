@@ -245,6 +245,24 @@ MonoBehaviour:
     m_SerializedLabels:
     - facialHairDetail
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d719541eb859348429638f84b2bbae79
+    m_Address: Assets/Scriptables/Passives/GlassCannon.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - passives
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ebb16c4f8c826447f92bfaceb39ce505
+    m_Address: Assets/Scriptables/Passives/Tank.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - passives
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c12bdfd2f4b104fda93f8c7d5b10dbaf
+    m_Address: Assets/Scriptables/Passives/Accurate.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - passives
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 7c8bf46af66d94c95b7860930c29ad14, type: 2}
   m_SchemaSet:

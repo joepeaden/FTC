@@ -31,7 +31,7 @@ public class BonusPay : SupportAbilityData
         BattleManager.Instance.PawnActivated(_activatedPawn);
         
         // text display event
-        BattleManager.Instance.AddTextNotification(_targetPawn.transform.position, "+Boosted");
+        // BattleManager.Instance.AddTextNotification(_targetPawn.transform.position, "+Boosted");
 
         // add icon to the character UI to show effect
         _targetPawn.UpdateEffect(statusEffect, true);
@@ -69,7 +69,7 @@ public class BonusPay : SupportAbilityData
     /// </summary>
     private void StopEffect()
     {
-        BattleManager.Instance.AddTextNotification(_targetPawn.transform.position, "-Boosted");
+        // BattleManager.Instance.AddTextNotification(_targetPawn.transform.position, "-Boosted");
 
         _targetPawn.UpdateEffect(statusEffect, false);
 

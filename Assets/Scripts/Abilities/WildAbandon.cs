@@ -15,8 +15,8 @@ public class WildAbandon : SupportAbilityData
         _activatedPawn = activatedPawn;
         _targetPawn = targetPawn;
 
-        _activatedPawn.OutDamageMult = outDmgMod;
-        _activatedPawn.InDamageMult = inDmgMod;
+        // _activatedPawn.OutDamageMult = outDmgMod;
+        // _activatedPawn.InDamageMult = inDmgMod;
         
         turnsForEffect = turnsDuration;
 
@@ -31,7 +31,7 @@ public class WildAbandon : SupportAbilityData
         BattleManager.Instance.PawnActivated(_activatedPawn);
         
         // text display event
-        BattleManager.Instance.AddTextNotification(_targetPawn.transform.position, "+Raging");
+        // BattleManager.Instance.AddTextNotification(_targetPawn.transform.position, "+Raging");
 
         // add icon to the character UI to show effect
         _targetPawn.UpdateEffect(statusEffect, true);
@@ -69,15 +69,15 @@ public class WildAbandon : SupportAbilityData
     /// </summary>
     private void StopEffect()
     {
-        BattleManager.Instance.AddTextNotification(_targetPawn.transform.position, "-Raging");
+        // BattleManager.Instance.AddTextNotification(_targetPawn.transform.position, "-Raging");
 
         _targetPawn.UpdateEffect(statusEffect, false);
 
         _activatedPawn.OnActivation.RemoveListener(HandleNewActivationForPawn);
         _activatedPawn.OnHit.RemoveListener(HandleDeath);
 
-        _activatedPawn.OutDamageMult = 0;
-        _activatedPawn.InDamageMult = 0;
+        // _activatedPawn.OutDamageMult = 0;
+        // _activatedPawn.InDamageMult = 0;
 
         _activatedPawn = null;
         _targetPawn = null;

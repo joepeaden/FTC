@@ -52,7 +52,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] PipStatBar apBar;
     [SerializeField] PipStatBar motBar;
     [SerializeField] private Transform _initStackParent;
-    [SerializeField] private List<TextFloatUp> _floatingTexts = new();
+    [SerializeField] private List<TextNotificationStack> _textNotifs;
     [SerializeField] private CharacterTooltip charTooltip;
     [SerializeField] private GameObject _instructionsUI;
     [SerializeField] private Button _startBattleButton;
@@ -96,6 +96,8 @@ public class BattleManager : MonoBehaviour
     private int _turnNumber = -1;
 
     private List<Tile> tilesToHighlight = new();
+
+    private List<(string, Color)> pendingTextNotifs = new();
 
     private void Awake()
     {
@@ -267,9 +269,14 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    public void AddTextNotification(Vector3 pos, string str)
+    public void AddPendingTextNotification(string str, Color color)
     {
-        foreach (TextFloatUp txt in _floatingTexts)
+        pendingTextNotifs.Add((str, color));
+    }
+    
+    public void TriggerTextNotification(Vector3 pos)
+    {
+        foreach (TextNotificationStack txt in _textNotifs)
         {
             if (txt.InUse)
             {
@@ -277,10 +284,12 @@ public class BattleManager : MonoBehaviour
             }
             else
             {
-                txt.SetData(pos, str, Color.white);
+                txt.SetData(pos, pendingTextNotifs);
                 break;
             }
         }
+
+        pendingTextNotifs.Clear();
     }
 
     public void RefreshInitStackUI()
@@ -704,7 +713,8 @@ public class BattleManager : MonoBehaviour
             audioSource.clip = _levelUpSound;
             audioSource.Play();
 
-            BattleManager.Instance.AddTextNotification(p.transform.position, "Level up!");
+            AddPendingTextNotification("Level up!", Color.yellow);
+            TriggerTextNotification(p.transform.position);
 
             yield return new WaitForSeconds(.25f);
         }
@@ -839,6 +849,8 @@ public class BattleManager : MonoBehaviour
         }
 
         _currentPawn = GetNextPawn();
+
+        // AddTextNotification(_currentPawn.transform.position, new () {(_currentPawn.OnPlayerTeam ? "For God and Glory!" : "FOR THE DARK GODS!", Color.white)});
 
         // see if the battle is over. If so, do sumthin about it 
         if (CheckEnemyWipedOut())

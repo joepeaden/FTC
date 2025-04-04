@@ -4,6 +4,7 @@ using UnityEngine;
 using Pathfinding;
 using System.Linq;
 using UnityEngine.Events;
+using Unity.VisualScripting;
 
 public class Pawn : MonoBehaviour
 {
@@ -57,9 +58,6 @@ public class Pawn : MonoBehaviour
     public bool PendingLevelUp { get; set; }
 
     #region Buffs / Debuffs
-    // outgoing and incoming damage multipliers
-    public int OutDamageMult;
-    public int InDamageMult;
     public float DodgeMod;
     public float HitMod;
     #endregion
@@ -143,6 +141,23 @@ public class Pawn : MonoBehaviour
 
         // set up listeners motivation conditions
         SetupMotConds();
+
+        int roll = Random.Range(0, 3);
+        switch (roll)
+        {
+            case 0:
+                GameChar.Passives.Add(DataLoader.passives["glasscannon"]);
+                break;
+            case 1:
+                GameChar.Passives.Add(DataLoader.passives["accurate"]);
+                break;
+            case 2:
+                GameChar.Passives.Add(DataLoader.passives["tank"]);
+                break;
+
+        }
+        
+        UpdateEffect(GameChar.Passives[0].effectDisplay, true);
     }
 
     private void SetupMotConds()
@@ -181,7 +196,7 @@ public class Pawn : MonoBehaviour
         {
             _fulfilledBattleMotConds.Remove(DataLoader.motConds["NoRetreat"]);
 
-            BattleManager.Instance.AddTextNotification(transform.position, "Oath Broken!");
+            // BattleManager.Instance.AddTextNotification(transform.position, "Oath Broken!");
         }
     }
 
@@ -191,7 +206,7 @@ public class Pawn : MonoBehaviour
         {
             _fulfilledBattleMotConds.Remove(DataLoader.motConds["AllyNoDmg"]);
 
-            BattleManager.Instance.AddTextNotification(transform.position, "Oath Broken!");
+            // BattleManager.Instance.AddTextNotification(transform.position, "Oath Broken!");
         }
     }
 
@@ -200,7 +215,7 @@ public class Pawn : MonoBehaviour
         // ew string parameters.
         // whatever.
         _fulfilledBattleMotConds.Add(DataLoader.motConds["Kill1"]);
-        BattleManager.Instance.AddTextNotification(transform.position, "Oath Fufilled!");
+        // BattleManager.Instance.AddTextNotification(transform.position, "Oath Fufilled!");
     }
 
     /// <summary>
@@ -379,22 +394,19 @@ public class Pawn : MonoBehaviour
         {
             bool targetHadArmor = targetPawn.ArmorPoints > 0;
 
+            int critRollMod = 0;
+            foreach (PassiveData passive in GameChar.Passives)
+            {
+                critRollMod += passive.critRollModifier;
+            }
+
             bool isCrit = false;
-            if (hitRoll >= GameChar.CritChance - currentAction.critChanceMod)
+            if (hitRoll >= (GameChar.CritChance - currentAction.critChanceMod + critRollMod))
             {
                 isCrit = true;
             }
 
             targetPawn.TakeDamage(this, currentAction, isCrit);
-
-            if (isCrit)
-            {
-                BattleManager.Instance.AddTextNotification(transform.position, "Critical Hit!");
-            }
-            else
-            {
-                BattleManager.Instance.AddTextNotification(transform.position, "Hit!");
-            }
 
             if (targetPawn.IsDead)
             {
@@ -415,7 +427,7 @@ public class Pawn : MonoBehaviour
         else
         {
             targetPawn.TriggerDodge();
-            BattleManager.Instance.AddTextNotification(transform.position, "Miss!");
+            // BattleManager.Instance.AddTextNotification(transform.position, "Miss!");
             StartCoroutine(PlayAudioAfterDelay(0.1f, GameChar.TheWeapon.Data.missSound));
         }
     }
@@ -442,23 +454,31 @@ public class Pawn : MonoBehaviour
         //    extraDmgMult += actionUsed.extraDmgMultiplier;
         //}
 
+        int dmgInMod = 0; 
+        foreach(PassiveData passive in GameChar.Passives)
+        {
+            dmgInMod += passive.damageInModifier;
+        }
+
+        int attackDmg = attackingCharacter.GetWeaponDamageForAction(actionUsed);
+
         bool armorHit = false;
         if (_armorPoints > 0)
         {
-            armorDmg = attackingCharacter.GetWeaponDamageForAction(actionUsed) + actionUsed.bonusDmg;
+            armorDmg = attackDmg + dmgInMod;
             _armorPoints = Mathf.Max(0, _armorPoints - armorDmg);
 
             // crits against armor do full damage to armor and hp
             if (isCrit)
             {
-                hitPointsDmg = attackingCharacter.GetWeaponDamageForAction(actionUsed) + actionUsed.bonusDmg;
+                hitPointsDmg = attackDmg;
             }
 
             armorHit = true;
         }
         else
         {
-            hitPointsDmg = attackingCharacter.GetWeaponDamageForAction(actionUsed) + actionUsed.bonusDmg;
+            hitPointsDmg = attackDmg;
 
             // crits against HP do double damage
             if (isCrit)
@@ -467,8 +487,23 @@ public class Pawn : MonoBehaviour
             }
         }
 
-        _hitPoints -= Mathf.Max(0, hitPointsDmg);
+        _hitPoints -= Mathf.Max(0, (hitPointsDmg + dmgInMod));
 
+        if (armorDmg > 0)
+        {
+            BattleManager.Instance.AddPendingTextNotification(isCrit ? armorDmg.ToString() + "(Crit!)" : armorDmg.ToString(), Color.yellow);
+        }
+
+        if (hitPointsDmg > 0)
+        {
+            BattleManager.Instance.AddPendingTextNotification(isCrit ? hitPointsDmg.ToString() + "(Crit!)" : hitPointsDmg.ToString(), Color.red);
+        }
+
+        if (hitPointsDmg == 0 && armorDmg == 0)
+        {
+            BattleManager.Instance.AddPendingTextNotification("0", Color.white);
+        }
+        
         attackingPawn.DmgInflicted += hitPointsDmg + armorDmg;
 
         // if took 3 damage, alert via event in case ally has associated oath
@@ -497,6 +532,8 @@ public class Pawn : MonoBehaviour
         _spriteController.HandleHit(_isDead, armorHit, armorHit && _armorPoints <= 0);
 
         OnHit.Invoke();
+
+        BattleManager.Instance.TriggerTextNotification(transform.position);
     }
 
     private void Die()
