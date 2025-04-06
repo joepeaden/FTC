@@ -490,12 +490,4 @@ public class GameCharacter
 
         return _moveRange + equipmentMoveMod + passiveMoveMod;
     }
-
-    // public int GetAPPerTileMoved()
-    // {
-    //     int totalArmorAPMod = HelmItem != null ? -HelmItem.moveMod : 0;
-
-    //     // so if negative then it will add AP.
-    //     return Tile.BASE_AP_TO_TRAVERSE + totalArmorAPMod;
-    // }
 }

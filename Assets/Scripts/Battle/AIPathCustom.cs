@@ -27,7 +27,6 @@ public class AIPathCustom : AIPath
     {
         _seeker.StartPath(transform.position, goalDestination, OnPathCalculated);
         pawnMovesLeft = _pawn.MoveRange;
-        // _pawnActionPoints = _pawn.actionPoints;
     }
 
     private void OnPathCalculated(Path p)
@@ -37,7 +36,6 @@ public class AIPathCustom : AIPath
         _currentPathIndex = 0;
 
         int totalTilesToMove = _pathToFollow.Count - 1;
-        // int apPerTileMoved = _pawn.GameChar.GetAPPerTileMoved();
 
         // if not enough AP to move the total distance to goal,
         // remove unreachable nodes

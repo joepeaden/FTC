@@ -448,14 +448,6 @@ public class BattleManager : MonoBehaviour
 
                     UpdateUIForPawn(_currentPawn);
                 }
-
-                // if targetPawn is null, then we're hovering a movement tile.
-                if (hoveredPawn == null)
-                {
-                    // int expectedAPAfterMove = _currentPawn.GetAPAfterMove(targetTile);
-                    // apBar.SetBar(expectedAPAfterMove);
-                    // motBar.SetBar(_currentPawn.Motivation);
-                }
             }
         }
 

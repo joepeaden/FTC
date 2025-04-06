@@ -235,34 +235,10 @@ public class Pawn : MonoBehaviour
         _onPlayerTeam = onPlayerTeam;
     }
 
-    // public int GetAPAfterAction()
-    // {
-    //     if (Ability.SelectedAbility as WeaponAbilityData != null)
-    //     {
-    //         return actionPoints - ((WeaponAbilityData)Ability.SelectedAbility).apCost;
-    //     }
-    //     else
-    //     {
-    //         return actionPoints;
-    //     }
-    // }
-
     public int GetMTAfterAction()
     {
         return Motivation - Ability.SelectedAbility.motCost;
     }
-
-    // public int GetAPAfterMove(Tile targetTile)
-    // {
-    //     // will have no AP if leaving combat
-    //     if (EngagedInCombat)
-    //     {
-    //         return 0;
-    //     }
-
-    //     int tileDist = _currentTile.GetTileDistance(targetTile);
-    //     return Mathf.Max(actionPoints - (tileDist * _gameChar.GetAPPerTileMoved()), 0);
-    // }
 
     private void UpdateMotivationResource()
     {
@@ -677,7 +653,7 @@ public class Pawn : MonoBehaviour
         // if doing that later, make sure to update the pathfinder code too.
 
         hasMoved = true;
-        actionPoints -= 1;// _gameChar.GetAPPerTileMoved() * tileDistance;        
+        actionPoints -= 1;
 
         // use whole turn to get out of combat with someone
         if (EngagedInCombat)
