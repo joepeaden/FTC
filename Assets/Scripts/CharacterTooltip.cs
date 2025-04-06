@@ -27,7 +27,7 @@ public class CharacterTooltip : MonoBehaviour
         characterMotivatorText.text = p.CurrentMotivator.ToString();
         armorBar.SetBar(p.MaxArmorPoints, p.ArmorPoints);
         healthBar.SetBar(p.MaxHitPoints, p.HitPoints);
-        apBar.SetBar(Pawn.BASE_ACTION_POINTS, p.ActionPoints);
+        apBar.SetBar(Pawn.BASE_ACTION_POINTS, p.actionPoints);
         motBar.SetBar(p.MaxMotivation, p.Motivation);
 
         _currentPawn = p;

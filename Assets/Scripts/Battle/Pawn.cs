@@ -10,7 +10,7 @@ public class Pawn : MonoBehaviour
 {
     private const int MOT_REGAIN_RATE = 10;
     private const int MOT_BASIC_ATTACK_COST = 10;
-    public const int BASE_ACTION_POINTS = 6;
+    public const int BASE_ACTION_POINTS = 2;
     public const int MOTIVATED_MOT_REGAIN_BUFF = 15;
 
     public UnityEvent OnMoved = new();
@@ -27,7 +27,7 @@ public class Pawn : MonoBehaviour
     public float baseDodgeChance;
     public float baseSurroundBonus;
 
-    public int MoveRange => ActionPoints / _gameChar.GetAPPerTileMoved();
+    public int MoveRange => GameChar.GetMoveRange();
 
     public Tile CurrentTile => _currentTile;
     private Tile _currentTile;
@@ -43,7 +43,9 @@ public class Pawn : MonoBehaviour
     public int ArmorPoints => _armorPoints;
     private int _armorPoints;
 
-    public int ActionPoints;
+    public int actionPoints;
+
+    public bool hasMoved;
 
     public int MaxMotivation => GameChar.GetBattleMotivationCap();
     public int Motivation;
@@ -137,7 +139,8 @@ public class Pawn : MonoBehaviour
         _armorPoints = character.GetTotalArmor();
 
         Motivation = GameChar.GetBattleMotivationCap();
-        ActionPoints = BASE_ACTION_POINTS;
+        actionPoints = BASE_ACTION_POINTS;
+        hasMoved = false;
 
         // set up listeners motivation conditions
         SetupMotConds();
@@ -232,34 +235,34 @@ public class Pawn : MonoBehaviour
         _onPlayerTeam = onPlayerTeam;
     }
 
-    public int GetAPAfterAction()
-    {
-        if (Ability.SelectedAbility as WeaponAbilityData != null)
-        {
-            return ActionPoints - ((WeaponAbilityData)Ability.SelectedAbility).apCost;
-        }
-        else
-        {
-            return ActionPoints;
-        }
-    }
+    // public int GetAPAfterAction()
+    // {
+    //     if (Ability.SelectedAbility as WeaponAbilityData != null)
+    //     {
+    //         return actionPoints - ((WeaponAbilityData)Ability.SelectedAbility).apCost;
+    //     }
+    //     else
+    //     {
+    //         return actionPoints;
+    //     }
+    // }
 
     public int GetMTAfterAction()
     {
         return Motivation - Ability.SelectedAbility.motCost;
     }
 
-    public int GetAPAfterMove(Tile targetTile)
-    {
-        // will have no AP if leaving combat
-        if (EngagedInCombat)
-        {
-            return 0;
-        }
+    // public int GetAPAfterMove(Tile targetTile)
+    // {
+    //     // will have no AP if leaving combat
+    //     if (EngagedInCombat)
+    //     {
+    //         return 0;
+    //     }
 
-        int tileDist = _currentTile.GetTileDistance(targetTile);
-        return Mathf.Max(ActionPoints - (tileDist * _gameChar.GetAPPerTileMoved()), 0);
-    }
+    //     int tileDist = _currentTile.GetTileDistance(targetTile);
+    //     return Mathf.Max(actionPoints - (tileDist * _gameChar.GetAPPerTileMoved()), 0);
+    // }
 
     private void UpdateMotivationResource()
     {
@@ -583,13 +586,12 @@ public class Pawn : MonoBehaviour
     /// <returns></returns>
     public bool HasResourcesForAttackAction(Ability theAbility = null)
     {
-        // this here needs cleanup. I need to remove the ActionData stuff basically alltogether.
         if (theAbility != null)
         {
             WeaponAbilityData action = theAbility as WeaponAbilityData;
             if (action != null)
             {
-                if (ActionPoints >= action.apCost && Motivation >= action.motCost)
+                if (actionPoints >= action.apCost && Motivation >= action.motCost)
                 {
                     return true;
                 }
@@ -605,7 +607,7 @@ public class Pawn : MonoBehaviour
         {
             foreach (Ability a in GameChar.TheWeapon.Abilities)
             {
-                if (Motivation >= a.motCost && ActionPoints >= ((WeaponAbilityData)a).apCost)
+                if (Motivation >= a.motCost && actionPoints >= ((WeaponAbilityData)a).apCost)
                 {
                     return true;
                 }
@@ -633,7 +635,8 @@ public class Pawn : MonoBehaviour
 
     public bool HasMovesLeft()
     {
-        return ActionPoints >= _gameChar.GetAPPerTileMoved();
+        // costs 2 AP to move
+        return actionPoints >= 2;
     }
 
     public void HandleActivation()
@@ -641,7 +644,8 @@ public class Pawn : MonoBehaviour
         UpdateMotivationResource();
 
         _spriteController.HandleTurnBegin();
-        ActionPoints = BASE_ACTION_POINTS;
+        actionPoints = BASE_ACTION_POINTS;
+        hasMoved = false;
 
         OnActivation.Invoke();
     }
@@ -656,7 +660,7 @@ public class Pawn : MonoBehaviour
     /// <returns></returns>
     public void TryMoveToTile(Tile targetTile)
     {
-        if (ActionPoints < _gameChar.GetAPPerTileMoved())
+        if (!HasMovesLeft())
         {
             return;
         }
@@ -672,15 +676,13 @@ public class Pawn : MonoBehaviour
         // process things one tile at a time if implementing varying AP costs, etc. But not now.
         // if doing that later, make sure to update the pathfinder code too.
 
+        hasMoved = true;
+        actionPoints -= 1;// _gameChar.GetAPPerTileMoved() * tileDistance;        
+
         // use whole turn to get out of combat with someone
         if (EngagedInCombat)
         {
-            ActionPoints = 0;
             OnDisengage.Invoke();
-        }
-        else
-        {
-            ActionPoints -= _gameChar.GetAPPerTileMoved() * tileDistance;
         }
 
         _currentTile.PawnExitTile();

@@ -18,7 +18,7 @@ MonoBehaviour:
   motCost: 1
   range: 1
   sprite: {fileID: 21300000, guid: 37f27f4eb8f4a486295cec51f0b77e60, type: 3}
-  apCost: 3
+  apCost: 1
   critChanceMod: 0
   rangeForExtraDamage: 0
   bonusDmg: 2

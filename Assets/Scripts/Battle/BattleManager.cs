@@ -358,12 +358,12 @@ public class BattleManager : MonoBehaviour
 
             if (Ability.SelectedAbility != null)
             {
-                apBar.SetBar(p.ActionPoints);
+                apBar.SetBar(p.actionPoints);
                 motBar.SetBar(p.Motivation);
             }
             else
             {
-                apBar.SetBar(p.ActionPoints);
+                apBar.SetBar(p.actionPoints);
                 motBar.SetBar(p.Motivation);
             }
 
@@ -452,9 +452,9 @@ public class BattleManager : MonoBehaviour
                 // if targetPawn is null, then we're hovering a movement tile.
                 if (hoveredPawn == null)
                 {
-                    int expectedAPAfterMove = _currentPawn.GetAPAfterMove(targetTile);
-                    apBar.SetBar(expectedAPAfterMove);
-                    motBar.SetBar(_currentPawn.Motivation);
+                    // int expectedAPAfterMove = _currentPawn.GetAPAfterMove(targetTile);
+                    // apBar.SetBar(expectedAPAfterMove);
+                    // motBar.SetBar(_currentPawn.Motivation);
                 }
             }
         }
@@ -556,7 +556,7 @@ public class BattleManager : MonoBehaviour
 
     public void SpawnTestGuys(bool friendly)
     {
-        int numToSpawn = Random.Range(DEFAULT_MIN_AMOUNT_TO_SPAWN, DEFAULT_MAX_AMOUNT_TO_SPAWN);
+        int numToSpawn = friendly ? Random.Range(DEFAULT_MIN_AMOUNT_TO_SPAWN, DEFAULT_MAX_AMOUNT_TO_SPAWN) : 1;
 
         for (int i = 0; i < numToSpawn; i++)
         {
@@ -567,7 +567,11 @@ public class BattleManager : MonoBehaviour
             if (friendly)
             {
                 guy.EquipItem(sword);
-                guy.EquipItem(medHelm);
+
+                if (i % 2 == 0)
+                {
+                    guy.EquipItem(medHelm);
+                }
 
                 guy.Abilities.Add(new WildAbandon());
             }

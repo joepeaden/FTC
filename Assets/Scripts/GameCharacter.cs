@@ -44,6 +44,8 @@ public class GameCharacter
     public int CritChance => _critChance;
     private int _critChance;
 
+    private int _moveRange;
+
     public ArmorItemData HelmItem => _helmItem;
     private ArmorItemData _helmItem;
 
@@ -156,6 +158,7 @@ public class GameCharacter
 
         _baseInitiative = Random.Range(charData.minInit, charData.maxInit);
         _hitPoints = Random.Range(charData.minHP, charData.maxHP);
+        _moveRange = charData.moveRange;
 
         WeaponItemData startingWeapon = charData.defaultWeaponOptions[Random.Range(0, charData.defaultWeaponOptions.Count)];
         EquipItem(startingWeapon);
@@ -475,14 +478,24 @@ public class GameCharacter
 
     public int GetMoveRange()
     {
-        return Pawn.BASE_ACTION_POINTS/GetAPPerTileMoved();
+        // equipment move modifier
+        int equipmentMoveMod = HelmItem != null ? HelmItem.moveMod : 0;
+
+        // get passive modifiers
+        int passiveMoveMod = 0;
+        foreach (PassiveData p in _passives)
+        {
+            passiveMoveMod += p.moveModifier;
+        }
+
+        return _moveRange + equipmentMoveMod + passiveMoveMod;
     }
 
-    public int GetAPPerTileMoved()
-    {
-        int totalArmorAPMod = HelmItem != null ? -HelmItem.moveMod : 0;
+    // public int GetAPPerTileMoved()
+    // {
+    //     int totalArmorAPMod = HelmItem != null ? -HelmItem.moveMod : 0;
 
-        // so if negative then it will add AP.
-        return Tile.BASE_AP_TO_TRAVERSE + totalArmorAPMod;
-    }
+    //     // so if negative then it will add AP.
+    //     return Tile.BASE_AP_TO_TRAVERSE + totalArmorAPMod;
+    // }
 }
