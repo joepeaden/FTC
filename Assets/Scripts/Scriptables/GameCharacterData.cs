@@ -19,6 +19,7 @@ public class GameCharacterData : ScriptableObject
     public int maxHP;
     public int minAcc;
     public int maxAcc;
+    public int moveRange;
 
     [Header("Equipment and Abilities")]
     public WeaponItemData fallbackWeapon;

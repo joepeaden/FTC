@@ -15,7 +15,7 @@ public class AIPathCustom : AIPath
 
     // only a local var that is used for tracking movement range when trying
     // to get to a destination. Not accurate if not being used.
-    private int _pawnActionPoints;
+    private int pawnMovesLeft;
 
     protected override void Awake()
     {
@@ -26,7 +26,7 @@ public class AIPathCustom : AIPath
     public void AttemptGoToLocation(Vector3 goalDestination)
     {
         _seeker.StartPath(transform.position, goalDestination, OnPathCalculated);
-        _pawnActionPoints = _pawn.ActionPoints;
+        pawnMovesLeft = _pawn.MoveRange;
     }
 
     private void OnPathCalculated(Path p)
@@ -36,13 +36,12 @@ public class AIPathCustom : AIPath
         _currentPathIndex = 0;
 
         int totalTilesToMove = _pathToFollow.Count - 1;
-        int apPerTileMoved = _pawn.GameChar.GetAPPerTileMoved();
 
         // if not enough AP to move the total distance to goal,
         // remove unreachable nodes
-        if (totalTilesToMove * apPerTileMoved > _pawnActionPoints)
+        if (totalTilesToMove > pawnMovesLeft)
         {
-            Vector3 finalPosition = _pathToFollow[_pawnActionPoints / apPerTileMoved];
+            Vector3 finalPosition = _pathToFollow[pawnMovesLeft];
             int finalIndex = _pathToFollow.IndexOf(finalPosition);
             _pathToFollow.RemoveRange(finalIndex+1, (_pathToFollow.Count - (finalIndex + 1)));
         }
@@ -75,7 +74,7 @@ public class AIPathCustom : AIPath
 
         if (_currentPathIndex > 0)
         {
-            _pawnActionPoints -= _pawn.GameChar.GetAPPerTileMoved();
+            pawnMovesLeft--;
         }
     }
 
@@ -103,7 +102,7 @@ public class AIPathCustom : AIPath
             //}
 
             if (_currentPathIndex >= _pathToFollow.Count
-                || _pawnActionPoints <= 0)
+                || pawnMovesLeft <= 0)
             {
                 OnDestinationReached.Invoke();
                 enabled = false;

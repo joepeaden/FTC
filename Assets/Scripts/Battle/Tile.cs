@@ -288,14 +288,14 @@ public class Tile : MonoBehaviour
         {
             pawnMoveRange--;
 
-            if (!_isSelected)
+            if (!_isSelected && !tilesInRange.Contains(this))
             {
                 tilesInRange.Add(this);
             }
 
             foreach (Tile t in _adjacentTiles)
             {
-                if (!tilesInRange.Contains(t))
+                if (!tilesInRange.Contains(t) && !t._isSelected)
                 {
                     t.GetTilesInMoveRangeRecursive(traveller, pawnMoveRange, tilesInRange);
                 }

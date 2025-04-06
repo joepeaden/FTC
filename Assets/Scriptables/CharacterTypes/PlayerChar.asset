@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: PlayerChar
   m_EditorClassIdentifier: 
   charTypeID: player
-  characterTypeName: 
+  characterTypeName: Recruit
   onPlayerTeam: 1
   startingGold: 1000
   price: 20
@@ -23,6 +23,7 @@ MonoBehaviour:
   maxHP: 7
   minAcc: 5
   maxAcc: 8
+  moveRange: 3
   fallbackWeapon: {fileID: 11400000, guid: 10bfb3287a43940979f35f88999d4de9, type: 2}
   defaultWeaponOptions:
   - {fileID: 11400000, guid: 10bfb3287a43940979f35f88999d4de9, type: 2}
