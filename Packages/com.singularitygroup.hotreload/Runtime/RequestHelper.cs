@@ -345,14 +345,41 @@ namespace SingularityGroup.HotReload {
             }
         }
         
+        public static bool IsReleaseMode() {
+#           if (UNITY_EDITOR && UNITY_2022_1_OR_NEWER)
+                return UnityEditor.Compilation.CompilationPipeline.codeOptimization == UnityEditor.Compilation.CodeOptimization.Release;
+#           elif (UNITY_EDITOR)
+                return false;
+#           elif (DEBUG)
+                return false;
+#           else
+                return true;
+#endif
+        }
+        
         public static Task RequestClearPatches() {
-            var body = SerializeRequestBody(new CompileRequest(serverInfo.rootPath));
+            var body = SerializeRequestBody(new CompileRequest(serverInfo.rootPath, IsReleaseMode()));
             return PostJson(url + "/clearpatches", body, 10);
         }
         
-        public static Task RequestCompile() {
-            var body = SerializeRequestBody(new CompileRequest(serverInfo.rootPath));
-            return PostJson(url + "/compile", body, 10);
+        public static async Task RequestCompile(Action<string> onResponseReceived) {
+            var body = SerializeRequestBody(new CompileRequest(serverInfo.rootPath, IsReleaseMode()));
+            var result = await PostJson(url + "/compile", body, 10);
+            if (result.statusCode == HttpStatusCode.OK && !string.IsNullOrEmpty(result.responseText)) {
+                var responses = JsonConvert.DeserializeObject<List<string>>(result.responseText);
+                if (responses == null) {
+                    return;
+                }
+                await ThreadUtility.SwitchToMainThread();
+                foreach (var response in responses) {
+                    // Avoid importing assets twice
+                    if (responses.Contains(response + ".meta")) {
+                        Log.Debug($"Ignoring asset change inside Unity: {response}");
+                        continue;
+                    }
+                    onResponseReceived(response);
+                }
+            }
         }
         
         internal static async Task<List<ChangelogVersion>> FetchChangelog(int timeoutSeconds = 20) {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using SingularityGroup.HotReload.DTO;
 using UnityEditor;
 using UnityEditor.Compilation;
 using UnityEditor.PackageManager;
@@ -11,19 +12,6 @@ using UnityEngine;
 
 namespace SingularityGroup.HotReload.Editor {
 
-    public enum HotReloadSuggestionKind {
-        UnsupportedChanges,
-        UnsupportedPackages,
-        [Obsolete] SymbolicLinks,
-        AutoRecompiledWhenPlaymodeStateChanges,
-        UnityBestDevelopmentToolAward2023,
-#if UNITY_2022_1_OR_NEWER
-        AutoRecompiledWhenPlaymodeStateChanges2022,
-#endif
-        MultidimensionalArrays,
-        EditorsWithoutHRRunning,
-    }
-    
 	internal static class HotReloadSuggestionsHelper {
         internal static void SetSuggestionsShown(HotReloadSuggestionKind hotReloadSuggestionKind) {
             if (EditorPrefs.GetBool($"HotReloadWindow.SuggestionsShown.{hotReloadSuggestionKind}")) {
@@ -40,6 +28,40 @@ namespace SingularityGroup.HotReload.Editor {
         
         internal static bool CheckSuggestionActive(HotReloadSuggestionKind hotReloadSuggestionKind) {
             return EditorPrefs.GetBool($"HotReloadWindow.SuggestionsActive.{hotReloadSuggestionKind}");
+        }
+        
+        internal static bool CheckSuggestionShown(HotReloadSuggestionKind hotReloadSuggestionKind) {
+            return EditorPrefs.GetBool($"HotReloadWindow.SuggestionsShown.{hotReloadSuggestionKind}");
+        }
+
+        internal static bool CanShowServerSuggestion(HotReloadSuggestionKind hotReloadSuggestionKind) {
+            if (hotReloadSuggestionKind == HotReloadSuggestionKind.FieldInitializerWithSideEffects) {
+                return !HotReloadState.ShowedFieldInitializerWithSideEffects;
+            } else if (hotReloadSuggestionKind == HotReloadSuggestionKind.FieldInitializerExistingInstancesEdited) {
+                return !HotReloadState.ShowedFieldInitializerExistingInstancesEdited;
+            } else if (hotReloadSuggestionKind == HotReloadSuggestionKind.FieldInitializerExistingInstancesUnedited) {
+                return !HotReloadState.ShowedFieldInitializerExistingInstancesUnedited;
+            } else if (hotReloadSuggestionKind == HotReloadSuggestionKind.DetailedErrorReportingIsEnabled) {
+                return !CheckSuggestionShown(HotReloadSuggestionKind.DetailedErrorReportingIsEnabled);
+            }
+            return false;
+        }
+        
+        internal static void SetServerSuggestionShown(HotReloadSuggestionKind hotReloadSuggestionKind) {
+            if (hotReloadSuggestionKind == HotReloadSuggestionKind.DetailedErrorReportingIsEnabled) {
+                HotReloadSuggestionsHelper.SetSuggestionsShown(hotReloadSuggestionKind);
+                return;
+            } 
+            if (hotReloadSuggestionKind == HotReloadSuggestionKind.FieldInitializerWithSideEffects) {
+                HotReloadState.ShowedFieldInitializerWithSideEffects = true;
+            } else if (hotReloadSuggestionKind == HotReloadSuggestionKind.FieldInitializerExistingInstancesEdited) {
+                HotReloadState.ShowedFieldInitializerExistingInstancesEdited = true;
+            } else if (hotReloadSuggestionKind == HotReloadSuggestionKind.FieldInitializerExistingInstancesUnedited) {
+                HotReloadState.ShowedFieldInitializerExistingInstancesUnedited = true;
+            } else {
+                return;
+            }
+            HotReloadSuggestionsHelper.SetSuggestionActive(hotReloadSuggestionKind);
         }
         
         // used for cases where suggestion might need to be shown more than once
@@ -85,9 +107,9 @@ namespace SingularityGroup.HotReload.Editor {
             return null;
         }
         
-        internal static readonly OpenURLButton recompileTroubleshootingButton = new OpenURLButton("Documentation", Constants.RecompileTroubleshootingURL);
-        internal static readonly OpenURLButton featuresDocumentationButton = new OpenURLButton("Documentation", Constants.FeaturesDocumentationURL);
-        internal static readonly OpenURLButton multipleEditorsDocumentationButton = new OpenURLButton("Documentation", Constants.MultipleEditorsURL);
+        internal static readonly OpenURLButton recompileTroubleshootingButton = new OpenURLButton("Docs", Constants.RecompileTroubleshootingURL);
+        internal static readonly OpenURLButton featuresDocumentationButton = new OpenURLButton("Docs", Constants.FeaturesDocumentationURL);
+        internal static readonly OpenURLButton multipleEditorsDocumentationButton = new OpenURLButton("Docs", Constants.MultipleEditorsURL);
         public static Dictionary<HotReloadSuggestionKind, AlertEntry> suggestionMap = new Dictionary<HotReloadSuggestionKind, AlertEntry> {
             { HotReloadSuggestionKind.UnityBestDevelopmentToolAward2023, new AlertEntry(
                 AlertType.Suggestion, 
@@ -109,7 +131,7 @@ namespace SingularityGroup.HotReload.Editor {
             { HotReloadSuggestionKind.UnsupportedChanges, new AlertEntry(
                 AlertType.Suggestion, 
                 "Which changes does Hot Reload support?", 
-                "Hot Reload supports most code changes, but there are some limitations. Generally, changes to the method definition and body are allowed. Non-method changes (like adding/editing classes and fields) are not supported. See the documentation for the list of current features and our current roadmap",
+                "Hot Reload supports most code changes, but there are some limitations. Generally, changes to methods and fields are supported. Things like adding new types is not (yet) supported. See the documentation for the list of current features and our current roadmap",
                 actionData: () => {
                     GUILayout.Space(10f);
                     using (new EditorGUILayout.HorizontalScope()) {
@@ -123,7 +145,7 @@ namespace SingularityGroup.HotReload.Editor {
             { HotReloadSuggestionKind.UnsupportedPackages, new AlertEntry(
                 AlertType.Suggestion, 
                 "Unsupported package detected",
-                "The following packages are only partially supported: ECS, Mirror, Fishnet, and Photon. Hot Reload will work in the project, but changes specific to those packages might not work. Contact us if these packages are a big part of your project",
+                "The following packages are only partially supported: ECS, Mirror, Fishnet, and Photon. Hot Reload will work in the project, but changes specific to those packages might not hot-reload",
                 iconType: AlertType.UnsupportedChange,
                 actionData: () => {
                     GUILayout.Space(10f);
@@ -138,7 +160,7 @@ namespace SingularityGroup.HotReload.Editor {
             { HotReloadSuggestionKind.AutoRecompiledWhenPlaymodeStateChanges, new AlertEntry(
                 AlertType.Suggestion, 
                 "Unity recompiles on enter/exit play mode?",
-                "If you have an issue with the Unity Editor recompiling when the Play Mode state changes, please consult the documentation, and don’t hesitate to reach out to us if you need assistance",
+                "If you have an issue with the Unity Editor recompiling when the Play Mode state changes, more info is available in the docs. Feel free to reach out if you require assistance. We'll be glad to help.",
                 actionData: () => {
                     GUILayout.Space(10f);
                     using (new EditorGUILayout.HorizontalScope()) {
@@ -162,8 +184,12 @@ namespace SingularityGroup.HotReload.Editor {
                 actionData: () => {
                     GUILayout.Space(10f);
                     using (new EditorGUILayout.HorizontalScope()) {
-                        if (GUILayout.Button(" Use \"Sprite Atlas V2\" ")) {
-                            EditorSettings.spritePackerMode = SpritePackerMode.SpriteAtlasV2;
+                        if (GUILayout.Button(" Use \"Build Time Only Atlas\" ")) {
+                            if (EditorSettings.spritePackerMode == SpritePackerMode.SpriteAtlasV2) {
+                                EditorSettings.spritePackerMode = SpritePackerMode.SpriteAtlasV2Build;
+                            } else {
+                                EditorSettings.spritePackerMode = SpritePackerMode.BuildTimeOnlyAtlas;
+                            }
                         }
                         if (GUILayout.Button(" Open Settings ")) {
                             SettingsService.OpenProjectSettings("Project/Editor");
@@ -183,7 +209,7 @@ namespace SingularityGroup.HotReload.Editor {
             { HotReloadSuggestionKind.MultidimensionalArrays, new AlertEntry(
                 AlertType.Suggestion, 
                 "Use jagged instead of multidimensional arrays",
-                "Hot Reload doesn't support multidimensional ([,]) arrays. Jagged arrays ([][]) are a better alternative, and Microsoft recommends using them instead",
+                "Hot Reload doesn't support methods with multidimensional arrays ([,]). You can work around this by using jagged arrays ([][])",
                 iconType: AlertType.UnsupportedChange,
                 actionData: () => {
                     GUILayout.Space(10f);
@@ -224,6 +250,116 @@ namespace SingularityGroup.HotReload.Editor {
                 entryType: EntryType.Foldout,
                 iconType: AlertType.UnsupportedChange
             )},
+            // Not in use (never reported from the server)
+            { HotReloadSuggestionKind.FieldInitializerWithSideEffects, new AlertEntry(
+                AlertType.Suggestion, 
+                "Field initializer with side-effects detected",
+                "A field initializer update might have side effects, e.g. calling a method or creating an object.\n\nWhile Hot Reload does support this, it can sometimes be confusing when the initializer logic runs at 'unexpected times'.",
+                actionData: () => {
+                    GUILayout.Space(10f);
+                    using (new EditorGUILayout.HorizontalScope()) {
+                        if (GUILayout.Button(" OK ")) {
+                            SetSuggestionInactive(HotReloadSuggestionKind.FieldInitializerWithSideEffects);
+                        }
+                        GUILayout.FlexibleSpace();
+                        if (GUILayout.Button(" Don't show again ")) {
+                            SetSuggestionsShown(HotReloadSuggestionKind.FieldInitializerWithSideEffects);
+                            SetSuggestionInactive(HotReloadSuggestionKind.FieldInitializerWithSideEffects);
+                        }
+                    }
+                },
+                timestamp: DateTime.Now,
+                entryType: EntryType.Foldout,
+                iconType: AlertType.Suggestion
+            )},
+            { HotReloadSuggestionKind.DetailedErrorReportingIsEnabled, new AlertEntry(
+                AlertType.Suggestion, 
+                "Detailed error reporting is enabled",
+                "When an error happens in Hot Reload, the exception stacktrace is sent as telemetry to help diagnose and fix the issue.\nThe exception stack trace is only included if it originated from the Hot Reload package or binary. Stacktraces from your own code are not sent.\nYou can disable detailed error reporting to prevent telemetry from including any information about your project.",
+                actionData: () => {
+                    GUILayout.Space(10f);
+                    using (new EditorGUILayout.HorizontalScope()) {
+                        GUILayout.Space(4f);
+                        if (GUILayout.Button("    OK    ")) {
+                            SetSuggestionInactive(HotReloadSuggestionKind.DetailedErrorReportingIsEnabled);
+                        }
+                        GUILayout.FlexibleSpace();
+                        if (GUILayout.Button(" Disable ")) {
+                            HotReloadSettingsTab.DisableDetailedErrorReportingInner(true);
+                            SetSuggestionInactive(HotReloadSuggestionKind.DetailedErrorReportingIsEnabled);
+                        }
+                        GUILayout.Space(10f);
+                    }
+                },
+                timestamp: DateTime.Now,
+                entryType: EntryType.Foldout,
+                iconType: AlertType.Suggestion
+            )},
+            // Not in use (never reported from the server)
+            { HotReloadSuggestionKind.FieldInitializerExistingInstancesEdited, new AlertEntry(
+                AlertType.Suggestion, 
+                "Field initializer edit updated the value of existing class instances",
+                "By default, Hot Reload updates field values of existing object instances when new field initializer has constant value.\n\nIf you want to change this behavior, disable the \"Apply field initializer edits to existing class instances\" option in Settings or click the button below.",
+                actionData: () => {
+                    GUILayout.Space(10f);
+                    using (new EditorGUILayout.HorizontalScope()) {
+                        if (GUILayout.Button(" Turn off ")) {
+                            #pragma warning disable CS0618
+                            HotReloadSettingsTab.ApplyApplyFieldInitializerEditsToExistingClassInstances(false);
+                            #pragma warning restore CS0618
+                            SetSuggestionInactive(HotReloadSuggestionKind.FieldInitializerExistingInstancesEdited);
+                        }
+                        if (GUILayout.Button(" Open Settings ")) {
+                            HotReloadWindow.Current.SelectTab(typeof(HotReloadSettingsTab));
+                        }
+                        GUILayout.FlexibleSpace();
+                        if (GUILayout.Button(" Don't show again ")) {
+                            SetSuggestionsShown(HotReloadSuggestionKind.FieldInitializerExistingInstancesEdited);
+                            SetSuggestionInactive(HotReloadSuggestionKind.FieldInitializerExistingInstancesEdited);
+                        }
+                    }
+                },
+                timestamp: DateTime.Now,
+                entryType: EntryType.Foldout,
+                iconType: AlertType.Suggestion
+            )},
+            { HotReloadSuggestionKind.FieldInitializerExistingInstancesUnedited, new AlertEntry(
+                AlertType.Suggestion, 
+                "Field initializer edits don't apply to existing objects",
+                "By default, Hot Reload applies field initializer edits of existing fields only to new objects (newly instantiated classes), just like normal C#.\n\nFor rapid prototyping, you can use static fields which will update across all instances.",
+                actionData: () => {
+                    GUILayout.Space(8f);
+                    using (new EditorGUILayout.HorizontalScope()) {
+                        if (GUILayout.Button(" OK ")) {
+                            SetSuggestionsShown(HotReloadSuggestionKind.FieldInitializerExistingInstancesUnedited);
+                            SetSuggestionInactive(HotReloadSuggestionKind.FieldInitializerExistingInstancesUnedited);
+                        }
+                        GUILayout.FlexibleSpace();
+                    }
+                },
+                timestamp: DateTime.Now,
+                entryType: EntryType.Foldout,
+                iconType: AlertType.Suggestion
+            )},
+#if UNITY_2020_1_OR_NEWER
+            { HotReloadSuggestionKind.SwitchToDebugModeForInlinedMethods, new AlertEntry(
+                AlertType.Suggestion, 
+                "Switch code optimization to Debug Mode",
+                "In Release Mode some methods are inlined, which prevents Hot Reload from applying changes. A clear warning is always shown when this happens, but you can use Debug Mode to avoid the issue altogether",
+                actionData: () => {
+                    GUILayout.Space(10f);
+                    using (new EditorGUILayout.HorizontalScope()) {
+                        if (GUILayout.Button(" Switch to Debug mode ") && HotReloadRunTab.ConfirmExitPlaymode("Switching code optimization will stop Play Mode.\n\nDo you wish to proceed?")) {
+                            HotReloadRunTab.SwitchToDebugMode();
+                        }
+                        GUILayout.FlexibleSpace();
+                    }
+                },
+                timestamp: DateTime.Now,
+                entryType: EntryType.Foldout,
+                iconType: AlertType.UnsupportedChange
+            )},
+#endif
         };
         
         static ListRequest listRequest;
@@ -260,10 +396,11 @@ namespace SingularityGroup.HotReload.Editor {
                 unsupportedPackagesList == null) 
             {
                 unsupportedPackagesList = new List<string>();
-                var packages = listRequest.Result;
-                foreach (var packageInfo in packages) {
-                    if (unsupportedPackages.Contains(packageInfo.name)) {
-                        unsupportedPackagesList.Add(packageInfo.name);
+                if (listRequest.Result != null) {
+                    foreach (var packageInfo in listRequest.Result) {
+                        if (unsupportedPackages.Contains(packageInfo.name)) {
+                            unsupportedPackagesList.Add(packageInfo.name);
+                        }
                     }
                 }
                 if (unsupportedPackagesList.Count > 0) {
@@ -274,7 +411,7 @@ namespace SingularityGroup.HotReload.Editor {
             CheckEditorsWithoutHR();
 
 #if UNITY_2022_1_OR_NEWER
-            if (EditorSettings.spritePackerMode == SpritePackerMode.AlwaysOnAtlas) {
+            if (EditorSettings.spritePackerMode == SpritePackerMode.AlwaysOnAtlas || EditorSettings.spritePackerMode == SpritePackerMode.SpriteAtlasV2) {
                 SetSuggestionsShown(HotReloadSuggestionKind.AutoRecompiledWhenPlaymodeStateChanges2022);
             } else if (CheckSuggestionActive(HotReloadSuggestionKind.AutoRecompiledWhenPlaymodeStateChanges2022)) { 
                 SetSuggestionInactive(HotReloadSuggestionKind.AutoRecompiledWhenPlaymodeStateChanges2022);
@@ -302,9 +439,9 @@ namespace SingularityGroup.HotReload.Editor {
                 checkingEditorsWihtoutHR = true;
                 var showSuggestion = await Task.Run(() => {
                     try {
-                        var runningUnities = Process.GetProcessesByName("Unity").Length;
+                        var runningUnities = Process.GetProcessesByName("Unity Editor").Length;
                         var runningPatchers = Process.GetProcessesByName("CodePatcherCLI").Length;
-                        return runningUnities > runningPatchers;
+                        return runningPatchers > 0 && runningUnities > runningPatchers;
                     } catch (ArgumentException) {
                         // On some devices GetProcessesByName throws ArgumentException for no good reason.
                         // it happens rarely and the feature is not the most important so proper solution is not required
