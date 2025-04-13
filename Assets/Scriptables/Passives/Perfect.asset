@@ -10,19 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 41c7530c5f4244cc8a770889a24a0e2a, type: 3}
-  m_Name: Tank
+  m_Name: Perfect
   m_EditorClassIdentifier: 
-  passiveID: tank
+  passiveID: perfect
   level: 1
-  displayName: Oath of Endurance
-  description: 'Swear an oath to endure punishment . Damage In: -1, and downgrade
-    critical hits to normal hits. May only attack once per turn.'
-  effectDisplay: {fileID: 11400000, guid: 850a1f1b6cb944fc2b21e76c86f6641f, type: 2}
+  displayName: Oath of Perfection
+  description: Swear an oath to strive for perfection. Greatly increased crit roll,
+    but deal 1 damage to self upon missing (to a minimum of 50% HP).
+  effectDisplay: {fileID: 11400000, guid: d63247348fb7d4912b224f2c89c4aa35, type: 2}
   damageOutModifier: 0
-  damageInModifier: -1
-  critRollModifier: 0
-  downgradesCrits: 1
+  damageInModifier: 0
+  critRollModifier: -3
+  damageSelfOnMiss: 1
+  downgradesCrits: 0
   moveModifier: 0
   noRetreat: 0
   freeAttacksPerEnemy: 0
-  oneAttackPerTurn: 1
+  oneAttackPerTurn: 0

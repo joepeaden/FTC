@@ -10,10 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 068988e82ac8d44a49d87f03a1dc82c2, type: 3}
-  m_Name: accurate
+  m_Name: holy
   m_EditorClassIdentifier: 
-  effectID: perfect
-  effectName: Oath of Perfection
-  description: Swear an oath to strive for perfection. Greatly increased crit roll
-    (-4), but deal 1 damage to self upon missing (to a minimum of 50% HP).
-  effectSprite: {fileID: 21300000, guid: 33a6203d7c3a9244ba0e334f4fe0ac3a, type: 3}
+  effectID: holy
+  effectName: Oath of Piety
+  description: 'Damage In: -2. Move -1.'
+  effectSprite: {fileID: 21300000, guid: dba0c48d5a7e35f4bb87f2e8b57499d0, type: 3}

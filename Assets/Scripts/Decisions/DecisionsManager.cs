@@ -276,7 +276,7 @@ public class DecisionsManager : MonoBehaviour
         _inventoryScreen.SetActive(true);
         _charDetail.SetCharacter(character);
 
-        if (character.PendingStatPoints > 0)
+        if (character.PendingLevelUp)
         {
             _levelUpButton.gameObject.SetActive(true);
         }

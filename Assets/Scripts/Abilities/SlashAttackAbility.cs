@@ -32,9 +32,6 @@ public class SlashAttackAbility : WeaponAbilityData
         {
             activatedPawn.AttackPawn(targetPawn, this);
         }
-
-        activatedPawn.actionPoints -= apCost;
-        activatedPawn.Motivation -= motCost;
         
         BattleManager.Instance.PawnActivated(activatedPawn);
 

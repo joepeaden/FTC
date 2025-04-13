@@ -18,9 +18,6 @@ public class BasicAttackAbility : WeaponAbilityData
          
         activatedPawn.AttackPawn(targetPawn, this);
 
-        activatedPawn.actionPoints -= apCost;
-        activatedPawn.Motivation -= motCost;
-
         BattleManager.Instance.PawnActivated(activatedPawn);
 
         activatedPawn.SetSpriteFacing(targetPawn.transform.position);

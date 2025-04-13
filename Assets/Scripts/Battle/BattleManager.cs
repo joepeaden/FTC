@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Events;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
 
 /// <summary>
 /// Manages the Battle scene.
@@ -464,7 +465,6 @@ public class BattleManager : MonoBehaviour
         ShowTooltipForPawn();
     }
 
-
     public void HandleTileHoverEnd(Tile t)
     {
         HideHitChance();
@@ -548,7 +548,7 @@ public class BattleManager : MonoBehaviour
 
     public void SpawnTestGuys(bool friendly)
     {
-        int numToSpawn = friendly ? Random.Range(DEFAULT_MIN_AMOUNT_TO_SPAWN, DEFAULT_MAX_AMOUNT_TO_SPAWN) : 1;
+        int numToSpawn = friendly ? Random.Range(DEFAULT_MIN_AMOUNT_TO_SPAWN, DEFAULT_MAX_AMOUNT_TO_SPAWN) : 3;
 
         for (int i = 0; i < numToSpawn; i++)
         {
@@ -566,6 +566,20 @@ public class BattleManager : MonoBehaviour
                 }
 
                 guy.Abilities.Add(new WildAbandon());
+                
+                int roll = Random.Range(0, 6);
+                switch (roll)
+                {
+                case 0:
+                    guy.Passives.Add(DataLoader.passives["courage"]);
+                    break;
+                case 1:
+                    guy.Passives.Add(DataLoader.passives["perfect"]);
+                    break;
+                case 2:
+                    guy.Passives.Add(DataLoader.passives["tank"]);
+                    break;
+                }
             }
 
             newPawn.SetCharacter(guy);
@@ -657,7 +671,8 @@ public class BattleManager : MonoBehaviour
     {
         // return pooled objects to the object pool parent so they
         // aren't destroyed
-        for (int i = 0; i < _initStackParent.childCount; i++)
+        int previewCount = _initStackParent.childCount;
+        for (int i = previewCount-1; i >= 0; i--)
         {
             Transform p = _initStackParent.GetChild(i);
             p.transform.SetParent(GameManager.Instance.transform);

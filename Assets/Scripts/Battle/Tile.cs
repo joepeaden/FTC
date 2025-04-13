@@ -268,9 +268,30 @@ public class Tile : MonoBehaviour
 
         int pawnMoveRange = _pawn.MoveRange;
         List<Tile> tilesInRange = new();
-        foreach (Tile t in _adjacentTiles)
+        Point p = new();
+        Tile t;
+        // start at x - range because we want to be able to move backwards. 
+        // Go to x + range because we want to be able to move forwards. Same for Y.
+        for (int x = Coordinates.X - pawnMoveRange; x <= pawnMoveRange + Coordinates.X; x++)
         {
-            t.GetTilesInMoveRangeRecursive(_pawn, pawnMoveRange, tilesInRange);
+            p.X = x;
+            for (int y = Coordinates.Y - pawnMoveRange; y <= pawnMoveRange + Coordinates.Y; y++)
+            {
+                p.Y = y;
+                
+                // don't go outside of grid
+                if  (!GridGenerator.Instance.Tiles.ContainsKey(p))
+                {
+                    continue;
+                }
+
+                t = GridGenerator.Instance.Tiles[p];
+
+                if (t.IsInRangeOf(this, pawnMoveRange) && t.IsTraversableByThisPawn(_pawn))
+                {
+                    tilesInRange.Add(t);
+                }
+            }
         }
         
         return tilesInRange;
@@ -280,29 +301,6 @@ public class Tile : MonoBehaviour
     {
         // Does it contain pawns or impassable tiles?
         return !IsImpassable && (_pawn == null || _pawn != null && traveller.OnPlayerTeam == _pawn.OnPlayerTeam);
-    }
-
-    private List<Tile> GetTilesInMoveRangeRecursive(Pawn traveller, int pawnMoveRange, List<Tile> tilesInRange)
-    {
-        if (pawnMoveRange > 0 && IsTraversableByThisPawn(traveller))
-        {
-            pawnMoveRange--;
-
-            if (!_isSelected && !tilesInRange.Contains(this))
-            {
-                tilesInRange.Add(this);
-            }
-
-            foreach (Tile t in _adjacentTiles)
-            {
-                if (!tilesInRange.Contains(t) && !t._isSelected)
-                {
-                    t.GetTilesInMoveRangeRecursive(traveller, pawnMoveRange, tilesInRange);
-                }
-            }
-        }
-
-        return tilesInRange;
     }
 
     public void HighlightTileAsActive()
@@ -373,7 +371,7 @@ public class Tile : MonoBehaviour
 
     public void HighlightTilesInRangeRecursive(Pawn subjectPawn, int range, bool isHighlighting, TileHighlightType highlightType)
     {
-        if (range > 0 && !IsImpassable &&
+        if (range > 0 && IsTraversableByThisPawn(_pawn) &&
             (_pawn == null ||
             (subjectPawn.OnPlayerTeam == _pawn.OnPlayerTeam && TileHighlightType.Move == highlightType ||
             TileHighlightType.Move != highlightType)))
@@ -397,13 +395,31 @@ public class Tile : MonoBehaviour
 
             foreach (Tile t in _adjacentTiles)
             {
-                t.HighlightTilesInRangeRecursive(subjectPawn, range, isHighlighting, highlightType);
+                if (!t._isSelected)
+                {
+                    t.HighlightTilesInRangeRecursive(subjectPawn, range, isHighlighting, highlightType);
+                }
             }
         }
         else
         {
             return;
         }
+    }
+
+    /// <summary>
+    /// Can this pawn traverse this tile?
+    /// </summary>
+    /// <param name="traversingPawn"></param>
+    /// <returns></returns>
+    public bool CanTraverse(Pawn traversingPawn)
+    {
+        if (_pawn != null)
+        {
+            return !IsImpassable && _pawn.OnPlayerTeam == traversingPawn.OnPlayerTeam;
+        }
+
+        return !IsImpassable;
     }
 
 
