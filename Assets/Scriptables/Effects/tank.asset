@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   effectID: tank
   effectName: Oath of Endurance
-  description: 'Damage In: -1. Move -1.'
+  description: 'Damage In: -1, and downgrade critical hits to normal hits. May only
+    attack once per turn.'
   effectSprite: {fileID: 21300000, guid: 570018e27fa24c34091ab0bbdcff209b, type: 3}

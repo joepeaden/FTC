@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 068988e82ac8d44a49d87f03a1dc82c2, type: 3}
-  m_Name: glasscannon
+  m_Name: warrior
   m_EditorClassIdentifier: 
-  effectID: glasscannon
-  effectName: Oath of Rage
-  description: 'Damage In: +1. Damage Out: +1.'
-  effectSprite: {fileID: 21300000, guid: e128b01dab70e7a498a78577123c2db0, type: 3}
+  effectID: warrior
+  effectName: Oath of Simplicity
+  description: 'Damage Out: +1. Crit Chance Requirement: +1'
+  effectSprite: {fileID: 21300000, guid: b915a7ee8a2712a43a9ed2e24541c454, type: 3}

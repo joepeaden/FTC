@@ -5,6 +5,7 @@ using Pathfinding;
 using System.Linq;
 using UnityEngine.Events;
 using Unity.VisualScripting;
+using UnityEditor.UI;
 
 public class Pawn : MonoBehaviour
 {
@@ -45,7 +46,8 @@ public class Pawn : MonoBehaviour
 
     public int actionPoints;
 
-    public bool hasMoved;
+    private bool _hasAttacked;
+    private bool _hasMoved;
 
     public int MaxMotivation => GameChar.GetBattleMotivationCap();
     public int Motivation;
@@ -63,6 +65,8 @@ public class Pawn : MonoBehaviour
     public float DodgeMod;
     public float HitMod;
     #endregion
+
+    public int freeAttacksRemaining;
 
     [SerializeField] AIPathCustom pathfinder;
 
@@ -140,27 +144,16 @@ public class Pawn : MonoBehaviour
 
         Motivation = GameChar.GetBattleMotivationCap();
         actionPoints = BASE_ACTION_POINTS;
-        hasMoved = false;
+        _hasMoved = false;
+        _hasAttacked = false;
 
         // set up listeners motivation conditions
         SetupMotConds();
-
-        int roll = Random.Range(0, 3);
-        switch (roll)
-        {
-            case 0:
-                GameChar.Passives.Add(DataLoader.passives["glasscannon"]);
-                break;
-            case 1:
-                GameChar.Passives.Add(DataLoader.passives["accurate"]);
-                break;
-            case 2:
-                GameChar.Passives.Add(DataLoader.passives["tank"]);
-                break;
-
-        }
         
-        UpdateEffect(GameChar.Passives[0].effectDisplay, true);
+        foreach (PassiveData p in GameChar.Passives)
+        {
+            UpdateEffect(p.effectDisplay, true);
+        }
     }
 
     private void SetupMotConds()
@@ -353,6 +346,29 @@ public class Pawn : MonoBehaviour
     // perhaps this stuff should all be moved to the AttackAbility classes...
     public void AttackPawn(Pawn targetPawn, WeaponAbilityData currentAction)
     {
+        if (GameChar.LimitedOneAttackPerTurn())
+        {
+            if (_hasAttacked)
+            {
+                return;
+            }
+            else
+            {
+                _hasAttacked = true;
+            }
+        }
+
+        if (freeAttacksRemaining > 0)
+        {
+            freeAttacksRemaining--;
+        }
+        else
+        {
+            actionPoints -= currentAction.apCost;
+        }
+        
+        Motivation -= currentAction.motCost;
+
         // if this pawn has a protector, try to hit that one instead
         if (targetPawn.ProtectingPawn != null)
         {
@@ -379,6 +395,7 @@ public class Pawn : MonoBehaviour
                 critRollMod += passive.critRollModifier;
             }
 
+            // Note - the defending pawn in TakeDamage can turn this crit false if they have abilities that do so.
             bool isCrit = false;
             if (hitRoll >= (GameChar.CritChance - currentAction.critChanceMod + critRollMod))
             {
@@ -408,6 +425,12 @@ public class Pawn : MonoBehaviour
             targetPawn.TriggerDodge();
             // BattleManager.Instance.AddTextNotification(transform.position, "Miss!");
             StartCoroutine(PlayAudioAfterDelay(0.1f, GameChar.TheWeapon.Data.missSound));
+
+            // if damage self upon miss and greater than half HP, damage self
+            if (GameChar.DamageSelfOnMiss() && HitPoints >= (GameChar.HitPoints/2) && (HitPoints-1) > 0)
+            {
+                TakeDamage(this, 1, false);
+            }
         }
     }
 
@@ -421,25 +444,21 @@ public class Pawn : MonoBehaviour
         _spriteController.TriggerDodge();
     }
 
-    public void TakeDamage(Pawn attackingPawn, WeaponAbilityData actionUsed, bool isCrit)
+    public void TakeDamage(Pawn attackingPawn, int attackDmg, bool isCrit)
     {
         int hitPointsDmg = 0;
         int armorDmg = 0;
-        GameCharacter attackingCharacter = attackingPawn.GameChar;
 
-        //if (actionUsed.rangeForExtraDamage > 0 && CurrentTile.GetTileDistance(attackingPawn.CurrentTile) == actionUsed.rangeForExtraDamage)
-        //{
-        //    // this could just become critical hits later perhaps.
-        //    extraDmgMult += actionUsed.extraDmgMultiplier;
-        //}
+        if (GameChar.ShouldDowngradeCrits())
+        {
+            isCrit = false;
+        }
 
         int dmgInMod = 0; 
         foreach(PassiveData passive in GameChar.Passives)
         {
             dmgInMod += passive.damageInModifier;
         }
-
-        int attackDmg = attackingCharacter.GetWeaponDamageForAction(actionUsed);
 
         bool armorHit = false;
         if (_armorPoints > 0)
@@ -513,6 +532,21 @@ public class Pawn : MonoBehaviour
         OnHit.Invoke();
 
         BattleManager.Instance.TriggerTextNotification(transform.position);
+    }
+
+    public void TakeDamage(Pawn attackingPawn, WeaponAbilityData actionUsed, bool isCrit)
+    {
+        GameCharacter attackingCharacter = attackingPawn.GameChar;
+
+        //if (actionUsed.rangeForExtraDamage > 0 && CurrentTile.GetTileDistance(attackingPawn.CurrentTile) == actionUsed.rangeForExtraDamage)
+        //{
+        //    // this could just become critical hits later perhaps.
+        //    extraDmgMult += actionUsed.extraDmgMultiplier;
+        //}
+
+        int attackDmg = attackingCharacter.GetWeaponDamageForAction(actionUsed);
+
+        TakeDamage(attackingPawn, attackDmg, isCrit);
     }
 
     private void Die()
@@ -611,8 +645,7 @@ public class Pawn : MonoBehaviour
 
     public bool HasMovesLeft()
     {
-        // costs 2 AP to move
-        return actionPoints >= 2;
+        return !_hasMoved && actionPoints > 0;
     }
 
     public void HandleActivation()
@@ -621,7 +654,10 @@ public class Pawn : MonoBehaviour
 
         _spriteController.HandleTurnBegin();
         actionPoints = BASE_ACTION_POINTS;
-        hasMoved = false;
+        _hasMoved = false;
+        _hasAttacked = false;
+        
+        UpdateFreeAttacksPassive();
 
         OnActivation.Invoke();
     }
@@ -636,7 +672,8 @@ public class Pawn : MonoBehaviour
     /// <returns></returns>
     public void TryMoveToTile(Tile targetTile)
     {
-        if (!HasMovesLeft())
+        if (!HasMovesLeft()
+            || EngagedInCombat && !GameChar.CanDisengageFromCombat())
         {
             return;
         }
@@ -652,7 +689,7 @@ public class Pawn : MonoBehaviour
         // process things one tile at a time if implementing varying AP costs, etc. But not now.
         // if doing that later, make sure to update the pathfinder code too.
 
-        hasMoved = true;
+        _hasMoved = true;
         actionPoints -= 1;
 
         // use whole turn to get out of combat with someone
@@ -693,10 +730,23 @@ public class Pawn : MonoBehaviour
 
         OnMoved.Invoke();
 
+        UpdateFreeAttacksPassive();
+
         _isMoving = false;
 
         _audioSource.loop = false;
         _audioSource.Stop();
+    }
+
+    public void UpdateFreeAttacksPassive()
+    {
+        foreach (PassiveData p in GameChar.Passives)
+        {
+            if (p.freeAttacksPerEnemy)
+            {
+                freeAttacksRemaining = GetAdjacentEnemies().Count();
+            }
+        }
     }
 
     public void SetSpriteFacing(Vector3 targetPos)

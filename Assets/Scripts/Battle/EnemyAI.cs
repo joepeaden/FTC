@@ -127,7 +127,7 @@ public class EnemyAI : MonoBehaviour
                 {
                     Pawn pawnAtTile = potentialTargetTile.GetPawn();
                     // don't consider if someone's there
-                    if (pawnAtTile != null && !pawnAtTile.IsDead || potentialTargetTile.IsImpassable)
+                    if (pawnAtTile != null && !pawnAtTile.IsDead || !potentialTargetTile.CanTraverse(activePawn))
                     {
                         continue;
                     }

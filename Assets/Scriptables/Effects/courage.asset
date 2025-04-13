@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 068988e82ac8d44a49d87f03a1dc82c2, type: 3}
-  m_Name: accurate
+  m_Name: courage
   m_EditorClassIdentifier: 
-  effectID: perfect
-  effectName: Oath of Perfection
-  description: Swear an oath to strive for perfection. Greatly increased crit roll
-    (-4), but deal 1 damage to self upon missing (to a minimum of 50% HP).
-  effectSprite: {fileID: 21300000, guid: 33a6203d7c3a9244ba0e334f4fe0ac3a, type: 3}
+  effectID: courage
+  effectName: Oath of Courage
+  description: Not allowed to disengage from a living enemy. +1 free attack (AP only)
+    per adjacent enemy.
+  effectSprite: {fileID: 21300000, guid: 43358b703766fee4ebe64c7fbd583376, type: 3}

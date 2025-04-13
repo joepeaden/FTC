@@ -10,14 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 41c7530c5f4244cc8a770889a24a0e2a, type: 3}
-  m_Name: Accurate
+  m_Name: Holy
   m_EditorClassIdentifier: 
-  passiveID: accurate
-  displayName: Oath of Criticality
-  description: 'Swear an oath to strike for the heart in all things. Crit Roll: -2.
-    Damage Out: -1.'
-  effectDisplay: {fileID: 11400000, guid: d63247348fb7d4912b224f2c89c4aa35, type: 2}
-  damageOutModifier: -1
+  passiveID: holy
+  level: 3
+  displayName: Oath of Piety
+  description: Swear an oath to allow God to work through you. Chance for holy posession
+    each turn.
+  effectDisplay: {fileID: 11400000, guid: 140c2f8e3daa747e79d8c4b3f13cbc82, type: 2}
+  damageOutModifier: 0
   damageInModifier: 0
-  critRollModifier: -2
+  critRollModifier: 0
+  damageSelfOnMiss: 0
+  downgradesCrits: 0
   moveModifier: 0
+  noRetreat: 0
+  freeAttacksPerEnemy: 0
+  oneAttackPerTurn: 0

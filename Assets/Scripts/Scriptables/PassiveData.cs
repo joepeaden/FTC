@@ -5,6 +5,10 @@ using System.Collections.Generic;
 public class PassiveData : ScriptableObject
 {
     public string passiveID;
+    /// <summary>
+    /// Level at which the passive is available
+    /// </summary>
+    public int level;
 
     [Header("Display Info")]
     public string displayName;
@@ -15,7 +19,15 @@ public class PassiveData : ScriptableObject
     public int damageOutModifier;
     public int damageInModifier;
     public int critRollModifier;
+    public bool damageSelfOnMiss;
+    public bool downgradesCrits;
 
     [Header("Other Modifiers")]
     public int moveModifier;
+    public int possessionChanceRoll;
+
+    [Header("Behaviour Modifiers")]
+    public bool noRetreat;
+    public bool freeAttacksPerEnemy;
+    public bool oneAttackPerTurn;
 }

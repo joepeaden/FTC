@@ -30,7 +30,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 3f9b368f6a59e4158b31a26846087db3, type: 2}
   defaultArmorOptions:
   - {fileID: 0}
-  - {fileID: 11400000, guid: 0b431dce146d34dfab68902568ff9584, type: 2}
   abilityList: []
   shirt: {fileID: 21300000, guid: dd9116136e8cb408c92f464663fe2c9e, type: 3}
   eyesSE: {fileID: 21300000, guid: 3e2493cfa88614e389c508b1c4fc9055, type: 3}

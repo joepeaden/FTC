@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Collections;
 using UnityEngine;
 
 public class GameCharacter
@@ -88,8 +89,8 @@ public class GameCharacter
     private int _level;
     public int XP => _xp;
     private int _xp;
-    public int PendingStatPoints => _pendingStatPoints;
-    private int _pendingStatPoints = 8;
+    public bool PendingLevelUp => _pendingLevelUp;
+    private bool _pendingLevelUp = false;
 
     /// <summary>
     /// MotConds - short for motivation conditions. Oaths for example.
@@ -249,7 +250,7 @@ public class GameCharacter
                     // take a new oath if not at max.
                     if (_motConds.Count < _level)
                     {
-                        AddNewOath();
+                        // AddNewOath();
                     }
                 }
 
@@ -297,7 +298,7 @@ public class GameCharacter
     private void SetHonorable()
     {
         // _abilities.Add(new HonorProtect());
-        AddNewOath();
+        // AddNewOath();
     }
 
     private void AddNewOath()
@@ -347,13 +348,19 @@ public class GameCharacter
             return false;
         }
 
+        // for now, cap is level 3.
+        if (_level >= 3)
+        {
+            return false;
+        }
+
         _xp += xpToAdd;
 
         if (_xp >= _xpCaps[_level])
         {
             _xp -= _xpCaps[_level];
             _level++;
-            _pendingStatPoints++;
+            _pendingLevelUp = true;
 
             return true;
         }
@@ -361,9 +368,9 @@ public class GameCharacter
         return false;
     }
 
-    public void SpendStatPoint()
+    public void SpendLevelUp()
     {
-        _pendingStatPoints--;
+        _pendingLevelUp = false;
     }
 
     /// <summary>
@@ -490,4 +497,58 @@ public class GameCharacter
 
         return _moveRange + equipmentMoveMod + passiveMoveMod;
     }
+
+    #region Passives
+
+    public bool DamageSelfOnMiss()
+    {
+        foreach (PassiveData p in _passives)
+        {
+            if (p.damageSelfOnMiss)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public bool LimitedOneAttackPerTurn()
+    {
+        foreach (PassiveData p in _passives)
+        {
+            if (p.oneAttackPerTurn)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public bool ShouldDowngradeCrits()
+    {
+        foreach (PassiveData p in _passives)
+        {
+            if (p.downgradesCrits)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public bool CanDisengageFromCombat()
+    {
+        return _passives.Where(x => x.noRetreat).Count() == 0;
+    }
+
+    public bool HasFreeAttacksPerEnemy()
+    {
+        return _passives.Where(x => x.freeAttacksPerEnemy).Count() > 0;
+    }
+
+#endregion
+
 }

@@ -10,19 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 41c7530c5f4244cc8a770889a24a0e2a, type: 3}
-  m_Name: Tank
+  m_Name: Courage
   m_EditorClassIdentifier: 
-  passiveID: tank
+  passiveID: courage
   level: 1
-  displayName: Oath of Endurance
-  description: 'Swear an oath to endure punishment . Damage In: -1, and downgrade
-    critical hits to normal hits. May only attack once per turn.'
-  effectDisplay: {fileID: 11400000, guid: 850a1f1b6cb944fc2b21e76c86f6641f, type: 2}
+  displayName: Oath of Courage
+  description: Swear an oath to never step back from a challenge. Not allowed to
+    disengage from a living enemy. +1 free attack (AP only) per adjacent enemy.
+  effectDisplay: {fileID: 11400000, guid: e6e99da6f90824c10a6719da9aee8151, type: 2}
   damageOutModifier: 0
-  damageInModifier: -1
+  damageInModifier: 0
   critRollModifier: 0
-  downgradesCrits: 1
+  damageSelfOnMiss: 0
+  downgradesCrits: 0
   moveModifier: 0
-  noRetreat: 0
-  freeAttacksPerEnemy: 0
-  oneAttackPerTurn: 1
+  noRetreat: 1
+  freeAttacksPerEnemy: 1
+  oneAttackPerTurn: 0

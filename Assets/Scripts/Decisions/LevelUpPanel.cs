@@ -40,12 +40,25 @@ public class LevelUpPanel : MonoBehaviour
 
     private void OnEnable()
     {
-        //_detailPanel
-
         foreach (LevelUpCard card in _cards)
         {
-            Ability cardAbility = DataLoader.abilities.Values.ToList()[Random.Range(0, DataLoader.abilities.Count)];
-            card.SetData(cardAbility, this);
+            if (_detailPanel.CurrentCharacter.Level == 1)
+            {
+                List<PassiveData> lvl1Passives = DataLoader.passives.Values.Where(x => x.level == 1).ToList();
+                PassiveData cardPassive = lvl1Passives[Random.Range(0, lvl1Passives.Count)];
+                card.SetData(cardPassive, this);
+            }
+            else if (_detailPanel.CurrentCharacter.Level == 2)
+            {
+                Ability cardAbility = DataLoader.abilities.Values.ToList()[Random.Range(0, DataLoader.abilities.Count)];
+                card.SetData(cardAbility, this);
+            }
+            else if (_detailPanel.CurrentCharacter.Level == 3)
+            {
+                List<PassiveData> lvl3Passives = DataLoader.passives.Values.Where(x => x.level == 3).ToList();
+                PassiveData cardPassive = lvl3Passives[Random.Range(0, lvl3Passives.Count)];
+                card.SetData(cardPassive, this);
+            }
         }
 
         //CheckStatCapOrPointsSpent();
@@ -58,7 +71,7 @@ public class LevelUpPanel : MonoBehaviour
     {
         _detailPanel.CurrentCharacter.ChangeAccRating(-1);
         _accLevelUpText.text = _detailPanel.CurrentCharacter.AccRating + "+";
-        _detailPanel.CurrentCharacter.SpendStatPoint();
+        _detailPanel.CurrentCharacter.SpendLevelUp();
 
         CheckStatCapOrPointsSpent();
     }
@@ -67,7 +80,7 @@ public class LevelUpPanel : MonoBehaviour
     {
         _detailPanel.CurrentCharacter.ChangeHP(1);
         _hpLevelUpStatBar.SetBar(_detailPanel.CurrentCharacter.HitPoints);
-        _detailPanel.CurrentCharacter.SpendStatPoint();
+        _detailPanel.CurrentCharacter.SpendLevelUp();
 
         CheckStatCapOrPointsSpent();
     }
@@ -75,18 +88,27 @@ public class LevelUpPanel : MonoBehaviour
     private void CheckStatCapOrPointsSpent()
     {
         bool hpAtMaxVal = _detailPanel.CurrentCharacter.HitPoints >= 8;
-        bool charHasStatPoints = _detailPanel.CurrentCharacter.PendingStatPoints > 0;
 
-        _increaseAccRating.gameObject.SetActive(charHasStatPoints);
-        _increaseHP.gameObject.SetActive(!hpAtMaxVal && charHasStatPoints);
+        _increaseAccRating.gameObject.SetActive(_detailPanel.CurrentCharacter.PendingLevelUp);
+        _increaseHP.gameObject.SetActive(!hpAtMaxVal && _detailPanel.CurrentCharacter.PendingLevelUp);
 
-        _statPoints.text = "Stat Points: " + _detailPanel.CurrentCharacter.PendingStatPoints;
+        _statPoints.text = "Stat Points: " + _detailPanel.CurrentCharacter.PendingLevelUp;
 
     }
 
-    public void HandleLvlUpCardSelected(Ability a)
+    public void HandleLvlUpCardSelected(LevelUpCard card)
     {
-        _detailPanel.CurrentCharacter.Abilities.Add(a);
+        if (card.ability != null)
+        {
+            _detailPanel.CurrentCharacter.Abilities.Add(card.ability);
+        }
+        else if (card.passive != null)
+        {
+            _detailPanel.CurrentCharacter.Passives.Add(card.passive);
+        }
+
+        _detailPanel.CurrentCharacter.SpendLevelUp();
+
         ApplyChanges();
     }
 

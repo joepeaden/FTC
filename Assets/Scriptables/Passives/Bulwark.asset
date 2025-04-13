@@ -10,14 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 41c7530c5f4244cc8a770889a24a0e2a, type: 3}
-  m_Name: GlassCannon
+  m_Name: Bulwark
   m_EditorClassIdentifier: 
-  passiveID: glasscannon
-  displayName: Oath of Rage
-  description: 'Swear an oath to destroy without regard for your own life. Damage
-    In: +1. Damage Out: +1.'
-  effectDisplay: {fileID: 11400000, guid: 67289e8752e1e4165ae57eda06bb6c23, type: 2}
-  damageOutModifier: 1
-  damageInModifier: 1
-  critRollModifier: 0
+  passiveID: bulwark
+  level: 3
+  displayName: Oath of the Bulwark
+  description: Swear to defend your fellows against all danger. -1 Damage Taken.
+    +2 Crit Roll Requirement.
+  effectDisplay: {fileID: 11400000, guid: ea69cea1f4ddf4703868aaf9163e8a12, type: 2}
+  damageOutModifier: 0
+  damageInModifier: -1
+  critRollModifier: 2
   moveModifier: 0
