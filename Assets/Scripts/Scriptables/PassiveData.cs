@@ -19,15 +19,18 @@ public class PassiveData : ScriptableObject
     public int damageOutModifier;
     public int damageInModifier;
     public int critRollModifier;
+    public int hitRollModifier;
     public bool damageSelfOnMiss;
     public bool downgradesCrits;
 
     [Header("Other Modifiers")]
     public int moveModifier;
-    public int possessionChanceRoll;
+    public int possessionChanceRoll = -1;
+    public int selfHealPerTurn;
 
     [Header("Behaviour Modifiers")]
     public bool noRetreat;
     public bool freeAttacksPerEnemy;
     public bool oneAttackPerTurn;
+    public bool obsorbDmgFromAdjacentAlly;
 }

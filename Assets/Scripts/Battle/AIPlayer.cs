@@ -4,31 +4,31 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class EnemyAI : MonoBehaviour
+public class AIPlayer : MonoBehaviour
 {
-    private List<Pawn> _pawns = new();
+    private List<Pawn> _enemyPawns = new();
 
     public void RegisterPawn(Pawn p)
     {
-        _pawns.Add(p);
+        _enemyPawns.Add(p);
     }
 
-    public List<Pawn> GetLivingPawns()
+    public List<Pawn> GetEnemyLivingPawns()
     {
         // OPTIMIZE: could just update the list when a pawn dies, not iterate
         // whole list every time
-        List<Pawn> pawnsToUse = new();
-        foreach (Pawn p in _pawns)
+        List<Pawn> enemyLivingPawns = new();
+        foreach (Pawn p in _enemyPawns)
         {
             if (p.IsDead)
             {
                 continue;
             }
 
-            pawnsToUse.Add(p);
+            enemyLivingPawns.Add(p);
         }
 
-        return pawnsToUse;
+        return enemyLivingPawns;
     }
 
     public void DoTurn(Pawn p)
@@ -111,10 +111,10 @@ public class EnemyAI : MonoBehaviour
 
 
 
-            // Get closest player pawn adjacent tile
+            List <Pawn> pawnsToTarget = activePawn.OnPlayerTeam ? _enemyPawns : BattleManager.Instance.PlayerPawns;
 
             List<Tile> potentialTargetTiles = new();
-            foreach (Pawn targetPawn in BattleManager.Instance.PlayerPawns)
+            foreach (Pawn targetPawn in pawnsToTarget)
             {
                 // don't circle around dead pawns forever (don't be fucking creepy)
                 if (targetPawn.IsDead)
@@ -161,7 +161,7 @@ public class EnemyAI : MonoBehaviour
         foreach (Tile t in activePawn.CurrentTile.GetAdjacentTiles())
         {
             targetPawn = t.GetPawn();
-            if (targetPawn != null && targetPawn.OnPlayerTeam)
+            if (targetPawn != null && targetPawn.OnPlayerTeam != activePawn.OnPlayerTeam)
             {
                 break;
             }

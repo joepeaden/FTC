@@ -4915,6 +4915,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 78ca02cd9ffa44ef38a957f5115cc867, type: 2}
   - {fileID: 11400000, guid: 71b52fbc9bdf34acda204a6cb64dc1d2, type: 2}
   - {fileID: 11400000, guid: 31f65f6bc6c324ccba0d3a2b5fddafd1, type: 2}
+  - {fileID: 11400000, guid: 60828ccceda0d409f8fdd4af06ef6c4c, type: 2}
   _charDetail: {fileID: 242677605}
   _disableCharPanelButton: {fileID: 1489040144}
   _levelUpButton: {fileID: 475451518}

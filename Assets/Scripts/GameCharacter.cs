@@ -280,14 +280,14 @@ public class GameCharacter
         _charMotivation = 0;
     }
 
-    public void ChangeAccRating(int change)
+    public void AddAcc(int change)
     {
         _accRating += change;
     }
 
-    public void ChangeHP(int change)
+    public void ChangeHP(int newValue)
     {
-        _hitPoints += change;
+        _hitPoints = newValue;
     }
 
     public int GetXPToLevel()
@@ -483,6 +483,17 @@ public class GameCharacter
         return oldItem;
     }
 
+    public int GetHitRollChance()
+    {        
+        int hitRollMod = 0;
+        foreach (PassiveData p in _passives)
+        {
+            hitRollMod += p.hitRollModifier;
+        }
+
+        return AccRating + hitRollMod;
+    }
+
     public int GetMoveRange()
     {
         // equipment move modifier
@@ -499,6 +510,30 @@ public class GameCharacter
     }
 
     #region Passives
+
+    public bool RollPosessed()
+    {
+        int totalPosessionChanceRoll = -1;
+        foreach (PassiveData p in _passives)
+        {
+            if (p.possessionChanceRoll > 0)
+            {
+                totalPosessionChanceRoll += p.possessionChanceRoll;
+            }
+        }
+
+        if (totalPosessionChanceRoll < 0)
+        {
+            return false;
+        }
+
+        if (Random.Range(0, 13) > totalPosessionChanceRoll)
+        {
+            return true;
+        }
+
+        return false;
+    }
 
     public bool DamageSelfOnMiss()
     {
@@ -544,9 +579,25 @@ public class GameCharacter
         return _passives.Where(x => x.noRetreat).Count() == 0;
     }
 
+    public int GetHealPerTurn()
+    {
+        int healPerTurn = 0;
+        foreach (PassiveData p in _passives)
+        {
+            healPerTurn += p.selfHealPerTurn;
+        }
+
+        return healPerTurn;
+    }
+
     public bool HasFreeAttacksPerEnemy()
     {
         return _passives.Where(x => x.freeAttacksPerEnemy).Count() > 0;
+    }
+
+    public bool ObsorbsAdjacentAllyDamage()
+    {
+        return _passives.Where(x => x.obsorbDmgFromAdjacentAlly).Count() > 0;
     }
 
 #endregion

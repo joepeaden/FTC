@@ -15,7 +15,7 @@ public class Pawn : MonoBehaviour
     public const int MOTIVATED_MOT_REGAIN_BUFF = 15;
 
     public UnityEvent OnMoved = new();
-    public UnityEvent OnHit = new();
+    public UnityEvent OnHPChanged = new();
     /// <summary>
     /// very specific here. lol. This is for the associated oath.
     /// </summary>
@@ -87,6 +87,8 @@ public class Pawn : MonoBehaviour
 
     public GameCharacter.CharMotivators CurrentMotivator => _gameChar.Motivator;
 
+    public bool IsPossessed;
+
     private bool _isMoving;
     private Vector3 _lastPosition;
 
@@ -94,6 +96,8 @@ public class Pawn : MonoBehaviour
     // is the reference for that guy. This is set by the HonorProtect class when
     // the ability is used.
     public Pawn ProtectingPawn { get; set; }
+
+    public bool InDefensiveStance = false;
 
     [Header("Audio")]
     [SerializeField] private AudioClip _movingSound;
@@ -303,12 +307,14 @@ public class Pawn : MonoBehaviour
         // all the hit mods don't work currently - need to be updated to d12
         //float abilityHitMod = HitMod - targetPawn.DodgeMod;
 
-        int toHit = GameChar.AccRating - surroundHitMod; // + abilityHitMod + GameChar.TheWeapon.Data.baseAccMod + (Ability.SelectedAbility != null ? Ability.SelectedAbility.hitMod : 0);
+        int toHit = GameChar.GetHitRollChance() - surroundHitMod; // + abilityHitMod + GameChar.TheWeapon.Data.baseAccMod + (Ability.SelectedAbility != null ? Ability.SelectedAbility.hitMod : 0);
 
-        // don't allow guaranteed hit here
-        if (toHit >= 12)
+
+
+        // don't allow guaranteed hit here (minimum of 2+)
+        if (toHit < 2)
         {
-            toHit = 11;
+            toHit = 2;
         }
 
         return toHit;
@@ -340,6 +346,7 @@ public class Pawn : MonoBehaviour
 
     public void HandleTurnEnded()
     {
+        IsPossessed = false;
         _spriteController.HandleTurnEnd();
     }
 
@@ -376,7 +383,7 @@ public class Pawn : MonoBehaviour
         }
 
         int toHit = GetRollToHit(targetPawn);
-        int hitRoll = Random.Range(1, 12);
+        int hitRoll = Random.Range(1, 13);
 
         BattleLogUI.Instance.AddLogEntry($"{GameChar.CharName} uses {currentAction.abilityName} against {targetPawn.GameChar.CharName}!");
         BattleLogUI.Instance.AddLogEntry($"Needs: {toHit}, Rolled: {hitRoll}");
@@ -460,6 +467,18 @@ public class Pawn : MonoBehaviour
             dmgInMod += passive.damageInModifier;
         }
 
+        // if this guy obsorbs damage, can't benifit from an ally obsorbing damage (I just don't feel like fixing endless loop of getting adjacents when TakeDamage is called.)
+        if (!GameChar.ObsorbsAdjacentAllyDamage())
+        {
+            // if there's an ally adjacent that can obsorb damage, reduce damage by 1.
+            List<Pawn> adjacentDmgObsorbers = GetAdjacentPawns().Where(x => x.OnPlayerTeam == _onPlayerTeam && x.GameChar.ObsorbsAdjacentAllyDamage()).ToList();
+            if (adjacentDmgObsorbers.Count() > 0)
+            {
+                adjacentDmgObsorbers[0].TakeDamage(attackingPawn, 1, isCrit);
+                attackDmg -= 1;
+            }
+        }
+
         bool armorHit = false;
         if (_armorPoints > 0)
         {
@@ -529,7 +548,7 @@ public class Pawn : MonoBehaviour
 
         _spriteController.HandleHit(_isDead, armorHit, armorHit && _armorPoints <= 0);
 
-        OnHit.Invoke();
+        OnHPChanged.Invoke();
 
         BattleManager.Instance.TriggerTextNotification(transform.position);
     }
@@ -656,10 +675,28 @@ public class Pawn : MonoBehaviour
         actionPoints = BASE_ACTION_POINTS;
         _hasMoved = false;
         _hasAttacked = false;
-        
+
+        if (_hitPoints < GameChar.HitPoints)
+        {
+            // self heal
+            int healAmount = GameChar.GetHealPerTurn();
+            if (healAmount > 0)
+            {
+                Heal(healAmount);
+            }
+        }
+
         UpdateFreeAttacksPassive();
 
         OnActivation.Invoke();
+    }
+
+    public void Heal(int healAmount)
+    {
+        _hitPoints += healAmount;
+        BattleManager.Instance.AddPendingTextNotification(healAmount.ToString(), Color.green);
+        BattleManager.Instance.TriggerTextNotification(transform.position);
+        OnHPChanged.Invoke();
     }
 
     #region Movement

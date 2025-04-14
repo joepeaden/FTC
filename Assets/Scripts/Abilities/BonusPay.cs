@@ -25,7 +25,7 @@ public class BonusPay : SupportAbilityData
         // on new activation, will want to check duration to see if end effect
         _activatedPawn.OnActivation.AddListener(HandleNewActivationForPawn);
         // ded. remove effect.
-        _activatedPawn.OnHit.AddListener(HandleDeath);
+        _activatedPawn.OnHPChanged.AddListener(HandleDeath);
 
         // tell battle manager we acted
         BattleManager.Instance.PawnActivated(_activatedPawn);
@@ -74,7 +74,7 @@ public class BonusPay : SupportAbilityData
         _targetPawn.UpdateEffect(statusEffect, false);
 
         _activatedPawn.OnActivation.RemoveListener(HandleNewActivationForPawn);
-        _activatedPawn.OnHit.RemoveListener(HandleDeath);
+        _activatedPawn.OnHPChanged.RemoveListener(HandleDeath);
 
         _activatedPawn.DodgeMod = 0;
         _activatedPawn.HitMod = 0;

@@ -19,6 +19,15 @@ MonoBehaviour:
     +2 Crit Roll Requirement.
   effectDisplay: {fileID: 11400000, guid: ea69cea1f4ddf4703868aaf9163e8a12, type: 2}
   damageOutModifier: 0
-  damageInModifier: -1
-  critRollModifier: 2
-  moveModifier: 0
+  damageInModifier: 0
+  critRollModifier: 0
+  hitRollModifier: 0
+  damageSelfOnMiss: 0
+  downgradesCrits: 0
+  moveModifier: -1
+  possessionChanceRoll: -1
+  selfHealPerTurn: 1
+  noRetreat: 0
+  freeAttacksPerEnemy: 0
+  oneAttackPerTurn: 0
+  obsorbDmgFromAdjacentAlly: 1

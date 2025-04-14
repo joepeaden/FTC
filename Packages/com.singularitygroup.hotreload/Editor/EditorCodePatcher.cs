@@ -72,7 +72,11 @@ namespace SingularityGroup.HotReload.Editor {
             return !UnityFieldHelper.IsFieldHidden(__instance.ParentType, __instance.Name);
         }
         internal static MethodInfo OdinPropertyDrawPrefixInfo = typeof(EditorCodePatcher).GetMethod("DrawPrefix", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
+        #if UNITY_2021_1_OR_NEWER
         internal static MethodInfo OdinPropertyDrawInfo = typeof(Sirenix.OdinInspector.Editor.InspectorProperty)?.GetMethod("Draw", 0, BindingFlags.Instance | BindingFlags.Public, null, new Type[]{}, null);
+        #else
+        internal static MethodInfo OdinPropertyDrawInfo = typeof(Sirenix.OdinInspector.Editor.InspectorProperty)?.GetMethod("Draw", BindingFlags.Instance | BindingFlags.Public, null, new Type[]{}, null);
+        #endif
         internal static MethodInfo DrawOdinInspectorInfo = typeof(Sirenix.OdinInspector.Editor.OdinEditor)?.GetMethod("DrawOdinInspector", BindingFlags.NonPublic | BindingFlags.Instance);
         #else
         internal static MethodInfo OdinPropertyDrawPrefixInfo = null;
@@ -145,7 +149,7 @@ namespace SingularityGroup.HotReload.Editor {
             DetectEditorStart();
             DetectVersionUpdate();
             RecordActiveDaysForRateApp();
-            CodePatcher.I.fieldHandler = new FieldHandler(FieldDrawerUtil.StoreField, UnityFieldHelper.HideField);
+            CodePatcher.I.fieldHandler = new FieldHandler(FieldDrawerUtil.StoreField, UnityFieldHelper.HideField, UnityFieldHelper.RegisterInspectorFieldAttributes);
             if (EditorApplication.isPlayingOrWillChangePlaymode) {
                 CodePatcher.I.InitPatchesBlocked(patchesFilePath);
                 HotReloadTimelineHelper.InitPersistedEvents();
@@ -713,6 +717,7 @@ namespace SingularityGroup.HotReload.Editor {
             
             var allFields = (patchResult?.addedFields.Select(f => GetExtendedFieldName(f)) ?? Array.Empty<string>())
                             .Concat(response.alteredFields?.Select(f => GetExtendedFieldName(f)).Distinct(StringComparer.OrdinalIgnoreCase) ?? Array.Empty<string>())
+                            .Concat(response.patches?.SelectMany(p => p?.propertyAttributesFieldUpdated ?? Array.Empty<SField>()).Select(f => GetExtendedFieldName(f)).Distinct(StringComparer.OrdinalIgnoreCase) ?? Array.Empty<string>())
                             .Distinct(StringComparer.OrdinalIgnoreCase);
             
             var patchedMembersDisplayNames = allMethods.Concat(allFields).ToArray();
@@ -1157,6 +1162,7 @@ namespace SingularityGroup.HotReload.Editor {
                     FieldDrawerUtil.DrawFromObject(editor.target);
                     if (repaintVisualTree) {
                         HideChildren(container, serializedObject);
+                        ResetInvalidatedInspectorFields(container, serializedObject);
                         // Mark dirty to repaint the visual tree
                         container.MarkDirtyRepaint();
                         repaintVisualTree = false;
@@ -1189,6 +1195,56 @@ namespace SingularityGroup.HotReload.Editor {
                 container.Remove(child);
             }
             childrenToRemove.Clear();
+        }
+        
+        static void ResetInvalidatedInspectorFields(VisualElement container, SerializedObject serializedObject) {
+            if (container == null || serializedObject == null) {
+                return;
+            } 
+            foreach (var child in container.Children()) {
+                if (!(child is PropertyField propertyField)) {
+                    continue;
+                }
+                try {
+                    var prop = serializedObject.FindProperty(propertyField.bindingPath);
+                    if (prop != null && serializedObject.targetObject && UnityFieldHelper.HasFieldInspectorCacheInvalidation(serializedObject.targetObject.GetType(), prop.name ?? "")) {
+                        child.GetType().GetMethod("Reset", BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { typeof(SerializedProperty) }, null)?.Invoke(child, new object[] { prop });
+                    }
+                } catch (NullReferenceException) {
+                    // serializedObject.targetObject throws nullref in cases where e.g. exising playmode
+                }
+            }
+        }
+        
+        internal static bool GetHandlerPrefix(
+            SerializedProperty property,
+            ref object __result
+        ) {
+            if (property == null || property.serializedObject == null || !property.serializedObject.targetObject) {
+                // do nothing
+                return true;
+            }
+            if (UnityFieldHelper.TryInvalidateFieldInspectorCache(property.serializedObject.targetObject.GetType(), property.name)) {
+                __result = null;
+                return false;
+            }
+            return true;
+        }
+
+        internal static bool GetFieldAttributesPrefix(
+            FieldInfo field,
+            ref List<PropertyAttribute> __result
+        ) {
+            if (field == null) {
+                // do nothing
+                return true;
+            }
+            List<PropertyAttribute> result;
+            if (UnityFieldHelper.TryGetInspectorFieldAttributes(field, out result)) {
+                __result = result;
+                return false;
+            }
+            return true;
         }
 
         internal static bool PropertyFieldPrefix(

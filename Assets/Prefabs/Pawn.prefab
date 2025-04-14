@@ -756,12 +756,11 @@ MonoBehaviour:
       m_Calls: []
   baseDodgeChance: 0
   baseSurroundBonus: 0.2
-  ActionPoints: 0
+  actionPoints: 0
   Motivation: 0
-  OutDamageMult: 0
-  InDamageMult: 0
   DodgeMod: 0
   HitMod: 0
+  freeAttacksRemaining: 0
   pathfinder: {fileID: 7279780515540898986}
   hitSound: {fileID: 8300000, guid: 26e178cc91d704d69b9c8f5c90d8e061, type: 3}
   armorHitSound: {fileID: 8300000, guid: f442ae3543bf8cd4b89b4085ed9f7917, type: 3}

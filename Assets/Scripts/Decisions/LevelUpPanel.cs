@@ -69,7 +69,7 @@ public class LevelUpPanel : MonoBehaviour
 
     private void ImproveAccRating()
     {
-        _detailPanel.CurrentCharacter.ChangeAccRating(-1);
+        _detailPanel.CurrentCharacter.AddAcc(-1);
         _accLevelUpText.text = _detailPanel.CurrentCharacter.AccRating + "+";
         _detailPanel.CurrentCharacter.SpendLevelUp();
 
@@ -78,7 +78,7 @@ public class LevelUpPanel : MonoBehaviour
 
     private void ImproveHP()
     {
-        _detailPanel.CurrentCharacter.ChangeHP(1);
+        _detailPanel.CurrentCharacter.ChangeHP(_detailPanel.CurrentCharacter.HitPoints+1);
         _hpLevelUpStatBar.SetBar(_detailPanel.CurrentCharacter.HitPoints);
         _detailPanel.CurrentCharacter.SpendLevelUp();
 

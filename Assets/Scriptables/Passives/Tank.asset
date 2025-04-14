@@ -21,8 +21,13 @@ MonoBehaviour:
   damageOutModifier: 0
   damageInModifier: -1
   critRollModifier: 0
+  hitRollModifier: 0
+  damageSelfOnMiss: 0
   downgradesCrits: 1
   moveModifier: 0
+  possessionChanceRoll: -1
+  selfHealPerTurn: 0
   noRetreat: 0
   freeAttacksPerEnemy: 0
   oneAttackPerTurn: 1
+  obsorbDmgFromAdjacentAlly: 0

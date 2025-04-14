@@ -126,6 +126,8 @@ namespace SingularityGroup.HotReload.JsonConverters {
                 SField[] deletedFields = null;
                 SField[] renamedFieldsFrom = null;
                 SField[] renamedFieldsTo = null;
+                SField[] propertyAttributesFieldOriginal = null;
+                SField[] propertyAttributesFieldUpdated = null;
 
                 while (reader.Read()) {
                     if (reader.TokenType == JsonToken.EndObject) {
@@ -183,6 +185,14 @@ namespace SingularityGroup.HotReload.JsonConverters {
                         case nameof(CodePatch.renamedFieldsTo):
                             renamedFieldsTo = ReadSFields(reader);
                             break;
+                        
+                        case nameof(CodePatch.propertyAttributesFieldOriginal):
+                            propertyAttributesFieldOriginal = ReadSFields(reader);
+                            break;
+                        
+                        case nameof(CodePatch.propertyAttributesFieldUpdated):
+                            propertyAttributesFieldUpdated = ReadSFields(reader);
+                            break;
 
                         default:
                             reader.Skip(); // Skip unknown properties
@@ -202,7 +212,9 @@ namespace SingularityGroup.HotReload.JsonConverters {
                     newFields: newFields ?? Array.Empty<SField>(),
                     deletedFields: deletedFields ?? Array.Empty<SField>(),
                     renamedFieldsFrom: renamedFieldsFrom ?? Array.Empty<SField>(),
-                    renamedFieldsTo: renamedFieldsTo ?? Array.Empty<SField>()
+                    renamedFieldsTo: renamedFieldsTo ?? Array.Empty<SField>(),
+                    propertyAttributesFieldOriginal: propertyAttributesFieldOriginal ?? Array.Empty<SField>(),
+                    propertyAttributesFieldUpdated: propertyAttributesFieldUpdated ?? Array.Empty<SField>()
                 ));
             }
 
@@ -552,6 +564,24 @@ namespace SingularityGroup.HotReload.JsonConverters {
                             writer.WritePropertyName(nameof(responsePatch.renamedFieldsTo));
                             writer.WriteStartArray();
                             foreach (var removedFieldTo in responsePatch.renamedFieldsTo) {
+                                WriteSField(writer, removedFieldTo);
+                            }
+                            writer.WriteEndArray();
+                        }
+                        
+                        if (responsePatch.propertyAttributesFieldOriginal != null) {
+                            writer.WritePropertyName(nameof(responsePatch.propertyAttributesFieldOriginal));
+                            writer.WriteStartArray();
+                            foreach (var removedFieldFrom in responsePatch.propertyAttributesFieldOriginal) {
+                                WriteSField(writer, removedFieldFrom);
+                            }
+                            writer.WriteEndArray();
+                        }
+                        
+                        if (responsePatch.propertyAttributesFieldUpdated != null) {
+                            writer.WritePropertyName(nameof(responsePatch.propertyAttributesFieldUpdated));
+                            writer.WriteStartArray();
+                            foreach (var removedFieldTo in responsePatch.propertyAttributesFieldUpdated) {
                                 WriteSField(writer, removedFieldTo);
                             }
                             writer.WriteEndArray();

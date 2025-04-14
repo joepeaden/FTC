@@ -15,15 +15,19 @@ MonoBehaviour:
   passiveID: holy
   level: 3
   displayName: Oath of Piety
-  description: Swear an oath to allow God to work through you. Chance for holy posession
-    each turn.
+  description: Swear an oath to allow God to work through you. Gain +2 damage, but
+    with a chance for holy posession each turn.
   effectDisplay: {fileID: 11400000, guid: 140c2f8e3daa747e79d8c4b3f13cbc82, type: 2}
-  damageOutModifier: 0
+  damageOutModifier: 2
   damageInModifier: 0
   critRollModifier: 0
+  hitRollModifier: 0
   damageSelfOnMiss: 0
   downgradesCrits: 0
   moveModifier: 0
+  possessionChanceRoll: 8
+  selfHealPerTurn: 0
   noRetreat: 0
   freeAttacksPerEnemy: 0
   oneAttackPerTurn: 0
+  obsorbDmgFromAdjacentAlly: 0

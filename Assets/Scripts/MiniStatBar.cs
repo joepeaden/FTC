@@ -42,7 +42,7 @@ public class MiniStatBar : MonoBehaviour
 
     private void OnDestroy()
     {
-        _pawn.OnHit.RemoveListener(UpdateBars);
+        _pawn.OnHPChanged.RemoveListener(UpdateBars);
         _pawn.OnEffectUpdate.RemoveListener(UpdateEffects);
     }
 
@@ -91,7 +91,7 @@ public class MiniStatBar : MonoBehaviour
 
         UpdateEffects(p.CurrentEffects);
 
-        p.OnHit.AddListener(UpdateBars);
+        p.OnHPChanged.AddListener(UpdateBars);
         p.OnEffectUpdate.AddListener(UpdateEffects);
     }
 

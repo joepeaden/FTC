@@ -12557,7 +12557,7 @@ MonoBehaviour:
   turnUI: {fileID: 1859024282}
   winLoseText: {fileID: 199997959}
   winLoseUI: {fileID: 271587606}
-  _enemyAI: {fileID: 756036164}
+  _aiPlayer: {fileID: 756036164}
   gameOverButton: {fileID: 1287323307}
   _selectionManager: {fileID: 756036161}
   pawnPrefab: {fileID: 7800610792907338965, guid: 8b7e6c0d0f7aa40e88f3125d19d33bf9, type: 3}
@@ -12609,6 +12609,7 @@ MonoBehaviour:
   sword: {fileID: 11400000, guid: 025279ef39ee34138ad771576ee830f3, type: 2}
   axe: {fileID: 11400000, guid: 3f9b368f6a59e4158b31a26846087db3, type: 2}
   spear: {fileID: 11400000, guid: edc95d4d67c154e75a73c0b5d49afce6, type: 2}
+  bigSword: {fileID: 11400000, guid: 60828ccceda0d409f8fdd4af06ef6c4c, type: 2}
   _levelUpSound: {fileID: 8300000, guid: 7efb69b5941154aaf82a7a816546399d, type: 3}
 --- !u!114 &756036164
 MonoBehaviour:

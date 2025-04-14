@@ -24,6 +24,6 @@ MonoBehaviour:
   abilities:
   - {fileID: 11400000, guid: 90b25c87f54274061819de0b9a6b1efa, type: 2}
   - {fileID: 11400000, guid: dbe5bb4f5f44b424ba13fe032cbe32f9, type: 2}
-  hitSound: {fileID: 8300000, guid: 1cbea69ffad026c448fbdf47f4d34f3b, type: 3}
+  hitSound: {fileID: 8300000, guid: c0d2632d7c7cd8f4b8de221b412dc07a, type: 3}
   killSound: {fileID: 8300000, guid: d1256636b10306449b7a8bf6f5295a0c, type: 3}
   missSound: {fileID: 8300000, guid: 89998cf45320f974ea4c9a4fcb2e668b, type: 3}

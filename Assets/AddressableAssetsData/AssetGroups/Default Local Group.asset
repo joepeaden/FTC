@@ -17,18 +17,6 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: 4bb1c285f07b9463aa037833afdfcca8
   m_SerializeEntries:
-  - m_GUID: efd033a143379436f83f51bf31063a51
-    m_Address: Assets/Scriptables/Abilities/WildAbandon.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - charAbilities
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 27baa4c7220654096a60b6a41521cc6e
-    m_Address: Assets/Scriptables/Abilities/BonusPay.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - charAbilities
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 73487471e3a3642baa450c5f4ec85564
     m_Address: Assets/Scriptables/MotConds/DoNotDisengage.asset
     m_ReadOnly: 0
@@ -173,12 +161,6 @@ MonoBehaviour:
     m_SerializedLabels:
     - contracts
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: a01e2d5a38c3c46759ec378e50a71213
-    m_Address: Assets/Scriptables/Abilities/OathOfLoyalty.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - charAbilities
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a51d28b9c4f274aa6b2b9c86f820f9c4
     m_Address: Assets/Scriptables/FaceDetail/Hair2.asset
     m_ReadOnly: 0
@@ -280,6 +262,12 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - passives
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b1d83ba4942fd46e3804534e7f4793c5
+    m_Address: Assets/Scriptables/Abilities/FirstAid.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - charAbilities
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 7c8bf46af66d94c95b7860930c29ad14, type: 2}

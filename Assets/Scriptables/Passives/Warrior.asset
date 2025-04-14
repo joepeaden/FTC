@@ -15,10 +15,19 @@ MonoBehaviour:
   passiveID: warrior
   level: 3
   displayName: Oath of Simplicity
-  description: 'Swear an oath to live simply. Damage Out: +1. Crit Chance Requirement:
-    +1'
+  description: 'Swear an oath to live simply. Damage Out: +1 and Hit Chance +2. Cannot
+    deal critical hits.'
   effectDisplay: {fileID: 11400000, guid: a0b8f3fbf39834b59ace3658c2bcacfe, type: 2}
   damageOutModifier: 1
   damageInModifier: 0
-  critRollModifier: 1
-  moveModifier: 0
+  critRollModifier: 100
+  hitRollModifier: -2
+  damageSelfOnMiss: 0
+  downgradesCrits: 0
+  moveModifier: 1
+  possessionChanceRoll: -1
+  selfHealPerTurn: 0
+  noRetreat: 0
+  freeAttacksPerEnemy: 0
+  oneAttackPerTurn: 0
+  obsorbDmgFromAdjacentAlly: 0

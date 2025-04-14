@@ -38,7 +38,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] GameObject turnUI;
     [SerializeField] TMP_Text winLoseText;
     [SerializeField] GameObject winLoseUI;
-    [SerializeField] private EnemyAI _enemyAI;
+    [SerializeField] private AIPlayer _aiPlayer;
     [SerializeField] private Button gameOverButton;
     [SerializeField] private SelectionManager _selectionManager;
     [SerializeField] GameObject pawnPrefab;
@@ -83,6 +83,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private WeaponItemData sword;
     [SerializeField] private WeaponItemData axe;
     [SerializeField] private WeaponItemData spear;
+    [SerializeField] private WeaponItemData bigSword;
 
     [Header("Audio")]
     [SerializeField] private AudioClip _levelUpSound;
@@ -126,7 +127,7 @@ public class BattleManager : MonoBehaviour
                 Pawn newPawn = Instantiate(pawnPrefab, enemyParent).GetComponent<Pawn>();
                 newPawn.SetCharacter(character);
 
-                _enemyAI.RegisterPawn(newPawn);
+                _aiPlayer.RegisterPawn(newPawn);
 
                 MiniStatBar miniStats = Instantiate(_miniStatBarPrefab, _healthBarParent);
                 miniStats.SetData(newPawn);
@@ -548,7 +549,7 @@ public class BattleManager : MonoBehaviour
 
     public void SpawnTestGuys(bool friendly)
     {
-        int numToSpawn = friendly ? Random.Range(DEFAULT_MIN_AMOUNT_TO_SPAWN, DEFAULT_MAX_AMOUNT_TO_SPAWN) : 3;
+        int numToSpawn = friendly ? 3 : 2;//Random.Range(DEFAULT_MIN_AMOUNT_TO_SPAWN, DEFAULT_MAX_AMOUNT_TO_SPAWN) : 3;
 
         for (int i = 0; i < numToSpawn; i++)
         {
@@ -556,6 +557,8 @@ public class BattleManager : MonoBehaviour
 
             GameCharacter guy = new(friendly ? DataLoader.charTypes["player"] : DataLoader.charTypes["warrior"]);
 
+                guy.ChangeHP(6);
+            
             if (friendly)
             {
                 guy.EquipItem(sword);
@@ -567,17 +570,23 @@ public class BattleManager : MonoBehaviour
 
                 guy.Abilities.Add(new WildAbandon());
                 
-                int roll = Random.Range(0, 6);
+                int roll = Random.Range(1, 3);
                 switch (roll)
                 {
                 case 0:
-                    guy.Passives.Add(DataLoader.passives["courage"]);
+                    guy.Passives.Add(DataLoader.passives["holy"]);
+
+                    // guy.Passives.Add(DataLoader.passives["courage"]);
                     break;
                 case 1:
-                    guy.Passives.Add(DataLoader.passives["perfect"]);
+                    guy.Passives.Add(DataLoader.passives["bulwark"]);
+
+                    // guy.Passives.Add(DataLoader.passives["perfect"]);
                     break;
                 case 2:
-                    guy.Passives.Add(DataLoader.passives["tank"]);
+                    guy.Passives.Add(DataLoader.passives["warrior"]);
+
+                    // guy.Passives.Add(DataLoader.passives["tank"]);
                     break;
                 }
             }
@@ -590,9 +599,9 @@ public class BattleManager : MonoBehaviour
             }
             else
             {
-                _enemyAI.RegisterPawn(newPawn);
+                _aiPlayer.RegisterPawn(newPawn);
             }
-
+            
             MiniStatBar miniStats = Instantiate(_miniStatBarPrefab, _healthBarParent);
             miniStats.SetData(newPawn);
         }
@@ -692,7 +701,7 @@ public class BattleManager : MonoBehaviour
             _selectionManager.SelectedTile.SetSelected(false);
         }
 
-        StartCoroutine(NextActivation());
+        StartCoroutine(NextPawnCoroutine());
     }
 
     /// <summary>
@@ -752,9 +761,13 @@ public class BattleManager : MonoBehaviour
         {
             PawnFinished(p);
         }
+        else if (p.OnPlayerTeam && p.IsPossessed)
+        {
+            _aiPlayer.DoTurn(p);
+        }
         else if (!p.OnPlayerTeam)
         {
-            _enemyAI.DoTurn(p);
+            _aiPlayer.DoTurn(p);
         }
     }
 
@@ -794,7 +807,7 @@ public class BattleManager : MonoBehaviour
             pawnList.Add(p);
         }
 
-        foreach (Pawn p in _enemyAI.GetLivingPawns())
+        foreach (Pawn p in _aiPlayer.GetEnemyLivingPawns())
         {
             pawnList.Add(p);
         }
@@ -809,7 +822,7 @@ public class BattleManager : MonoBehaviour
     {
         _turnNumber = 0;
         _instructionsUI.SetActive(false);
-        StartCoroutine(NextActivation());
+        StartCoroutine(NextPawnCoroutine());
     }
 
     private void HandleBattleResult(BattleResult battleResult)
@@ -830,7 +843,7 @@ public class BattleManager : MonoBehaviour
 
     private bool CheckEnemyWipedOut()
     {
-        return _enemyAI.GetLivingPawns().Count <= 0;
+        return _aiPlayer.GetEnemyLivingPawns().Count <= 0;
     }
 
     private bool CheckPlayerWipedOut()
@@ -848,7 +861,7 @@ public class BattleManager : MonoBehaviour
         return alivePawns <= 0;
     }
 
-    public IEnumerator NextActivation()
+    public IEnumerator NextPawnCoroutine()
     {
         // pause a little bit so the player can keep track of what the heck is happening
         // was using await here to avoid coroutine, but web builds can't use await.
@@ -885,8 +898,16 @@ public class BattleManager : MonoBehaviour
 
                 if (!_currentPawn.OnPlayerTeam)
                 {
-                    _enemyAI.DoTurn(_currentPawn);
                     _selectionManager.DisablePlayerControls();
+                    _aiPlayer.DoTurn(_currentPawn);
+                }        
+                else if (_currentPawn.OnPlayerTeam && _currentPawn.GameChar.RollPosessed())
+                {
+                    _selectionManager.DisablePlayerControls();
+                    _currentPawn.IsPossessed = true;
+                    AddPendingTextNotification("Possession!", Color.yellow);
+                    TriggerTextNotification(_currentPawn.transform.position);
+                    _aiPlayer.DoTurn(_currentPawn);
                 }
                 else
                 {
