@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c7c6226c8e7a4db0996a9a2b90847c8, type: 3}
+  m_Name: DefensivePosture
+  m_EditorClassIdentifier: 
+  abilityID: defensiveposture
+  abilityName: Defensive Posture
+  description: Gain a dodge buff. When dodging, chance to make an attack against
+    your opponent
+  motCost: 1
+  range: 0
+  sprite: {fileID: 21300008, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  turnsDuration: 1
+  statusEffect: {fileID: 11400000, guid: d63247348fb7d4912b224f2c89c4aa35, type: 2}
+  outDmgMod: 0
+  inDmgMod: 0
+  hitMod: 0
+  dodgeMod: 3

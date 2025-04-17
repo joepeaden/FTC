@@ -269,6 +269,18 @@ MonoBehaviour:
     m_SerializedLabels:
     - charAbilities
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 719cd45cbadfd4fe9b2079e57c57da87
+    m_Address: Assets/Scriptables/Abilities/DefensivePosture.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - charAbilities
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ce82754719cb74d3184aed24fa207833
+    m_Address: Assets/Scriptables/Abilities/Shove.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - charAbilities
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 7c8bf46af66d94c95b7860930c29ad14, type: 2}
   m_SchemaSet:

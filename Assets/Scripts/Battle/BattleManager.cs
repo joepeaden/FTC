@@ -8,6 +8,7 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
+using JetBrains.Annotations;
 
 /// <summary>
 /// Manages the Battle scene.
@@ -438,7 +439,7 @@ public class BattleManager : MonoBehaviour
                     tilesToHighlight.Clear();
                     tilesToHighlight.Add(targetTile);
                     
-                    if ((WeaponAbilityData)Ability.SelectedAbility as WeaponAbilityData != null && ((WeaponAbilityData)Ability.SelectedAbility).attackStyle == WeaponAbilityData.AttackStyle.LShape)
+                    if (Ability.SelectedAbility as WeaponAbilityData != null && ((WeaponAbilityData)Ability.SelectedAbility).attackStyle == WeaponAbilityData.AttackStyle.LShape)
                     {
                         tilesToHighlight.Add(_currentPawn.CurrentTile.GetClockwiseNextTile(targetTile));
                     }
@@ -549,7 +550,7 @@ public class BattleManager : MonoBehaviour
 
     public void SpawnTestGuys(bool friendly)
     {
-        int numToSpawn = friendly ? 3 : 2;//Random.Range(DEFAULT_MIN_AMOUNT_TO_SPAWN, DEFAULT_MAX_AMOUNT_TO_SPAWN) : 3;
+        int numToSpawn = Random.Range(DEFAULT_MIN_AMOUNT_TO_SPAWN, DEFAULT_MAX_AMOUNT_TO_SPAWN);// : 3;
 
         for (int i = 0; i < numToSpawn; i++)
         {
@@ -561,32 +562,53 @@ public class BattleManager : MonoBehaviour
             
             if (friendly)
             {
-                guy.EquipItem(sword);
-
-                if (i % 2 == 0)
-                {
-                    guy.EquipItem(medHelm);
-                }
-
-                guy.Abilities.Add(new WildAbandon());
+                // if (i == 1)// == 0)
+                // {
+                //     guy.EquipItem(bigSword);
+                //     guy.EquipItem(heavyHelm);
+                //     guy.Abilities.Add(DataLoader.abilities["firstaid"]);
+                // }
+                // else
+                // {
+                // }
                 
-                int roll = Random.Range(1, 3);
+                int roll = Random.Range(0,7);
                 switch (roll)
                 {
                 case 0:
                     guy.Passives.Add(DataLoader.passives["holy"]);
-
-                    // guy.Passives.Add(DataLoader.passives["courage"]);
+                    guy.Abilities.Add(DataLoader.abilities["firstaid"]);
+                    guy.EquipItem(medHelm);
+                    guy.EquipItem(sword);
                     break;
                 case 1:
                     guy.Passives.Add(DataLoader.passives["bulwark"]);
-
-                    // guy.Passives.Add(DataLoader.passives["perfect"]);
+                    guy.Abilities.Add(DataLoader.abilities["defensiveposture"]);
+                    guy.EquipItem(heavyHelm);
+                    guy.EquipItem(bigSword);
                     break;
                 case 2:
                     guy.Passives.Add(DataLoader.passives["warrior"]);
-
-                    // guy.Passives.Add(DataLoader.passives["tank"]);
+                    guy.Abilities.Add(DataLoader.abilities["shove"]);
+                    guy.EquipItem(lightHelm);
+                    guy.EquipItem(spear);
+                    break;
+                case 3:
+                    guy.Passives.Add(DataLoader.passives["perfect"]);
+                    guy.Abilities.Add(DataLoader.abilities["shove"]);
+                    guy.EquipItem(lightHelm);
+                    guy.EquipItem(sword);
+                    break;
+                case 4: 
+                    guy.Passives.Add(DataLoader.passives["courage"]);
+                    guy.Abilities.Add(DataLoader.abilities["shove"]);
+                    guy.EquipItem(axe);
+                    break;
+                case 5: 
+                    guy.Passives.Add(DataLoader.passives["tank"]);
+                    guy.Abilities.Add(DataLoader.abilities["defensiveposture"]);
+                    guy.EquipItem(heavyHelm);
+                    guy.EquipItem(axe);
                     break;
                 }
             }
@@ -631,7 +653,7 @@ public class BattleManager : MonoBehaviour
         }
 
         ShowTooltipForPawn();
-        UpdateUIForPawn(_currentPawn);
+        // UpdateUIForPawn(_currentPawn);
     }
 
     private void HandleActionClicked(Ability action)
@@ -715,6 +737,8 @@ public class BattleManager : MonoBehaviour
 
     public IEnumerator PawnActivatedCoroutine(Pawn p)
     {
+        yield return new WaitUntil(() => !p.HoldingForAttackAnimation);
+
         // level up visuals & audio. Need pauses to allow the player time to
         // process what's going on.
         if (p.PendingLevelUp)
@@ -874,6 +898,8 @@ public class BattleManager : MonoBehaviour
 
         _currentPawn = GetNextPawn();
 
+        yield return new WaitUntil(() => !_currentPawn.HoldingForAttackAnimation);
+
         // AddTextNotification(_currentPawn.transform.position, new () {(_currentPawn.OnPlayerTeam ? "For God and Glory!" : "FOR THE DARK GODS!", Color.white)});
 
         // see if the battle is over. If so, do sumthin about it 
@@ -889,7 +915,7 @@ public class BattleManager : MonoBehaviour
             }
             else
             {
-                _currentPawn.HandleActivation();
+                _currentPawn.HandleTurnBegin();
                 UpdateUIForPawn(_currentPawn);
                 _currentPawn.OnEffectUpdate.AddListener(UpdateEffects);
 

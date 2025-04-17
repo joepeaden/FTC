@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06694ff04b28647418e6b6f1573dee26, type: 3}
+  m_Name: Shove
+  m_EditorClassIdentifier: 
+  abilityID: shove
+  abilityName: Shove
+  description: Shove your opponent one tile backwards
+  motCost: 1
+  range: 1
+  sprite: {fileID: 21300000, guid: 5ed54572ef0354241b7f1ec43d869ad3, type: 3}
+  turnsDuration: 0
+  statusEffect: {fileID: 0}
+  outDmgMod: 0
+  inDmgMod: 0
+  hitMod: 0
+  dodgeMod: 0

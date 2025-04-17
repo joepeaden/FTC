@@ -1,4 +1,5 @@
 ﻿using System;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "DefensivePosture", menuName = "MyScriptables/Abilities/DefensivePosture")]
@@ -6,97 +7,69 @@ public class DefensivePosture : SupportAbilityData
 {
     private int _remainingDuration;
     private Pawn _activatedPawn;
-    private Pawn _targetPawn;
-
     public override bool Activate(Pawn activatedPawn, Pawn targetPawn)
     {
-        activatedPawn.Motivation -= motCost;
+        _activatedPawn = activatedPawn;
 
+        _activatedPawn.Motivation -= motCost;
 
+        _activatedPawn.InDefensiveStance = true;
+        _remainingDuration = turnsDuration;
+
+        activatedPawn.DodgeMod += dodgeMod;
+
+        _activatedPawn.OnActivation.AddListener(HandleNewActivationForPawn);
+        _activatedPawn.OnHPChanged.AddListener(HandleDeath);
 
         // tell battle manager we acted
-        BattleManager.Instance.PawnActivated(activatedPawn);
+        BattleManager.Instance.PawnActivated(_activatedPawn);
         
+        // text display event
+        BattleManager.Instance.AddPendingTextNotification("Defensive Stance", Color.white);
+        BattleManager.Instance.TriggerTextNotification(activatedPawn.transform.position);
+
         return true;
     }
-}
-//         _targetPawn.ProtectingPawn = _activatedPawn;
-//         _turnsToProtect = turnsDuration;
 
-//         _activatedPawn.Motivation -= motCost;
+    /// <summary>
+    /// If pawn is killed whilist protecting another, end the protection
+    /// </summary>
+    private void HandleDeath()
+    {
+        if (_activatedPawn.IsDead)
+        {
+            StopDefensiveStance();
+        }
+    }
 
-//         // on new activation, will want to check duration to see if stop protecting
-//         _activatedPawn.OnActivation.AddListener(HandleNewActivationForPawn);
-//         // obviously can't protect someone if we're dead can we?
-//         _activatedPawn.OnHPChanged.AddListener(HandleDeath);
-//         // listen when the pawn moves to check if we're still in range to protect
-//         _activatedPawn.OnMoved.AddListener(CheckAdjacencyForProtection);
-//         _targetPawn.OnMoved.AddListener(CheckAdjacencyForProtection);
+    /// <summary>
+    /// Upon activation check if we're done protecting that mofo
+    /// </summary>
+    private void HandleNewActivationForPawn()
+    {
+        _remainingDuration--;
 
-//         // tell battle manager we acted
-//         BattleManager.Instance.PawnActivated(_activatedPawn);
+        // remove listener and remove protection from target pawn
+        if (_remainingDuration <= 0)
+        {
+            StopDefensiveStance();
+        }
+    }
+
+    /// <summary>
+    /// Stop the activated pawn from protecting the target pawn, and cleanup
+    /// </summary>
+    private void StopDefensiveStance()
+    {
+        if (_activatedPawn == null)
+        {
+            return;
+        }
         
-//         // text display event
-//         // BattleManager.Instance.AddTextNotification(_targetPawn.transform.position, "+Protection");
-
-//         // add icon to the character UI to show effect
-//         _targetPawn.UpdateEffect(statusEffect, true);
-
-//         return true;
-//     }
-
-//     /// <summary>
-//     /// If pawn is killed whilist protecting another, end the protection
-//     /// </summary>
-//     private void HandleDeath()
-//     {
-//         if (_activatedPawn.IsDead)
-//         {
-//             StopProtection();
-//         }
-//     }
-
-//     /// <summary>
-//     /// Upon activation check if we're done protecting that mofo
-//     /// </summary>
-//     private void HandleNewActivationForPawn()
-//     {
-//         _turnsToProtect--;
-
-//         // remove listener and remove protection from target pawn
-//         if (_turnsToProtect <= 0)
-//         {
-//             StopProtection();
-//         }
-//     }
-
-//     /// <summary>
-//     /// Checks if the target pawn is still adjacent, if not, end protection
-//     /// </summary>
-//     private void CheckAdjacencyForProtection()
-//     {
-//         if (!_activatedPawn.GetAdjacentPawns().Contains(_targetPawn))
-//         {
-//             StopProtection();
-//         }
-//     }
-
-//     /// <summary>
-//     /// Stop the activated pawn from protecting the target pawn, and cleanup
-//     /// </summary>
-//     private void StopProtection()
-//     {
-//         // BattleManager.Instance.AddTextNotification(_targetPawn.transform.position, "-Protection");
-
-//         _targetPawn.UpdateEffect(statusEffect, false);
-
-//         _activatedPawn.OnActivation.RemoveListener(HandleNewActivationForPawn);
-//         _activatedPawn.OnHPChanged.RemoveListener(HandleDeath);
-//         _activatedPawn.OnMoved.RemoveListener(CheckAdjacencyForProtection);
-//         _targetPawn.OnMoved.RemoveListener(CheckAdjacencyForProtection);
-
-//         _targetPawn.ProtectingPawn = null;
-//         _activatedPawn = null;
-//         _targetPawn = null;
-//     }
-// }
+        _activatedPawn.OnActivation.RemoveListener(HandleNewActivationForPawn);
+        _activatedPawn.OnHPChanged.RemoveListener(HandleDeath);
+        _activatedPawn.InDefensiveStance = false;
+        _activatedPawn.DodgeMod -= dodgeMod;
+        _activatedPawn = null;
+    }
+}

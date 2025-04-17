@@ -6,6 +6,7 @@ using System.Linq;
 using UnityEngine.Events;
 using Unity.VisualScripting;
 using UnityEditor.UI;
+using UnityEngine.Rendering.Universal;
 
 public class Pawn : MonoBehaviour
 {
@@ -48,6 +49,7 @@ public class Pawn : MonoBehaviour
 
     private bool _hasAttacked;
     private bool _hasMoved;
+    private bool _isMyTurn;
 
     public int MaxMotivation => GameChar.GetBattleMotivationCap();
     public int Motivation;
@@ -62,7 +64,7 @@ public class Pawn : MonoBehaviour
     public bool PendingLevelUp { get; set; }
 
     #region Buffs / Debuffs
-    public float DodgeMod;
+    public int DodgeMod;
     public float HitMod;
     #endregion
 
@@ -109,6 +111,8 @@ public class Pawn : MonoBehaviour
 
     public int BattleKills = 0;
     public int DmgInflicted = 0;
+
+    public bool HoldingForAttackAnimation = false;
 
     #region UnityEvents
 
@@ -237,10 +241,10 @@ public class Pawn : MonoBehaviour
         return Motivation - Ability.SelectedAbility.motCost;
     }
 
-    private void UpdateMotivationResource()
-    {
-        Motivation = Mathf.Clamp(Motivation + MOT_REGAIN_RATE, Motivation, GameChar.GetBattleMotivationCap());
-    }
+    // private void UpdateMotivationResource()
+    // {
+    //     Motivation = Mathf.Clamp(Motivation + MOT_REGAIN_RATE, Motivation, GameChar.GetBattleMotivationCap());
+    // }
 
     private void PickStartTile()
     {
@@ -297,6 +301,11 @@ public class Pawn : MonoBehaviour
 
     #region Combat
 
+    // public int GetDodge()
+    // {
+    //     return 10;
+    // }
+
     public int GetRollToHit(Pawn targetPawn)
     {
         int surroundingAllies = targetPawn.GetAdjacentEnemies().Count;
@@ -307,7 +316,7 @@ public class Pawn : MonoBehaviour
         // all the hit mods don't work currently - need to be updated to d12
         //float abilityHitMod = HitMod - targetPawn.DodgeMod;
 
-        int toHit = GameChar.GetHitRollChance() - surroundHitMod; // + abilityHitMod + GameChar.TheWeapon.Data.baseAccMod + (Ability.SelectedAbility != null ? Ability.SelectedAbility.hitMod : 0);
+        int toHit = GameChar.GetHitRollChance() - surroundHitMod + targetPawn.DodgeMod;//GetDodge(); // + abilityHitMod + GameChar.TheWeapon.Data.baseAccMod + (Ability.SelectedAbility != null ? Ability.SelectedAbility.hitMod : 0);
 
 
 
@@ -318,6 +327,19 @@ public class Pawn : MonoBehaviour
         }
 
         return toHit;
+    }
+
+    public WeaponAbilityData GetBasicAttack()
+    {
+        if (GetWeaponAbilities().Count > 0)
+        {
+            return GetWeaponAbilities()[0] as WeaponAbilityData;
+        }
+        else
+        {
+            Debug.LogWarning("No weapon abilities found in GetBasicAttack method.");
+            return new BasicAttackAbility();
+        }
     }
 
     public List<Ability> GetWeaponAbilities()
@@ -346,6 +368,7 @@ public class Pawn : MonoBehaviour
 
     public void HandleTurnEnded()
     {
+        _isMyTurn = false;
         IsPossessed = false;
         _spriteController.HandleTurnEnd();
     }
@@ -429,7 +452,8 @@ public class Pawn : MonoBehaviour
         }
         else
         {
-            targetPawn.TriggerDodge();
+            targetPawn.TriggerDodge(this);
+            
             // BattleManager.Instance.AddTextNotification(transform.position, "Miss!");
             StartCoroutine(PlayAudioAfterDelay(0.1f, GameChar.TheWeapon.Data.missSound));
 
@@ -446,9 +470,29 @@ public class Pawn : MonoBehaviour
         _spriteController.SetLevelUp();
     }
 
-    public void TriggerDodge()
+    public void TriggerDodge(Pawn opponentPawn)
     {
-        _spriteController.TriggerDodge();
+        StartCoroutine(TriggerDodgeCoroutine(opponentPawn));
+    }
+
+    private IEnumerator TriggerDodgeCoroutine(Pawn opponentPawn)
+    {
+        if (InDefensiveStance)
+        {
+            opponentPawn.HoldingForAttackAnimation = true;
+            yield return new WaitForSeconds(.25f);
+
+            BattleManager.Instance.AddPendingTextNotification("Counter!", Color.white);
+            BattleManager.Instance.TriggerTextNotification(this.transform.position);
+
+            AttackPawn(opponentPawn, GetBasicAttack());
+
+            opponentPawn.HoldingForAttackAnimation = false;
+        }
+        else
+        {
+            _spriteController.TriggerDodge();
+        }
     }
 
     public void TakeDamage(Pawn attackingPawn, int attackDmg, bool isCrit)
@@ -667,9 +711,11 @@ public class Pawn : MonoBehaviour
         return !_hasMoved && actionPoints > 0;
     }
 
-    public void HandleActivation()
+    public void HandleTurnBegin()
     {
-        UpdateMotivationResource();
+        // UpdateMotivationResource();
+
+        _isMyTurn = true;
 
         _spriteController.HandleTurnBegin();
         actionPoints = BASE_ACTION_POINTS;
@@ -693,13 +739,38 @@ public class Pawn : MonoBehaviour
 
     public void Heal(int healAmount)
     {
-        _hitPoints += healAmount;
+        // cap the max hitpoints to heal
+        _hitPoints = Mathf.Min(healAmount + _hitPoints, GameChar.HitPoints);
         BattleManager.Instance.AddPendingTextNotification(healAmount.ToString(), Color.green);
         BattleManager.Instance.TriggerTextNotification(transform.position);
         OnHPChanged.Invoke();
     }
 
     #region Movement
+
+    /// <summary>
+    /// Move as close as possible to the tile. If not enough AP, pick the next
+    /// closest tile that there is enough AP for
+    /// </summary>
+    /// <param name="targetTile"></param>
+    /// <returns></returns>
+    public void ForceMoveToTile(Tile targetTile)
+    {
+        pathfinder.AttemptGoToLocation(targetTile.transform.position);
+
+        _spriteController.Move();
+
+        // use whole turn to get out of combat with someone
+        if (EngagedInCombat)
+        {
+            OnDisengage.Invoke();
+        }
+
+        _currentTile.PawnExitTile();
+
+        _isMoving = true;
+    }
+
 
     /// <summary>
     /// Move as close as possible to the tile. If not enough AP, pick the next
@@ -715,33 +786,67 @@ public class Pawn : MonoBehaviour
             return;
         }
 
-        int tileDistance = _currentTile.GetTileDistance(targetTile);
-
-        //Vector3 position = adjustedTargetTile.transform.position;
-        pathfinder.AttemptGoToLocation(targetTile.transform.position);
-
-        _spriteController.Move();
-
         // the ap adjustments may need to happen as the pawn enters each tile. May be best to
         // process things one tile at a time if implementing varying AP costs, etc. But not now.
         // if doing that later, make sure to update the pathfinder code too.
 
-        _hasMoved = true;
         actionPoints -= 1;
 
-        // use whole turn to get out of combat with someone
+        StartCoroutine(TryMoveToTileCoroutine(targetTile));
+    }
+
+    public IEnumerator TryMoveToTileCoroutine(Tile targetTile)
+    {
+        // opportunity attacks implementation
+        bool gotHitByOpportunityAttack = false;
         if (EngagedInCombat)
         {
-            OnDisengage.Invoke();
+            foreach (Pawn enemyPawn in GetAdjacentEnemies())
+            {
+                HoldingForAttackAnimation = true;
+                yield return new WaitForSeconds(.25f);
+
+                int originalHP = _hitPoints;
+                int originalArmor = _armorPoints; 
+                enemyPawn.AttackPawn(this, enemyPawn.GetBasicAttack());
+                HoldingForAttackAnimation = false;
+
+                // if got hit, end the move.
+                if (originalHP != _hitPoints || originalArmor != _armorPoints)
+                {
+                    gotHitByOpportunityAttack = true;
+                    HandleDestinationReached();
+                    break;
+                }
+            }
         }
 
-        _currentTile.PawnExitTile();
+        // don't proceed with move if got hit during opportunity attack
+        if (!gotHitByOpportunityAttack)
+        {
+            _hasMoved = true;
 
-        _isMoving = true;
+            int tileDistance = _currentTile.GetTileDistance(targetTile);
 
-        _audioSource.clip = _movingSound;
-        _audioSource.loop = true;
-        _audioSource.Play();
+            //Vector3 position = adjustedTargetTile.transform.position;
+            pathfinder.AttemptGoToLocation(targetTile.transform.position);
+
+            _spriteController.Move();
+
+            // use whole turn to get out of combat with someone
+            if (EngagedInCombat)
+            {
+                OnDisengage.Invoke();
+            }
+
+            _currentTile.PawnExitTile();
+
+            _isMoving = true;
+
+            _audioSource.clip = _movingSound;
+            _audioSource.loop = true;
+            _audioSource.Play();
+        }
     }
 
     public void HandleDestinationReached()
@@ -760,19 +865,18 @@ public class Pawn : MonoBehaviour
             }
         }
 
+        if (_isMyTurn)
+        {
+            UpdateSpriteOnStop(true);
+            BattleManager.Instance.PawnActivated(this);
+            _audioSource.loop = false;
+            _audioSource.Stop();
+        }
+
         _spriteController.StopMoving();
-        UpdateSpriteOnStop(true);
-
-        BattleManager.Instance.PawnActivated(this);
-
         OnMoved.Invoke();
-
         UpdateFreeAttacksPassive();
-
         _isMoving = false;
-
-        _audioSource.loop = false;
-        _audioSource.Stop();
     }
 
     public void UpdateFreeAttacksPassive()

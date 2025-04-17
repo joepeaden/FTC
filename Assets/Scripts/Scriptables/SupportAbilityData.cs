@@ -18,5 +18,5 @@ public class SupportAbilityData : Ability
     /// </summary>
     public int inDmgMod;
     public float hitMod;
-    public float dodgeMod;
+    public int dodgeMod;
 }

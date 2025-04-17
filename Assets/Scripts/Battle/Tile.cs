@@ -150,6 +150,26 @@ public class Tile : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Get adjacent tile that aligns to the direction given
+    ///  Thanks ChatGPT :)
+    /// </summary>
+    /// <param name="direction"></param>
+    /// <returns></returns>
+    public Tile GetNextTileInDirection(Vector3 direction)
+    {
+        direction = direction.normalized;
+        
+        return _adjacentTiles
+            .OrderByDescending(t => Vector3.Dot((t.transform.position - transform.position).normalized, direction))
+            .FirstOrDefault();
+    }
+
+    /// <summary>
+    /// For getting adjacent tiles AROUND a specific tile
+    /// </summary>
+    /// <param name="startTile"></param>
+    /// <returns></returns>
     public Tile GetAdjacentTileInDirection(Tile startTile)
     {
         List<Tile> adjTiles = GetAdjacentTiles();
@@ -332,7 +352,7 @@ public class Tile : MonoBehaviour
 
     public void ClearActionHighlight()
     {
-        if (Ability.SelectedAbility != null && BattleManager.Instance.CurrentPawn.CurrentTile.IsInRangeOf(this, ((WeaponAbilityData)Ability.SelectedAbility).range))
+        if (Ability.SelectedAbility != null && BattleManager.Instance.CurrentPawn.CurrentTile.IsInRangeOf(this, Ability.SelectedAbility.range))
         {
             tileOverlayUI.sprite = attackHighlightSprite;
         }
