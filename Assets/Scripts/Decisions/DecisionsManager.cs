@@ -16,6 +16,9 @@ public class DecisionsManager : MonoBehaviour
     [SerializeField] private Button _troopsButton;
     [SerializeField] private Button _shopButton;
     [SerializeField] private Button _restButton;
+    [SerializeField] private Button _upgradeContractsButton;
+    [SerializeField] private Button _upgradeRecruitsButton;
+    [SerializeField] private Button _upgradeShopButton;
     [SerializeField] private GameObject _recruitsScreen;
     [SerializeField] private GameObject _contractsScreen;
     [SerializeField] private GameObject _troopsScreen;
@@ -128,9 +131,18 @@ public class DecisionsManager : MonoBehaviour
         // the player gold isn't used mid-battle anyway. Perhaps should move this here later.
         // I guess it's only there for the sake of persistence, but we can keep that information
         // in a file anyway once we implement perisistence.
-        if (GameManager.Instance != null && GameManager.Instance.PlayerGold > GameManager.GOLD_WIN_AMOUNT)
+        if (GameManager.Instance != null)
         {
-            _winUI.SetActive(true);
+            if (GameManager.Instance.PlayerGold > GameManager.GOLD_WIN_AMOUNT)
+            {
+                _winUI.SetActive(true);
+                _winUI.GetComponent<GameEndPopup>().SetPlayerWon(true);
+            }
+            else if (GameManager.Instance.PlayerGold < GameManager.Instance.GameCharData.price && GameManager.Instance.PlayerFollowers.Count == 0) 
+            {
+                _winUI.SetActive(true);
+                _winUI.GetComponent<GameEndPopup>().SetPlayerWon(false);
+            }
         }
     }
 

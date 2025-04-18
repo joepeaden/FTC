@@ -19,7 +19,7 @@ MonoBehaviour:
   price: 20
   minInit: 0
   maxInit: 5
-  minHP: 3
+  minHP: 5
   maxHP: 7
   minAcc: 5
   maxAcc: 8

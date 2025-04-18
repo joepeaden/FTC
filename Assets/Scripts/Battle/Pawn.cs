@@ -1,12 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Pathfinding;
 using System.Linq;
 using UnityEngine.Events;
-using Unity.VisualScripting;
-using UnityEditor.UI;
-using UnityEngine.Rendering.Universal;
 
 public class Pawn : MonoBehaviour
 {

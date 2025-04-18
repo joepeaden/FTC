@@ -27,7 +27,6 @@ MonoBehaviour:
   fallbackWeapon: {fileID: 11400000, guid: 10bfb3287a43940979f35f88999d4de9, type: 2}
   defaultWeaponOptions:
   - {fileID: 11400000, guid: 10bfb3287a43940979f35f88999d4de9, type: 2}
-  - {fileID: 11400000, guid: 3f9b368f6a59e4158b31a26846087db3, type: 2}
   defaultArmorOptions:
   - {fileID: 0}
   abilityList: []

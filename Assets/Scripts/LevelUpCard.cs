@@ -31,6 +31,7 @@ public class LevelUpCard : MonoBehaviour
 
     public void SetData(PassiveData passive, LevelUpPanel lvlUpPanel)
     {
+        this.ability = null;
         title.text = passive.displayName;
         image.gameObject.SetActive(false);
         // image.sprite = passive.sprite;
@@ -42,6 +43,7 @@ public class LevelUpCard : MonoBehaviour
 
     public void SetData(Ability ability, LevelUpPanel lvlUpPanel)
     {
+        this.passive = null;
         title.text = ability.abilityName;
         image.sprite = ability.sprite;
         description.text = ability.description;
