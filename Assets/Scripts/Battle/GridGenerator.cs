@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using Pathfinding;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GridGenerator : MonoBehaviour
@@ -17,31 +18,40 @@ public class GridGenerator : MonoBehaviour
     [SerializeField] float tileSize;
     [SerializeField] float impassableChancePerTile;
 
-    public Dictionary<Point, Tile> Tiles => _tiles;
-    private Dictionary<Point, Tile> _tiles = new();
+    public Dictionary<Vector2, Tile> Tiles = new();
+    public List<Vector2> TilesPoints = new();
+    public List<Tile> TilesList = new();
 
-    public List<Tile> PlayerSpawns => _playerSpawns;
-    public List<Tile> EnemySpawns => _enemySpawns;
-    private List<Tile> _playerSpawns = new();
-    private List<Tile> _enemySpawns = new();
+    public List<Tile> TownFollowerSpawns = new();
+    public List<Tile> TownRecruitSpawns = new();
+    public List<Tile> TownInventorySpawns = new();
+    public List<Tile> TownShopSpawns = new();
 
-    //private int layerIncrement = 10;
+    public List<Tile> PlayerSpawns = new();
+    public List<Tile> EnemySpawns = new();
 
     void Awake()
     {
         _instance = this;
 
-        GenerateGrid();
+        // set up dictionary for easy access
+        foreach (Vector2 p in TilesPoints)
+        {
+            Tiles[p] = TilesList[TilesPoints.IndexOf(p)];
+        }
 
-        AstarPath.active.Scan();
+        // Generate the pathfinding nodes
+        GeneratePathfinding();
+
+        // Generate obstacles. Idk why I called them impassables.
+        // GenerateImpassables();
     }
 
-    public void GenerateGrid()
+    /// <summary>
+    /// Clear the pathfinding graph and set up node connections, then scan.
+    /// </summary>
+    private void GeneratePathfinding()
     {
-        // note for later: I really really don't need to regenerate the tiles
-        // and pathfinding grid every time. Really I just need to randomize
-        // terrain and update grid nodes w/ new walkability etc.
-
         // need to clear all nodes to set up new ones
         if (AstarPath.active.data.pointGraph.nodes != null)
         {
@@ -49,91 +59,155 @@ public class GridGenerator : MonoBehaviour
             AstarPath.active.Scan();
         }
 
-        _playerSpawns.Clear();
-        _enemySpawns.Clear();
-
         // need pathfinding graph updates to happen in this callback
-        // I guess (graph updates mostly in Tile class like adding nodes)
+        // Graph updates mostly in Tile class like adding nodes
         AstarPath.active.AddWorkItem(new AstarWorkItem(ctx =>
         {
-            for (int x = 0; x < gridWidth; x++)
-            {
-                for (int y = 0; y < gridHeight; y++)
-                {
-                    Point gridPoint = new Point(x, y);
-                    if (_tiles.ContainsKey(gridPoint) && _tiles[gridPoint] != null)
-                    {
-                        DestroyImmediate(_tiles[gridPoint].gameObject);
-                    }
-
-                    GameObject tileGO = Instantiate(tilePrefab, transform);
-                    Tile tileScript = tileGO.GetComponent<Tile>();
-
-                    float posX = (x * tileSize + y * tileSize) / 2f;
-                    float posY = (x * tileSize - y * tileSize) / 4f;
-
-                    tileGO.transform.position = new Vector3(posX, posY);
-                    tileGO.name = "Tile (" + x + ", " + y + ")";
-
-                    // 10 unit increments (the y pos are all .5 different) so that there's enough
-                    // room for pawn sprite detail layering between obstacles
-                    tileScript.SetTerrainSortingOrder((int)(-1 * posY * 20));
-
-                    _tiles[gridPoint] = tileScript;
-
-                    if (y <= 9)
-                    {
-                        if (x == 0)
-                        {
-                            _playerSpawns.Add(tileScript);
-                        }
-                        else if (x == 9)
-                        {
-                            _enemySpawns.Add(tileScript);
-                        }
-                    }
-                }
-            }
-
-            List<Tile> randomizedListOfTiles = new();
-            foreach (KeyValuePair<Point, Tile> kvp in _tiles)
+            foreach (KeyValuePair<Vector2, Tile> kvp in Tiles)
             {
                 Tile tile = kvp.Value;
-                Point coord = kvp.Key;
+                Vector2 coord = kvp.Key;
 
-                tile.Initialize(_tiles, coord, false);
-
-                randomizedListOfTiles.Add(tile);
+                // set up adjacency, node connections, etc.
+                tile.Initialize(Tiles, coord, false);
             }
 
-            for (int i = 0; i < randomizedListOfTiles.Count; i++)
-            {
-                Tile tile = randomizedListOfTiles[Random.Range(0, randomizedListOfTiles.Count)];
-
-                bool isImpassible = false;
-                if (!_playerSpawns.Contains(tile) && !_enemySpawns.Contains(tile))
-                {
-                    isImpassible = Random.Range(0f, 1f) < impassableChancePerTile;
-                }
-
-                tile.SetImpassable(isImpassible);
-
-                if (isImpassible && !CheckConnectivity(_playerSpawns[0]) || !CheckConnectivity(_enemySpawns[0]))
-                {
-                    tile.SetImpassable(false);
-                    //EnsureConnectivity();
-                }
-
-                randomizedListOfTiles.Remove(tile);
-            }
-
-            foreach (Tile t in _tiles.Values)
+            // This second iteration is necessary. Can't do it in the same loop.
+            // Tile.Initialize sets the pathfinding node, and all the pathfinding nodes need
+            // to be set before Tile.UpdateNodeConnections can connect them all.
+            foreach (Tile t in Tiles.Values)
             {
                 t.UpdateNodeConnections();
             }
-
         }));
 
+        AstarPath.active.Scan();
+    }
+
+    public void GenerateImpassables()
+    {
+        List<Tile> randomizedListOfTiles = new();
+        foreach (KeyValuePair<Vector2, Tile> kvp in Tiles)
+        {
+            Tile tile = kvp.Value;
+            randomizedListOfTiles.Add(tile);
+        }
+
+        for (int i = 0; i < randomizedListOfTiles.Count; i++)
+        {
+            Tile tile = randomizedListOfTiles[Random.Range(0, randomizedListOfTiles.Count)];
+
+            bool isImpassible = false;
+            if (!PlayerSpawns.Contains(tile) && !EnemySpawns.Contains(tile))
+            {
+                isImpassible = Random.Range(0f, 1f) < impassableChancePerTile;
+            }
+
+            tile.SetImpassable(isImpassible);
+
+            if (isImpassible && !CheckConnectivity(PlayerSpawns[0]) || !CheckConnectivity(EnemySpawns[0]))
+            {
+                tile.SetImpassable(false);
+                //EnsureConnectivity();
+            }
+
+            randomizedListOfTiles.Remove(tile);
+        }
+    }
+
+    /// <summary>
+    /// Generate tiles, not pathfinding nodes.
+    /// </summary>
+    public void GenerateTiles()
+    {
+        TownRecruitSpawns.Clear();
+        TownInventorySpawns.Clear();
+        TownFollowerSpawns.Clear();
+        EnemySpawns.Clear();
+        PlayerSpawns.Clear();
+        TilesList.Clear();
+        TilesPoints.Clear();
+
+        for (int x = 0; x < gridWidth; x++)
+        {
+            for (int y = 0; y < gridHeight; y++)
+            {
+                Vector2 gridPoint = new Vector2(x, y);
+                if (TilesPoints.Contains(gridPoint) && TilesList[TilesPoints.IndexOf(gridPoint)] != null)
+                {
+                    DestroyImmediate(TilesList[TilesPoints.IndexOf(gridPoint)].gameObject);
+                }
+
+                GameObject tileGO = Instantiate(tilePrefab, transform);
+                Tile tileScript = tileGO.GetComponent<Tile>();
+
+                float posX = (x * tileSize + y * tileSize) / 2f;
+                float posY = (x * tileSize - y * tileSize) / 4f;
+
+                tileGO.transform.position = new Vector3(posX, posY);
+                tileGO.name = "Tile (" + x + ", " + y + ")";
+
+                // 10 unit increments (the y pos are all .5 different) so that there's enough
+                // room for pawn sprite detail layering between obstacles
+                tileScript.SetTerrainSortingOrder((int)(-1 * posY * 20));
+
+                TilesPoints.Add(gridPoint);
+                TilesList.Add(tileScript);
+
+            }
+        }
+
+        // add town follower spawn points
+        for (int x = 0; x < 5; x++)
+        {
+            for (int y = 5; y < 7; y++)
+            {
+                TownFollowerSpawns.Add(TilesList[TilesPoints.IndexOf(new Vector2(x, y))]);
+            }
+        }
+
+        // add town recruit spawn points
+        for (int x = 8; x < 10; x++)
+        {
+            for (int y = 5; y < 8; y++)
+            {
+                TownRecruitSpawns.Add(TilesList[TilesPoints.IndexOf(new Vector2(x, y))]);
+            }
+        }
+
+        // add town inventory spawns
+        for (int x = 0; x < 5; x++)
+        {
+            for (int y = 7; y < 9; y++)
+            {
+                TownInventorySpawns.Add(TilesList[TilesPoints.IndexOf(new Vector2(x, y))]);
+            }
+        }
+
+        // add town shop spawns
+        for (int x = 0; x < 5; x++)
+        {
+            for (int y = 0; y < 2; y++)
+            {
+                TownShopSpawns.Add(TilesList[TilesPoints.IndexOf(new Vector2(x, y))]);
+            }
+        }
+
+        for (int x = 0; x < 3; x++)
+        {
+            for (int y = 0; y < 3; y++)
+            {
+                PlayerSpawns.Add(TilesList[TilesPoints.IndexOf(new Vector2(x, y))]);
+            }
+        }
+        
+        for (int x = 4; x < 7; x++)
+        {
+            for (int y = 0; y < 3; y++)
+            {
+                EnemySpawns.Add(TilesList[TilesPoints.IndexOf(new Vector2(x, y))]);
+            }
+        }
     }
 
     /// <summary>
@@ -144,7 +218,7 @@ public class GridGenerator : MonoBehaviour
     /// <returns></returns>
     public Tile GetClosestTileToPosition(Vector3 pos)
     {
-        foreach (Tile t in _tiles.Values)
+        foreach (Tile t in Tiles.Values)
         {
             if (Mathf.Abs(t.transform.position.x - pos.x) < .1f &&
                 Mathf.Abs(t.transform.position.y - pos.y) < .1f &&
@@ -181,7 +255,7 @@ public class GridGenerator : MonoBehaviour
         }
 
         // Check if all non-impassable tiles are visited
-        foreach (var tile in _tiles.Values)
+        foreach (var tile in Tiles.Values)
         {
             if (!tile.IsImpassable && !visited.Contains(tile))
             {
@@ -197,7 +271,7 @@ public class GridGenerator : MonoBehaviour
         List<Tile> impassableTiles = new List<Tile>();
 
         // Collect all impassable tiles
-        foreach (var tile in _tiles.Values)
+        foreach (var tile in Tiles.Values)
         {
             if (tile.IsImpassable)
             {
@@ -210,7 +284,7 @@ public class GridGenerator : MonoBehaviour
             impassableTiles[i].SetImpassable(false); // Temporarily make passable
 
             // Check connectivity after clearing this tile
-            if (CheckConnectivity(_playerSpawns[0]))
+            if (CheckConnectivity(PlayerSpawns[0]))
             {
                 break; // Exit if the connectivity is restored
             }

@@ -36,6 +36,7 @@ public class Tile : MonoBehaviour
     public bool IsImpassable => _isImpassable;
     private bool _isImpassable = false;
 
+    [SerializeField] private ItemUIImmersive _item;
     [SerializeField] private Pawn _pawn;
     private bool _isSelected;
     //private bool _isInMoveRange;
@@ -43,8 +44,8 @@ public class Tile : MonoBehaviour
 
     public PointNode PathfindingNode => _pathfindingNode;
     private PointNode _pathfindingNode;
-    public Point Coordinates => _coordinates;
-    private Point _coordinates;
+    public Vector2 Coordinates => _coordinates;
+    private Vector2 _coordinates;
 
     private Sprite _prevHighlightSprite;
 
@@ -103,7 +104,7 @@ public class Tile : MonoBehaviour
         _pathfindingNode.Walkable = !IsImpassable;
     }
 
-    public void Initialize(Dictionary<Point, Tile> tiles, Point coord, bool isImpassable)
+    public void Initialize(Dictionary<Vector2, Tile> tiles, Vector2 coord, bool isImpassable)
     {
         _coordinates = coord;
 
@@ -113,26 +114,26 @@ public class Tile : MonoBehaviour
         SetImpassable(isImpassable);
 
         // set up adjacent tiles
-        Point p = new Point(coord.X + 1, coord.Y);
+        Vector2 p = new Vector2(coord.x + 1, coord.y);
         if (tiles.ContainsKey(p))
         {
             _adjacentTiles.Add(tiles[p]);
         }
 
-        p.X = coord.X - 1;
+        p.x = coord.x - 1;
         if (tiles.ContainsKey(p))
         {
             _adjacentTiles.Add(tiles[p]);
         }
 
-        p.Y = coord.Y + 1;
-        p.X = coord.X;
+        p.y = coord.y + 1;
+        p.x = coord.x;
         if (tiles.ContainsKey(p))
         {
             _adjacentTiles.Add(tiles[p]);
         }
 
-        p.Y = coord.Y - 1;
+        p.y = coord.y - 1;
         if (tiles.ContainsKey(p))
         {
             _adjacentTiles.Add(tiles[p]);
@@ -174,28 +175,28 @@ public class Tile : MonoBehaviour
     {
         List<Tile> adjTiles = GetAdjacentTiles();
 
-        if (startTile.Coordinates.X > Coordinates.X)
+        if (startTile.Coordinates.x > Coordinates.x)
         {
             // attack was down, get target to left
-            Tile t = adjTiles.Where(tile => tile.Coordinates.X < Coordinates.X).FirstOrDefault();
+            Tile t = adjTiles.Where(tile => tile.Coordinates.x < Coordinates.x).FirstOrDefault();
             return t;
         }
-        else if (startTile.Coordinates.X < Coordinates.X)
+        else if (startTile.Coordinates.x < Coordinates.x)
         {
             // attack was up, get target to right
-            Tile t = adjTiles.Where(tile => tile.Coordinates.X > Coordinates.X).FirstOrDefault();
+            Tile t = adjTiles.Where(tile => tile.Coordinates.x > Coordinates.x).FirstOrDefault();
             return t;
         }
-        else if (startTile.Coordinates.Y > Coordinates.Y)
+        else if (startTile.Coordinates.y > Coordinates.y)
         {
             // attack was to the right, get target down
-            Tile t = adjTiles.Where(tile => tile.Coordinates.Y < Coordinates.Y).FirstOrDefault();
+            Tile t = adjTiles.Where(tile => tile.Coordinates.y < Coordinates.y).FirstOrDefault();
             return t;
         }
         else
         {
             // attack was to left, get target up
-            Tile t = adjTiles.Where(tile => tile.Coordinates.Y > Coordinates.Y).FirstOrDefault();
+            Tile t = adjTiles.Where(tile => tile.Coordinates.y > Coordinates.y).FirstOrDefault();
             return t;
         }
     }
@@ -210,28 +211,28 @@ public class Tile : MonoBehaviour
     {
         List<Tile> adjTiles = GetAdjacentTiles();
 
-        if (startTile.Coordinates.X > Coordinates.X)
+        if (startTile.Coordinates.x > Coordinates.x)
         {
             // attack was to left, get target up
-            Tile t = adjTiles.Where(tile => tile.Coordinates.Y > Coordinates.Y).FirstOrDefault();
+            Tile t = adjTiles.Where(tile => tile.Coordinates.y > Coordinates.y).FirstOrDefault();
             return t;
         }
-        else if (startTile.Coordinates.X < Coordinates.X)
+        else if (startTile.Coordinates.x < Coordinates.x)
         {
             // attack was to the right, get target down
-            Tile t = adjTiles.Where(tile => tile.Coordinates.Y < Coordinates.Y).FirstOrDefault();
+            Tile t = adjTiles.Where(tile => tile.Coordinates.y < Coordinates.y).FirstOrDefault();
             return t;
         }
-        else if (startTile.Coordinates.Y > Coordinates.Y)
+        else if (startTile.Coordinates.y > Coordinates.y)
         {
             // attack was down, get target to left
-            Tile t = adjTiles.Where(tile => tile.Coordinates.X < Coordinates.X).FirstOrDefault();
+            Tile t = adjTiles.Where(tile => tile.Coordinates.x < Coordinates.x).FirstOrDefault();
             return t;
         }
         else
         {
             // attack was up, get target to right
-            Tile t = adjTiles.Where(tile => tile.Coordinates.X > Coordinates.X).FirstOrDefault();
+            Tile t = adjTiles.Where(tile => tile.Coordinates.x > Coordinates.x).FirstOrDefault();
             return t;
         }
     }
@@ -243,8 +244,8 @@ public class Tile : MonoBehaviour
 
     public int GetTileDistance(Tile targetTile)
     {
-        int yDiff = Mathf.Abs(targetTile.Coordinates.Y - _coordinates.Y);
-        int xDiff = Mathf.Abs(targetTile.Coordinates.X - _coordinates.X);
+        int yDiff = (int) Mathf.Abs(targetTile.Coordinates.y - _coordinates.y);
+        int xDiff = (int) Mathf.Abs(targetTile.Coordinates.x - _coordinates.x);
         return xDiff + yDiff;
     }
 
@@ -262,6 +263,16 @@ public class Tile : MonoBehaviour
     {
         SetSelected(false);
         _pawn = null;
+    }
+
+    public void SetItem(ItemUIImmersive item)
+    {
+        _item = item;
+    }
+
+    public ItemUIImmersive GetItem()
+    {
+        return _item;
     }
 
     public Pawn GetPawn()
@@ -288,16 +299,16 @@ public class Tile : MonoBehaviour
 
         int pawnMoveRange = _pawn.MoveRange;
         List<Tile> tilesInRange = new();
-        Point p = new();
+        Vector2 p = new();
         Tile t;
         // start at x - range because we want to be able to move backwards. 
         // Go to x + range because we want to be able to move forwards. Same for Y.
-        for (int x = Coordinates.X - pawnMoveRange; x <= pawnMoveRange + Coordinates.X; x++)
+        for (int x = (int)Coordinates.x - pawnMoveRange; x <= pawnMoveRange + Coordinates.x; x++)
         {
-            p.X = x;
-            for (int y = Coordinates.Y - pawnMoveRange; y <= pawnMoveRange + Coordinates.Y; y++)
+            p.x = x;
+            for (int y = (int)Coordinates.y - pawnMoveRange; y <= pawnMoveRange + Coordinates.y; y++)
             {
-                p.Y = y;
+                p.y = y;
                 
                 // don't go outside of grid
                 if  (!GridGenerator.Instance.Tiles.ContainsKey(p))

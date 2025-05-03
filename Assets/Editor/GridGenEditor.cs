@@ -12,7 +12,7 @@ public class GridGenEditor : Editor
 
         if (GUILayout.Button("Generate"))
         {
-            gridGen.GenerateGrid();
+            gridGen.GenerateTiles();
         }
     }
 }

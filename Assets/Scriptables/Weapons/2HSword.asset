@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd5a69d4543524cf881e71e538083d38, type: 3}
   m_Name: 2HSword
   m_EditorClassIdentifier: 
+  itemID: 2hsword
   itemName: Bastard Sword
   description: A huge two handed sword. Takes a full turn to attack but does massive
     damage.

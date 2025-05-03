@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5494fd04dbee14f34b60b102d5cb9856, type: 3}
   m_Name: BadHelm1
   m_EditorClassIdentifier: 
+  itemID: badhelm
   itemName: BadHelm
   description: An acceptable piece of noggin protection.
   itemPrice: 30

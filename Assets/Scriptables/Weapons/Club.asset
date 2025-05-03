@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd5a69d4543524cf881e71e538083d38, type: 3}
   m_Name: Club
   m_EditorClassIdentifier: 
+  itemID: club
   itemName: Club
   description: A hefty stick. Nothing special here, it's just a stick.
   itemPrice: 0
   itemType: 2
   isDefault: 1
   itemSprite: {fileID: 21300000, guid: e28b8f6f6cf28404eb455c6f677329ec, type: 3}
-  weaponType: 0
   baseDamage: 1
   abilities:
   - {fileID: 11400000, guid: 048eae1a93afc4e42bc14b36427ca584, type: 2}

@@ -108,38 +108,6 @@ public class BattleManager : MonoBehaviour
 
         gameOverButton.onClick.AddListener(ExitBattle);
 
-        // if not started from Battle scene, spawn player's company and enemies in contract
-        if (GameManager.Instance != null)
-        {
-            //dudesToSpawn = GameManager.Instance.GetNumOfEnemiesToSpawn();
-
-            foreach (GameCharacter character in GameManager.Instance.PlayerFollowers)
-            {
-                Pawn newPawn = Instantiate(pawnPrefab, friendlyParent).GetComponent<Pawn>();
-                _playerPawns.Add(newPawn);
-                newPawn.SetCharacter(character);
-
-                MiniStatBar miniStats = Instantiate(_miniStatBarPrefab, _healthBarParent);
-                miniStats.SetData(newPawn);
-            }
-
-            foreach(GameCharacter character in GameManager.Instance.GetEnemiesForContract())
-            {
-                Pawn newPawn = Instantiate(pawnPrefab, enemyParent).GetComponent<Pawn>();
-                newPawn.SetCharacter(character);
-
-                _aiPlayer.RegisterPawn(newPawn);
-
-                MiniStatBar miniStats = Instantiate(_miniStatBarPrefab, _healthBarParent);
-                miniStats.SetData(newPawn);
-            }
-        }
-        // otherwise, spawn a random assortment of friendly and enemy dudes
-        else
-        {
-            StartCoroutine(TestModeOnDataLoadedStart());
-        }
-
         Tile.OnTileHoverStart.AddListener(HandleTileHoverStart);
         Tile.OnTileHoverEnd.AddListener(HandleTileHoverEnd);
 
@@ -151,29 +119,7 @@ public class BattleManager : MonoBehaviour
 
         // show instructions
         //_instructionsUI.SetActive(true);
-    }
-
-    /// <summary>
-    /// Start for when just testing battles. Not very secure but it's just for testing. 
-    /// </summary>
-    /// <returns></returns>
-    private IEnumerator TestModeOnDataLoadedStart()
-    {
-        // instantiate data loader
-        DataLoader dataLoader = new DataLoader();
-        dataLoader.LoadData();
-
-        // wait for data to load. 
-        yield return new WaitForSeconds(3f);
-        // change game over button text to "restart"
-        gameOverButton.GetComponentInChildren<TMP_Text>().text = "Restart";
-
-        Debug.Log("No game manager, spawning default amount");
-        SpawnTestGuys(true);
-        SpawnTestGuys(false);
-
-        _battleResult = BattleResult.Undecided;
-        StartBattle();
+        // Spawn();
     }
 
     private void Start()
@@ -181,8 +127,12 @@ public class BattleManager : MonoBehaviour
         if (GameManager.Instance != null)
         {
             _battleResult = BattleResult.Undecided;
+
+            Spawn();
             StartBattle();
         }
+
+        Spawn();
     }
 
     private void Update()
@@ -223,6 +173,94 @@ public class BattleManager : MonoBehaviour
         _nextInstructionsButton.onClick.AddListener(NextInstructions);
         _showInstructionsButton.onClick.RemoveListener(ToggleInstructions);
     }
+
+
+    private void Spawn()
+    {
+        // if not started from Battle scene, spawn player's company and enemies in contract
+        if (GameManager.Instance != null)
+        {
+            //dudesToSpawn = GameManager.Instance.GetNumOfEnemiesToSpawn();
+
+            foreach (GameCharacter character in GameManager.Instance.PlayerFollowers)
+            {
+                Pawn newPawn = Instantiate(pawnPrefab, friendlyParent).GetComponent<Pawn>();
+                _playerPawns.Add(newPawn);
+                newPawn.SetCharacter(character);
+                PickStartTileBattle(newPawn);
+
+                MiniStatBar miniStats = Instantiate(_miniStatBarPrefab, _healthBarParent);
+                miniStats.SetData(newPawn);
+
+                
+            }
+
+            foreach(GameCharacter character in GameManager.Instance.GetEnemiesForContract())
+            {
+                Pawn newPawn = Instantiate(pawnPrefab, enemyParent).GetComponent<Pawn>();
+                newPawn.SetCharacter(character);
+
+                _aiPlayer.RegisterPawn(newPawn);
+
+                PickStartTileBattle(newPawn);
+
+                MiniStatBar miniStats = Instantiate(_miniStatBarPrefab, _healthBarParent);
+                miniStats.SetData(newPawn);
+            }
+        }
+        // otherwise, spawn a random assortment of friendly and enemy dudes
+        else
+        {
+            StartCoroutine(TestModeOnDataLoadedStart());
+        }
+    }
+
+    private void PickStartTileBattle(Pawn p)
+    {
+        Tile spawnTile;
+        if (p.OnPlayerTeam)
+        {
+            do
+            {
+                spawnTile = GridGenerator.Instance.PlayerSpawns[Random.Range(0, GridGenerator.Instance.PlayerSpawns.Count)];
+            } while (spawnTile.GetPawn() != null);
+        }
+        else
+        {
+            do
+            {
+                spawnTile = GridGenerator.Instance.EnemySpawns[Random.Range(0, GridGenerator.Instance.EnemySpawns.Count)];
+            } while (spawnTile.GetPawn() != null);
+        }
+
+        p.PlaceAtTile(spawnTile);
+        p.transform.position = spawnTile.transform.position;
+    }
+
+    /// <summary>
+    /// Start for when just testing battles. Not very secure but it's just for testing. 
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator TestModeOnDataLoadedStart()
+    {
+        // instantiate data loader
+        DataLoader dataLoader = new DataLoader();
+        dataLoader.LoadData();
+
+        // wait for data to load. 
+        yield return new WaitForSeconds(3f);
+        // change game over button text to "restart"
+        gameOverButton.GetComponentInChildren<TMP_Text>().text = "Restart";
+
+        Debug.Log("No game manager, spawning default amount");
+        SpawnTestGuys(true);
+        SpawnTestGuys(false);
+
+        _battleResult = BattleResult.Undecided;
+        // Spawn();
+        StartBattle();
+    }
+
 
     #region UI
 
@@ -550,7 +588,7 @@ public class BattleManager : MonoBehaviour
 
     public void SpawnTestGuys(bool friendly)
     {
-        int numToSpawn = Random.Range(DEFAULT_MIN_AMOUNT_TO_SPAWN, DEFAULT_MAX_AMOUNT_TO_SPAWN);// : 3;
+        int numToSpawn = 3;//Random.Range(DEFAULT_MIN_AMOUNT_TO_SPAWN, DEFAULT_MAX_AMOUNT_TO_SPAWN);// : 3;
 
         for (int i = 0; i < numToSpawn; i++)
         {
@@ -623,6 +661,8 @@ public class BattleManager : MonoBehaviour
             {
                 _aiPlayer.RegisterPawn(newPawn);
             }
+
+            PickStartTileBattle(newPawn);
             
             MiniStatBar miniStats = Instantiate(_miniStatBarPrefab, _healthBarParent);
             miniStats.SetData(newPawn);
@@ -863,6 +903,7 @@ public class BattleManager : MonoBehaviour
         winLoseText.text = battleResult == BattleResult.Win ? "Victory!" : "Defeat!" ;
 
         _battleResult = battleResult;
+
     }
 
     private bool CheckEnemyWipedOut()

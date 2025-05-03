@@ -119,8 +119,7 @@ public class Pawn : MonoBehaviour
 
     private void Start()
     {
-        PickStartTile();
-        _spriteController.SetData(this);
+        // PickStartTile();
     }
 
     private void OnDestroy()
@@ -158,6 +157,29 @@ public class Pawn : MonoBehaviour
         {
             UpdateEffect(p.effectDisplay, true);
         }
+
+        _spriteController.SetData(this);
+    }
+
+    /// <summary>
+    /// For situations like recruits switching shirts when recruited
+    /// </summary>
+    public void SetAltShirt(bool useAlt)
+    {
+        if (GameChar.Data.altShirt == null && useAlt)
+        {
+            Debug.Log("No alt shirt!");
+            return;
+        }
+
+        _spriteController.SetShirt(useAlt ? GameChar.Data.altShirt : GameChar.Data.shirt);
+    }
+
+    public void PlaceAtTile(Tile t)
+    {
+        _currentTile = t;
+        t.PawnEnterTile(this);
+        transform.position = t.transform.position;
     }
 
     private void SetupMotConds()
@@ -242,28 +264,28 @@ public class Pawn : MonoBehaviour
     //     Motivation = Mathf.Clamp(Motivation + MOT_REGAIN_RATE, Motivation, GameChar.GetBattleMotivationCap());
     // }
 
-    private void PickStartTile()
-    {
-        Tile spawnTile;
-        if (OnPlayerTeam)
-        {
-            do
-            {
-                spawnTile = GridGenerator.Instance.PlayerSpawns[Random.Range(0, GridGenerator.Instance.PlayerSpawns.Count)];
-            } while (spawnTile.GetPawn() != null);
-        }
-        else
-        {
-            do
-            {
-                spawnTile = GridGenerator.Instance.EnemySpawns[Random.Range(0, GridGenerator.Instance.EnemySpawns.Count)];
-            } while (spawnTile.GetPawn() != null);
-        }
+    // private void PickStartTile()
+    // {
+    //     Tile spawnTile;
+    //     if (OnPlayerTeam)
+    //     {
+    //         do
+    //         {
+    //             spawnTile = GridGenerator.Instance.PlayerSpawns[Random.Range(0, GridGenerator.Instance.PlayerSpawns.Count)];
+    //         } while (spawnTile.GetPawn() != null);
+    //     }
+    //     else
+    //     {
+    //         do
+    //         {
+    //             spawnTile = GridGenerator.Instance.EnemySpawns[Random.Range(0, GridGenerator.Instance.EnemySpawns.Count)];
+    //         } while (spawnTile.GetPawn() != null);
+    //     }
 
-        _currentTile = spawnTile;
-        spawnTile.PawnEnterTile(this);
-        transform.position = spawnTile.transform.position;
-    }
+    //     _currentTile = spawnTile;
+    //     spawnTile.PawnEnterTile(this);
+    //     transform.position = spawnTile.transform.position;
+    // }
     
     public List<Pawn> GetAdjacentPawns()
     {

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PawnSprite : MonoBehaviour
@@ -113,14 +114,19 @@ public class PawnSprite : MonoBehaviour
 
         if (pawn.OnPlayerTeam)
         {
-            UpdateFacingAndSpriteOrder(Vector3.zero, new Vector3(1, 1), pawn.CurrentTile);
-            _anim.Play("IdleNE", 0, Random.Range(0f, 1f));
+            UpdateFacingAndSpriteOrder(Vector3.zero, new Vector3(1, -1), pawn.CurrentTile);
+            _anim.Play("IdleSE", 0, Random.Range(0f, 1f));
         }
         else
         {
             UpdateFacingAndSpriteOrder(Vector3.zero, new Vector3(-1, -1), pawn.CurrentTile);
             _anim.Play("IdleSW", 0, Random.Range(0f, 1f));
         }
+    }
+
+    public void SetShirt(Sprite s)
+    {
+        _bodySpriteRend.sprite = s;
     }
 
     public void Reset()

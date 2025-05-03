@@ -16,6 +16,9 @@ public class DataLoader
     // passive abilities for characters
     public static Dictionary<string, PassiveData> passives = new();
 
+    // items
+    public static Dictionary<string, ItemData> items = new();
+
     // contract types
     public static Dictionary<string, ContractData> contracts = new();
 
@@ -41,6 +44,12 @@ public class DataLoader
         Addressables.LoadAssetsAsync<ContractData>("contracts", OnLoadContractsCompleted);
         Addressables.LoadAssetsAsync<Ability>("charAbilities", OnLoadCharacterAbilities);
         Addressables.LoadAssetsAsync<PassiveData>("passives", OnLoadPassives);
+        Addressables.LoadAssetsAsync<ItemData>("shopItems", OnLoadItems);
+    }
+
+    private void OnLoadItems(ItemData result)
+    {
+        items[result.itemID] = result;
     }
 
     private void OnLoadPassives(PassiveData result)

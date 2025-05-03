@@ -3,6 +3,7 @@ using System.Collections;
 
 public class ItemData : ScriptableObject
 {
+    public string itemID;
     [Header("Descriptive")]
     public string itemName;
     public string description;

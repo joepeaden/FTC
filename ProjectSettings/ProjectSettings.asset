@@ -603,6 +603,7 @@ PlayerSettings:
   platformArchitecture: {}
   scriptingBackend:
     Standalone: 0
+    WebGL: 1
   il2cppCompilerConfiguration: {}
   il2cppCodeGeneration: {}
   managedStrippingLevel:

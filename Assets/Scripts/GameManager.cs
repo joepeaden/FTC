@@ -66,7 +66,7 @@ public class GameManager : MonoBehaviour
             TryAddFollower(0, new GameCharacter(DataLoader.charTypes["player"]));
         }
 
-        SceneManager.LoadScene("DecisionsUI");
+        SceneManager.LoadScene("BattleScene");
     }
 
     public GameCharacter TryAddFollower(int cost, GameCharacter newFollower)
@@ -96,7 +96,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public bool TryAddItem(ItemData item)
+    public bool TryBuyItem(ItemData item)
     {
         if (item.itemPrice > _playerGold)
         {

@@ -229,7 +229,7 @@ public class DecisionsManager : MonoBehaviour
     public void PurchaseItem(ItemUI itemUI)
     {
         // add item to player inventory data structure
-        bool success = GameManager.Instance.TryAddItem(itemUI.Item);
+        bool success = GameManager.Instance.TryBuyItem(itemUI.Item);
 
         // !success can mean we didn't have enough money
         if (!success)

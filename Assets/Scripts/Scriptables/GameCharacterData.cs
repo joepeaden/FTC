@@ -29,6 +29,10 @@ public class GameCharacterData : ScriptableObject
 
     [Header("Appearance")]
     public Sprite shirt;
+    /// <summary>
+    /// For cases like recruits switching shirts when hired
+    /// </summary>
+    public Sprite altShirt;
     public Sprite eyesSE;
     public Sprite eyesSW;
     public Sprite contractDisplaySprite;

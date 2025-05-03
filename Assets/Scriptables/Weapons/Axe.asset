@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd5a69d4543524cf881e71e538083d38, type: 3}
   m_Name: Axe
   m_EditorClassIdentifier: 
+  itemID: axe
   itemName: Axe
   description: A common tool turned brutal weapon, axes have high damage and are
     best against a single target.
@@ -19,7 +20,6 @@ MonoBehaviour:
   itemType: 2
   isDefault: 0
   itemSprite: {fileID: 21300000, guid: 50e72420994aa5c44a30b1424e783f5b, type: 3}
-  weaponType: 3
   baseDamage: 3
   abilities:
   - {fileID: 11400000, guid: 44abbab1a81a844698561ab662c7a5d9, type: 2}
