@@ -1,6 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using Pathfinding;
 using UnityEngine;
@@ -268,6 +266,11 @@ public class Tile : MonoBehaviour
     public void SetItem(ItemUIImmersive item)
     {
         _item = item;
+
+        if (_item != null)
+        {
+            item.CurrentTile = this;
+        }
     }
 
     public ItemUIImmersive GetItem()

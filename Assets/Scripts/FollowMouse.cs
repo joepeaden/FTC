@@ -1,10 +1,13 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class FollowMouse : MonoBehaviour
 {
+    public Vector2 offset;
+    
     private RectTransform _rect;
+
+    // Lol. Should the "followmouse" script follow the mouse? Not always, apparently.
+    [HideInInspector] public bool ShouldFollow = true; 
 
     private void Start()
     {
@@ -13,14 +16,17 @@ public class FollowMouse : MonoBehaviour
 
     private void Update()
     {
-        Vector2 mousePos;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            GetComponent<RectTransform>().parent as RectTransform, 
-            Input.mousePosition,
-            CameraManager.MainCamera,
-            out mousePos);
+        if (ShouldFollow)
+        {
+            Vector2 mousePos;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                GetComponent<RectTransform>().parent as RectTransform, 
+                Input.mousePosition,
+                null,
+                out mousePos);
 
-        // Update the position of the UI element
-        _rect.anchoredPosition = mousePos;
+            // Update the position of the UI element
+            _rect.anchoredPosition = mousePos + offset;
+        }
     }
 }

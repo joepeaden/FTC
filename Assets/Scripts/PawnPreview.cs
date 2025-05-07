@@ -26,6 +26,8 @@ public class PawnPreview : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     [SerializeField] private Image eyesRend;
     [SerializeField] private Image fHairRend;
     [SerializeField] private Image browRend;
+    
+    [HideInInspector] public bool ShowEquipment; 
 
     private Pawn _pawn;
 
@@ -77,7 +79,7 @@ public class PawnPreview : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     private void SetupAppearance(ArmorItemData helm, WeaponItemData weapon, Sprite eyesSprite, Sprite bodySprite, Sprite hairSprite, Sprite fHairSprite, Sprite browSprite)
     {
-        if (helm != null)
+        if (ShowEquipment && helm != null)
         {
             helmRend.gameObject.SetActive(true);
             helmRend.sprite = helm.itemSprite;
@@ -89,7 +91,7 @@ public class PawnPreview : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
             helmRend.gameObject.SetActive(false);
         }
 
-        if (weapon != null)
+        if (ShowEquipment && weapon != null)
         {
             weaponRend.gameObject.SetActive(true);
             weaponRend.sprite = weapon.itemSprite;

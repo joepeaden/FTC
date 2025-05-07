@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.Search;
 using UnityEngine;
 
 public class ItemUIImmersive : MonoBehaviour
@@ -12,6 +9,8 @@ public class ItemUIImmersive : MonoBehaviour
 
     public ItemData Item => _item;
     private ItemData _item;
+
+    public Tile CurrentTile;
 
     private void Awake()
     {

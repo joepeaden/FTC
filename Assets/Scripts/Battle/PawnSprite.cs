@@ -89,6 +89,11 @@ public class PawnSprite : MonoBehaviour
             _helmSpriteRend.sprite = _currentHelm.SWSprite;
             _hairSpriteRend.gameObject.SetActive(false);
         }
+        else
+        {
+            _helmSpriteRend.sprite = null;
+            _hairSpriteRend.gameObject.SetActive(true);
+        }
 
         _NEHair = pawn.GameChar.HairDetail.NESprite;
         _NWHair = pawn.GameChar.HairDetail.NWSprite;

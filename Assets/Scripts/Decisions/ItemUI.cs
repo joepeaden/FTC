@@ -23,7 +23,7 @@ public class ItemUI : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void SetData(ItemData theItem, DecisionsManager d, UnityAction<ItemUI> callback)
+    public void SetData(ItemData theItem, UnityAction<ItemUI> callback)
     {
         gameObject.SetActive(true);
 

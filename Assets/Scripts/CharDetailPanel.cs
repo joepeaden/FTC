@@ -12,11 +12,10 @@ public class CharDetailPanel : MonoBehaviour
     [SerializeField] private TMP_Text _charName;
 
     [SerializeField] private PipStatBar _healthStatBar;
-    [SerializeField] private PipStatBar _armorStatBar;
+    [SerializeField] private TMP_Text _armorText;
     [SerializeField] private PipStatBar _motivStatBar;
 
     [SerializeField] private TMP_Text _levelText;
-    [SerializeField] private TMP_Text _classText;
     [SerializeField] private TMP_Text _xpText;
     [SerializeField] private TMP_Text _moveText;
     [SerializeField] private TMP_Text _initText;
@@ -27,7 +26,10 @@ public class CharDetailPanel : MonoBehaviour
 
     public GameCharacter CurrentCharacter => _currentCharacter;
     private GameCharacter _currentCharacter;
-    private DecisionsManager _decisions;
+
+    public Pawn CurrentPawn;
+
+    // private DecisionsManager _decisions;
     [SerializeField] private ItemUI _helmUI;
     [SerializeField] private ItemUI _weaponUI;
 
@@ -36,9 +38,15 @@ public class CharDetailPanel : MonoBehaviour
     [SerializeField] private List<ActionButton> _actionButtons = new();
     [SerializeField] private List<InfoLine> _motivationConditionDisplay = new();
 
-    public void Setup(DecisionsManager decisions)
+    // public void Setup(DecisionsManager decisions)
+    // {
+    //     _decisions = decisions;
+    // }
+
+    public void SetPawn(Pawn p)
     {
-        _decisions = decisions;
+        CurrentPawn = p;
+        SetCharacter(p.GameChar);
     }
 
     public void SetCharacter(GameCharacter character)
@@ -46,7 +54,7 @@ public class CharDetailPanel : MonoBehaviour
         _currentCharacter = character;
         _charName.text = _currentCharacter.CharName;
         _healthStatBar.SetBar(_currentCharacter.HitPoints);
-        _armorStatBar.SetBar(_currentCharacter.GetTotalArmor()); ;
+        _armorText.text = _currentCharacter.GetTotalArmor().ToString();
         _motivStatBar.SetBar(_currentCharacter.GetBattleMotivationCap());
 
         _xpText.text = "XP: " + _currentCharacter.XP + "/" + _currentCharacter.GetXPToLevel();
@@ -56,15 +64,12 @@ public class CharDetailPanel : MonoBehaviour
         _dmgText.text = _currentCharacter.TheWeapon.Data.baseDamage.ToString();
         _accRating.text = _currentCharacter.AccRating + "+";
         _critText.text = _currentCharacter.CritChance + "+";
-
-        //_classText.text = _currentCharacter.Motivator.ToString();
-
         _helmUI.RemoveCallbacks();
         _weaponUI.RemoveCallbacks();
 
         if (character.HelmItem != null)
         {
-            _helmUI.SetData(character.HelmItem, _decisions, UnEquipItem);
+            _helmUI.SetData(character.HelmItem, UnEquipItem);
         }
         else if (_helmUI != null)
         {
@@ -73,7 +78,7 @@ public class CharDetailPanel : MonoBehaviour
 
         if (character.TheWeapon != null)
         {
-            _weaponUI.SetData(character.TheWeapon.Data, _decisions, UnEquipItem);
+            _weaponUI.SetData(character.TheWeapon.Data, UnEquipItem);
         }
         else if (_weaponUI != null)
         {
@@ -106,21 +111,22 @@ public class CharDetailPanel : MonoBehaviour
             actionButton.gameObject.SetActive(false);
         }
 
-        List<MotCondData> motConditions = character.GetMotCondsForBattle();
-        for (i = 0; i < motConditions.Count; i++)
-        {
-            MotCondData condition = motConditions[i];
+        // List<MotCondData> motConditions = character.GetMotCondsForBattle();
+        // for (i = 0; i < motConditions.Count; i++)
+        // {
+        //     MotCondData condition = motConditions[i];
 
-            _motivationConditionDisplay[i].SetData("", condition.description);
+        //     _motivationConditionDisplay[i].SetData("", condition.description);
 
-        }
+        // }
 
         // update the remaining buttons
-        for (i = 0; i < _motivationConditionDisplay.Count; i++)
-        {
-            _motivationConditionDisplay[i].Hide();
-        }
+        // for (i = 0; i < _motivationConditionDisplay.Count; i++)
+        // {
+        //     _motivationConditionDisplay[i].Hide();
+        // }
 
+        _pawnPreview.ShowEquipment = false;
         _pawnPreview.SetData(character);
     }
 
@@ -132,8 +138,8 @@ public class CharDetailPanel : MonoBehaviour
             return;
         }
 
-        _currentCharacter.UnEquipItem(itemUI.Item);
-        GameManager.Instance.PlayerInventory.Add(itemUI.Item);
+        CurrentPawn.UnEquipItem(itemUI.Item);
+        GameManager.Instance.AddItem(itemUI.Item);
 
         switch (itemUI.Item.itemType)
         {
@@ -145,21 +151,21 @@ public class CharDetailPanel : MonoBehaviour
                 break;
         }
 
-        _decisions.RefreshInventory();
+        // _decisions.RefreshInventory();
 
         SetCharacter(_currentCharacter);
     }
 
     public void EquipItem(ItemData item)
     {
-        ItemData oldItem = _currentCharacter.EquipItem(item);
+        ItemData oldItem = CurrentPawn.EquipItem(item);
 
         if (oldItem != null)
         {
             // put the item back in player inventory if it's not the default one
             if (!oldItem.isDefault)
             {
-                GameManager.Instance.PlayerInventory.Add(oldItem);
+                GameManager.Instance.AddItem(oldItem);
             }
         }
 

@@ -161,6 +161,20 @@ public class Pawn : MonoBehaviour
         _spriteController.SetData(this);
     }
 
+    public ItemData EquipItem(ItemData theItem)
+    {
+        ItemData oldItem = GameChar.EquipItem(theItem);
+        SetCharacter(GameChar);
+
+        return oldItem;
+    }    
+    
+    public void UnEquipItem(ItemData theItem)
+    {
+        GameChar.UnEquipItem(theItem);
+        SetCharacter(GameChar);
+    }
+
     /// <summary>
     /// For situations like recruits switching shirts when recruited
     /// </summary>

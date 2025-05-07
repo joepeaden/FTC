@@ -36,6 +36,7 @@ namespace SingularityGroup.HotReload.Editor {
         private const string LaunchOnEditorStartKey = "HotReloadWindow.LaunchOnEditorStart";
         private const string AutoRecompileUnsupportedChangesKey = "HotReloadWindow.AutoRecompileUnsupportedChanges";
         private const string AutoRecompilePartiallyUnsupportedChangesKey = "HotReloadWindow.AutoRecompilePartiallyUnsupportedChanges";
+        private const string DisplayNewMonobehaviourMethodsAsPartiallySupportedKey = "HotReloadWindow.DisplayNewMonobehaviourMethodsAsPartiallySupported";
         private const string ShowNotificationsKey = "HotReloadWindow.ShowNotifications";
         private const string ShowPatchingNotificationsKey = "HotReloadWindow.ShowPatchingNotifications";
         private const string ShowCompilingUnsupportedNotificationsKey = "HotReloadWindow.ShowCompilingUnsupportedNotifications";
@@ -54,6 +55,7 @@ namespace SingularityGroup.HotReload.Editor {
         private const string IncludeShaderChangesKey = "HotReloadWindow.IncludeShaderChanges";
         private const string DisableConsoleWindowKey = "HotReloadWindow.DisableConsoleWindow";
         private const string DisableDetailedErrorReportingKey = "HotReloadWindow.DisableDetailedErrorReporting";
+        private const string DebuggerCompatibilityEnabledKey = "HotReloadWindow.DebuggerCompatibilityEnabled";
         private const string RedeemLicenseEmailKey = "HotReloadWindow.RedeemLicenseEmail";
         private const string RedeemLicenseInvoiceKey = "HotReloadWindow.RedeemLicenseInvoice";
         private const string RunTabEventsSuggestionsFoldoutKey = "HotReloadWindow.RunTabEventsSuggestionsFoldout";
@@ -281,6 +283,11 @@ namespace SingularityGroup.HotReload.Editor {
             get { return EditorPrefs.GetBool(AutoRecompilePartiallyUnsupportedChangesKey, false); }
             set { EditorPrefs.SetBool(AutoRecompilePartiallyUnsupportedChangesKey, value); }
         }
+        
+        public static bool DisplayNewMonobehaviourMethodsAsPartiallySupported {
+            get { return EditorPrefs.GetBool(DisplayNewMonobehaviourMethodsAsPartiallySupportedKey, false); }
+            set { EditorPrefs.SetBool(DisplayNewMonobehaviourMethodsAsPartiallySupportedKey, value); }
+        }
 
         public static bool ShowNotifications {
             get { return EditorPrefs.GetBool(ShowNotificationsKey, true); }
@@ -461,6 +468,11 @@ namespace SingularityGroup.HotReload.Editor {
         public static bool DisableDetailedErrorReporting {
             get { return EditorPrefs.GetBool(DisableDetailedErrorReportingKey, false); }
             set { EditorPrefs.SetBool(DisableDetailedErrorReportingKey, value); }
+        }
+        
+        public static bool AutoDisableHotReloadWithDebugger {
+            get { return EditorPrefs.GetBool(DebuggerCompatibilityEnabledKey, true); }
+            set { EditorPrefs.SetBool(DebuggerCompatibilityEnabledKey, value); }
         }
     }
 }

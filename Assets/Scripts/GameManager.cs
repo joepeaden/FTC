@@ -1,12 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance => _instance;
     private static GameManager _instance;
+
+    public UnityEvent OnPlayerInventoryUpdated = new();
 
     public static int GOLD_WIN_AMOUNT = 1000;
 
@@ -93,10 +97,18 @@ public class GameManager : MonoBehaviour
         if (PlayerInventory.Contains(item))
         {
             PlayerInventory.Remove(item);
+            OnPlayerInventoryUpdated.Invoke();
         }
     }
 
-    public bool TryBuyItem(ItemData item)
+    public void AddItem(ItemData item)
+    {
+        // add item to player inventory data structure and trigger event
+        PlayerInventory.Add(item);
+        OnPlayerInventoryUpdated.Invoke();
+    }
+
+    public bool TryBuyItem(ItemData item, bool addToInventory = true)
     {
         if (item.itemPrice > _playerGold)
         {
@@ -105,9 +117,11 @@ public class GameManager : MonoBehaviour
 
         _playerGold -= item.itemPrice;
 
-        // add item to player inventory data structure
-        PlayerInventory.Add(item);
-
+        if (addToInventory)
+        {
+            AddItem(item);
+        }
+        
         return true;
     }
 

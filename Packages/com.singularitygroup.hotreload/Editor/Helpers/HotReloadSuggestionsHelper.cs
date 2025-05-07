@@ -41,6 +41,8 @@ namespace SingularityGroup.HotReload.Editor {
                 return !HotReloadState.ShowedFieldInitializerExistingInstancesEdited;
             } else if (hotReloadSuggestionKind == HotReloadSuggestionKind.FieldInitializerExistingInstancesUnedited) {
                 return !HotReloadState.ShowedFieldInitializerExistingInstancesUnedited;
+            } else if (hotReloadSuggestionKind == HotReloadSuggestionKind.AddMonobehaviourMethod) {
+                return !HotReloadState.ShowedAddMonobehaviourMethods;
             } else if (hotReloadSuggestionKind == HotReloadSuggestionKind.DetailedErrorReportingIsEnabled) {
                 return !CheckSuggestionShown(HotReloadSuggestionKind.DetailedErrorReportingIsEnabled);
             }
@@ -58,6 +60,8 @@ namespace SingularityGroup.HotReload.Editor {
                 HotReloadState.ShowedFieldInitializerExistingInstancesEdited = true;
             } else if (hotReloadSuggestionKind == HotReloadSuggestionKind.FieldInitializerExistingInstancesUnedited) {
                 HotReloadState.ShowedFieldInitializerExistingInstancesUnedited = true;
+            } else if (hotReloadSuggestionKind == HotReloadSuggestionKind.AddMonobehaviourMethod) {
+                HotReloadState.ShowedAddMonobehaviourMethods = true;
             } else {
                 return;
             }
@@ -110,6 +114,7 @@ namespace SingularityGroup.HotReload.Editor {
         internal static readonly OpenURLButton recompileTroubleshootingButton = new OpenURLButton("Docs", Constants.RecompileTroubleshootingURL);
         internal static readonly OpenURLButton featuresDocumentationButton = new OpenURLButton("Docs", Constants.FeaturesDocumentationURL);
         internal static readonly OpenURLButton multipleEditorsDocumentationButton = new OpenURLButton("Docs", Constants.MultipleEditorsURL);
+        internal static readonly OpenURLButton debuggerDocumentationButton = new OpenURLButton("More Info", Constants.DebuggerURL);
         public static Dictionary<HotReloadSuggestionKind, AlertEntry> suggestionMap = new Dictionary<HotReloadSuggestionKind, AlertEntry> {
             { HotReloadSuggestionKind.UnityBestDevelopmentToolAward2023, new AlertEntry(
                 AlertType.Suggestion, 
@@ -341,6 +346,33 @@ namespace SingularityGroup.HotReload.Editor {
                 entryType: EntryType.Foldout,
                 iconType: AlertType.Suggestion
             )},
+            { HotReloadSuggestionKind.AddMonobehaviourMethod, new AlertEntry(
+                AlertType.Suggestion, 
+                "New MonoBehaviour methods are not shown in the inspector",
+                "New methods in MonoBehaviours are not shown in the inspector until the script is recompiled. This is a limitation of Hot Reload handling of Unity's serialization system.\n\nYou can use the button below to auto recompile partially supported changes such as this one.",
+                actionData: () => {
+                    GUILayout.Space(8f);
+                    using (new EditorGUILayout.HorizontalScope()) {
+                        if (GUILayout.Button(" OK ")) {
+                            SetSuggestionInactive(HotReloadSuggestionKind.AddMonobehaviourMethod);
+                        }
+                        if (GUILayout.Button(" Auto Recompile ")) {
+                            SetSuggestionInactive(HotReloadSuggestionKind.AddMonobehaviourMethod);
+                            HotReloadPrefs.AutoRecompilePartiallyUnsupportedChanges = true;
+                            HotReloadPrefs.DisplayNewMonobehaviourMethodsAsPartiallySupported = true;
+                            HotReloadRunTab.RecompileWithChecks();
+                        }
+                        GUILayout.FlexibleSpace();
+                        if (GUILayout.Button(" Don't show again ")) {
+                            SetSuggestionsShown(HotReloadSuggestionKind.AddMonobehaviourMethod);
+                            SetSuggestionInactive(HotReloadSuggestionKind.AddMonobehaviourMethod);
+                        }
+                    }
+                },
+                timestamp: DateTime.Now,
+                entryType: EntryType.Foldout,
+                iconType: AlertType.Suggestion
+            )},
 #if UNITY_2020_1_OR_NEWER
             { HotReloadSuggestionKind.SwitchToDebugModeForInlinedMethods, new AlertEntry(
                 AlertType.Suggestion, 
@@ -360,6 +392,53 @@ namespace SingularityGroup.HotReload.Editor {
                 iconType: AlertType.UnsupportedChange
             )},
 #endif
+            { HotReloadSuggestionKind.HotReloadWhileDebuggerIsAttached, new AlertEntry(
+                AlertType.Suggestion, 
+                "Hot Reload is disabled while a debugger is attached",
+                "Hot Reload automatically disables itself while a debugger is attached, as it can otherwise interfere with certain debugger features.\nWhile disabled, every code change will trigger a full Unity recompilation.\n\nYou can choose to keep Hot Reload enabled while a debugger is attached, though some features like debugger variable inspection might not always work as expected.",
+                actionData: () => {
+                    GUILayout.Space(8f);
+                    using (new EditorGUILayout.HorizontalScope()) {
+                        if (GUILayout.Button(" Keep enabled during debugging ")) {
+                            SetSuggestionInactive(HotReloadSuggestionKind.HotReloadWhileDebuggerIsAttached);
+                            HotReloadPrefs.AutoDisableHotReloadWithDebugger = false;
+                        }
+                        GUILayout.FlexibleSpace();
+                        debuggerDocumentationButton.OnGUI();
+                        if (GUILayout.Button(" Don't show again ")) {
+                            SetSuggestionsShown(HotReloadSuggestionKind.HotReloadWhileDebuggerIsAttached);
+                            SetSuggestionInactive(HotReloadSuggestionKind.HotReloadWhileDebuggerIsAttached);
+                        }
+                    }
+                },
+                timestamp: DateTime.Now,
+                entryType: EntryType.Foldout,
+                iconType: AlertType.Suggestion
+            )},
+            { HotReloadSuggestionKind.HotReloadedMethodsWhenDebuggerIsAttached, new AlertEntry(
+                AlertType.Suggestion, 
+                "Hot Reload may interfere with your debugger session",
+                "Some debugger features, like variable inspection, might not work as expected for methods patched during the Hot Reload session. A full Unity recompile is required to get the full debugger experience.",
+                actionData: () => {
+                    GUILayout.Space(8f);
+                    using (new EditorGUILayout.HorizontalScope()) {
+                        if (GUILayout.Button(" Recompile ")) {
+                            SetSuggestionInactive(HotReloadSuggestionKind.HotReloadedMethodsWhenDebuggerIsAttached);
+                            if (HotReloadRunTab.ConfirmExitPlaymode("Using the Recompile button will stop Play Mode.\n\nDo you wish to proceed?")) {
+                                HotReloadRunTab.Recompile();
+                            }
+                        }
+                        GUILayout.FlexibleSpace();
+                        debuggerDocumentationButton.OnGUI();
+                        GUILayout.Space(8f);
+                    }
+                },
+                timestamp: DateTime.Now,
+                entryType: EntryType.Foldout,
+                iconType: AlertType.UnsupportedChange,
+                hasExitButton: false
+            )},
+            
         };
         
         static ListRequest listRequest;

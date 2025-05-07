@@ -53,7 +53,7 @@ public class DecisionsManager : MonoBehaviour
         _restButton.onClick.AddListener(Rest);
         _disableCharPanelButton.onClick.AddListener(HideCharacterPanel);
 
-        _charDetail.Setup(this);
+        // _charDetail.Setup(this);
     }
 
     private void OnEnable()
@@ -117,7 +117,7 @@ public class DecisionsManager : MonoBehaviour
         {
             ItemData item = possibleShopItems[Random.Range(0, possibleShopItems.Count)];
             GameObject itemGO = Instantiate(_itemPrefab, _shopGrid.transform);
-            itemGO.GetComponent<ItemUI>().SetData(item, this, PurchaseItem);
+            // itemGO.GetComponent<ItemUI>().SetData(item, this, PurchaseItem);
         }
 
         RefreshInventory();
@@ -168,7 +168,7 @@ public class DecisionsManager : MonoBehaviour
             foreach (ItemData item in GameManager.Instance.PlayerInventory)
             {
                 GameObject itemGO = Instantiate(_itemPrefab, _inventoryGrid.transform);
-                itemGO.GetComponent<ItemUI>().SetData(item, this, HandleInventoryItemSelected);
+                // itemGO.GetComponent<ItemUI>().SetData(item, this, HandleInventoryItemSelected);
             }
         }
     }
@@ -286,7 +286,7 @@ public class DecisionsManager : MonoBehaviour
         _troopsScreen.SetActive(false);
         _levelUpScreen.SetActive(false);
         _inventoryScreen.SetActive(true);
-        _charDetail.SetCharacter(character);
+        // _charDetail.SetCharacter(character);
 
         if (character.PendingLevelUp)
         {
