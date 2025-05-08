@@ -10,6 +10,8 @@ public class ContextMenu : MonoBehaviour
     private FollowMouse mouseFollow;
     [SerializeField] private ContextButton contextButtonPrefab;
 
+    [SerializeField] private float _yOffset;
+
     private void Awake()
     {
         if (_instance == null)
@@ -22,10 +24,13 @@ public class ContextMenu : MonoBehaviour
         }
 
         mouseFollow = GetComponent<FollowMouse>();
+        mouseFollow.ShouldFollow = false;
     }
 
-    public void SetOptionsAndShow(Dictionary<string, UnityAction> options)
+    public void SetOptionsAndShow(Tile tile, Dictionary<string, UnityAction> options)
     {
+        ClearChildren();
+
         foreach (KeyValuePair<string, UnityAction> kvp in options)
         {
             string text = kvp.Key;
@@ -34,12 +39,21 @@ public class ContextMenu : MonoBehaviour
             ContextButton newContextButton = Instantiate(contextButtonPrefab, transform);
             newContextButton.SetData(text, callback);
         }
-
-        mouseFollow.ShouldFollow = false;
+        
+        // set position at tile
+        Vector3 newPos = CameraManager.MainCamera.WorldToScreenPoint(tile.transform.position);
+        newPos.y += _yOffset;
+        Vector2 uiPos;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            transform.parent as RectTransform,
+            newPos,
+            null,
+            out uiPos);
+        GetComponent<RectTransform>().localPosition = uiPos;
     }
 
-    public void Hide()
-    {        
+    private void ClearChildren()
+    {
         // DESTROY THE CHILDREN MUAHAHAHAHAHAHAHAHAHAHAHAHAHAAHA
         
         // haiku time
@@ -51,7 +65,10 @@ public class ContextMenu : MonoBehaviour
         {
             Destroy(transform.GetChild(i).gameObject);
         }
+    }
 
-        mouseFollow.ShouldFollow = true;
+    public void Hide()
+    {        
+        ClearChildren();
     }
 }

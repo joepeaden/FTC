@@ -23,10 +23,10 @@ public class AIPathCustom : AIPath
         _pawn = GetComponent<Pawn>();
     }
 
-    public void AttemptGoToLocation(Vector3 goalDestination)
+    public void AttemptGoToLocation(Vector3 goalDestination, bool ignoreMovementCap = false)
     {
         _seeker.StartPath(transform.position, goalDestination, OnPathCalculated);
-        pawnMovesLeft = _pawn.MoveRange;
+        pawnMovesLeft = ignoreMovementCap ? int.MaxValue : _pawn.MoveRange;
     }
 
     private void OnPathCalculated(Path p)

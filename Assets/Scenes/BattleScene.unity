@@ -36799,7 +36799,6 @@ GameObject:
   m_Component:
   - component: {fileID: 911687832}
   - component: {fileID: 911687834}
-  - component: {fileID: 911687833}
   - component: {fileID: 911687835}
   m_Layer: 0
   m_Name: Context Menu
@@ -36828,20 +36827,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 500, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &911687833
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 911687831}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fdfda45289ad54747aaef6fcbdb5fe27, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  offset: {x: 0, y: -5}
-  ShouldFollow: 0
 --- !u!114 &911687834
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -36881,6 +36866,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   contextButtonPrefab: {fileID: 7546139354201478043, guid: 3314b2f88e6d04d6cb5c05e5d1b5219e, type: 3}
+  _yOffset: -125
 --- !u!1 &922732257
 GameObject:
   m_ObjectHideFlags: 0

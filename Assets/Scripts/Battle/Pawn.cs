@@ -810,9 +810,9 @@ public class Pawn : MonoBehaviour
     /// </summary>
     /// <param name="targetTile"></param>
     /// <returns></returns>
-    public void TryMoveToTile(Tile targetTile)
+    public void TryMoveToTile(Tile targetTile, bool ignoreMovementCap = false)
     {
-        if (!HasMovesLeft()
+        if (!ignoreMovementCap && !HasMovesLeft()
             || EngagedInCombat && !GameChar.CanDisengageFromCombat())
         {
             return;
@@ -824,10 +824,10 @@ public class Pawn : MonoBehaviour
 
         actionPoints -= 1;
 
-        StartCoroutine(TryMoveToTileCoroutine(targetTile));
+        StartCoroutine(TryMoveToTileCoroutine(targetTile, ignoreMovementCap));
     }
 
-    public IEnumerator TryMoveToTileCoroutine(Tile targetTile)
+    public IEnumerator TryMoveToTileCoroutine(Tile targetTile, bool ignoreMovementCap)
     {
         // opportunity attacks implementation
         bool gotHitByOpportunityAttack = false;
@@ -861,7 +861,7 @@ public class Pawn : MonoBehaviour
             int tileDistance = _currentTile.GetTileDistance(targetTile);
 
             //Vector3 position = adjustedTargetTile.transform.position;
-            pathfinder.AttemptGoToLocation(targetTile.transform.position);
+            pathfinder.AttemptGoToLocation(targetTile.transform.position, ignoreMovementCap);
 
             _spriteController.Move();
 

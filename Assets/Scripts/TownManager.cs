@@ -5,6 +5,7 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
 public class TownManager : MonoBehaviour
 {
@@ -127,6 +128,11 @@ public class TownManager : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
+            if (EventSystem.current.IsPointerOverGameObject())
+            {
+                return;
+            }
+
             leftClickBeginTime = Time.time;
 
             Vector3 mousePos = CameraManager.MainCamera.ScreenToWorldPoint(Input.mousePosition);
@@ -245,8 +251,8 @@ public class TownManager : MonoBehaviour
                 _recruitDetails.SetPawn(tilePawn);
 
                 Dictionary<string, UnityAction> options = new();
-                options.Add("Recruit", () => { Recruit(tilePawn); });
-                ContextMenu.Instance.SetOptionsAndShow(options);
+                options.Add("Recruit (" + tilePawn.GameChar.Data.price + " gold)", () => { Recruit(tilePawn); });
+                ContextMenu.Instance.SetOptionsAndShow(tile, options);
             }
         }
 
@@ -269,7 +275,19 @@ public class TownManager : MonoBehaviour
 
     private void Recruit(Pawn p)
     {
-        Debug.Log(p.name);
+        foreach (Tile tile in GridGenerator.Instance.TownFollowerSpawns)
+        {
+            Pawn tilePawn = tile.GetPawn();
+            if (tilePawn == null)
+            {
+                GameManager.Instance.TryAddFollower(0, p.GameChar);
+                p.SetAltShirt(false);
+                p.TryMoveToTile(tile, true);    
+                ContextMenu.Instance.Hide();
+                _recruitDetails.gameObject.SetActive(false);
+                break;   
+            }
+        }
     }
 
     public void TransactItem(ItemUIImmersive item, bool isBuying, bool directEquip = false)
