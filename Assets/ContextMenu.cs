@@ -7,9 +7,9 @@ public class ContextMenu : MonoBehaviour
     public static ContextMenu Instance => _instance;
     private static ContextMenu _instance;
 
-    private FollowMouse mouseFollow;
-    [SerializeField] private ContextButton contextButtonPrefab;
+    public static bool IsShowing; 
 
+    [SerializeField] private ContextButton contextButtonPrefab;
     [SerializeField] private float _yOffset;
 
     private void Awake()
@@ -22,9 +22,6 @@ public class ContextMenu : MonoBehaviour
         {
             Destroy(this);
         }
-
-        mouseFollow = GetComponent<FollowMouse>();
-        mouseFollow.ShouldFollow = false;
     }
 
     public void SetOptionsAndShow(Tile tile, Dictionary<string, UnityAction> options)
@@ -50,6 +47,8 @@ public class ContextMenu : MonoBehaviour
             null,
             out uiPos);
         GetComponent<RectTransform>().localPosition = uiPos;
+
+        IsShowing = true;
     }
 
     private void ClearChildren()
@@ -70,5 +69,7 @@ public class ContextMenu : MonoBehaviour
     public void Hide()
     {        
         ClearChildren();
+
+        IsShowing = false;
     }
 }
