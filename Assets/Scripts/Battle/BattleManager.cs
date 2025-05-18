@@ -64,6 +64,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private ParticleSystem armorHitEffect;
 
     [Header("UI")]
+    [SerializeField] private GameObject _battleUI;
     [SerializeField] private Transform _healthBarParent;
     [SerializeField] private MiniStatBar _miniStatBarPrefab;
     [SerializeField] private GameObject _instructionsP1;
@@ -122,8 +123,10 @@ public class BattleManager : MonoBehaviour
         // Spawn();
     }
 
-    private void Start()
+    public void InitializeBattle()
     {
+        _battleUI.SetActive(true);
+
         if (GameManager.Instance != null)
         {
             _battleResult = BattleResult.Undecided;
@@ -132,7 +135,7 @@ public class BattleManager : MonoBehaviour
             StartBattle();
         }
 
-        Spawn();
+        // Spawn();
     }
 
     private void Update()
@@ -223,14 +226,14 @@ public class BattleManager : MonoBehaviour
             do
             {
                 spawnTile = GridGenerator.Instance.PlayerSpawns[Random.Range(0, GridGenerator.Instance.PlayerSpawns.Count)];
-            } while (spawnTile.GetPawn() != null);
+            } while (spawnTile.GetInhabitant() != null);
         }
         else
         {
             do
             {
                 spawnTile = GridGenerator.Instance.EnemySpawns[Random.Range(0, GridGenerator.Instance.EnemySpawns.Count)];
-            } while (spawnTile.GetPawn() != null);
+            } while (spawnTile.GetInhabitant() != null);
         }
 
         p.PlaceAtTile(spawnTile);
@@ -465,8 +468,13 @@ public class BattleManager : MonoBehaviour
 
     public void HandleTileHoverStart(Tile targetTile)
     {
+        if (!gameObject.activeInHierarchy)
+        {
+            return;
+        }
+
         _hoveredTile = targetTile;
-        Pawn hoveredPawn = targetTile.GetPawn();
+        Pawn hoveredPawn = targetTile.GetInhabitant() as Pawn;
 
         if (_selectionManager.SelectedTile != null)
         {
@@ -507,6 +515,11 @@ public class BattleManager : MonoBehaviour
 
     public void HandleTileHoverEnd(Tile t)
     {
+        if (!gameObject.activeInHierarchy)
+        {
+            return;
+        }
+
         HideHitChance();
 
         foreach (Tile highlightedTile in tilesToHighlight)
@@ -531,7 +544,7 @@ public class BattleManager : MonoBehaviour
             return;
         }
 
-        Pawn hoveredPawn = _hoveredTile.GetPawn();
+        Pawn hoveredPawn = _hoveredTile.GetInhabitant() as Pawn;
         if (hoveredPawn == null)
         {
             return;
@@ -717,7 +730,7 @@ public class BattleManager : MonoBehaviour
 
     private void EndTurn()
     {
-        Pawn activePawn = _selectionManager.SelectedTile.GetPawn();
+        Pawn activePawn = _selectionManager.SelectedTile.GetInhabitant() as Pawn;
         PawnFinished(activePawn);
     }
 
@@ -727,18 +740,22 @@ public class BattleManager : MonoBehaviour
         {
             bool playerWon = _battleResult == BattleResult.Win;
 
-            Cleanup();
+            Unload();
+
+            _battleUI.SetActive(false);
+
+            _selectionManager.ClearSelectedTile();
 
             GameManager.Instance.ExitBattle(playerWon);
         }
-        else
-        {
-            // easy reload for testing
-            SceneManager.LoadScene("BattleScene");
-        }
+        // else
+        // {
+        //     // easy reload for testing
+        //     SceneManager.LoadScene("BattleScene");
+        // }
     }
 
-    private void Cleanup()
+    private void Unload()
     {
         // return pooled objects to the object pool parent so they
         // aren't destroyed
@@ -749,6 +766,9 @@ public class BattleManager : MonoBehaviour
             p.transform.SetParent(GameManager.Instance.transform);
             p.gameObject.SetActive(false);
         }
+
+        Spawner.Instance.DestroyLoadedObjects();
+        gameObject.SetActive(false);
     }
 
     /// <summary>
@@ -884,6 +904,7 @@ public class BattleManager : MonoBehaviour
 
     private void StartBattle()
     {
+        gameObject.SetActive(true);
         _turnNumber = 0;
         _instructionsUI.SetActive(false);
         StartCoroutine(NextPawnCoroutine());

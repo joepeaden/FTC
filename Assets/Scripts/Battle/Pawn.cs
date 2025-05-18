@@ -4,7 +4,7 @@ using UnityEngine;
 using System.Linq;
 using UnityEngine.Events;
 
-public class Pawn : MonoBehaviour
+public class Pawn : TileInhabitant
 {
     private const int MOT_REGAIN_RATE = 10;
     private const int MOT_BASIC_ATTACK_COST = 10;
@@ -26,9 +26,6 @@ public class Pawn : MonoBehaviour
     public float baseSurroundBonus;
 
     public int MoveRange => GameChar.GetMoveRange();
-
-    public Tile CurrentTile => _currentTile;
-    private Tile _currentTile;
 
     public bool OnPlayerTeam => _onPlayerTeam;
     private bool _onPlayerTeam;
@@ -115,6 +112,7 @@ public class Pawn : MonoBehaviour
     private void Awake()
     {
         pathfinder.OnDestinationReached.AddListener(HandleDestinationReached);
+        TheInhabitantType = InhabitantType.Pawn;
     }
 
     private void Start()
@@ -191,8 +189,7 @@ public class Pawn : MonoBehaviour
 
     public void PlaceAtTile(Tile t)
     {
-        _currentTile = t;
-        t.PawnEnterTile(this);
+        t.SetInhabitant(this);
         transform.position = t.transform.position;
     }
 
@@ -296,7 +293,7 @@ public class Pawn : MonoBehaviour
     //         } while (spawnTile.GetPawn() != null);
     //     }
 
-    //     _currentTile = spawnTile;
+    //     CurrentTile = spawnTile;
     //     spawnTile.PawnEnterTile(this);
     //     transform.position = spawnTile.transform.position;
     // }
@@ -304,9 +301,9 @@ public class Pawn : MonoBehaviour
     public List<Pawn> GetAdjacentPawns()
     {
         List<Pawn> adjPawns = new();
-        foreach (Tile t in _currentTile.GetAdjacentTiles())
+        foreach (Tile t in CurrentTile.GetAdjacentTiles())
         {
-            Pawn p = t.GetPawn();
+            Pawn p = t.GetInhabitant() as Pawn;
             if (p != null && !p.IsDead)
             {
                 adjPawns.Add(p);
@@ -319,9 +316,9 @@ public class Pawn : MonoBehaviour
     public List<Pawn> GetAdjacentEnemies()
     {
         List<Pawn> adjacentEnemies = new();
-        foreach (Tile t in _currentTile.GetAdjacentTiles())
+        foreach (Tile t in CurrentTile.GetAdjacentTiles())
         {
-            Pawn p = t.GetPawn();
+            Pawn p = t.GetInhabitant() as Pawn;
             if (p != null && p.OnPlayerTeam != _onPlayerTeam && !p.IsDead)
             {
                 adjacentEnemies.Add(p);
@@ -651,7 +648,7 @@ public class Pawn : MonoBehaviour
 
         _isDead = true;
 
-        CurrentTile.PawnExitTile();
+        CurrentTile.ClearInhabitant();
         BattleManager.Instance.PawnKilled(this);
     }
 
@@ -798,7 +795,7 @@ public class Pawn : MonoBehaviour
             OnDisengage.Invoke();
         }
 
-        _currentTile.PawnExitTile();
+        CurrentTile.ClearInhabitant();
 
         _isMoving = true;
     }
@@ -858,7 +855,7 @@ public class Pawn : MonoBehaviour
         {
             _hasMoved = true;
 
-            int tileDistance = _currentTile.GetTileDistance(targetTile);
+            int tileDistance = CurrentTile.GetTileDistance(targetTile);
 
             //Vector3 position = adjustedTargetTile.transform.position;
             pathfinder.AttemptGoToLocation(targetTile.transform.position, ignoreMovementCap);
@@ -871,7 +868,7 @@ public class Pawn : MonoBehaviour
                 OnDisengage.Invoke();
             }
 
-            _currentTile.PawnExitTile();
+            CurrentTile.ClearInhabitant();
 
             _isMoving = true;
 
@@ -890,8 +887,7 @@ public class Pawn : MonoBehaviour
             Tile newTile = hit.transform.GetComponent<Tile>();
             if (newTile != null)
             {
-                newTile.PawnEnterTile(this);
-                _currentTile = newTile;
+                newTile.SetInhabitant(this);
                 //pathfinder.enabled = false;
                 break;
             }

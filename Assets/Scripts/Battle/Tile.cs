@@ -19,8 +19,11 @@ public class Tile : MonoBehaviour
     public static UnityEvent<Tile> OnTileHoverEnd = new();
     private static UnityEvent OnTileSelectChange = new();
 
+    // out of bounds tiles
+    [SerializeField] private List<Sprite> oobTileSprites= new();
     [SerializeField] private List<Sprite> tileSprites = new();
     [SerializeField] private List<Sprite> terrainSprites = new();
+    [SerializeField] private Sprite shopTileSprite;
     [SerializeField] private SpriteRenderer tileSpriteRend;
     [SerializeField] private SpriteRenderer terrainSpriteRend;
     [SerializeField] private Sprite selectionSprite;
@@ -35,7 +38,9 @@ public class Tile : MonoBehaviour
     private bool _isImpassable = false;
 
     [SerializeField] private ItemUIImmersive _item;
-    [SerializeField] private Pawn _pawn;
+    [SerializeField] private Pawn _pawn => _inhabitant as Pawn;
+    private TileInhabitant _inhabitant;
+
     private bool _isSelected;
     //private bool _isInMoveRange;
     private List<Tile> _adjacentTiles = new();
@@ -46,6 +51,8 @@ public class Tile : MonoBehaviour
     private Vector2 _coordinates;
 
     private Sprite _prevHighlightSprite;
+
+    public bool OutOfBounds = true;
 
     private void Awake()
     {
@@ -78,7 +85,24 @@ public class Tile : MonoBehaviour
         tileOverlayUI.enabled = false;
     }
 
-    public void SetImpassable(bool isImpassable)
+    public void SetShopTile(bool isShopTile)
+    {
+        terrainSpriteRend.gameObject.SetActive(isShopTile);
+        
+        if (isShopTile)
+        {
+            terrainSpriteRend.gameObject.SetActive(isShopTile);
+            terrainSpriteRend.sprite = shopTileSprite;
+            terrainSpriteRend.sortingLayerName = "DeadCharacters";
+        }
+        else
+        {
+            terrainSpriteRend.sprite = terrainSprites[Random.Range(0, terrainSprites.Count)];
+            terrainSpriteRend.sortingLayerName = "Characters";
+        }
+    }
+
+    public void SetTerrainObstacle(bool isImpassable)
     {
         if (_isImpassable == isImpassable)
         {
@@ -109,7 +133,7 @@ public class Tile : MonoBehaviour
         PointGraph graph = AstarPath.active.data.pointGraph;
         _pathfindingNode = graph.AddNode((Int3)transform.position);
 
-        SetImpassable(isImpassable);
+        SetTerrainObstacle(isImpassable);
 
         // set up adjacent tiles
         Vector2 p = new Vector2(coord.x + 1, coord.y);
@@ -137,7 +161,15 @@ public class Tile : MonoBehaviour
             _adjacentTiles.Add(tiles[p]);
         }
 
-        tileSpriteRend.sprite = tileSprites[Random.Range(0, tileSprites.Count)];
+        if (OutOfBounds)
+        {
+            tileSpriteRend.sprite = oobTileSprites[Random.Range(0, oobTileSprites.Count)];
+        }
+        else
+        {
+            tileSpriteRend.sprite = tileSprites[Random.Range(0, tileSprites.Count)];
+        }
+
         terrainSpriteRend.sprite = terrainSprites[Random.Range(0, terrainSprites.Count)];
     }
 
@@ -251,36 +283,26 @@ public class Tile : MonoBehaviour
     {
         return _pawn != null;
     }
-
-    public void PawnEnterTile(Pawn newPawn)
-    {
-        _pawn = newPawn;
-    }
-
-    public void PawnExitTile()
+    
+    public void ClearInhabitant()
     {
         SetSelected(false);
-        _pawn = null;
+        SetInhabitant(null);
     }
 
-    public void SetItem(ItemUIImmersive item)
+    public void SetInhabitant(TileInhabitant thing)
     {
-        _item = item;
+        _inhabitant = thing;
 
-        if (_item != null)
+        if (_inhabitant != null)
         {
-            item.CurrentTile = this;
+            _inhabitant.CurrentTile = this;
         }
     }
 
-    public ItemUIImmersive GetItem()
+    public TileInhabitant GetInhabitant()
     {
-        return _item;
-    }
-
-    public Pawn GetPawn()
-    {
-        return _pawn;
+        return _inhabitant;
     }
 
     public bool IsAdjacentTo(Tile t)
@@ -405,7 +427,7 @@ public class Tile : MonoBehaviour
 
     public void HighlightTilesInRangeRecursive(Pawn subjectPawn, int range, bool isHighlighting, TileHighlightType highlightType)
     {
-        if (range > 0 && IsTraversableByThisPawn(_pawn) &&
+        if (!OutOfBounds && range > 0 && IsTraversableByThisPawn(_pawn) &&
             (_pawn == null ||
             (subjectPawn.OnPlayerTeam == _pawn.OnPlayerTeam && TileHighlightType.Move == highlightType ||
             TileHighlightType.Move != highlightType)))

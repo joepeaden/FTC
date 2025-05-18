@@ -9,12 +9,16 @@ using UnityEngine.EventSystems;
 
 public class TownManager : MonoBehaviour
 {
+    public static TownManager Instance => _instance;
+    private static TownManager _instance;
+
     [Header("UI")]
     [SerializeField] private TMP_Text _goldText;
     [SerializeField] private CharDetailPanel _followerDetails;
     [SerializeField] private CharDetailPanel _recruitDetails;
     [SerializeField] private ItemDetailsImmersive _shopItemDetails;
     [SerializeField] private ItemDetailsImmersive _inventoryItemDetails;
+    [SerializeField] private GameObject _missionBoardUI;
 
     private ItemUIImmersive _selectedItem;
     private Pawn _selectedPawn;
@@ -26,6 +30,8 @@ public class TownManager : MonoBehaviour
 
     private void Awake()
     {
+        _instance = this;
+
         Tile.OnTileHoverStart.AddListener(HandleTileHoverStart);
         Tile.OnTileHoverEnd.AddListener(HandleTileHoverEnd);
         GameManager.Instance.OnPlayerInventoryUpdated.AddListener(RefreshInventory);
@@ -33,19 +39,7 @@ public class TownManager : MonoBehaviour
 
     void Start()
     {
-        Spawner.Instance.SpawnTown();
-
-        RefreshInventory();
-
-        // fill out shop
-        int shopItemsCount = Random.Range(3, 6);
-        for (int i = 0; i < shopItemsCount; i++)
-        {
-            ItemData item = DataLoader.items.Values.ToList()[Random.Range(0, DataLoader.items.Count)];
-            Spawner.Instance.SpawnTownItem(item, GridGenerator.Instance.TownShopSpawns[i], false);
-        }   
-
-        ClearSelected();
+        InitializeTown();
     }
 
     private void OnEnable()
@@ -84,38 +78,41 @@ public class TownManager : MonoBehaviour
                     Tile hoveredTile = hit.transform.GetComponent<Tile>();
                     if (hoveredTile != null)
                     {
-
-                        // this is also copy and pasted like 10 times. Should combine.
-                        Pawn tilePawn = hoveredTile.GetPawn();
-                        ItemUIImmersive tileItem = hoveredTile.GetItem();
-
-                        if (tilePawn != null)
+                        TileInhabitant thing = hoveredTile.GetInhabitant();
+                        if (thing == null)
                         {
-                            if (GameManager.Instance.PlayerFollowers.Contains(tilePawn.GameChar))
-                            {
-                                _followerDetails.gameObject.SetActive(true);
-                                _followerDetails.SetPawn(tilePawn);
-                            }
-                            else 
-                            {
-                                _recruitDetails.gameObject.SetActive(true);
-                                _recruitDetails.SetPawn(tilePawn);
-                            }
-                            
+                            continue;
                         }
 
-                        if (tileItem != null)
+                        switch (thing.TheInhabitantType)
                         {
-                            if (tileItem.PlayerOwns)
-                            {
-                                _inventoryItemDetails.gameObject.SetActive(true);
-                                _inventoryItemDetails.SetItem(tileItem.Item);
-                            }
-                            else 
-                            {
-                                _shopItemDetails.gameObject.SetActive(true);
-                                _shopItemDetails.SetItem(tileItem.Item);
-                            }
+                            case TileInhabitant.InhabitantType.Pawn:
+                                Pawn tilePawn = thing as Pawn;
+                                if (GameManager.Instance.PlayerFollowers.Contains(tilePawn.GameChar))
+                                {
+                                    _followerDetails.gameObject.SetActive(true);
+                                    _followerDetails.SetPawn(tilePawn);
+                                }
+                                else 
+                                {
+                                    _recruitDetails.gameObject.SetActive(true);
+                                    _recruitDetails.SetPawn(tilePawn);
+                                }
+                                
+                                break;
+                            case TileInhabitant.InhabitantType.Item:
+                                ItemUIImmersive tileItem = thing as ItemUIImmersive;
+                                if (tileItem.PlayerOwns)
+                                {
+                                    _inventoryItemDetails.gameObject.SetActive(true);
+                                    _inventoryItemDetails.SetItem(tileItem.Item);
+                                }
+                                else 
+                                {
+                                    _shopItemDetails.gameObject.SetActive(true);
+                                    _shopItemDetails.SetItem(tileItem.Item);
+                                }
+                                break;
                         }
                     }
                 }
@@ -136,7 +133,7 @@ public class TownManager : MonoBehaviour
                         Tile dropTile = hit.transform.GetComponent<Tile>();
                         if (dropTile != null)
                         {
-                            Pawn dropPawn = dropTile.GetPawn();
+                            Pawn dropPawn = dropTile.GetInhabitant() as Pawn;
                             if (dropPawn != null && GameManager.Instance.PlayerFollowers.Contains(dropPawn.GameChar))
                             {
                                 // if (dropPawn != _selectedPawn)
@@ -216,6 +213,32 @@ public class TownManager : MonoBehaviour
         
     }
 
+    public void Unload()
+    {
+        Spawner.Instance.ClearTiles();
+        gameObject.SetActive(false);
+    }
+
+    public void InitializeTown()
+    {
+        _missionBoardUI.SetActive(false);
+
+        gameObject.SetActive(true);
+        Spawner.Instance.SpawnTown();
+
+        RefreshInventory();
+
+        // fill out shop
+        int shopItemsCount = Random.Range(3, 6);
+        for (int i = 0; i < shopItemsCount; i++)
+        {
+            ItemData item = DataLoader.items.Values.ToList()[Random.Range(0, DataLoader.items.Count)];
+            Spawner.Instance.SpawnTownItem(item, GridGenerator.Instance.TownShopSpawns[i], false);
+        }   
+
+        ClearSelected();
+    }
+
     private void ClearSelected()
     {
         _selectedItem = null;
@@ -235,11 +258,10 @@ public class TownManager : MonoBehaviour
         // clear all items
         foreach (Tile tile in GridGenerator.Instance.TownInventorySpawns)
         {
-            ItemUIImmersive tileItem = tile.GetItem();
+            ItemUIImmersive tileItem = tile.GetInhabitant() as ItemUIImmersive;
             if (tileItem  != null)
             {
-                tile.SetItem(null);
-                Destroy(tileItem.gameObject);
+                Spawner.Instance.DestroyInhabitant(tileItem);
             }
         }
 
@@ -261,58 +283,74 @@ public class TownManager : MonoBehaviour
 
     private void HandleTileClicked(Tile tile)
     {
-        Pawn tilePawn = tile.GetPawn();
-        ItemUIImmersive tileItem = tile.GetItem();
-
         ClearSelected();
 
-        if (tilePawn != null || tileItem != null)
+        TileInhabitant thing = tile.GetInhabitant();
+        if (thing != null)
         {
             SetSelectedTile(tile);
         }
-
-        if (tilePawn != null)
+        else
         {
-            _selectedPawn = tilePawn;
-            
-            if (GameManager.Instance.PlayerFollowers.Contains(tilePawn.GameChar))
-            {
-                _followerDetails.gameObject.SetActive(true);
-                _followerDetails.SetPawn(tilePawn);
-            }
-            else 
-            {
-                _recruitDetails.gameObject.SetActive(true);
-                _recruitDetails.SetPawn(tilePawn);
-
-                Dictionary<string, UnityAction> options = new();
-                options.Add("Recruit (" + tilePawn.GameChar.Data.price + " gold)", () => { Recruit(tilePawn); });
-                ContextMenu.Instance.SetOptionsAndShow(tile, options);
-            }
+            return;
         }
 
-        if (tileItem != null)
+        switch (thing.TheInhabitantType)
         {
-            _selectedItem = tileItem;
+            case TileInhabitant.InhabitantType.Pawn:
+                Pawn tilePawn = tile.GetInhabitant() as Pawn;
+                _selectedPawn = tilePawn;
+                
+                if (GameManager.Instance.PlayerFollowers.Contains(tilePawn.GameChar))
+                {
+                    _followerDetails.gameObject.SetActive(true);
+                    _followerDetails.SetPawn(tilePawn);
+                }
+                else 
+                {
+                    _recruitDetails.gameObject.SetActive(true);
+                    _recruitDetails.SetPawn(tilePawn);
 
-            if (tileItem.PlayerOwns)
-            {
-                _inventoryItemDetails.gameObject.SetActive(true);
-                _inventoryItemDetails.SetItem(tileItem.Item);
-                Dictionary<string, UnityAction> options = new();
-                options.Add("Sell (" + tileItem.Item.itemPrice + " gold)", () => { TransactItem(tileItem, false); });
-                options.Add("Equip", () => { SetEquipping(); });
-                ContextMenu.Instance.SetOptionsAndShow(tile, options);
-            }
-            else 
-            {
-                _shopItemDetails.gameObject.SetActive(true);
-                _shopItemDetails.SetItem(tileItem.Item);
-                Dictionary<string, UnityAction> options = new();
-                options.Add("Buy (" + tileItem.Item.itemPrice + " gold)", () => { TransactItem(tileItem, true); });
-                ContextMenu.Instance.SetOptionsAndShow(tile, options);
-            }
+                    Dictionary<string, UnityAction> options = new();
+                    options.Add("Recruit (" + tilePawn.GameChar.Data.price + " gold)", () => { Recruit(tilePawn); });
+                    ContextMenu.Instance.SetOptionsAndShow(tile, options);
+                }
+                break;
+            case TileInhabitant.InhabitantType.Item:
+                ItemUIImmersive tileItem = tile.GetInhabitant() as ItemUIImmersive;
+                _selectedItem = tileItem;
+
+                if (tileItem.PlayerOwns)
+                {
+                    _inventoryItemDetails.gameObject.SetActive(true);
+                    _inventoryItemDetails.SetItem(tileItem.Item);
+                    Dictionary<string, UnityAction> options = new();
+                    options.Add("Sell (" + tileItem.Item.itemPrice + " gold)", () => { TransactItem(tileItem, false); });
+                    options.Add("Equip", () => { SetEquipping(); });
+                    ContextMenu.Instance.SetOptionsAndShow(tile, options);
+                }
+                else 
+                {
+                    _shopItemDetails.gameObject.SetActive(true);
+                    _shopItemDetails.SetItem(tileItem.Item);
+                    Dictionary<string, UnityAction> options = new();
+                    options.Add("Buy (" + tileItem.Item.itemPrice + " gold)", () => { TransactItem(tileItem, true); });
+                    ContextMenu.Instance.SetOptionsAndShow(tile, options);
+                }
+                break;
+            case TileInhabitant.InhabitantType.MissionBoard:
+                // MissionBoard board = tile.GetInhabitant() as MissionBoard;
+                ShowMissions();
+                // Dictionary<string, UnityAction> options = new();
+                // options.Add("Buy (" + tileItem.Item.itemPrice + " gold)", () => { TransactItem(tileItem, true); });
+                // ContextMenu.Instance.SetOptionsAndShow(tile, options);
+                break;
         }
+    }
+
+    private void ShowMissions()
+    {  
+        _missionBoardUI.SetActive(true);
     }
 
     private void Recruit(Pawn p)
@@ -325,7 +363,7 @@ public class TownManager : MonoBehaviour
             _recruitDetails.gameObject.SetActive(false);
             foreach (Tile tile in GridGenerator.Instance.TownFollowerSpawns)
             {
-                Pawn tilePawn = tile.GetPawn();
+                Pawn tilePawn = tile.GetInhabitant() as Pawn;
                 if (tilePawn == null)
                 {
                     p.TryMoveToTile(tile, true);    
@@ -343,7 +381,10 @@ public class TownManager : MonoBehaviour
         {
             // add item to player inventory data structure
             success = GameManager.Instance.TryBuyItem(item.Item, !directEquip);
-            Destroy(_selectedItem.gameObject);
+            if (success)
+            {
+                Spawner.Instance.DestroyInhabitant(_selectedItem);                
+            }
         }
         else
         {
@@ -372,7 +413,7 @@ public class TownManager : MonoBehaviour
     {
         foreach (Tile tile in GridGenerator.Instance.TownInventorySpawns)
         {
-            if (tile.GetItem() == null)
+            if (tile.GetInhabitant() == null)
             {
                 Spawner.Instance.SpawnTownItem(item, tile, true);
                 break;
@@ -384,7 +425,7 @@ public class TownManager : MonoBehaviour
     {
         foreach (Tile tile in GridGenerator.Instance.TownShopSpawns)
         {
-            if (tile.GetItem() == null)
+            if (tile.GetInhabitant() == null)
             {
                 Spawner.Instance.SpawnTownItem(item, tile, false);
                 break;
@@ -413,69 +454,88 @@ public class TownManager : MonoBehaviour
 
     public void HandleTileHoverStart(Tile targetTile)
     {
-        Pawn hoveredPawn = targetTile.GetPawn();
-        ItemUIImmersive hoveredItem = targetTile.GetItem();
-
-        if (hoveredPawn != null && _selectedPawn == null)
+        TileInhabitant thing = targetTile.GetInhabitant();
+        if (thing == null)
         {
-            if (GameManager.Instance.PlayerFollowers.Contains(hoveredPawn.GameChar))
-            {
-                _followerDetails.gameObject.SetActive(true);
-                _followerDetails.SetPawn(hoveredPawn);
-            }
-            else 
-            {
-                _recruitDetails.gameObject.SetActive(true);
-                _recruitDetails.SetPawn(hoveredPawn);
-            }
-            
-            Debug.Log("started hovering " + hoveredPawn.GameChar.CharName);
+            return;
         }
 
-        if (hoveredItem != null && _selectedItem == null)
+        switch (thing.TheInhabitantType)
         {
-            if (hoveredItem.PlayerOwns)
-            {
-                _inventoryItemDetails.gameObject.SetActive(true);
-                _inventoryItemDetails.SetItem(hoveredItem.Item);
-            }
-            else 
-            {
-                _shopItemDetails.gameObject.SetActive(true);
-                _shopItemDetails.SetItem(hoveredItem.Item);
-            }
+            case TileInhabitant.InhabitantType.Pawn:                
+                if (_selectedPawn == null)
+                {
+                    Pawn hoveredPawn = thing as Pawn;
+                    if (GameManager.Instance.PlayerFollowers.Contains(hoveredPawn.GameChar))
+                    {
+                         _followerDetails.gameObject.SetActive(true);
+                        _followerDetails.SetPawn(hoveredPawn);
+                    }
+                    else 
+                    {
+                        _recruitDetails.gameObject.SetActive(true);
+                        _recruitDetails.SetPawn(hoveredPawn);
+                    }
+                }
+                break;
+            case TileInhabitant.InhabitantType.Item:
+                if (_selectedItem == null)
+                {
+                    ItemUIImmersive hoveredItem = thing as ItemUIImmersive;
+                    if (hoveredItem.PlayerOwns)
+                    {
+                        _inventoryItemDetails.gameObject.SetActive(true);
+                        _inventoryItemDetails.SetItem(hoveredItem.Item);
+                    }
+                    else 
+                    {
+                        _shopItemDetails.gameObject.SetActive(true);
+                        _shopItemDetails.SetItem(hoveredItem.Item);
+                    }
+                }
+                break;
         }
+
     }
 
-    public void HandleTileHoverEnd(Tile t)
+    public void HandleTileHoverEnd(Tile targetTile)
     {
-        Pawn hoveredPawn = t.GetPawn();
-        ItemUIImmersive hoveredItem = t.GetItem();
-
-        if (hoveredPawn != null && _selectedPawn == null)
+        TileInhabitant thing = targetTile.GetInhabitant();
+        if (thing == null)
         {
-            if (GameManager.Instance.PlayerFollowers.Contains(hoveredPawn.GameChar))
-            {
-                _followerDetails.gameObject.SetActive(false);
-            }
-            else 
-            {
-                _recruitDetails.gameObject.SetActive(false);
-            }
-
-            Debug.Log("stopped hovering " + hoveredPawn.GameChar.CharName);
+            return;
         }
-
-        if (hoveredItem != null && _selectedItem == null)
+        
+        switch (thing.TheInhabitantType)
         {
-            if (hoveredItem.PlayerOwns)
-            {
-                _inventoryItemDetails.gameObject.SetActive(false);
-            }
-            else 
-            {
-                _shopItemDetails.gameObject.SetActive(false);
-            }
+            case TileInhabitant.InhabitantType.Pawn:                
+                if (_selectedPawn == null)
+                {
+                    Pawn hoveredPawn = thing as Pawn;
+                    if (GameManager.Instance.PlayerFollowers.Contains(hoveredPawn.GameChar))
+                    {
+                        _followerDetails.gameObject.SetActive(false);
+                    }
+                    else 
+                    {
+                        _recruitDetails.gameObject.SetActive(false);
+                    }
+                }
+                break;
+            case TileInhabitant.InhabitantType.Item:
+                ItemUIImmersive hoveredItem = thing as ItemUIImmersive;
+                if (_selectedItem == null)
+                {
+                    if (hoveredItem.PlayerOwns)
+                    {
+                        _inventoryItemDetails.gameObject.SetActive(false);
+                    }
+                    else 
+                    {
+                        _shopItemDetails.gameObject.SetActive(false);
+                    }
+                }
+                break;
         }
     }
 

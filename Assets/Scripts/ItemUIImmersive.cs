@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ItemUIImmersive : MonoBehaviour
+public class ItemUIImmersive : TileInhabitant
 {
     public bool PlayerOwns = false;
 
@@ -10,11 +10,10 @@ public class ItemUIImmersive : MonoBehaviour
     public ItemData Item => _item;
     private ItemData _item;
 
-    public Tile CurrentTile;
-
     private void Awake()
     {
         _itemSpriteRend = GetComponent<SpriteRenderer>();
+        TheInhabitantType = InhabitantType.Item;
     }
 
     public void SetData(ItemData theItem, bool playerOwns)
@@ -25,18 +24,8 @@ public class ItemUIImmersive : MonoBehaviour
         }
 
         PlayerOwns = playerOwns;
-        // if (theItem == null)
-        // {
-        //     return;
-        // }
 
         _itemSpriteRend.sprite = theItem.itemSprite;
-
-        // the character preview ItemUI intances don't have prices
-        // if (itemPriceTxt != null)
-        // {
-        //     itemPriceTxt.text = theItem.itemPrice.ToString();
-        // }
 
         _item = theItem;        
     }

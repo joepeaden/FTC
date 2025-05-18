@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.Analytics;
@@ -11,13 +12,16 @@ public class Spawner : MonoBehaviour
     private static Spawner _instance;
 
     // prefabs
-    [SerializeField] private GameObject _pawnPrefab;
-    [SerializeField] private GameObject _equipmentPrefab;
+    [SerializeField] private TileInhabitant _pawnPrefab;
+    [SerializeField] private TileInhabitant _equipmentPrefab;
+    [SerializeField] private TileInhabitant _missionBoardPrefab;
     
     // parents
     [SerializeField] private Transform _townParent;
     [SerializeField] private Transform _friendlyParent;
     [SerializeField] private Transform _enemyParent;
+
+    private List<TileInhabitant> spawnedInhabitants = new();
 
     private void Awake()
     {
@@ -31,12 +35,61 @@ public class Spawner : MonoBehaviour
         _instance = this;
     }
 
+    /// <summary>
+    /// Destroy an inhabitant that occupies a tile.
+    /// </summary>
+    /// <param name="inhabitant"></param>
+    /// <param name="removeFromList">Pass false if you don't want to remove the inhabitant from the 
+    /// spawnedInhabitants collection. Useful if doing a foreach loop, like DestroyLoadedObjects.</param>
+    public void DestroyInhabitant(TileInhabitant inhabitant, bool removeFromList = true)
+    {
+        if (removeFromList)
+        {
+            spawnedInhabitants.Remove(inhabitant);
+        }
+
+        inhabitant.CurrentTile.ClearInhabitant();
+        Destroy(inhabitant.gameObject);
+    }
+
+    public void ClearTiles()
+    {
+        foreach (Tile tile in GridGenerator.Instance.TownShopSpawns)
+        {
+            tile.SetShopTile(false);
+        }
+
+        foreach (Tile tile in GridGenerator.Instance.TownInventorySpawns)
+        {
+            tile.SetShopTile(false);
+        }
+
+        DestroyLoadedObjects();
+    }
+
+    public void DestroyLoadedObjects()
+    {
+        foreach (TileInhabitant inhabitant in spawnedInhabitants)
+        {
+            DestroyInhabitant(inhabitant, false);
+        }
+
+        spawnedInhabitants.Clear();
+    }
+
+    private TileInhabitant SpawnInhabitant(TileInhabitant prefab, Transform parent)
+    {
+        TileInhabitant spawnedObject = Instantiate(prefab, parent);
+        spawnedInhabitants.Add(spawnedObject);
+        return spawnedObject;
+    }
+
     public void SpawnTown()
     {         
         // spawn followers
         foreach (GameCharacter character in GameManager.Instance.PlayerFollowers)
         {
-            Pawn newPawn = Instantiate(_pawnPrefab, _townParent).GetComponent<Pawn>();
+            Pawn newPawn = SpawnInhabitant(_pawnPrefab, _townParent).GetComponent<Pawn>();
             // _playerPawns.Add(newPawn);
             newPawn.SetCharacter(character);
             PickPawnSpawnTileTown(newPawn, GridGenerator.Instance.TownFollowerSpawns);
@@ -45,20 +98,34 @@ public class Spawner : MonoBehaviour
         // spawn recruits
         for (int i = 0; i < 5; i++)
         {
-            Pawn newPawn = Instantiate(_pawnPrefab, _townParent).GetComponent<Pawn>();
+            Pawn newPawn = SpawnInhabitant(_pawnPrefab, _townParent).GetComponent<Pawn>();
             // _playerPawns.Add(newPawn);
             newPawn.SetCharacter(new GameCharacter(DataLoader.charTypes["player"]));
             newPawn.SetAltShirt(true);
             PickPawnSpawnTileTown(newPawn, GridGenerator.Instance.TownRecruitSpawns);
         }
+
+        TileInhabitant missionBoard = SpawnInhabitant(_missionBoardPrefab, _townParent);
+        GridGenerator.Instance.TownMissionBoardSpawn.SetInhabitant(missionBoard.GetComponent<TileInhabitant>());
+        missionBoard.transform.position = GridGenerator.Instance.TownMissionBoardSpawn.transform.position;
+
+        foreach (Tile t in GridGenerator.Instance.TownShopSpawns)
+        {
+            t.SetShopTile(true);
+        }
+
+        foreach (Tile t in GridGenerator.Instance.TownInventorySpawns)
+        {
+            t.SetShopTile(true);
+        }
     }
 
     public void SpawnTownItem(ItemData item, Tile tile, bool playerOwns)
     {
-        GameObject sampleItem = Instantiate(_equipmentPrefab, _townParent);
+        TileInhabitant sampleItem = SpawnInhabitant(_equipmentPrefab, _townParent);
         ItemUIImmersive immersiveItem = sampleItem.GetComponent<ItemUIImmersive>();
         immersiveItem.SetData(item, playerOwns);
-        tile.SetItem(immersiveItem);
+        tile.SetInhabitant(immersiveItem);
 
         sampleItem.transform.position = tile.transform.position;
     }
@@ -67,7 +134,7 @@ public class Spawner : MonoBehaviour
     {   
         foreach(Tile t in spawnPoints)
         {
-            if (t.GetPawn() == null)
+            if (t.GetInhabitant() == null)
             {
                 p.PlaceAtTile(t);
                 return;
@@ -86,14 +153,14 @@ public class Spawner : MonoBehaviour
             do
             {
                 spawnTile = GridGenerator.Instance.PlayerSpawns[Random.Range(0, GridGenerator.Instance.PlayerSpawns.Count)];
-            } while (spawnTile.GetPawn() != null);
+            } while (spawnTile.GetInhabitant() != null);
         }
         else
         {
             do
             {
                 spawnTile = GridGenerator.Instance.EnemySpawns[Random.Range(0, GridGenerator.Instance.EnemySpawns.Count)];
-            } while (spawnTile.GetPawn() != null);
+            } while (spawnTile.GetInhabitant() != null);
         }
 
         p.PlaceAtTile(spawnTile);
@@ -111,22 +178,22 @@ public class Spawner : MonoBehaviour
 
         //     foreach (GameCharacter character in GameManager.Instance.PlayerFollowers)
         //     {
-        //         Pawn newPawn = Instantiate(_pawnPrefab, _friendlyParent).GetComponent<Pawn>();
+        //         Pawn newPawn = SpawnInhabitant(_pawnPrefab, _friendlyParent).GetComponent<Pawn>();
         //         // _playerPawns.Add(newPawn);
         //         newPawn.SetCharacter(character);
 
-        //         MiniStatBar miniStats = Instantiate(_miniStatBarPrefab, _healthBarParent);
+        //         MiniStatBar miniStats = SpawnInhabitant(_miniStatBarPrefab, _healthBarParent);
         //         miniStats.SetData(newPawn);
         //     }
 
         //     foreach(GameCharacter character in GameManager.Instance.GetEnemiesForContract())
         //     {
-        //         Pawn newPawn = Instantiate(_pawnPrefab, _enemyParent).GetComponent<Pawn>();
+        //         Pawn newPawn = SpawnInhabitant(_pawnPrefab, _enemyParent).GetComponent<Pawn>();
         //         newPawn.SetCharacter(character);
 
         //         // _aiPlayer.RegisterPawn(newPawn);
 
-        //         MiniStatBar miniStats = Instantiate(_miniStatBarPrefab, _healthBarParent);
+        //         MiniStatBar miniStats = SpawnInhabitant(_miniStatBarPrefab, _healthBarParent);
         //         miniStats.SetData(newPawn);
         //     }
         // }

@@ -26,6 +26,7 @@ public class GridGenerator : MonoBehaviour
     public List<Tile> TownRecruitSpawns = new();
     public List<Tile> TownInventorySpawns = new();
     public List<Tile> TownShopSpawns = new();
+    public Tile TownMissionBoardSpawn = new();
 
     public List<Tile> PlayerSpawns = new();
     public List<Tile> EnemySpawns = new();
@@ -33,6 +34,8 @@ public class GridGenerator : MonoBehaviour
     void Awake()
     {
         _instance = this;
+
+        SetSpawnPoints();
 
         // set up dictionary for easy access
         foreach (Vector2 p in TilesPoints)
@@ -45,6 +48,61 @@ public class GridGenerator : MonoBehaviour
 
         // Generate obstacles. Idk why I called them impassables.
         // GenerateImpassables();
+    }
+
+    private void SetSpawnPoints()
+    {        
+        TownRecruitSpawns.Clear();
+        TownInventorySpawns.Clear();
+        TownFollowerSpawns.Clear();
+        TownShopSpawns.Clear();
+        EnemySpawns.Clear();
+        PlayerSpawns.Clear();
+
+        // add town follower spawn points
+        for (int x = 6; x <= 8; x++)
+        {
+            for (int y = 14; y <= 16; y++)
+            {
+                TownFollowerSpawns.Add(TilesList[TilesPoints.IndexOf(new Vector2(x, y))]);
+            }
+        }
+
+        // add town recruit spawn points
+        for (int x = 13; x <= 15; x++)
+        {
+            for (int y = 7; y <= 9; y++)
+            {
+                TownRecruitSpawns.Add(TilesList[TilesPoints.IndexOf(new Vector2(x, y))]);
+            }
+        }
+
+        // add town inventory spawns
+        for (int x = 13; x <= 15; x++)
+        {
+            for (int y = 14; y <= 16; y++)
+            {
+                TownInventorySpawns.Add(TilesList[TilesPoints.IndexOf(new Vector2(x, y))]);
+            }
+        }
+
+        // add town shop spawns
+        for (int x = 6; x <= 8; x++)
+        {
+            for (int y = 7; y <= 9; y++)
+            {
+                TownShopSpawns.Add(TilesList[TilesPoints.IndexOf(new Vector2(x, y))]);
+            }
+        }
+
+        for (int y = 7; y < 16; y++)
+        {
+            PlayerSpawns.Add(TilesList[TilesPoints.IndexOf(new Vector2(6, y))]);
+            EnemySpawns.Add(TilesList[TilesPoints.IndexOf(new Vector2(15, y))]);
+        }
+            
+        TownMissionBoardSpawn = TilesList[TilesPoints.IndexOf(new Vector2(11,11))];
+
     }
 
     /// <summary>
@@ -103,11 +161,11 @@ public class GridGenerator : MonoBehaviour
                 isImpassible = Random.Range(0f, 1f) < impassableChancePerTile;
             }
 
-            tile.SetImpassable(isImpassible);
+            tile.SetTerrainObstacle(isImpassible);
 
             if (isImpassible && !CheckConnectivity(PlayerSpawns[0]) || !CheckConnectivity(EnemySpawns[0]))
             {
-                tile.SetImpassable(false);
+                tile.SetTerrainObstacle(false);
                 //EnsureConnectivity();
             }
 
@@ -120,11 +178,6 @@ public class GridGenerator : MonoBehaviour
     /// </summary>
     public void GenerateTiles()
     {
-        TownRecruitSpawns.Clear();
-        TownInventorySpawns.Clear();
-        TownFollowerSpawns.Clear();
-        EnemySpawns.Clear();
-        PlayerSpawns.Clear();
         TilesList.Clear();
         TilesPoints.Clear();
 
@@ -154,60 +207,27 @@ public class GridGenerator : MonoBehaviour
                 TilesPoints.Add(gridPoint);
                 TilesList.Add(tileScript);
 
+                if (x >= 6 && x <= 15 && y >= 7 && y <= 16)
+                {
+                    tileScript.OutOfBounds = false;
+                }
+                else
+                {
+                    tileScript.OutOfBounds = true;
+                }
             }
         }
 
-        // add town follower spawn points
-        for (int x = 0; x < 5; x++)
-        {
-            for (int y = 5; y < 7; y++)
-            {
-                TownFollowerSpawns.Add(TilesList[TilesPoints.IndexOf(new Vector2(x, y))]);
-            }
-        }
 
-        // add town recruit spawn points
-        for (int x = 8; x < 10; x++)
-        {
-            for (int y = 5; y < 8; y++)
-            {
-                TownRecruitSpawns.Add(TilesList[TilesPoints.IndexOf(new Vector2(x, y))]);
-            }
-        }
-
-        // add town inventory spawns
-        for (int x = 0; x < 5; x++)
-        {
-            for (int y = 7; y < 9; y++)
-            {
-                TownInventorySpawns.Add(TilesList[TilesPoints.IndexOf(new Vector2(x, y))]);
-            }
-        }
-
-        // add town shop spawns
-        for (int x = 0; x < 5; x++)
-        {
-            for (int y = 0; y < 2; y++)
-            {
-                TownShopSpawns.Add(TilesList[TilesPoints.IndexOf(new Vector2(x, y))]);
-            }
-        }
-
-        for (int x = 0; x < 3; x++)
-        {
-            for (int y = 0; y < 3; y++)
-            {
-                PlayerSpawns.Add(TilesList[TilesPoints.IndexOf(new Vector2(x, y))]);
-            }
-        }
+        // for (int x = 6; x <= 15; x++)
+        // {
+        //     for (int y = 7; y <= 16; y++)
+        //     {
+        //         TilesList[TilesPoints.IndexOf(new Vector2(x,y))].OutOfBounds = false;
+        //         Debug.Log(x + ", " + y + " set in bounds");
+        //     }   
+        // }
         
-        for (int x = 4; x < 7; x++)
-        {
-            for (int y = 0; y < 3; y++)
-            {
-                EnemySpawns.Add(TilesList[TilesPoints.IndexOf(new Vector2(x, y))]);
-            }
-        }
     }
 
     /// <summary>
@@ -281,7 +301,7 @@ public class GridGenerator : MonoBehaviour
 
         for (int i = 0; i < impassableTiles.Count; i++)
         {
-            impassableTiles[i].SetImpassable(false); // Temporarily make passable
+            impassableTiles[i].SetTerrainObstacle(false); // Temporarily make passable
 
             // Check connectivity after clearing this tile
             if (CheckConnectivity(PlayerSpawns[0]))
@@ -290,7 +310,7 @@ public class GridGenerator : MonoBehaviour
             }
             else
             {
-                impassableTiles[i].SetImpassable(true); // Revert if no path is found
+                impassableTiles[i].SetTerrainObstacle(true); // Revert if no path is found
             }
         }
     }

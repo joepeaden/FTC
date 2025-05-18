@@ -125,7 +125,7 @@ public class AIPlayer : MonoBehaviour
                 Tile bestTargetTile = null;
                 foreach (Tile potentialTargetTile in targetPawn.CurrentTile.GetAdjacentTiles())
                 {
-                    Pawn pawnAtTile = potentialTargetTile.GetPawn();
+                    Pawn pawnAtTile = potentialTargetTile.GetInhabitant() as Pawn;
                     // don't consider if someone's there
                     if (pawnAtTile != null && !pawnAtTile.IsDead || !potentialTargetTile.CanTraverse(activePawn))
                     {
@@ -160,7 +160,7 @@ public class AIPlayer : MonoBehaviour
         Pawn targetPawn = null;
         foreach (Tile t in activePawn.CurrentTile.GetAdjacentTiles())
         {
-            targetPawn = t.GetPawn();
+            targetPawn = t.GetInhabitant() as Pawn;
             if (targetPawn != null && targetPawn.OnPlayerTeam != activePawn.OnPlayerTeam)
             {
                 break;

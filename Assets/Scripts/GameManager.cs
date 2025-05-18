@@ -138,7 +138,8 @@ public class GameManager : MonoBehaviour
         _enemiesForContract = enemies;
         _potentialRewardAmount = rewardAmount;
 
-        SceneManager.LoadScene("BattleScene");
+        TownManager.Instance.Unload();
+        BattleManager.Instance.InitializeBattle();
 
         _musicPlayer.clip = _battleMusic;
         _musicPlayer.Play();
@@ -156,7 +157,9 @@ public class GameManager : MonoBehaviour
 
     public void ExitBattle(bool playerWon)
     {
-        SceneManager.LoadScene("DecisionsUI");
+        //SceneManager.LoadScene("DecisionsUI");
+
+        TownManager.Instance.InitializeTown();
 
         if (playerWon)
         {

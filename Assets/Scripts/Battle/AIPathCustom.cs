@@ -53,7 +53,7 @@ public class AIPathCustom : AIPath
             Vector3 endPoint = _pathToFollow[pathIndex];
             Tile finalTile = GridGenerator.Instance.GetClosestTileToPosition(endPoint);
 
-            if (finalTile.GetPawn() != null)
+            if (finalTile.GetInhabitant() != null)
             {
                 _pathToFollow.Remove(endPoint);
             }

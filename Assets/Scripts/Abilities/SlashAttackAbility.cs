@@ -22,9 +22,9 @@ public class SlashAttackAbility : WeaponAbilityData
         if (attackStyle == WeaponAbilityData.AttackStyle.LShape)
         {
             Tile clockwiseNextTile = activatedPawn.CurrentTile.GetClockwiseNextTile(primaryTargetPawn.CurrentTile);
-            if (clockwiseNextTile.GetPawn())
+            if (clockwiseNextTile.GetInhabitant())
             {
-                targetPawns.Add(clockwiseNextTile.GetPawn());
+                targetPawns.Add(clockwiseNextTile.GetInhabitant() as Pawn);
             }
         }
 

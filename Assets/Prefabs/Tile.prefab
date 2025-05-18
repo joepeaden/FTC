@@ -157,15 +157,15 @@ SpriteRenderer:
   m_SortingLayerID: -896573283
   m_SortingLayer: 3
   m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: 98df362d46505407e860ee272c8ee36b, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 272980bf2fca545fe93cf30aa4ac640b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 4, y: 2}
+  m_Size: {x: 2, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &6244671537510217347
@@ -337,6 +337,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d38bc87e6d2884bebbf50d78facc3ceb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  oobTileSprites:
+  - {fileID: 21300000, guid: 890ed7a44fe1d4e62af90e3f310ff3ba, type: 3}
   tileSprites:
   - {fileID: 21300000, guid: 7722672de2daccb4b87486ae0ebd9eb2, type: 3}
   - {fileID: 21300000, guid: e45be383f8e8e4bf7970d0beb83a12a4, type: 3}
@@ -346,15 +348,17 @@ MonoBehaviour:
   - {fileID: 21300000, guid: e4496bc7d37b56a408d8cbdd884c63b1, type: 3}
   - {fileID: 21300000, guid: ed0bc25a7cc704303ab3f76f5acae69e, type: 3}
   - {fileID: 21300000, guid: fe56b631c1f7849c4bed9c3a658a392f, type: 3}
+  shopTileSprite: {fileID: 21300000, guid: 77fd7b97e1be7495fa6c9c819818adcc, type: 3}
   tileSpriteRend: {fileID: 1716172795536360721}
   terrainSpriteRend: {fileID: 5014756007081718938}
-  selectionSprite: {fileID: 21300000, guid: c34e91e3fb1af4616a37fbd8ad4366df, type: 3}
-  moveRangeSprite: {fileID: 21300000, guid: 87705c8be948744fdb21cb3419b1c653, type: 3}
-  attackHighlightSprite: {fileID: 21300000, guid: a7671d60fd3aa4d7c8d1f0e0e6de47ff, type: 3}
-  attackTargetHighlightSprite: {fileID: 21300000, guid: 68694f32466694c25be58e5c110ab06e, type: 3}
+  selectionSprite: {fileID: 21300000, guid: 3f0f630bc112e468aab87126d94ae08c, type: 3}
+  moveRangeSprite: {fileID: 21300000, guid: 3f0f630bc112e468aab87126d94ae08c, type: 3}
+  attackHighlightSprite: {fileID: 21300000, guid: 0058cdfef89454bf2b2ee263378c6015, type: 3}
+  attackTargetHighlightSprite: {fileID: 21300000, guid: 0058cdfef89454bf2b2ee263378c6015, type: 3}
   tileOverlayUI: {fileID: 8157718088664233285}
   tileHoverUI: {fileID: 4394614102146550778}
-  _pawn: {fileID: 0}
+  _item: {fileID: 0}
+  OutOfBounds: 0
 --- !u!60 &5009864740182896781
 PolygonCollider2D:
   m_ObjectHideFlags: 0

@@ -34,34 +34,17 @@ public class DecisionPanel : MonoBehaviour
     private void Awake()
     {
         GetComponent<Button>().onClick.AddListener(HandleClick);
+
+        GenerateContractOption();
     }
 
     public void GenerateRecruitOption()
     {
         _recruit = new(DataLoader.charTypes["player"]);
-
-
-
-        //_numOfEnemiesTxt.gameObject.SetActive(false);
-
         _titleText.text = _recruit.CharName;
-
-        //switch (_recruit.Motivator)
-        //{
-        //    case GameCharacter.CharMotivators.Greed:
-                _descriptionText.text = _recruit.CharName + " is a young man looking for work with a company.";
-        //        break;
-        //    case GameCharacter.CharMotivators.Honor:
-        //        _descriptionText.text = _recruit.CharName + " is righteous and honorable - and full of arrogance.";
-        //        break;
-        //    case GameCharacter.CharMotivators.Glory:
-        //        _descriptionText.text = _recruit.CharName + " wishes the crowds to know his name, be it by amazing deed or brutal death.";
-        //        break;
-        //}
-
+        _descriptionText.text = _recruit.CharName + " is a young man looking for work with a company.";
         _goldAmountText.text = "Cost: " + _recruit.Data.price + " gold";
         goldAmount = _recruit.Data.price;
-
         _decisionType = DecisionType.Recruit;
 
         _pawnPreview.gameObject.SetActive(true);

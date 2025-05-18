@@ -126,11 +126,11 @@ public class SelectionManager : MonoBehaviour
                     foreach (RaycastHit2D hit in hits)
                     {
                         Tile newTile = hit.transform.GetComponent<Tile>();
-                        if (newTile != null && !newTile.IsImpassable)
+                        if (newTile != null && !newTile.IsImpassable && !newTile.OutOfBounds)
                         {
                             if (currentPawn.OnPlayerTeam)
                             {
-                                Pawn targetPawn = newTile.GetPawn();
+                                Pawn targetPawn = newTile.GetInhabitant() as Pawn;
                                 if (Ability.SelectedAbility != null && targetPawn != null && currentPawn.IsTargetInRange(targetPawn, Ability.SelectedAbility))
                                 {
                                     ClearHighlights();
