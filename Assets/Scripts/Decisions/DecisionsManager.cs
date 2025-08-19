@@ -11,10 +11,10 @@ public class DecisionsManager : MonoBehaviour
     [SerializeField] private GameObject _winUI;
 
     [SerializeField] private TMP_Text _goldText;
-    [SerializeField] private Button _recruitsButton;
-    [SerializeField] private Button _contractsButton;
-    [SerializeField] private Button _troopsButton;
-    [SerializeField] private Button _shopButton;
+    [SerializeField] private MyTabButton _recruitsButton;
+    [SerializeField] private MyTabButton _contractsButton;
+    [SerializeField] private MyTabButton _troopsButton;
+    [SerializeField] private MyTabButton _shopButton;
     [SerializeField] private Button _restButton;
     [SerializeField] private Button _upgradeContractsButton;
     [SerializeField] private Button _upgradeRecruitsButton;
@@ -43,17 +43,19 @@ public class DecisionsManager : MonoBehaviour
     [SerializeField] private AudioClip goldSound;
     [SerializeField] private AudioClip equipSound;
 
-    private void Awake()
+    private void Start()
     {
-        _recruitsButton.onClick.AddListener(ShowRecruitsScreen);
-        _contractsButton.onClick.AddListener(ShowContractsScreen);
-        _troopsButton.onClick.AddListener(ShowTroopsScreen);
+        _recruitsButton.TheButton.onClick.AddListener(ShowRecruitsScreen);
+        _contractsButton.TheButton.onClick.AddListener(ShowContractsScreen);
+        _troopsButton.TheButton.onClick.AddListener(ShowTroopsScreen);
         _levelUpButton.onClick.AddListener(ShowLevelUpScreen);
-        _shopButton.onClick.AddListener(ShowShopScreen);
+        _shopButton.TheButton.onClick.AddListener(ShowShopScreen);
         _restButton.onClick.AddListener(Rest);
         _disableCharPanelButton.onClick.AddListener(HideCharacterPanel);
 
         _charDetail.Setup(this);
+
+        ShowTroopsScreen();
     }
 
     private void OnEnable()
@@ -308,6 +310,11 @@ public class DecisionsManager : MonoBehaviour
         _inventoryScreen.SetActive(false);
         _charDetail.gameObject.SetActive(false);
         _levelUpScreen.gameObject.SetActive(false);
+
+        _troopsButton.SetSelected(false);
+        _contractsButton.SetSelected(false);
+        _shopButton.SetSelected(false);
+        _recruitsButton.SetSelected(true);
     }
 
     private void ShowContractsScreen()
@@ -320,6 +327,11 @@ public class DecisionsManager : MonoBehaviour
         _inventoryScreen.SetActive(false);
         _charDetail.gameObject.SetActive(false);
         _levelUpScreen.gameObject.SetActive(false);
+
+        _troopsButton.SetSelected(false);
+        _contractsButton.SetSelected(true);
+        _shopButton.SetSelected(false);
+        _recruitsButton.SetSelected(false);
     }
 
     private void ShowTroopsScreen()
@@ -331,6 +343,11 @@ public class DecisionsManager : MonoBehaviour
         _inventoryScreen.SetActive(true);
         _charDetail.gameObject.SetActive(false);
         _levelUpScreen.gameObject.SetActive(false);
+
+        _troopsButton.SetSelected(true);
+        _contractsButton.SetSelected(false);
+        _shopButton.SetSelected(false);
+        _recruitsButton.SetSelected(false);
     }
 
     private void ShowLevelUpScreen()
@@ -353,15 +370,20 @@ public class DecisionsManager : MonoBehaviour
         _inventoryScreen.SetActive(true);
         _charDetail.gameObject.SetActive(false);
         _levelUpScreen.gameObject.SetActive(false);
+
+        _troopsButton.SetSelected(false);
+        _contractsButton.SetSelected(false);
+        _shopButton.SetSelected(true);
+        _recruitsButton.SetSelected(false);
     }
 
     private void OnDestroy()
     {
-        _recruitsButton.onClick.RemoveListener(ShowRecruitsScreen);
-        _contractsButton.onClick.RemoveListener(ShowContractsScreen);
-        _troopsButton.onClick.RemoveListener(ShowTroopsScreen);
+        _recruitsButton.TheButton.onClick.RemoveListener(ShowRecruitsScreen);
+        _contractsButton.TheButton.onClick.RemoveListener(ShowContractsScreen);
+        _troopsButton.TheButton.onClick.RemoveListener(ShowTroopsScreen);
         _levelUpButton.onClick.RemoveListener(ShowLevelUpScreen);
-        _shopButton.onClick.RemoveListener(ShowShopScreen);
+        _shopButton.TheButton.onClick.RemoveListener(ShowShopScreen);
         _disableCharPanelButton.onClick.RemoveListener(HideCharacterPanel);
         _restButton.onClick.RemoveListener(Rest);
     }
