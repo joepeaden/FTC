@@ -12,13 +12,20 @@ public class InfoLine : MonoBehaviour
 
     public bool isHidden = true;
 
+    private TooltipTarget tooltipTarget;
+
+    private void Awake()
+    {
+        tooltipTarget = GetComponent<TooltipTarget>();
+    }
+
     public void Hide()
     {
         isHidden = true;
         gameObject.SetActive(false);
     }
 
-    public void SetData(string infoLabelString, string infoValueString)
+    public void SetData(string infoLabelString, string infoValueString, string tooltipDescription = "")
     {
         isHidden = false;
 
@@ -30,5 +37,13 @@ public class InfoLine : MonoBehaviour
         }
 
         infoValue.text = infoValueString;
+
+        if (tooltipDescription != "")
+        {
+            // set the title of the tooltip
+            tooltipTarget.displayTitle = infoValueString;
+            // set tooltip description
+            tooltipTarget.displayString = tooltipDescription;
+        }
     }
 }

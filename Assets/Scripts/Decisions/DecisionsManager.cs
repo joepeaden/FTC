@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using System.Linq;
 
 public class DecisionsManager : MonoBehaviour
 {
@@ -38,10 +39,20 @@ public class DecisionsManager : MonoBehaviour
     [SerializeField] private CharDetailPanel _charDetail;
     [SerializeField] private Button _disableCharPanelButton;
     [SerializeField] private Button _levelUpButton;
+    [SerializeField] private Button _nextCharButton;
+    [SerializeField] private Button _lastCharButton;
+
+    private int _currentCharToShow = 0;
+    /// <summary>
+    /// Dict with character as key and index (child position in _troopsGrid) as value
+    /// </summary>
+    private Dictionary<GameCharacter, int> _charactersToIndex = new();
+    private Dictionary<int, GameCharacter> _indexToCharacters = new();
 
     [Header("Audio")]
     [SerializeField] private AudioClip goldSound;
     [SerializeField] private AudioClip equipSound;
+    
 
     private void Start()
     {
@@ -52,6 +63,8 @@ public class DecisionsManager : MonoBehaviour
         _shopButton.TheButton.onClick.AddListener(ShowShopScreen);
         _restButton.onClick.AddListener(Rest);
         _disableCharPanelButton.onClick.AddListener(HideCharacterPanel);
+        _nextCharButton.onClick.AddListener(NextCharacterDetails);
+        _lastCharButton.onClick.AddListener(LastCharacterDetails);
 
         _charDetail.Setup(this);
 
@@ -80,7 +93,7 @@ public class DecisionsManager : MonoBehaviour
 
         // fill out recruits
         for (int i = 0; i < _recruitPanelParent.childCount; i++)
-        {
+        { 
             DecisionPanel panel = _recruitPanelParent.GetChild(i).GetComponent<DecisionPanel>();
             panel.GenerateRecruitOption();
         }
@@ -94,9 +107,14 @@ public class DecisionsManager : MonoBehaviour
         // fill out warband
         if (GameManager.Instance != null)
         {
+            int i = 0;
             foreach (GameCharacter character in GameManager.Instance.PlayerFollowers)
             {
                 AddCharacterPanel(character);
+                _charactersToIndex[character] = i;     // forward lookup
+                _indexToCharacters[i] = character;     // reverse lookup
+
+                i++;
             }
         }
         else
@@ -263,6 +281,30 @@ public class DecisionsManager : MonoBehaviour
         _charDetail.gameObject.SetActive(false);
     }
 
+    private void NextCharacterDetails()
+    {
+        _currentCharToShow++;
+
+        if (_currentCharToShow > _indexToCharacters.Count - 1)
+        {
+            _currentCharToShow = 0;
+        }
+
+        ShowCharacterPanel(_indexToCharacters[_currentCharToShow]);
+    }
+
+    private void LastCharacterDetails()
+    {
+        _currentCharToShow--;
+
+        if (_currentCharToShow < 0)
+        {
+            _currentCharToShow = _indexToCharacters.Count - 1;
+        }
+
+        ShowCharacterPanel(_indexToCharacters[_currentCharToShow]);
+    }
+
     private void HandleRecruit(GameCharacter newChar)
     {
         UpdateGoldText();
@@ -284,6 +326,9 @@ public class DecisionsManager : MonoBehaviour
 
     public void ShowCharacterPanel(GameCharacter character)
     {
+        // get the index of the character for paging
+        _currentCharToShow = _charactersToIndex[character];
+
         _charDetail.gameObject.SetActive(true);
         _troopsScreen.SetActive(false);
         _levelUpScreen.SetActive(false);
@@ -386,5 +431,7 @@ public class DecisionsManager : MonoBehaviour
         _shopButton.TheButton.onClick.RemoveListener(ShowShopScreen);
         _disableCharPanelButton.onClick.RemoveListener(HideCharacterPanel);
         _restButton.onClick.RemoveListener(Rest);
+        _nextCharButton.onClick.RemoveListener(NextCharacterDetails);
+        _lastCharButton.onClick.RemoveListener(LastCharacterDetails);
     }
 }

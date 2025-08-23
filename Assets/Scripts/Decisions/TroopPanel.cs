@@ -10,6 +10,7 @@ public class TroopPanel : MonoBehaviour
     [SerializeField] private TMP_Text _troopNameText;
     [SerializeField] private Button _theButton;
     [SerializeField] private PawnPreview _preview;
+    [SerializeField] private GameObject _levelUpObjects;
 
     private GameCharacter _gameChar;
 
@@ -19,6 +20,8 @@ public class TroopPanel : MonoBehaviour
         _theButton.onClick.AddListener(() => { callback(gameChar); });
 
         _preview.SetData(gameChar);
+
+        _levelUpObjects.SetActive(gameChar.PendingLevelUp);
 
         _gameChar = gameChar;
     }

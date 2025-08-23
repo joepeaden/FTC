@@ -34,7 +34,7 @@ public class CharDetailPanel : MonoBehaviour
     [SerializeField] private PawnPreview _pawnPreview;
 
     [SerializeField] private List<ActionButton> _actionButtons = new();
-    [SerializeField] private List<InfoLine> _motivationConditionDisplay = new();
+    [SerializeField] private List<InfoLine> _oathsDisplay = new();
 
     public void Setup(DecisionsManager decisions)
     {
@@ -106,19 +106,18 @@ public class CharDetailPanel : MonoBehaviour
             actionButton.gameObject.SetActive(false);
         }
 
-        List<MotCondData> motConditions = character.GetMotCondsForBattle();
-        for (i = 0; i < motConditions.Count; i++)
+        for (i = 0; i < character.Passives.Count; i++)
         {
-            MotCondData condition = motConditions[i];
+            PassiveData passive = character.Passives[i];
 
-            _motivationConditionDisplay[i].SetData("", condition.description);
+            _oathsDisplay[i].SetData("", passive.displayName, passive.description);
 
         }
 
         // update the remaining buttons
-        for (i = 0; i < _motivationConditionDisplay.Count; i++)
+        for (; i < _oathsDisplay.Count; i++)
         {
-            _motivationConditionDisplay[i].Hide();
+            _oathsDisplay[i].Hide();
         }
 
         _pawnPreview.SetData(character);

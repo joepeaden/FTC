@@ -148,6 +148,7 @@ GameObject:
   - component: {fileID: 942407601497787684}
   - component: {fileID: 5119674031910330049}
   - component: {fileID: 8303319131988937538}
+  - component: {fileID: 2203065482829216174}
   m_Layer: 5
   m_Name: InfoTextBox
   m_TagString: Untagged
@@ -249,3 +250,17 @@ MonoBehaviour:
   infoLabel: {fileID: 0}
   infoValue: {fileID: 7000252602806475566}
   isHidden: 1
+--- !u!114 &2203065482829216174
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7264438475373321583}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9d44135b26964ffba02b4db43594a49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  displayTitle: 
+  displayString: 

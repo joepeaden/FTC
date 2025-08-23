@@ -4766,6 +4766,8 @@ MonoBehaviour:
   _charDetail: {fileID: 242677605}
   _disableCharPanelButton: {fileID: 1489040144}
   _levelUpButton: {fileID: 475451518}
+  _nextCharButton: {fileID: 687952540}
+  _lastCharButton: {fileID: 687952539}
   goldSound: {fileID: 8300000, guid: 30883ef5dd87446e9bf2f3c4955b6653, type: 3}
   equipSound: {fileID: 8300000, guid: be9e8fd9f23b18146852ddb3924f7ffb, type: 3}
 --- !u!1 &628766847
@@ -5475,6 +5477,28 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 683943407}
   m_CullTransparentMesh: 1
+--- !u!114 &687952539 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4328574174893309499, guid: 6c073253d5e224ea19e28d990fb0306e, type: 3}
+  m_PrefabInstance: {fileID: 6376139312427368820}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &687952540 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2639940852473606665, guid: 6c073253d5e224ea19e28d990fb0306e, type: 3}
+  m_PrefabInstance: {fileID: 6376139312427368820}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &691943203
 GameObject:
   m_ObjectHideFlags: 0
