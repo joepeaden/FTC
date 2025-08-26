@@ -28,6 +28,9 @@ public class SlashAttackAbility : WeaponAbilityData
             }
         }
 
+        activatedPawn.actionPoints -= apCost;
+        activatedPawn.Motivation -= motCost;
+
         foreach (Pawn targetPawn in targetPawns)
         {
             activatedPawn.AttackPawn(targetPawn, this);

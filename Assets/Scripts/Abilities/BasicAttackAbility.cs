@@ -16,6 +16,16 @@ public class BasicAttackAbility : WeaponAbilityData
             return false;
         }
          
+        if (activatedPawn.freeAttacksRemaining > 0)
+        {
+            activatedPawn.freeAttacksRemaining--;
+        }
+        else
+        {
+            activatedPawn.actionPoints -= apCost;
+        }
+        activatedPawn.Motivation -= motCost;
+
         activatedPawn.AttackPawn(targetPawn, this);
 
         BattleManager.Instance.PawnActivated(activatedPawn);

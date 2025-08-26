@@ -133,8 +133,16 @@ public class SelectionManager : MonoBehaviour
                                 Pawn targetPawn = newTile.GetPawn();
                                 if (Ability.SelectedAbility != null && targetPawn != null && currentPawn.IsTargetInRange(targetPawn, Ability.SelectedAbility))
                                 {
-                                    ClearHighlights();
-                                    Ability.SelectedAbility.Activate(currentPawn, targetPawn);
+                                    bool isAlly = targetPawn.OnPlayerTeam == currentPawn.OnPlayerTeam;
+
+                                    // only allow support ability use on allies or attack ability use on enemies
+                                    // THIS NEEDS UPDATE IF WE ADD OTHER ABILITY TYPES OTHER THAN WEAPON OR SUPPORT
+                                    if (Ability.SelectedAbility is SupportAbilityData && isAlly ||
+                                        Ability.SelectedAbility is WeaponAbilityData && !isAlly)
+                                    {
+                                        ClearHighlights();
+                                        Ability.SelectedAbility.Activate(currentPawn, targetPawn);
+                                    }
                                 }
                                 else if (currentPawn.CurrentTile.GetTilesInMoveRange().Contains(newTile) && targetPawn == null && Ability.SelectedAbility == null && _selectedTile != null)
                                 {

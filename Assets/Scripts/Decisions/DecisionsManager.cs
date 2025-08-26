@@ -98,6 +98,30 @@ public class DecisionsManager : MonoBehaviour
             panel.GenerateRecruitOption();
         }
 
+        RefreshWarband();
+
+        // clear shop items
+        for (int i = 0; i < _shopGrid.transform.childCount; i++)
+        {
+            Destroy(_shopGrid.transform.GetChild(i).gameObject);
+        }
+
+        // fill out shop
+        int shopItemsCount = Random.Range(_minNumOfShopItems, _maxNumOfShopItems);
+        for (int i = 0; i < shopItemsCount; i++)
+        {
+            ItemData item = possibleShopItems[Random.Range(0, possibleShopItems.Count)];
+            GameObject itemGO = Instantiate(_itemPrefab, _shopGrid.transform);
+            itemGO.GetComponent<ItemUI>().SetData(item, this, PurchaseItem);
+        }
+
+        RefreshInventory();
+        UpdateGoldText();
+        CheckForGameVictory();
+    }
+
+    private void RefreshWarband()
+    {
         // clear warband stuff
         for (int i = 0; i < _troopsGrid.transform.childCount; i++)
         {
@@ -124,25 +148,6 @@ public class DecisionsManager : MonoBehaviour
                 GameObject panelGO = Instantiate(_troopPrefab, _troopsGrid.transform);
             }
         }
-
-        // clear shop items
-        for (int i = 0; i < _shopGrid.transform.childCount; i++)
-        {
-            Destroy(_shopGrid.transform.GetChild(i).gameObject);
-        }
-
-        // fill out shop
-        int shopItemsCount = Random.Range(_minNumOfShopItems, _maxNumOfShopItems);
-        for (int i = 0; i < shopItemsCount; i++)
-        {
-            ItemData item = possibleShopItems[Random.Range(0, possibleShopItems.Count)];
-            GameObject itemGO = Instantiate(_itemPrefab, _shopGrid.transform);
-            itemGO.GetComponent<ItemUI>().SetData(item, this, PurchaseItem);
-        }
-
-        RefreshInventory();
-        UpdateGoldText();
-        CheckForGameVictory();
     }
 
     private void CheckForGameVictory()
@@ -158,7 +163,7 @@ public class DecisionsManager : MonoBehaviour
                 _winUI.SetActive(true);
                 _winUI.GetComponent<GameEndPopup>().SetPlayerWon(true);
             }
-            else if (GameManager.Instance.PlayerGold < GameManager.Instance.GameCharData.price && GameManager.Instance.PlayerFollowers.Count == 0) 
+            else if (GameManager.Instance.PlayerGold < GameManager.Instance.GameCharData.price && GameManager.Instance.PlayerFollowers.Count == 0)
             {
                 _winUI.SetActive(true);
                 _winUI.GetComponent<GameEndPopup>().SetPlayerWon(false);
@@ -279,6 +284,8 @@ public class DecisionsManager : MonoBehaviour
     {
         _troopsScreen.SetActive(true);
         _charDetail.gameObject.SetActive(false);
+
+        RefreshWarband();
     }
 
     private void NextCharacterDetails()
@@ -393,6 +400,8 @@ public class DecisionsManager : MonoBehaviour
         _contractsButton.SetSelected(false);
         _shopButton.SetSelected(false);
         _recruitsButton.SetSelected(false);
+
+        RefreshWarband();
     }
 
     private void ShowLevelUpScreen()

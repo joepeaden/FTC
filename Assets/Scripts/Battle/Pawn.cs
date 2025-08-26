@@ -384,17 +384,6 @@ public class Pawn : MonoBehaviour
             }
         }
 
-        if (freeAttacksRemaining > 0)
-        {
-            freeAttacksRemaining--;
-        }
-        else
-        {
-            actionPoints -= currentAction.apCost;
-        }
-        
-        Motivation -= currentAction.motCost;
-
         // if this pawn has a protector, try to hit that one instead
         if (targetPawn.ProtectingPawn != null)
         {
