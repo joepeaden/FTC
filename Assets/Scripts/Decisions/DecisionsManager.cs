@@ -12,10 +12,10 @@ public class DecisionsManager : MonoBehaviour
     [SerializeField] private GameObject _winUI;
 
     [SerializeField] private TMP_Text _goldText;
-    [SerializeField] private MyTabButton _recruitsButton;
-    [SerializeField] private MyTabButton _contractsButton;
-    [SerializeField] private MyTabButton _troopsButton;
-    [SerializeField] private MyTabButton _shopButton;
+    [SerializeField] private TheTabButton _recruitsButton;
+    [SerializeField] private TheTabButton _contractsButton;
+    [SerializeField] private TheTabButton _troopsButton;
+    [SerializeField] private TheTabButton _shopButton;
     [SerializeField] private Button _restButton;
     [SerializeField] private Button _upgradeContractsButton;
     [SerializeField] private Button _upgradeRecruitsButton;

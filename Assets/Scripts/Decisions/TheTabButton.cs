@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 [RequireComponent(typeof(Button))]
 [RequireComponent(typeof(Image))]
-public class MyTabButton : MonoBehaviour
+public class TheTabButton : MonoBehaviour
 {
     private Image image;
     public Sprite defaultSprite;
