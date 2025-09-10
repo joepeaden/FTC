@@ -36,11 +36,14 @@ public class DecisionsManager : MonoBehaviour
     private int _maxNumOfShopItems = 10;
     private int _minNumOfShopItems = 6;
 
+    [Header("Char Detail Panel Stuff")]
     [SerializeField] private CharDetailPanel _charDetail;
     [SerializeField] private Button _disableCharPanelButton;
     [SerializeField] private Button _levelUpButton;
     [SerializeField] private Button _nextCharButton;
     [SerializeField] private Button _lastCharButton;
+
+    [SerializeField] private GameObject _statLevelUpPopup;
 
     private int _currentCharToShow = 0;
     /// <summary>
@@ -59,7 +62,7 @@ public class DecisionsManager : MonoBehaviour
         _recruitsButton.TheButton.onClick.AddListener(ShowRecruitsScreen);
         _contractsButton.TheButton.onClick.AddListener(ShowContractsScreen);
         _troopsButton.TheButton.onClick.AddListener(ShowTroopsScreen);
-        _levelUpButton.onClick.AddListener(ShowLevelUpScreen);
+        _levelUpButton.onClick.AddListener(ShowStatLevelUpPopup);
         _shopButton.TheButton.onClick.AddListener(ShowShopScreen);
         _restButton.onClick.AddListener(Rest);
         _disableCharPanelButton.onClick.AddListener(HideCharacterPanel);
@@ -404,7 +407,12 @@ public class DecisionsManager : MonoBehaviour
         RefreshWarband();
     }
 
-    private void ShowLevelUpScreen()
+    public void ShowStatLevelUpPopup()
+    {
+        _statLevelUpPopup.SetActive(true);
+    }
+
+    public void ShowPerkLevelUpScreen()
     {
         _recruitsScreen.SetActive(false);
         _contractsScreen.SetActive(false);
@@ -436,7 +444,7 @@ public class DecisionsManager : MonoBehaviour
         _recruitsButton.TheButton.onClick.RemoveListener(ShowRecruitsScreen);
         _contractsButton.TheButton.onClick.RemoveListener(ShowContractsScreen);
         _troopsButton.TheButton.onClick.RemoveListener(ShowTroopsScreen);
-        _levelUpButton.onClick.RemoveListener(ShowLevelUpScreen);
+        _levelUpButton.onClick.RemoveListener(ShowStatLevelUpPopup);
         _shopButton.TheButton.onClick.RemoveListener(ShowShopScreen);
         _disableCharPanelButton.onClick.RemoveListener(HideCharacterPanel);
         _restButton.onClick.RemoveListener(Rest);

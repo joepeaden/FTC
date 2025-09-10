@@ -245,7 +245,7 @@ public class GameCharacter
                 {
                     //add one motivation, up to the max, which is based on the level
                     //of the character.
-                    _charMotivation = Mathf.Clamp(_charMotivation + 1, 0, _level + 1);
+                    // _charMotivation = Mathf.Clamp(_charMotivation + 1, 0, _level + 1);
 
                     // take a new oath if not at max.
                     if (_motConds.Count < _level)
@@ -280,14 +280,34 @@ public class GameCharacter
         _charMotivation = 0;
     }
 
-    public void AddAcc(int change)
+    public void ChangeAcc(int addedValue)
     {
-        _accRating += change;
+        _accRating += addedValue;
     }
 
-    public void ChangeHP(int newValue)
+    public void ChangeHP(int addedValue)
     {
-        _hitPoints = newValue;
+        _hitPoints += addedValue;
+    }
+
+    public void ChangeMove(int addedValue)
+    {
+        _moveRange += addedValue;
+    }
+    
+    public void ChangeCritChance(int addedValue)
+    {
+        _critChance += addedValue;
+    }
+
+    public void ChangeInit(int addedValue)
+    {
+        _baseInitiative += addedValue;
+    }
+
+    public void ChangeMot(int addedValue)
+    {
+        _charMotivation += addedValue;
     }
 
     public int GetXPToLevel()

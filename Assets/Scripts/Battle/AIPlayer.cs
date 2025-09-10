@@ -111,7 +111,7 @@ public class AIPlayer : MonoBehaviour
 
 
 
-            List <Pawn> pawnsToTarget = activePawn.OnPlayerTeam ? _enemyPawns : BattleManager.Instance.PlayerPawns;
+            List<Pawn> pawnsToTarget = activePawn.OnPlayerTeam ? _enemyPawns : BattleManager.Instance.PlayerPawns;
 
             List<Tile> potentialTargetTiles = new();
             foreach (Pawn targetPawn in pawnsToTarget)
@@ -143,9 +143,17 @@ public class AIPlayer : MonoBehaviour
                 }
             }
 
-            Tile finalTargetTile = potentialTargetTiles.OrderBy(t => activePawn.CurrentTile.GetTileDistance(t)).First();
+            // if there's no potential tiles to move towrads... just stand there.
+            if (potentialTargetTiles.Count > 0)
+            {
+                Tile finalTargetTile = potentialTargetTiles.OrderBy(t => activePawn.CurrentTile.GetTileDistance(t)).First();
 
-            activePawn.TryMoveToTile(finalTargetTile);
+                activePawn.TryMoveToTile(finalTargetTile);
+            }
+            else
+            {
+                activePawn.PassTurn();
+            }
         }
     }
 

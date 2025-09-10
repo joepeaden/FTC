@@ -419,6 +419,8 @@ public class Pawn : MonoBehaviour
 
             targetPawn.TakeDamage(this, currentAction, isCrit);
 
+            CameraManager.Instance.ShakeCamera();
+
             if (targetPawn.IsDead)
             {
                 StartCoroutine(PlayAudioAfterDelay(0f, GameChar.TheWeapon.Data.killSound));
@@ -832,6 +834,11 @@ public class Pawn : MonoBehaviour
             _audioSource.loop = true;
             _audioSource.Play();
         }
+    }
+
+    public void PassTurn()
+    {
+        BattleManager.Instance.PawnActivated(this);
     }
 
     public void HandleDestinationReached()
