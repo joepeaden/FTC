@@ -21,7 +21,7 @@ public class TroopPanel : MonoBehaviour
 
         _preview.SetData(gameChar);
 
-        _levelUpObjects.SetActive(gameChar.PendingLevelUp);
+        _levelUpObjects.SetActive(gameChar.PendingPerkChoices > 0 || gameChar.PendingStatChoices > 0);
 
         _gameChar = gameChar;
     }

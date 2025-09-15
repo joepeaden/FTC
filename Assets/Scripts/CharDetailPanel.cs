@@ -106,6 +106,11 @@ public class CharDetailPanel : MonoBehaviour
 
         for (i = 0; i < character.Passives.Count; i++)
         {
+            if (i >= _oathsDisplay.Count)
+            {
+                break;
+            }
+
             PassiveData passive = character.Passives[i];
 
             _oathsDisplay[i].SetData("", passive.displayName, passive.description);

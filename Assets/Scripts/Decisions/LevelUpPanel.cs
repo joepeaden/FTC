@@ -11,8 +11,6 @@ using System.Linq;
 /// </summary>
 public class LevelUpPanel : MonoBehaviour
 {
-    [SerializeField] private Button _increaseHP;
-    [SerializeField] private Button _increaseAccRating;
     [SerializeField] private PipStatBar _hpLevelUpStatBar;
     [SerializeField] private TMP_Text _accLevelUpText;
     [SerializeField] private TMP_Text _statPoints;
@@ -26,19 +24,20 @@ public class LevelUpPanel : MonoBehaviour
 
     private void Start()
     {
-        _increaseAccRating.onClick.AddListener(ImproveAccRating);
-        _increaseHP.onClick.AddListener(ImproveHP);
         _confirmButton.onClick.AddListener(ApplyChanges);
     }
 
     private void OnDestroy()
     {
-        _increaseAccRating.onClick.RemoveListener(ImproveAccRating);
-        _increaseHP.onClick.RemoveListener(ImproveHP);
         _confirmButton.onClick.RemoveListener(ApplyChanges);
     }
 
     private void OnEnable()
+    {
+        Refresh();
+    }
+
+    private void Refresh()
     {
         foreach (LevelUpCard card in _cards)
         {
@@ -60,54 +59,23 @@ public class LevelUpPanel : MonoBehaviour
                 card.SetData(cardPassive, this);
             }
         }
-
-        //CheckStatCapOrPointsSpent();
-
-        //_hpLevelUpStatBar.SetBar(_detailPanel.CurrentCharacter.HitPoints);
-        //_accLevelUpText.text = _detailPanel.CurrentCharacter.AccRating + "+";
-    }
-
-    private void ImproveAccRating()
-    {
-        _detailPanel.CurrentCharacter.ChangeAcc(-1);
-        _accLevelUpText.text = _detailPanel.CurrentCharacter.AccRating + "+";
-        _detailPanel.CurrentCharacter.SpendLevelUp();
-
-        CheckStatCapOrPointsSpent();
-    }
-
-    private void ImproveHP()
-    {
-        _detailPanel.CurrentCharacter.ChangeHP(1);
-        _hpLevelUpStatBar.SetBar(_detailPanel.CurrentCharacter.HitPoints);
-        _detailPanel.CurrentCharacter.SpendLevelUp();
-
-        CheckStatCapOrPointsSpent();
-    }
-
-    private void CheckStatCapOrPointsSpent()
-    {
-        bool hpAtMaxVal = _detailPanel.CurrentCharacter.HitPoints >= 8;
-
-        _increaseAccRating.gameObject.SetActive(_detailPanel.CurrentCharacter.PendingLevelUp);
-        _increaseHP.gameObject.SetActive(!hpAtMaxVal && _detailPanel.CurrentCharacter.PendingLevelUp);
-
-        _statPoints.text = "Stat Points: " + _detailPanel.CurrentCharacter.PendingLevelUp;
-
     }
 
     public void HandleLvlUpCardSelected(LevelUpCard card)
     {
-        if (card.ability != null)
+        if (!_detailPanel.CurrentCharacter.Abilities.Contains(card.ability))
         {
-            _detailPanel.CurrentCharacter.Abilities.Add(card.ability);
-        }
-        else if (card.passive != null)
-        {
-            _detailPanel.CurrentCharacter.Passives.Add(card.passive);
+            if (card.ability != null)
+            {
+                _detailPanel.CurrentCharacter.Abilities.Add(card.ability);
+            }
+            else if (card.passive != null)
+            {
+                _detailPanel.CurrentCharacter.Passives.Add(card.passive);
+            }
         }
 
-        _detailPanel.CurrentCharacter.SpendLevelUp();
+        _detailPanel.CurrentCharacter.PendingPerkChoices--;
 
         ApplyChanges();
     }
@@ -115,7 +83,12 @@ public class LevelUpPanel : MonoBehaviour
     private void ApplyChanges()
     {
         // refresh the detail panel w/ new stats
-        //_detailPanel.SetCharacter(_detailPanel.CurrentCharacter);
         _decisionsManager.ShowCharacterPanel(_detailPanel.CurrentCharacter);
+
+        // if there's still perk points, let the player pick more.
+        if (_detailPanel.CurrentCharacter.PendingPerkChoices > 0)
+        {
+            _decisionsManager.ShowPerkLevelUpScreen();
+        }
     }
 }

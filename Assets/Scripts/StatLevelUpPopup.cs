@@ -34,6 +34,8 @@ public class StatLevelUpPopup : MonoBehaviour
     private int _addMot;
     private int _addCritChance;
 
+    private int _pendingStatChoices;
+
     public void Awake()
     {
         _improveHPButton.onClick.AddListener(BoostHP);
@@ -85,6 +87,8 @@ public class StatLevelUpPopup : MonoBehaviour
         _addMot = 0;
         _addCritChance = 0;
 
+        _pendingStatChoices = _detailPanel.CurrentCharacter.PendingStatChoices;
+
         Refresh();
     }
 
@@ -97,8 +101,14 @@ public class StatLevelUpPopup : MonoBehaviour
         _detailPanel.CurrentCharacter.ChangeInit(_addInit);
         _detailPanel.CurrentCharacter.ChangeMot(_addMot);
 
+        _detailPanel.CurrentCharacter.PendingStatChoices = _pendingStatChoices;
+
         _decisions.ShowCharacterPanel(_detailPanel.CurrentCharacter);
-        _decisions.ShowPerkLevelUpScreen();
+
+        if (_detailPanel.CurrentCharacter.PendingPerkChoices > 0)
+        {
+            _decisions.ShowPerkLevelUpScreen();
+        }
 
         gameObject.SetActive(false);
     }
@@ -117,41 +127,71 @@ public class StatLevelUpPopup : MonoBehaviour
     {
         _addAcc--;
         _AccText.text = (_currentCharacter.AccRating + _addAcc).ToString();
-        SetImproveButtonsActive(false);
+
+        _pendingStatChoices--;
+        if (_pendingStatChoices <= 0)
+        {
+            SetImproveButtonsActive(false);
+        }
     }
 
     private void BoostHP()
     {
         _addHP++;
         _HPBar.SetBar(_currentCharacter.HitPoints + _addHP);
-        SetImproveButtonsActive(false);
+
+        _pendingStatChoices--;
+        if (_pendingStatChoices <= 0)
+        {
+            SetImproveButtonsActive(false);
+        }
     }
 
     private void BoostMove()
     {
         _addMove++;
         _MoveText.text = (_currentCharacter.GetMoveRange() + _addMove).ToString();
-        SetImproveButtonsActive(false);
+
+        _pendingStatChoices--;
+        if (_pendingStatChoices <= 0)
+        {
+            SetImproveButtonsActive(false);
+        }
     }
 
     private void BoostCritChance()
     {
         _addCritChance--;
         _CritChanceText.text = (_currentCharacter.CritChance + _addCritChance).ToString();
-        SetImproveButtonsActive(false);
+
+        _pendingStatChoices--;
+        if (_pendingStatChoices <= 0)
+        {
+            SetImproveButtonsActive(false);
+        }
     }
 
     private void BoostMot()
     {
         _addMot++;
         _MotBar.SetBar(_currentCharacter.GetBattleMotivationCap() + _addMot);
-        SetImproveButtonsActive(false);
+
+        _pendingStatChoices--;
+        if (_pendingStatChoices <= 0)
+        {
+            SetImproveButtonsActive(false);
+        }
     }
 
     private void BoostInit()
     {
         _addInit++;
         _InitText.text = (_currentCharacter.BaseInitiative + _addInit).ToString();
-        SetImproveButtonsActive(false);
+
+        _pendingStatChoices--;
+        if (_pendingStatChoices <= 0)
+        {
+            SetImproveButtonsActive(false);
+        }
     }
 }

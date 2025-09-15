@@ -80,17 +80,43 @@ public class GameCharacter
     private Weapon _theWeapon = new Weapon();
 
     public List<PassiveData> Passives => _passives;
-    private List<PassiveData> _passives = new ();
+    private List<PassiveData> _passives = new();
 
     public List<Ability> Abilities => _abilities;
-    private List<Ability> _abilities = new ();
+    private List<Ability> _abilities = new();
 
     public int Level => _level;
-    private int _level;
+    private int _level = 0;
+
     public int XP => _xp;
     private int _xp;
-    public bool PendingLevelUp => _pendingLevelUp;
-    private bool _pendingLevelUp = false;
+
+    // the total number of stat / perk choices awaiting from level ups
+    public int PendingPerkChoices
+    {
+        get
+        {
+            return _pendingPerkChoices;
+        }
+        set
+        {
+            _pendingPerkChoices = value > 0 ? value : 0;
+        }
+    }
+    private int _pendingPerkChoices = 0;
+
+    public int PendingStatChoices
+    {
+        get
+        {
+            return _pendingStatChoices;
+        }
+        set
+        {
+            _pendingStatChoices = value > 0 ? value : 0;
+        }
+    }
+    private int _pendingStatChoices = 0;
 
     /// <summary>
     /// MotConds - short for motivation conditions. Oaths for example.
@@ -182,8 +208,6 @@ public class GameCharacter
 
     private void GenerateFace()
     {
-        // hell yeah bruther.
-
         Dictionary<string, FaceDetailData> hairDetails = DataLoader.hairDetail;
         _hairDetail = hairDetails.Values.ToList()[Random.Range(0, hairDetails.Count)];
         
@@ -315,45 +339,10 @@ public class GameCharacter
         return _xpCaps[_level];
     }
 
-    private void SetHonorable()
-    {
-        // _abilities.Add(new HonorProtect());
-        // AddNewOath();
-    }
-
-    private void AddNewOath()
-    {
-        switch (_level)
-        {
-            case 0:
-                _motConds.Add(DataLoader.motConds["Kill1"]);
-                break;
-            case 1:
-                _motConds.Add(DataLoader.motConds["NoRetreat"]);
-                break;
-            case 2:
-                _motConds.Add(DataLoader.motConds["AllyNoDmg"]);
-                break;
-        }
-    }
-
     private void SetMotivator(CharMotivators newMotivator)
     {
         _motivator = newMotivator;
         _charMotivation = 1;
-
-        //switch (_motivator)
-        //{
-        //    case CharMotivators.Honor:
-                SetHonorable();
-        //        break;
-        //    case CharMotivators.Glory:
-        //        _abilities.Add(new WildAbandon());
-        //        break;
-        //    case CharMotivators.Greed:
-        //        _abilities.Add(new BonusPay());
-        //        break;
-        //}
     }
 
     /// <summary>
@@ -379,18 +368,15 @@ public class GameCharacter
         if (_xp >= _xpCaps[_level])
         {
             _xp -= _xpCaps[_level];
+
             _level++;
-            _pendingLevelUp = true;
+            PendingStatChoices++;
+            PendingPerkChoices++;
 
             return true;
         }
 
         return false;
-    }
-
-    public void SpendLevelUp()
-    {
-        _pendingLevelUp = false;
     }
 
     /// <summary>
@@ -415,21 +401,8 @@ public class GameCharacter
         return Mathf.Max(1, _theWeapon.Data.baseDamage + action.bonusDmg + totalPassivesBuff);
     }
 
-    // public int GetWeaponArmorDamageForAction(WeaponAbilityData action)
-    // {
-        // Damage multipliers, and armor, needs to be reworked for the recent change from % system to d12 scale.
-
-    //     return _theWeapon.Data.baseDamage;//Mathf.RoundToInt(GetWeaponDamageForAction(action) * (action.armorDamageMod + _theWeapon.Data.baseArmorDamage));
-    // }
-
     public int GetTotalViceValue()
     {
-        //int equipmentViceBonus = 0;
-        //if (_helmItem != null && _helmItem.viceToMod == _motivator)
-        //{
-        //    equipmentViceBonus += _helmItem.viceMod;
-        //}
-
         return _charMotivation;// + equipmentViceBonus;
     }
 

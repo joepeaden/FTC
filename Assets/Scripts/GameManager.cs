@@ -44,6 +44,15 @@ public class GameManager : MonoBehaviour
     // The cost per character level that the player must pay each day
     private int _levelCostMultiplier = 10;
 
+    /// <summary>
+    /// List of levels before the battle - so we know what to charge for wages right after the battle.
+    /// </summary>
+    /// <remarks>
+    /// It would be better to have an ID for each character to use for things like this. Could just store
+    /// the ID - less storage intensive. At this point, I'm not going to implement that however.
+    /// </remarks>
+    private Dictionary<GameCharacter, int> _preBattleLevels = new();
+
     private void Awake()
     {
         _instance = this;
@@ -95,10 +104,10 @@ public class GameManager : MonoBehaviour
         _playerGold += amount;
     }
 
-    public void NextDay()
+    public void NextDay(bool postBatle)
     {
         // make the player pay for their total follower levels.
-        _playerGold -= GetPayout();
+        _playerGold -= GetPayout(postBatle);
         _currentDay++;
     }
 
@@ -112,14 +121,25 @@ public class GameManager : MonoBehaviour
     /// Get the money that the player owes during the next day.
     /// </summary>
     /// <returns></returns>
-    public int GetPayout()
+    public int GetPayout(bool usePreBattleLevels)
     {
         int totalPayout = 0;
 
         foreach (GameCharacter character in PlayerFollowers)
         {
+            int level;
+            // if we're just after a battle, charge the player for the levels from before the battle
+            if (usePreBattleLevels)
+            {
+                level = _preBattleLevels[character];
+            }
+            else
+            {
+                level = character.Level;
+            }
+
             // character.Level+1 because initially, they're level 0
-            totalPayout += (character.Level+1) * _levelCostMultiplier;
+            totalPayout += (level + 1) * _levelCostMultiplier;
         }
 
         return totalPayout;
@@ -158,6 +178,11 @@ public class GameManager : MonoBehaviour
 
     public void LoadBattle(List<GameCharacter> enemies, int rewardAmount)
     {
+        foreach (GameCharacter character in PlayerFollowers)
+        {
+            _preBattleLevels[character] = character.Level;
+        }
+
         _enemiesForContract = enemies;
         _potentialRewardAmount = rewardAmount;
 
@@ -187,7 +212,12 @@ public class GameManager : MonoBehaviour
         }
 
         // pass a day after a mission (which increments the day and triggers a payout)
-        NextDay();
+        NextDay(true);
+        
+        foreach (GameCharacter character in PlayerFollowers)
+        {
+            ;
+        }
 
         _musicPlayer.clip = _menuMusic;
         _musicPlayer.Play();

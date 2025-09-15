@@ -64,7 +64,7 @@ public class DecisionsManager : MonoBehaviour
         _recruitsButton.TheButton.onClick.AddListener(ShowRecruitsScreen);
         _contractsButton.TheButton.onClick.AddListener(ShowContractsScreen);
         _troopsButton.TheButton.onClick.AddListener(ShowTroopsScreen);
-        _levelUpButton.onClick.AddListener(ShowStatLevelUpPopup);
+        _levelUpButton.onClick.AddListener(TriggerLevelUp);
         _shopButton.TheButton.onClick.AddListener(ShowShopScreen);
         _restButton.onClick.AddListener(Rest);
         _disableCharPanelButton.onClick.AddListener(HideCharacterPanel);
@@ -185,7 +185,7 @@ public class DecisionsManager : MonoBehaviour
     /// </summary>
     private void Rest()
     {
-        GameManager.Instance.NextDay();
+        GameManager.Instance.NextDay(false);
         Refresh();
     }
 
@@ -355,7 +355,7 @@ public class DecisionsManager : MonoBehaviour
         {
             _goldText.text = "Gold: " + GameManager.Instance.PlayerGold.ToString();
 
-            _payoutText.text = "Payout: -" + GameManager.Instance.GetPayout();
+            _payoutText.text = "Payout: -" + GameManager.Instance.GetPayout(false);
         }
         // just for testing purposes
         else
@@ -375,7 +375,7 @@ public class DecisionsManager : MonoBehaviour
         _inventoryScreen.SetActive(true);
         _charDetail.SetCharacter(character);
 
-        if (character.PendingLevelUp)
+        if (character.PendingPerkChoices > 0 || character.PendingStatChoices > 0)
         {
             _levelUpButton.gameObject.SetActive(true);
         }
@@ -435,6 +435,18 @@ public class DecisionsManager : MonoBehaviour
         _recruitsButton.SetSelected(false);
 
         RefreshWarband();
+    }
+
+    public void TriggerLevelUp()
+    {
+        if (_indexToCharacters[_currentCharToShow].PendingStatChoices > 0)
+        {
+            ShowStatLevelUpPopup();
+        } 
+        else if (_indexToCharacters[_currentCharToShow].PendingPerkChoices > 0)
+        {
+            ShowPerkLevelUpScreen();
+        }
     }
 
     public void ShowStatLevelUpPopup()
