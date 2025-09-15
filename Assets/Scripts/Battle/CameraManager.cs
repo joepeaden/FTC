@@ -9,7 +9,7 @@ public class CameraManager : MonoBehaviour
     private static CameraManager _instance;
     public static Camera MainCamera { get; private set; }
     [SerializeField] private CinemachineVirtualCamera _vCam;
-    public float shakeTimerDuration = .1f;  
+    private float shakeTimerDuration = .1f;  
     private float shakeTimer;              
     private bool shakeTimerRunning = false;
 
@@ -28,7 +28,7 @@ public class CameraManager : MonoBehaviour
 
     public void ShakeCamera()
     {
-        _vCam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>().m_AmplitudeGain = 5;
+        _vCam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>().m_AmplitudeGain = 2;
 
         shakeTimer = shakeTimerDuration;
         shakeTimerRunning = true;

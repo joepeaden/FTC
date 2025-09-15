@@ -12,6 +12,7 @@ public class DecisionsManager : MonoBehaviour
     [SerializeField] private GameObject _winUI;
 
     [SerializeField] private TMP_Text _goldText;
+    [SerializeField] private TMP_Text _payoutText;
     [SerializeField] private TheTabButton _recruitsButton;
     [SerializeField] private TheTabButton _contractsButton;
     [SerializeField] private TheTabButton _troopsButton;
@@ -42,6 +43,7 @@ public class DecisionsManager : MonoBehaviour
     [SerializeField] private Button _levelUpButton;
     [SerializeField] private Button _nextCharButton;
     [SerializeField] private Button _lastCharButton;
+    [SerializeField] private Button _fireCharacterButton;
 
     [SerializeField] private GameObject _statLevelUpPopup;
 
@@ -68,6 +70,7 @@ public class DecisionsManager : MonoBehaviour
         _disableCharPanelButton.onClick.AddListener(HideCharacterPanel);
         _nextCharButton.onClick.AddListener(NextCharacterDetails);
         _lastCharButton.onClick.AddListener(LastCharacterDetails);
+        _fireCharacterButton.onClick.AddListener(FireCharacter);
 
         _charDetail.Setup(this);
 
@@ -131,6 +134,9 @@ public class DecisionsManager : MonoBehaviour
             Destroy(_troopsGrid.transform.GetChild(i).gameObject);
         }
 
+        _charactersToIndex.Clear();
+        _indexToCharacters.Clear();
+
         // fill out warband
         if (GameManager.Instance != null)
         {
@@ -174,8 +180,12 @@ public class DecisionsManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Rest, which tells the Game Manager to pass a day and refreshes the UI
+    /// </summary>
     private void Rest()
     {
+        GameManager.Instance.NextDay();
         Refresh();
     }
 
@@ -303,6 +313,23 @@ public class DecisionsManager : MonoBehaviour
         ShowCharacterPanel(_indexToCharacters[_currentCharToShow]);
     }
 
+    private void FireCharacter()
+    {
+        GameManager.Instance.RemoveFollower(_indexToCharacters[_currentCharToShow]);
+
+        Refresh();
+
+        // If there's no characters to show, close the detail window. Otherwise, cycle to next character.
+        if (GameManager.Instance.PlayerFollowers.Count == 0)
+        {
+            HideCharacterPanel();
+        }
+        else
+        {
+            NextCharacterDetails();
+        }
+    }
+
     private void LastCharacterDetails()
     {
         _currentCharToShow--;
@@ -327,7 +354,10 @@ public class DecisionsManager : MonoBehaviour
         if (GameManager.Instance != null)
         {
             _goldText.text = "Gold: " + GameManager.Instance.PlayerGold.ToString();
+
+            _payoutText.text = "Payout: -" + GameManager.Instance.GetPayout();
         }
+        // just for testing purposes
         else
         {
             _goldText.text = "Gold: " + 200;
@@ -450,5 +480,6 @@ public class DecisionsManager : MonoBehaviour
         _restButton.onClick.RemoveListener(Rest);
         _nextCharButton.onClick.RemoveListener(NextCharacterDetails);
         _lastCharButton.onClick.RemoveListener(LastCharacterDetails);
+        _fireCharacterButton.onClick.RemoveListener(FireCharacter);
     }
 }

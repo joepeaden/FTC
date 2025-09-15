@@ -115,7 +115,7 @@ public class StatLevelUpPopup : MonoBehaviour
 
     private void BoostAcc()
     {
-        _addAcc++;
+        _addAcc--;
         _AccText.text = (_currentCharacter.AccRating + _addAcc).ToString();
         SetImproveButtonsActive(false);
     }

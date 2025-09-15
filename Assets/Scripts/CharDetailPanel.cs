@@ -16,13 +16,13 @@ public class CharDetailPanel : MonoBehaviour
     [SerializeField] private PipStatBar _motivStatBar;
 
     [SerializeField] private TMP_Text _levelText;
-    [SerializeField] private TMP_Text _classText;
     [SerializeField] private TMP_Text _xpText;
     [SerializeField] private TMP_Text _moveText;
     [SerializeField] private TMP_Text _initText;
     [SerializeField] private TMP_Text _dmgText;
     [SerializeField] private TMP_Text _accRating;
     [SerializeField] private TMP_Text _critText;
+    [SerializeField] private TMP_Text wageText;
     [SerializeField] private GameObject itemUIPrefab;
 
     public GameCharacter CurrentCharacter => _currentCharacter;
@@ -56,8 +56,6 @@ public class CharDetailPanel : MonoBehaviour
         _dmgText.text = _currentCharacter.TheWeapon.Data.baseDamage.ToString();
         _accRating.text = _currentCharacter.AccRating + "+";
         _critText.text = _currentCharacter.CritChance + "+";
-
-        //_classText.text = _currentCharacter.Motivator.ToString();
 
         _helmUI.RemoveCallbacks();
         _weaponUI.RemoveCallbacks();
@@ -121,6 +119,8 @@ public class CharDetailPanel : MonoBehaviour
         }
 
         _pawnPreview.SetData(character);
+
+        wageText.text = "Wage: " + GameManager.Instance.GetWageForCharacter(character);
     }
 
     public void UnEquipItem(ItemUI itemUI)

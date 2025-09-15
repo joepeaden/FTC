@@ -36,6 +36,14 @@ public class GameManager : MonoBehaviour
     [SerializeField] private AudioClip _menuMusic;
     [SerializeField] private AudioClip _battleMusic;
 
+    public int CurrentDay => _currentDay;
+    private int _currentDay = 0;
+
+    // perhaps this value should be in a scriptable. Idk if there's one set up yet for these kinds of 
+    // values.
+    // The cost per character level that the player must pay each day
+    private int _levelCostMultiplier = 10;
+
     private void Awake()
     {
         _instance = this;
@@ -51,14 +59,13 @@ public class GameManager : MonoBehaviour
         LoadMainMenu();
     }
 
+    /// <summary>
+    /// Refresh gold, day, and followers and start a new game.
+    /// </summary>
     public void StartNewGame()
     {
-#if UNITY_EDITOR
         _playerGold = GameCharData.startingGold;
-        //_playerGold = 2000;
-#else
-        _playerGold = GameCharData.startingGold;
-#endif
+        _currentDay = 0;
 
         // add 3 default characters for player
         for (int i = 0; i < 3; i++)
@@ -86,6 +93,36 @@ public class GameManager : MonoBehaviour
     public void AddGold(int amount)
     {
         _playerGold += amount;
+    }
+
+    public void NextDay()
+    {
+        // make the player pay for their total follower levels.
+        _playerGold -= GetPayout();
+        _currentDay++;
+    }
+
+    public int GetWageForCharacter(GameCharacter character)
+    {
+        // character.Level+1 because initially, they're level 0
+        return _levelCostMultiplier * (character.Level + 1);
+    }
+
+    /// <summary>
+    /// Get the money that the player owes during the next day.
+    /// </summary>
+    /// <returns></returns>
+    public int GetPayout()
+    {
+        int totalPayout = 0;
+
+        foreach (GameCharacter character in PlayerFollowers)
+        {
+            // character.Level+1 because initially, they're level 0
+            totalPayout += (character.Level+1) * _levelCostMultiplier;
+        }
+
+        return totalPayout;
     }
 
     public void RemoveItem(ItemData item)
@@ -148,6 +185,9 @@ public class GameManager : MonoBehaviour
         {
             AddGold(_potentialRewardAmount);
         }
+
+        // pass a day after a mission (which increments the day and triggers a payout)
+        NextDay();
 
         _musicPlayer.clip = _menuMusic;
         _musicPlayer.Play();
