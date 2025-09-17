@@ -30,6 +30,12 @@ public class DataLoader
     // effects a character could endure
     public static Dictionary<string, EffectData> effects = new();
 
+    // weapons
+    public static Dictionary<string, ItemData> weapons = new();
+    
+    // armor
+    public static Dictionary<string, ItemData> armor = new();
+
     public void LoadData()
     {
         Addressables.LoadAssetsAsync<GameCharacterData>("charTypes", OnLoadCharTypesCompleted);
@@ -41,6 +47,8 @@ public class DataLoader
         Addressables.LoadAssetsAsync<ContractData>("contracts", OnLoadContractsCompleted);
         Addressables.LoadAssetsAsync<Ability>("charAbilities", OnLoadCharacterAbilities);
         Addressables.LoadAssetsAsync<PassiveData>("passives", OnLoadPassives);
+        Addressables.LoadAssetsAsync<WeaponItemData>("weapons", OnLoadWeaponsCompleted);
+        Addressables.LoadAssetsAsync<ArmorItemData>("armor", OnLoadArmorCompleted);
     }
 
     private void OnLoadPassives(PassiveData result)
@@ -90,5 +98,15 @@ public class DataLoader
     private void OnLoadFacialHairDetailCompleted(FaceDetailData result)
     {
         browDetail[result.name] = result;
+    }
+
+    private void OnLoadWeaponsCompleted(ItemData result)
+    {
+        weapons[result.itemName] = result;
+    }
+
+    private void OnLoadArmorCompleted(ItemData result)
+    {
+        armor[result.itemName] = result;
     }
 }

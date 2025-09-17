@@ -10,6 +10,14 @@ public class ItemData : ScriptableObject
     public ItemType itemType;
     public bool isDefault;
 
+    /// <summary>
+    /// If the item is intended to be avaialable in the store,
+    /// it'll have a value greater than 0. Value corresponds 
+    /// to the level that the player has upgraded their store
+    /// to.
+    /// </summary>
+    public int storeLevel;
+
     [Header("Display")]
     public Sprite itemSprite;
 }

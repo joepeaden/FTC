@@ -281,6 +281,78 @@ MonoBehaviour:
     m_SerializedLabels:
     - charAbilities
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3f9b368f6a59e4158b31a26846087db3
+    m_Address: Assets/Scriptables/Weapons/Axe.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - weapons
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 60828ccceda0d409f8fdd4af06ef6c4c
+    m_Address: Assets/Scriptables/Weapons/2HSword.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - weapons
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: edc95d4d67c154e75a73c0b5d49afce6
+    m_Address: Assets/Scriptables/Weapons/Spear.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - weapons
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 10bfb3287a43940979f35f88999d4de9
+    m_Address: Assets/Scriptables/Weapons/Club.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - weapons
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 025279ef39ee34138ad771576ee830f3
+    m_Address: Assets/Scriptables/Weapons/Sword.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - weapons
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 09bc3b809f61541ba816946baf191fa6
+    m_Address: Assets/Scriptables/Armor/PeasantHelm.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - armor
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9fecc5ccb3cea43869fed948286e28ac
+    m_Address: Assets/Scriptables/Armor/VeteranHelm.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - armor
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 78ca02cd9ffa44ef38a957f5115cc867
+    m_Address: Assets/Scriptables/Armor/HonorableVeteranHelm.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - armor
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 71b52fbc9bdf34acda204a6cb64dc1d2
+    m_Address: Assets/Scriptables/Armor/GloriousSoldierHelm.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - armor
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 948a5120fb2ec4686bd785d02511ad58
+    m_Address: Assets/Scriptables/Armor/SoldierHelm.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - armor
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0b431dce146d34dfab68902568ff9584
+    m_Address: Assets/Scriptables/Armor/BadHelm1.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - armor
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 31f65f6bc6c324ccba0d3a2b5fddafd1
+    m_Address: Assets/Scriptables/Armor/FancyPeasantHelm.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - armor
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 7c8bf46af66d94c95b7860930c29ad14, type: 2}
   m_SchemaSet:

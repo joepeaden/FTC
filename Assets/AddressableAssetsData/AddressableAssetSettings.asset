@@ -15,7 +15,7 @@ MonoBehaviour:
   m_DefaultGroup: 4bb1c285f07b9463aa037833afdfcca8
   m_currentHash:
     serializedVersion: 2
-    Hash: 3c8436a9e4719c9f35672a59a0cfae1d
+    Hash: 507754ddc9ba729228667c09472db35a
   m_OptimizeCatalogSize: 0
   m_BuildRemoteCatalog: 0
   m_BundleLocalCatalog: 0
@@ -96,6 +96,8 @@ MonoBehaviour:
     - contracts
     - charAbilities
     - passives
+    - weapons
+    - armor
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: b7ac138f21e874c598474dc0cd4b2e72, type: 2}

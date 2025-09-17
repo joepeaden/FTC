@@ -44,6 +44,9 @@ public class GameManager : MonoBehaviour
     // The cost per character level that the player must pay each day
     private int _levelCostMultiplier = 10;
 
+    public int ShopLevel => _shopLevel;
+    private int _shopLevel = 0;
+
     /// <summary>
     /// List of levels before the battle - so we know what to charge for wages right after the battle.
     /// </summary>
@@ -104,6 +107,11 @@ public class GameManager : MonoBehaviour
         _playerGold += amount;
     }
 
+    public void SetShopLevel(int newLevel)
+    {
+        _shopLevel = newLevel;
+    }
+
     public void NextDay(bool postBatle)
     {
         // make the player pay for their total follower levels.
@@ -153,7 +161,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public bool TryAddItem(ItemData item)
+    public bool TryPurchaseItem(ItemData item)
     {
         if (item.itemPrice > _playerGold)
         {

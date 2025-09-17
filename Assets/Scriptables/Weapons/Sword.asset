@@ -18,8 +18,8 @@ MonoBehaviour:
   itemPrice: 20
   itemType: 2
   isDefault: 0
+  storeLevel: 1
   itemSprite: {fileID: 21300000, guid: a5072443420c241cfaa3621276b97435, type: 3}
-  weaponType: 1
   baseDamage: 2
   abilities:
   - {fileID: 11400000, guid: 90b25c87f54274061819de0b9a6b1efa, type: 2}

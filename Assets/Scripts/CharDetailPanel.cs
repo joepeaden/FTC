@@ -3,12 +3,15 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using UnityEngine.Events;
 
 /// <summary>
 /// Handles character detail view and also the level up view
 /// </summary>
 public class CharDetailPanel : MonoBehaviour
 {
+    public UnityEvent<ItemData> OnItemUnequipped = new();
+
     [SerializeField] private TMP_Text _charName;
 
     [SerializeField] private PipStatBar _healthStatBar;
@@ -62,7 +65,7 @@ public class CharDetailPanel : MonoBehaviour
 
         if (character.HelmItem != null)
         {
-            _helmUI.SetData(character.HelmItem, _decisions, UnEquipItem);
+            _helmUI.SetData(character.HelmItem, UnEquipItem);
         }
         else if (_helmUI != null)
         {
@@ -71,7 +74,7 @@ public class CharDetailPanel : MonoBehaviour
 
         if (character.TheWeapon != null)
         {
-            _weaponUI.SetData(character.TheWeapon.Data, _decisions, UnEquipItem);
+            _weaponUI.SetData(character.TheWeapon.Data, UnEquipItem);
         }
         else if (_weaponUI != null)
         {
@@ -137,7 +140,6 @@ public class CharDetailPanel : MonoBehaviour
         }
 
         _currentCharacter.UnEquipItem(itemUI.Item);
-        GameManager.Instance.PlayerInventory.Add(itemUI.Item);
 
         switch (itemUI.Item.itemType)
         {
@@ -149,8 +151,7 @@ public class CharDetailPanel : MonoBehaviour
                 break;
         }
 
-        _decisions.RefreshInventory();
-
+        OnItemUnequipped.Invoke(itemUI.Item);
         SetCharacter(_currentCharacter);
     }
 

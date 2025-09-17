@@ -730,3 +730,5 @@ MonoBehaviour:
   pawnPreviewPoolSize: 15
   audioSourcePrefab: {fileID: 8567179387656561764, guid: c5b47d9f5a6a1a04496b0f441bab48b9, type: 3}
   audioSourcePoolSize: 10
+  itemUIPrefab: {fileID: 6471140891649023232, guid: 8583335a164604fdc991f92b147e5b46, type: 3}
+  itemUIPoolSize: 100

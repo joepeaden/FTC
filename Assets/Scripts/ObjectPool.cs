@@ -18,8 +18,13 @@ public class ObjectPool : MonoBehaviour
     public GameObject audioSourcePrefab;
     public int audioSourcePoolSize;
 
+    [Header("ItemUIs")]
+    public GameObject itemUIPrefab;
+    public int itemUIPoolSize;
+
     private List<GameObject> pawnPreviews;
     private List<GameObject> audioSources;
+    private List<GameObject> itemUIs;
 
     void Awake()
     {
@@ -30,6 +35,7 @@ public class ObjectPool : MonoBehaviour
     {
         audioSources = CreatePool(audioSourcePrefab, audioSources, audioSourcePoolSize);
         pawnPreviews = CreatePool(pawnPreviewPrefab, pawnPreviews, pawnPreviewPoolSize);
+        itemUIs = CreatePool(itemUIPrefab, itemUIs, itemUIPoolSize);
 
         // some of these are re-parented (the pawn previews) so they need to
         // be individually set like this.
@@ -76,5 +82,20 @@ public class ObjectPool : MonoBehaviour
     public GameObject GetAudioSource()
     {
         return GetPooledObject(audioSources, audioSourcePrefab);
+    }
+
+    public GameObject GetItemUI()
+    {
+        return GetPooledObject(itemUIs, itemUIPrefab);
+    }
+
+    /// <summary>
+    /// Disable and re-parent the gameobject back to the object pool
+    /// </summary>
+    /// <param name="g"></param>
+    public void Return(GameObject g)
+    {
+        g.gameObject.SetActive(false);
+        g.transform.parent = ObjectPool.instance.transform;
     }
 }

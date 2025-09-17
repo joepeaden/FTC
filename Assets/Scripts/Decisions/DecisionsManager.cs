@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using System.Linq;
+using UnityEngine.Events;
 
 public class DecisionsManager : MonoBehaviour
 {
@@ -16,26 +17,26 @@ public class DecisionsManager : MonoBehaviour
     [SerializeField] private TheTabButton _recruitsButton;
     [SerializeField] private TheTabButton _contractsButton;
     [SerializeField] private TheTabButton _troopsButton;
-    [SerializeField] private TheTabButton _shopButton;
-    [SerializeField] private Button _restButton;
-    [SerializeField] private Button _upgradeContractsButton;
-    [SerializeField] private Button _upgradeRecruitsButton;
-    [SerializeField] private Button _upgradeShopButton;
+    //[SerializeField] private Button _upgradeContractsButton;
+    //[SerializeField] private Button _upgradeRecruitsButton;
     [SerializeField] private GameObject _recruitsScreen;
     [SerializeField] private GameObject _contractsScreen;
     [SerializeField] private GameObject _troopsScreen;
-    [SerializeField] private GameObject _shopScreen;
-    [SerializeField] private GameObject _inventoryScreen;
     [SerializeField] private GameObject _levelUpScreen;
     [SerializeField] private GameObject _troopsGrid;
-    [SerializeField] private GameObject _shopGrid;
-    [SerializeField] private GameObject _inventoryGrid;
     [SerializeField] private GameObject _troopPrefab;
-    [SerializeField] private GameObject _itemPrefab;
 
-    [SerializeField] private List<ItemData> possibleShopItems = new();
-    private int _maxNumOfShopItems = 10;
-    private int _minNumOfShopItems = 6;
+    [SerializeField] private InventoryPanel _inventoryPanel;
+
+    [SerializeField] private Button _restButton;
+
+    [Header("Shop Stuff")]
+    // price associated with upgrading the shop at each level
+    [SerializeField] private int[] _shopUpgradeCosts = new int[3];
+    [SerializeField] private ShopPanel _shopPanel;
+    [SerializeField] private TheTabButton _shopButton;
+    [SerializeField] private Button _upgradeShopButton;
+    [SerializeField] private TMP_Text _upgradeShopText;
 
     [Header("Char Detail Panel Stuff")]
     [SerializeField] private CharDetailPanel _charDetail;
@@ -71,6 +72,11 @@ public class DecisionsManager : MonoBehaviour
         _nextCharButton.onClick.AddListener(NextCharacterDetails);
         _lastCharButton.onClick.AddListener(LastCharacterDetails);
         _fireCharacterButton.onClick.AddListener(FireCharacter);
+        _upgradeShopButton.onClick.AddListener(IncreaseShopLevel);
+
+        _inventoryPanel.OnInventoryItemClick.AddListener(HandleInventoryItemSelected);
+        _shopPanel.OnItemPurchased.AddListener(HandleItemPurchased);
+        _charDetail.OnItemUnequipped.AddListener(HandleItemUnequipped);
 
         _charDetail.Setup(this);
 
@@ -86,6 +92,24 @@ public class DecisionsManager : MonoBehaviour
         }
 
         Refresh();
+    }
+
+    private void OnDestroy()
+    {
+        _recruitsButton.TheButton.onClick.RemoveListener(ShowRecruitsScreen);
+        _contractsButton.TheButton.onClick.RemoveListener(ShowContractsScreen);
+        _troopsButton.TheButton.onClick.RemoveListener(ShowTroopsScreen);
+        _levelUpButton.onClick.RemoveListener(ShowStatLevelUpPopup);
+        _shopButton.TheButton.onClick.RemoveListener(ShowShopScreen);
+        _disableCharPanelButton.onClick.RemoveListener(HideCharacterPanel);
+        _restButton.onClick.RemoveListener(Rest);
+        _nextCharButton.onClick.RemoveListener(NextCharacterDetails);
+        _lastCharButton.onClick.RemoveListener(LastCharacterDetails);
+        _fireCharacterButton.onClick.RemoveListener(FireCharacter);
+        _inventoryPanel.OnInventoryItemClick.RemoveListener(HandleInventoryItemSelected);
+        _shopPanel.OnItemPurchased.RemoveListener(HandleItemPurchased);
+        _charDetail.OnItemUnequipped.RemoveListener(HandleItemUnequipped);
+        _upgradeShopButton.onClick.RemoveListener(IncreaseShopLevel);
     }
 
     private void Refresh()
@@ -105,25 +129,18 @@ public class DecisionsManager : MonoBehaviour
         }
 
         RefreshWarband();
+        _shopPanel.Refresh();
 
-        // clear shop items
-        for (int i = 0; i < _shopGrid.transform.childCount; i++)
-        {
-            Destroy(_shopGrid.transform.GetChild(i).gameObject);
-        }
-
-        // fill out shop
-        int shopItemsCount = Random.Range(_minNumOfShopItems, _maxNumOfShopItems);
-        for (int i = 0; i < shopItemsCount; i++)
-        {
-            ItemData item = possibleShopItems[Random.Range(0, possibleShopItems.Count)];
-            GameObject itemGO = Instantiate(_itemPrefab, _shopGrid.transform);
-            itemGO.GetComponent<ItemUI>().SetData(item, this, PurchaseItem);
-        }
-
-        RefreshInventory();
         UpdateGoldText();
         CheckForGameVictory();
+
+
+        if (GameManager.Instance.ShopLevel >= _shopUpgradeCosts.Count())
+        {
+            _upgradeShopButton.gameObject.SetActive(false);
+        }
+
+        _upgradeShopText.text = "Upgrade Shop\n(" + _shopUpgradeCosts[GameManager.Instance.ShopLevel] + " Gold)";
     }
 
     private void RefreshWarband()
@@ -159,6 +176,30 @@ public class DecisionsManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// If the player has enough money, upgrade the shop and refresh it
+    /// </summary>
+    private void IncreaseShopLevel()
+    {
+        if (GameManager.Instance.PlayerGold >= _shopUpgradeCosts[GameManager.Instance.ShopLevel])
+        {
+            GameManager.Instance.AddGold(-_shopUpgradeCosts[GameManager.Instance.ShopLevel]);
+            GameManager.Instance.SetShopLevel(GameManager.Instance.ShopLevel + 1);
+
+            _shopPanel.Refresh();
+            HandlePlayerUseGold();
+
+            if (GameManager.Instance.ShopLevel >= _shopUpgradeCosts.Count())
+            {
+                _upgradeShopButton.gameObject.SetActive(false);
+            }
+            else
+            {
+                _upgradeShopText.text = "Upgrade Shop\n(" + _shopUpgradeCosts[GameManager.Instance.ShopLevel] + " Gold)";
+            }
+        }
+    }
+
     private void CheckForGameVictory()
     {
         // should this information even be stored in the game manager? I'm not so certain.
@@ -189,70 +230,49 @@ public class DecisionsManager : MonoBehaviour
         Refresh();
     }
 
-    public void RefreshInventory()
+    private void HandleItemUnequipped(ItemData item)
     {
-        // muahahahahaha lazy bug fix  (the tooltip wasn't closing when a gameobjectw as destroyed because
-        // of purchase or unequip etc.
-        TooltipManager.Instance.HandleCloseTooltip();
-
-        for (int i = 0; i < _inventoryGrid.transform.childCount; i++)
-        {
-            Destroy(_inventoryGrid.transform.GetChild(i).gameObject);
-        }
-
-        // fill out inventory
-        if (GameManager.Instance != null)
-        {
-            foreach (ItemData item in GameManager.Instance.PlayerInventory)
-            {
-                GameObject itemGO = Instantiate(_itemPrefab, _inventoryGrid.transform);
-                itemGO.GetComponent<ItemUI>().SetData(item, this, HandleInventoryItemSelected);
-            }
-        }
+        GameManager.Instance.PlayerInventory.Add(item);
+        _inventoryPanel.AddItem(item);
     }
 
-    public void HandleInventoryItemSelected(ItemUI itemUI)
+    public void HandleItemPurchased(ItemData item)
+    {
+        _inventoryPanel.AddItem(item);
+        HandlePlayerUseGold();
+    }
+
+    public void HandleInventoryItemSelected(ItemData item)
     {
         // if we're in character detail view then it should equip the item
         if (_charDetail.gameObject.activeInHierarchy)
         {
             // equip character
-            _charDetail.EquipItem(itemUI.Item);
-
+            _charDetail.EquipItem(item);
             PlaySound(equipSound);
-
-            // remove the item ffrom plyer inventory
-            GameManager.Instance.PlayerInventory.Remove(itemUI.Item);
-
-            // refresh UI for inventory
-            RefreshInventory();
         }
-        // if in troops screen don't do anything
-        else if (_troopsScreen.activeInHierarchy)
+        // otherwise, if we're looking at the shop, so sell the item 
+        else if (_shopPanel.isActiveAndEnabled)
         {
-            return;
-        }
-        // otherwise, we're looking at the shop, so sell the item 
-        else if (_shopScreen.activeInHierarchy)
-        {
-            // remove item from player inventory data structure
-            GameManager.Instance.RemoveItem(itemUI.Item);
-
             // give the player money back
-            GameManager.Instance.AddGold(itemUI.Item.itemPrice);
+            GameManager.Instance.AddGold(item.itemPrice);
+            _shopPanel.AddShopItem(item);
 
-            PlaySound(goldSound);
-
+            HandlePlayerUseGold();
             CheckForGameVictory();
-
-            // move the item UI from Shop to Inventory
-            itemUI.transform.SetParent(_shopGrid.transform);
-
-            itemUI.RemoveCallbacks();
-            itemUI.SetCallback(PurchaseItem);
-
-            UpdateGoldText();
         }
+
+        // remove item from player inventory data structure
+        GameManager.Instance.RemoveItem(item);
+    }
+
+    /// <summary>
+    /// The player did something involving gold (spend or sell) - play the sound and update UI
+    /// </summary>
+    public void HandlePlayerUseGold()
+    {
+        PlaySound(goldSound);
+        UpdateGoldText();
     }
 
     private void PlaySound(AudioClip clip)
@@ -262,28 +282,6 @@ public class DecisionsManager : MonoBehaviour
         AudioSource aSource = audioGO.GetComponent<AudioSource>();
         aSource.clip = clip;
         aSource.Play();
-    }
-
-    public void PurchaseItem(ItemUI itemUI)
-    {
-        // add item to player inventory data structure
-        bool success = GameManager.Instance.TryAddItem(itemUI.Item);
-
-        // !success can mean we didn't have enough money
-        if (!success)
-        {
-            return;
-        }
-
-        PlaySound(goldSound);
-
-        // move the item UI from Shop to Inventory
-        itemUI.transform.SetParent(_inventoryGrid.transform);
-
-        itemUI.RemoveCallbacks();
-        itemUI.SetCallback(HandleInventoryItemSelected);
-
-        UpdateGoldText();
     }
 
     private void AddCharacterPanel(GameCharacter character)
@@ -364,79 +362,6 @@ public class DecisionsManager : MonoBehaviour
         }
     }
 
-    public void ShowCharacterPanel(GameCharacter character)
-    {
-        // get the index of the character for paging
-        _currentCharToShow = _charactersToIndex[character];
-
-        _charDetail.gameObject.SetActive(true);
-        _troopsScreen.SetActive(false);
-        _levelUpScreen.SetActive(false);
-        _inventoryScreen.SetActive(true);
-        _charDetail.SetCharacter(character);
-
-        if (character.PendingPerkChoices > 0 || character.PendingStatChoices > 0)
-        {
-            _levelUpButton.gameObject.SetActive(true);
-        }
-        else
-        {
-            _levelUpButton.gameObject.SetActive(false);
-        }
-    }
-
-    private void ShowRecruitsScreen()
-    {
-        _recruitsScreen.SetActive(true);
-        _contractsScreen.SetActive(false);
-        _troopsScreen.SetActive(false);
-        _shopScreen.SetActive(false);
-        _troopsScreen.SetActive(false);
-        _inventoryScreen.SetActive(false);
-        _charDetail.gameObject.SetActive(false);
-        _levelUpScreen.gameObject.SetActive(false);
-
-        _troopsButton.SetSelected(false);
-        _contractsButton.SetSelected(false);
-        _shopButton.SetSelected(false);
-        _recruitsButton.SetSelected(true);
-    }
-
-    private void ShowContractsScreen()
-    {
-        _recruitsScreen.SetActive(false);
-        _contractsScreen.SetActive(true);
-        _troopsScreen.SetActive(false);
-        _shopScreen.SetActive(false);
-        _troopsScreen.SetActive(false);
-        _inventoryScreen.SetActive(false);
-        _charDetail.gameObject.SetActive(false);
-        _levelUpScreen.gameObject.SetActive(false);
-
-        _troopsButton.SetSelected(false);
-        _contractsButton.SetSelected(true);
-        _shopButton.SetSelected(false);
-        _recruitsButton.SetSelected(false);
-    }
-
-    private void ShowTroopsScreen()
-    {
-        _recruitsScreen.SetActive(false);
-        _contractsScreen.SetActive(false);
-        _shopScreen.SetActive(false);
-        _troopsScreen.SetActive(true);
-        _inventoryScreen.SetActive(true);
-        _charDetail.gameObject.SetActive(false);
-        _levelUpScreen.gameObject.SetActive(false);
-
-        _troopsButton.SetSelected(true);
-        _contractsButton.SetSelected(false);
-        _shopButton.SetSelected(false);
-        _recruitsButton.SetSelected(false);
-
-        RefreshWarband();
-    }
-
     public void TriggerLevelUp()
     {
         if (_indexToCharacters[_currentCharToShow].PendingStatChoices > 0)
@@ -454,13 +379,86 @@ public class DecisionsManager : MonoBehaviour
         _statLevelUpPopup.SetActive(true);
     }
 
+    public void ShowCharacterPanel(GameCharacter character)
+    {
+        // get the index of the character for paging
+        _currentCharToShow = _charactersToIndex[character];
+
+        _charDetail.gameObject.SetActive(true);
+        _troopsScreen.SetActive(false);
+        _levelUpScreen.SetActive(false);
+        _inventoryPanel.gameObject.SetActive(true);
+        _charDetail.SetCharacter(character);
+
+        if (character.PendingPerkChoices > 0 || character.PendingStatChoices > 0)
+        {
+            _levelUpButton.gameObject.SetActive(true);
+        }
+        else
+        {
+            _levelUpButton.gameObject.SetActive(false);
+        }
+    }
+
+    private void ShowRecruitsScreen()
+    {
+        _recruitsScreen.SetActive(true);
+        _contractsScreen.SetActive(false);
+        _troopsScreen.SetActive(false);
+        _shopPanel.gameObject.SetActive(false);
+        _troopsScreen.SetActive(false);
+        _inventoryPanel.gameObject.SetActive(false);
+        _charDetail.gameObject.SetActive(false);
+        _levelUpScreen.gameObject.SetActive(false);
+
+        _troopsButton.SetSelected(false);
+        _contractsButton.SetSelected(false);
+        _shopButton.SetSelected(false);
+        _recruitsButton.SetSelected(true);
+    }
+
+    private void ShowContractsScreen()
+    {
+        _recruitsScreen.SetActive(false);
+        _contractsScreen.SetActive(true);
+        _troopsScreen.SetActive(false);
+        _shopPanel.gameObject.SetActive(false);
+        _troopsScreen.SetActive(false);
+        _inventoryPanel.gameObject.SetActive(false);
+        _charDetail.gameObject.SetActive(false);
+        _levelUpScreen.gameObject.SetActive(false);
+
+        _troopsButton.SetSelected(false);
+        _contractsButton.SetSelected(true);
+        _shopButton.SetSelected(false);
+        _recruitsButton.SetSelected(false);
+    }
+
+    private void ShowTroopsScreen()
+    {
+        _recruitsScreen.SetActive(false);
+        _contractsScreen.SetActive(false);
+        _shopPanel.gameObject.SetActive(false);
+        _troopsScreen.SetActive(true);
+        _inventoryPanel.gameObject.SetActive(true);
+        _charDetail.gameObject.SetActive(false);
+        _levelUpScreen.gameObject.SetActive(false);
+
+        _troopsButton.SetSelected(true);
+        _contractsButton.SetSelected(false);
+        _shopButton.SetSelected(false);
+        _recruitsButton.SetSelected(false);
+
+        RefreshWarband();
+    }
+
     public void ShowPerkLevelUpScreen()
     {
         _recruitsScreen.SetActive(false);
         _contractsScreen.SetActive(false);
-        _shopScreen.SetActive(false);
+        _shopPanel.gameObject.SetActive(false);
         _troopsScreen.SetActive(false);
-        _inventoryScreen.SetActive(false);
+        _inventoryPanel.gameObject.SetActive(false);
         _charDetail.gameObject.SetActive(true);
         _levelUpScreen.gameObject.SetActive(true);
     }
@@ -469,9 +467,9 @@ public class DecisionsManager : MonoBehaviour
     {
         _recruitsScreen.SetActive(false);
         _contractsScreen.SetActive(false);
-        _shopScreen.SetActive(true);
+        _shopPanel.gameObject.SetActive(true);
         _troopsScreen.SetActive(false);
-        _inventoryScreen.SetActive(true);
+        _inventoryPanel.gameObject.SetActive(true);
         _charDetail.gameObject.SetActive(false);
         _levelUpScreen.gameObject.SetActive(false);
 
@@ -479,19 +477,5 @@ public class DecisionsManager : MonoBehaviour
         _contractsButton.SetSelected(false);
         _shopButton.SetSelected(true);
         _recruitsButton.SetSelected(false);
-    }
-
-    private void OnDestroy()
-    {
-        _recruitsButton.TheButton.onClick.RemoveListener(ShowRecruitsScreen);
-        _contractsButton.TheButton.onClick.RemoveListener(ShowContractsScreen);
-        _troopsButton.TheButton.onClick.RemoveListener(ShowTroopsScreen);
-        _levelUpButton.onClick.RemoveListener(ShowStatLevelUpPopup);
-        _shopButton.TheButton.onClick.RemoveListener(ShowShopScreen);
-        _disableCharPanelButton.onClick.RemoveListener(HideCharacterPanel);
-        _restButton.onClick.RemoveListener(Rest);
-        _nextCharButton.onClick.RemoveListener(NextCharacterDetails);
-        _lastCharButton.onClick.RemoveListener(LastCharacterDetails);
-        _fireCharacterButton.onClick.RemoveListener(FireCharacter);
     }
 }
