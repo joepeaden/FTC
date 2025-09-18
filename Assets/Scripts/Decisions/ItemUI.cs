@@ -18,6 +18,11 @@ public class ItemUI : MonoBehaviour
     public ItemData Item => _item;
     private ItemData _item;
 
+    private void OnDestroy()
+    {
+        theButton.onClick.RemoveAllListeners();
+    }
+
     public void Hide()
     {
         gameObject.SetActive(false);
@@ -41,7 +46,8 @@ public class ItemUI : MonoBehaviour
         }
 
         _item = theItem;
-        
+
+        theButton.onClick.RemoveAllListeners();
         theButton.onClick.AddListener(() => { callback(this); });
     }
 
@@ -66,11 +72,6 @@ public class ItemUI : MonoBehaviour
     }
 
     public void RemoveCallbacks()
-    {
-        theButton.onClick.RemoveAllListeners();
-    }
-
-    private void OnDestroy()
     {
         theButton.onClick.RemoveAllListeners();
     }

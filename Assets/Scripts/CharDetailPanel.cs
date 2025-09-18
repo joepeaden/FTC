@@ -141,6 +141,8 @@ public class CharDetailPanel : MonoBehaviour
 
         _currentCharacter.UnEquipItem(itemUI.Item);
 
+        OnItemUnequipped.Invoke(itemUI.Item);
+
         switch (itemUI.Item.itemType)
         {
             case ItemType.Helmet:
@@ -151,11 +153,16 @@ public class CharDetailPanel : MonoBehaviour
                 break;
         }
 
-        OnItemUnequipped.Invoke(itemUI.Item);
         SetCharacter(_currentCharacter);
     }
 
-    public void EquipItem(ItemData item)
+
+    /// <summary>
+    /// Equip the new item
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns>The previously equipped item, but also can return null if none equipped</returns>
+    public ItemData EquipItem(ItemData item)
     {
         ItemData oldItem = _currentCharacter.EquipItem(item);
 
@@ -169,5 +176,14 @@ public class CharDetailPanel : MonoBehaviour
         }
 
         SetCharacter(_currentCharacter);
+
+        // the default weapon is just a stick - don't need that in player inventory
+        // there is no default helmet on the other hand
+        if (oldItem == null || oldItem != null && oldItem.isDefault)
+        {
+            return null;
+        }
+
+        return oldItem;
     }
 }

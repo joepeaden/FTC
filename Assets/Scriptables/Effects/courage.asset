@@ -16,4 +16,4 @@ MonoBehaviour:
   effectName: Oath of Courage
   description: Not allowed to disengage from a living enemy. +1 free attack (AP only)
     per adjacent enemy.
-  effectSprite: {fileID: 21300000, guid: 43358b703766fee4ebe64c7fbd583376, type: 3}
+  effectSprite: {fileID: 21300000, guid: a7cb79b2288cbf84985a9d01a86e48ba, type: 3}

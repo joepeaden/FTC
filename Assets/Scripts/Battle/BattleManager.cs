@@ -687,27 +687,12 @@ public class BattleManager : MonoBehaviour
         {
             bool playerWon = _battleResult == BattleResult.Win;
 
-            Cleanup();
-
             GameManager.Instance.ExitBattle(playerWon);
         }
         else
         {
             // easy reload for testing
             SceneManager.LoadScene("BattleScene");
-        }
-    }
-
-    private void Cleanup()
-    {
-        // return pooled objects to the object pool parent so they
-        // aren't destroyed
-        int previewCount = _initStackParent.childCount;
-        for (int i = previewCount-1; i >= 0; i--)
-        {
-            Transform p = _initStackParent.GetChild(i);
-            p.transform.SetParent(GameManager.Instance.transform);
-            p.gameObject.SetActive(false);
         }
     }
 

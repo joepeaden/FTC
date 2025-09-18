@@ -14,11 +14,6 @@ public class ShopPanel : MonoBehaviour
     private int _maxNumOfItems = 10;
     private int _minNumOfItems = 6;
 
-    private void Awake()
-    {
-        Refresh();
-    }
-
     /// <summary>
     /// Get store items from data loader based on the current store level
     /// </summary>

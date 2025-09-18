@@ -186,6 +186,8 @@ public class GameManager : MonoBehaviour
 
     public void LoadBattle(List<GameCharacter> enemies, int rewardAmount)
     {
+        ObjectPool.instance.ReparentObjects();
+
         foreach (GameCharacter character in PlayerFollowers)
         {
             _preBattleLevels[character] = character.Level;
@@ -212,6 +214,7 @@ public class GameManager : MonoBehaviour
 
     public void ExitBattle(bool playerWon)
     {
+        ObjectPool.instance.ReparentObjects();
         SceneManager.LoadScene("DecisionsUI");
 
         if (playerWon)
@@ -221,11 +224,6 @@ public class GameManager : MonoBehaviour
 
         // pass a day after a mission (which increments the day and triggers a payout)
         NextDay(true);
-        
-        foreach (GameCharacter character in PlayerFollowers)
-        {
-            ;
-        }
 
         _musicPlayer.clip = _menuMusic;
         _musicPlayer.Play();

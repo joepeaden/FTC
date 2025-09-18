@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 /// <summary>
 /// The pool where all the objects like to hang out.
@@ -63,8 +64,9 @@ public class ObjectPool : MonoBehaviour
     {
         for (int i = 0; i < theList.Count; i++)
         {
-            if (!theList[i].activeInHierarchy)
+            if (!theList[i].activeSelf)
             {
+                theList[i].SetActive(true);
                 return theList[i];
             }
         }
@@ -97,5 +99,21 @@ public class ObjectPool : MonoBehaviour
     {
         g.gameObject.SetActive(false);
         g.transform.parent = ObjectPool.instance.transform;
+    }
+
+    public void ReparentObjects()
+    {
+        ResetPooledObjects(itemUIs);
+        ResetPooledObjects(pawnPreviews);
+        ResetPooledObjects(audioSources);
+    }
+
+    private void ResetPooledObjects(List<GameObject> theList)
+    {
+        foreach (GameObject g in theList)
+        {
+            g.transform.parent = transform;
+            g.SetActive(false);
+        }
     }
 }

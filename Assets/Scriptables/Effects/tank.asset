@@ -16,4 +16,4 @@ MonoBehaviour:
   effectName: Oath of Endurance
   description: 'Damage In: -1, and downgrade critical hits to normal hits. May only
     attack once per turn.'
-  effectSprite: {fileID: 21300000, guid: 570018e27fa24c34091ab0bbdcff209b, type: 3}
+  effectSprite: {fileID: 21300000, guid: e60617dfd172973458f5000421a3b196, type: 3}

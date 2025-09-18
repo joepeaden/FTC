@@ -248,8 +248,17 @@ public class DecisionsManager : MonoBehaviour
         if (_charDetail.gameObject.activeInHierarchy)
         {
             // equip character
-            _charDetail.EquipItem(item);
+            ItemData oldItem = _charDetail.EquipItem(item);
             PlaySound(equipSound);
+
+            if (oldItem != null)
+            {
+                _inventoryPanel.AddItem(oldItem);
+            }
+        }
+        else if (_troopsScreen.activeInHierarchy)
+        {
+            return;
         }
         // otherwise, if we're looking at the shop, so sell the item 
         else if (_shopPanel.isActiveAndEnabled)

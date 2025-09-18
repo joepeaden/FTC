@@ -33,7 +33,7 @@ public class LevelUpCard : MonoBehaviour
     {
         this.ability = null;
         title.text = passive.displayName;
-        image.gameObject.SetActive(false);
+        image.sprite = passive.effectDisplay.effectSprite;
         // image.sprite = passive.sprite;
         description.text = passive.description;
 

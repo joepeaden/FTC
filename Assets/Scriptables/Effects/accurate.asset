@@ -16,4 +16,4 @@ MonoBehaviour:
   effectName: Oath of Perfection
   description: Swear an oath to strive for perfection. Greatly increased crit roll
     (-4), but deal 1 damage to self upon missing (to a minimum of 50% HP).
-  effectSprite: {fileID: 21300000, guid: 33a6203d7c3a9244ba0e334f4fe0ac3a, type: 3}
+  effectSprite: {fileID: 21300000, guid: de4a64eae8c0922498c8e08ea1ebc756, type: 3}
