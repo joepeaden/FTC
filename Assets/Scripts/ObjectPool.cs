@@ -101,6 +101,10 @@ public class ObjectPool : MonoBehaviour
         g.transform.parent = ObjectPool.instance.transform;
     }
 
+    /// <summary>
+    /// Resets pooled objects to not active and reparents them to the object pool - otherwise
+    /// they may be destroyed along with their parent object when changing scenes.
+    /// </summary>
     public void ReparentObjects()
     {
         ResetPooledObjects(itemUIs);
@@ -108,6 +112,10 @@ public class ObjectPool : MonoBehaviour
         ResetPooledObjects(audioSources);
     }
 
+    /// <summary>
+    /// Iterate the list and set inactive & reset parent
+    /// </summary>
+    /// <param name="theList"></param>
     private void ResetPooledObjects(List<GameObject> theList)
     {
         foreach (GameObject g in theList)
