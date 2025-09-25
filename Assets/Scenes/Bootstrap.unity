@@ -603,7 +603,7 @@ MonoBehaviour:
   _gameCharData: {fileID: 11400000, guid: 2ffcd208c31b24b8d89ae7832606b8f1, type: 2}
   _equipmentListData: {fileID: 11400000, guid: 45ebae92ddc7f4eb09d9065cfbc49418, type: 2}
   _clickSound: {fileID: 8300000, guid: 44655ac3e8d1745429020578a1c4698e, type: 3}
-  _menuMusic: {fileID: 8300000, guid: 8e702df844c674287a983489dd6f0edf, type: 3}
+  _menuMusic: {fileID: 8300000, guid: 9e6cb96ad30ffa44d802497c858ff99f, type: 3}
   _battleMusic: {fileID: 8300000, guid: 590146107f25b42d4af12f70b316a631, type: 3}
 --- !u!114 &1966799577
 MonoBehaviour:
@@ -628,7 +628,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 8e702df844c674287a983489dd6f0edf, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 9e6cb96ad30ffa44d802497c858ff99f, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 0.2
   m_Pitch: 1

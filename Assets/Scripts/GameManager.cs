@@ -33,6 +33,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private AudioClip _clickSound;
 
     private AudioSource _musicPlayer;
+    [SerializeField] private AudioClip _themeMusic;
     [SerializeField] private AudioClip _menuMusic;
     [SerializeField] private AudioClip _battleMusic;
 
@@ -85,7 +86,7 @@ public class GameManager : MonoBehaviour
             TryAddFollower(0, new GameCharacter(DataLoader.charTypes["player"]));
         }
 
-        SceneManager.LoadScene("DecisionsUI");
+        LoadDecisionsScene();
     }
 
     public GameCharacter TryAddFollower(int cost, GameCharacter newFollower)
@@ -210,12 +211,22 @@ public class GameManager : MonoBehaviour
     public void LoadMainMenu()
     {
         SceneManager.LoadScene("MainMenu");
+        _musicPlayer.clip = _themeMusic;
+        _musicPlayer.Play();
+    }
+
+    public void LoadDecisionsScene()
+    {
+        SceneManager.LoadScene("DecisionsUI");
+        _musicPlayer.clip = _menuMusic;
+        _musicPlayer.Play();
     }
 
     public void ExitBattle(bool playerWon)
     {
         ObjectPool.instance.ReparentObjects();
-        SceneManager.LoadScene("DecisionsUI");
+
+        LoadDecisionsScene();
 
         if (playerWon)
         {
@@ -224,9 +235,6 @@ public class GameManager : MonoBehaviour
 
         // pass a day after a mission (which increments the day and triggers a payout)
         NextDay(true);
-
-        _musicPlayer.clip = _menuMusic;
-        _musicPlayer.Play();
     }
 
     public void PlayClickEffect()
