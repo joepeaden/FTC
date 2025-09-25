@@ -89,6 +89,7 @@ public class Pawn : MonoBehaviour
 
     private bool _isMoving;
     private Vector3 _lastPosition;
+    private PawnSprite.FacingDirection _facing;
 
     // if a pawn is guarding this pawn using an ability for example then this
     // is the reference for that guy. This is set by the HonorProtect class when
@@ -153,7 +154,7 @@ public class Pawn : MonoBehaviour
 
         // set up listeners motivation conditions
         SetupMotConds();
-        
+
         foreach (PassiveData p in GameChar.Passives)
         {
             UpdateEffect(p.effectDisplay, true);
@@ -264,7 +265,7 @@ public class Pawn : MonoBehaviour
         spawnTile.PawnEnterTile(this);
         transform.position = spawnTile.transform.position;
     }
-    
+
     public List<Pawn> GetAdjacentPawns()
     {
         List<Pawn> adjPawns = new();
@@ -412,7 +413,7 @@ public class Pawn : MonoBehaviour
 
             // Note - the defending pawn in TakeDamage can turn this crit false if they have abilities that do so.
             bool isCrit = false;
-            if (hitRoll >= (GameChar.CritChance - currentAction.critChanceMod + critRollMod))
+            if (targetPawn.IsFlankedBy(this) || hitRoll >= (GameChar.CritChance - currentAction.critChanceMod + critRollMod))
             {
                 isCrit = true;
             }
@@ -440,12 +441,12 @@ public class Pawn : MonoBehaviour
         else
         {
             targetPawn.TriggerDodge(this);
-            
+
             // BattleManager.Instance.AddTextNotification(transform.position, "Miss!");
             StartCoroutine(PlayAudioAfterDelay(0.1f, GameChar.TheWeapon.Data.missSound));
 
             // if damage self upon miss and greater than half HP, damage self
-            if (GameChar.DamageSelfOnMiss() && HitPoints >= (GameChar.HitPoints/2) && (HitPoints-1) > 0)
+            if (GameChar.DamageSelfOnMiss() && HitPoints >= (GameChar.HitPoints / 2) && (HitPoints - 1) > 0)
             {
                 TakeDamage(this, 1, false);
             }
@@ -492,8 +493,8 @@ public class Pawn : MonoBehaviour
             isCrit = false;
         }
 
-        int dmgInMod = 0; 
-        foreach(PassiveData passive in GameChar.Passives)
+        int dmgInMod = 0;
+        foreach (PassiveData passive in GameChar.Passives)
         {
             dmgInMod += passive.damageInModifier;
         }
@@ -551,7 +552,7 @@ public class Pawn : MonoBehaviour
         {
             BattleManager.Instance.AddPendingTextNotification("0", Color.white);
         }
-        
+
         attackingPawn.DmgInflicted += hitPointsDmg + armorDmg;
 
         // if took 3 damage, alert via event in case ally has associated oath
@@ -656,12 +657,12 @@ public class Pawn : MonoBehaviour
                     return true;
                 }
             }
-            else if(Motivation >= theAbility.motCost)
+            else if (Motivation >= theAbility.motCost)
             {
                 return true;
             }
-            
-            return false;            
+
+            return false;
         }
         else
         {
@@ -683,7 +684,7 @@ public class Pawn : MonoBehaviour
         {
             return true;
         }
-        
+
         // can still move
         if (!EngagedInCombat && HasMovesLeft())
         {
@@ -794,7 +795,7 @@ public class Pawn : MonoBehaviour
                 yield return new WaitForSeconds(.25f);
 
                 int originalHP = _hitPoints;
-                int originalArmor = _armorPoints; 
+                int originalArmor = _armorPoints;
                 enemyPawn.AttackPawn(this, enemyPawn.GetBasicAttack());
                 HoldingForAttackAnimation = false;
 
@@ -852,23 +853,137 @@ public class Pawn : MonoBehaviour
             {
                 newTile.PawnEnterTile(this);
                 _currentTile = newTile;
-                //pathfinder.enabled = false;
                 break;
             }
         }
 
         if (_isMyTurn)
         {
-            UpdateSpriteOnStop(true);
-            BattleManager.Instance.PawnActivated(this);
+            if (!_onPlayerTeam)
+            {
+                UpdateSpriteOnStop(true);
+            }
+
             _audioSource.loop = false;
             _audioSource.Stop();
+
+            BeginSetFacing();
         }
 
         _spriteController.StopMoving();
         OnMoved.Invoke();
         UpdateFreeAttacksPassive();
         _isMoving = false;
+    }
+
+    private void BeginSetFacing()
+    {
+        // something tells me we shouldn't make decisions based on this variable in here - this should be a controlling script 
+        // kind of decision.
+        if (_onPlayerTeam)
+        {
+            StartCoroutine(TrackMouseForFacing());
+        }
+        else
+        {
+            _facing = _spriteController._facingDirection;
+            BattleManager.Instance.PawnActivated(this);
+        }
+    }
+
+    // before merging - need to remove facing code from sprite and add it to this one. DRY.
+    private IEnumerator TrackMouseForFacing()
+    {
+        while (true)
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                break;
+            }
+            
+            Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            mouseWorldPos.z = 0f;
+
+            // going NE
+            if (mouseWorldPos.x > transform.position.x && mouseWorldPos.y > transform.position.y)
+            {
+                _facing = PawnSprite.FacingDirection.NE;
+            }
+            // going NW
+            else if (mouseWorldPos.x < transform.position.x && mouseWorldPos.y > transform.position.y)
+            {
+                _facing = PawnSprite.FacingDirection.NW;
+            }
+            // going SE
+            else if (mouseWorldPos.x > transform.position.x && mouseWorldPos.y < transform.position.y)
+            {
+                _facing = PawnSprite.FacingDirection.SE;
+            }
+            // going SW
+            else
+            {
+                _facing = PawnSprite.FacingDirection.SW;
+            }
+
+            _spriteController.UpdateFacingAndSpriteOrder(transform.position, mouseWorldPos, CurrentTile);
+
+            yield return null;
+        }
+
+        BattleManager.Instance.PawnActivated(this);
+    }
+
+    public bool IsFlankedBy(Pawn attackingPawn)
+    {
+
+        // this is to check if this pawn is being flanked by the parameter pawn (attackingPawn)
+
+        // DRY again here - the position comparison is same as above.
+
+        // going NE
+        if (transform.position.x > attackingPawn.transform.position.x && transform.position.y > attackingPawn.transform.position.y)
+        {
+            if (_facing == PawnSprite.FacingDirection.NE)
+            {
+
+                Debug.Log("Flank!");
+                return true;
+            }
+        }
+        // going NW
+        else if (transform.position.x < attackingPawn.transform.position.x && transform.position.y > attackingPawn.transform.position.y)
+        {
+            if (_facing == PawnSprite.FacingDirection.NW)
+            {
+
+                Debug.Log("Flank!");
+                return true;
+            }
+        }
+        // going SE
+        else if (transform.position.x > attackingPawn.transform.position.x && transform.position.y < attackingPawn.transform.position.y)
+        {
+            if (_facing == PawnSprite.FacingDirection.SE)
+            {
+
+                Debug.Log("Flank!");
+                return true;
+            }
+        }
+        // going SW
+        else
+        {
+            if (_facing == PawnSprite.FacingDirection.SW)
+            {
+
+                Debug.Log("Flank!");
+                return true;
+            }
+        }
+
+        //if (attackingPawn)
+
+        return false;
     }
 
     public void UpdateFreeAttacksPassive()
@@ -901,13 +1016,13 @@ public class Pawn : MonoBehaviour
         }
 
         // get adjacent enemies to face me 
-        if (isFirst)
-        {
-            for (int i = 0; i < adjEnemies.Count; i++)
-            {
-                adjEnemies[i].UpdateSpriteOnStop(false);
-            }
-        }
+        // if (isFirst)
+        // {
+        //     for (int i = 0; i < adjEnemies.Count; i++)
+        //     {
+        //         adjEnemies[i].UpdateSpriteOnStop(false);
+        //     }
+        // }
     }
 
     #endregion

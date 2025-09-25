@@ -279,43 +279,43 @@ public class Tile : MonoBehaviour
         SetSelected(!_isSelected);
     }
 
-    public List<Tile> GetTilesInMoveRange()
-    {
-        if (_pawn == null)
-        {
-            return null;
-        }
+    //public List<Tile> GetTilesInMoveRange()
+    //{
+    //    if (_pawn == null)
+    //    {
+    //        return null;
+    //    }
 
-        int pawnMoveRange = _pawn.MoveRange;
-        List<Tile> tilesInRange = new();
-        Point p = new();
-        Tile t;
-        // start at x - range because we want to be able to move backwards. 
-        // Go to x + range because we want to be able to move forwards. Same for Y.
-        for (int x = Coordinates.X - pawnMoveRange; x <= pawnMoveRange + Coordinates.X; x++)
-        {
-            p.X = x;
-            for (int y = Coordinates.Y - pawnMoveRange; y <= pawnMoveRange + Coordinates.Y; y++)
-            {
-                p.Y = y;
+    //    int pawnMoveRange = _pawn.MoveRange;
+    //    List<Tile> tilesInRange = new();
+    //    Point p = new();
+    //    Tile t;
+    //    // start at x - range because we want to be able to move backwards. 
+    //    // Go to x + range because we want to be able to move forwards. Same for Y.
+    //    for (int x = Coordinates.X - pawnMoveRange; x <= pawnMoveRange + Coordinates.X; x++)
+    //    {
+    //        p.X = x;
+    //        for (int y = Coordinates.Y - pawnMoveRange; y <= pawnMoveRange + Coordinates.Y; y++)
+    //        {
+    //            p.Y = y;
                 
-                // don't go outside of grid
-                if  (!GridGenerator.Instance.Tiles.ContainsKey(p))
-                {
-                    continue;
-                }
+    //            // don't go outside of grid
+    //            if  (!GridGenerator.Instance.Tiles.ContainsKey(p))
+    //            {
+    //                continue;
+    //            }
 
-                t = GridGenerator.Instance.Tiles[p];
+    //            t = GridGenerator.Instance.Tiles[p];
 
-                if (t.IsInRangeOf(this, pawnMoveRange) && t.IsTraversableByThisPawn(_pawn))
-                {
-                    tilesInRange.Add(t);
-                }
-            }
-        }
+    //            if (t.IsInRangeOf(this, pawnMoveRange) && t.IsTraversableByThisPawn(_pawn))
+    //            {
+    //                tilesInRange.Add(t);
+    //            }
+    //        }
+    //    }
         
-        return tilesInRange;
-    }
+    //    return tilesInRange;
+    //}
 
     public bool IsTraversableByThisPawn(Pawn traveller)
     {
@@ -368,64 +368,70 @@ public class Tile : MonoBehaviour
 
     public void HighlightTilesInRange(Pawn subjectPawn, int range, bool isHighlighting, TileHighlightType highlightType)
     {
-        if (!_isSelected)
-        {
-            tileOverlayUI.enabled = isHighlighting;
+        HashSet<Tile> tilesInRange = GetTilesInRange(subjectPawn, range);
 
-            switch (highlightType)
+        Sprite spriteToUse = highlightType switch
+        {
+            TileHighlightType.Move => moveRangeSprite,
+            TileHighlightType.AttackRange => attackHighlightSprite,
+            _ => moveRangeSprite
+        };
+
+        foreach (Tile t in tilesInRange)
+        {
+            if (!t._isSelected) 
             {
-                case TileHighlightType.Move:
-                    tileOverlayUI.sprite = moveRangeSprite;
-                    break;
-                case TileHighlightType.AttackRange:
-                    tileOverlayUI.sprite = attackHighlightSprite;
-                    break;
+                t.tileOverlayUI.enabled = isHighlighting;
+                t.tileOverlayUI.sprite = spriteToUse;
             }
-        }
-
-        foreach (Tile t in _adjacentTiles)
-        {
-            t.HighlightTilesInRangeRecursive(subjectPawn, range, isHighlighting, highlightType);
         }
     }
 
-    public void HighlightTilesInRangeRecursive(Pawn subjectPawn, int range, bool isHighlighting, TileHighlightType highlightType)
+    public HashSet<Tile> GetTilesInRange(Pawn subjectPawn, int range)
     {
-        if (range > 0 && IsTraversableByThisPawn(_pawn) &&
-            (_pawn == null ||
-            (subjectPawn.OnPlayerTeam == _pawn.OnPlayerTeam && TileHighlightType.Move == highlightType ||
-            TileHighlightType.Move != highlightType)))
+        var tilesInRange = new HashSet<Tile>();
+        var queue = new Queue<(Tile tile, int distance)>();
+        queue.Enqueue((this, 0));
+
+        while (queue.Count > 0)
         {
-            range--;
+            var (current, dist) = queue.Dequeue();
 
-            if (!_isSelected)
+            if (dist > range) continue;
+            if (!current.IsTraversableByThisPawn(subjectPawn)) continue;
+            if (!tilesInRange.Add(current)) continue;
+
+            foreach (Tile neighbor in current._adjacentTiles)
             {
-                tileOverlayUI.enabled = isHighlighting;
-
-                switch (highlightType)
-                {
-                    case TileHighlightType.Move:
-                        tileOverlayUI.sprite = moveRangeSprite;
-                        break;
-                    case TileHighlightType.AttackRange:
-                        tileOverlayUI.sprite = attackHighlightSprite;
-                        break;
-                }
-            }
-
-            foreach (Tile t in _adjacentTiles)
-            {
-                if (!t._isSelected)
-                {
-                    t.HighlightTilesInRangeRecursive(subjectPawn, range, isHighlighting, highlightType);
-                }
+                queue.Enqueue((neighbor, dist + 1));
             }
         }
-        else
-        {
-            return;
-        }
+
+        return tilesInRange;
     }
+
+    //public HashSet<Tile> GetTilesInRange(Pawn subjectPawn, int range)
+    //{
+    //    var tilesInRange = new HashSet<Tile>();
+    //    GetTilesInRangeRecursive(subjectPawn, range, tilesInRange);
+    //    return tilesInRange;
+    //}
+
+    //private void GetTilesInRangeRecursive(Pawn subjectPawn, int range, HashSet<Tile> tilesInRange)
+    //{
+    //    if (range < 0) return;
+    //    if (!IsTraversableByThisPawn(subjectPawn)) return;
+    //    if (!tilesInRange.Add(this)) return; // skip if already visited
+
+    //    int nextRange = range - 1;
+    //    if (nextRange >= 0)
+    //    {
+    //        foreach (Tile t in _adjacentTiles)
+    //        {
+    //            t.GetTilesInRangeRecursive(subjectPawn, nextRange, tilesInRange);
+    //        }
+    //    }
+    //}
 
     /// <summary>
     /// Can this pawn traverse this tile?

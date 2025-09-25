@@ -56,8 +56,8 @@ public class PawnSprite : MonoBehaviour
 
     private ArmorItemData _currentHelm;
 
-    private FacingDirection _facingDirection;
-    private enum FacingDirection
+    public FacingDirection _facingDirection;
+    public enum FacingDirection
     {
         NW,
         NE,
