@@ -3,9 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using Pathfinding;
 using UnityEngine.Events;
+using UnityEditor;
 
 public class AIPathCustom : AIPath
 {
+    public const uint DEFAULT_NODE_TAG = 0;
+    public const uint PLAYER_TEAM_NODE_TAG = 1;
+    public const uint ENEMY_TEAM_NODE_TAG= 2;
+
     public UnityEvent OnDestinationReached = new ();
     private Seeker _seeker;
     private Pawn _pawn;
@@ -21,6 +26,21 @@ public class AIPathCustom : AIPath
     {
         _seeker = GetComponent<Seeker>();
         _pawn = GetComponent<Pawn>();
+
+        // I'm not sure if all tags are enabled by default so just set them all to active first
+        _seeker.traversableTags = -1;
+
+        // traversable tags will be used to manage movement through allies / enemies
+        // there's two - because setting up for potential perks or abilities that allow
+        // movement through allies or enemies
+        _seeker.traversableTags &= ~(1 << (int)ENEMY_TEAM_NODE_TAG); 
+        _seeker.traversableTags &= ~(1 << (int)PLAYER_TEAM_NODE_TAG);
+         
+    }
+
+    public int GetTraversableTagsBitmask()
+    {
+        return _seeker.traversableTags;
     }
 
     public void AttemptGoToLocation(Vector3 goalDestination)

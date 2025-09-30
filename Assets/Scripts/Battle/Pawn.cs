@@ -22,9 +22,6 @@ public class Pawn : MonoBehaviour
     private UnityEvent OnKillEnemy = new();
     private UnityEvent OnDisengage = new();
 
-    public float baseDodgeChance;
-    public float baseSurroundBonus;
-
     public int MoveRange => GameChar.GetMoveRange();
 
     public Tile CurrentTile => _currentTile;
@@ -226,6 +223,11 @@ public class Pawn : MonoBehaviour
     public void HandleBattleEnd()
     {
         GameChar.HandleBattleEnd(_fulfilledBattleMotConds);
+    }
+
+    public int GetPathfinderTraversableTagsBitmask()
+    {
+        return pathfinder.GetTraversableTagsBitmask();
     }
 
     public void SetTeam(bool onPlayerTeam)
@@ -773,7 +775,7 @@ public class Pawn : MonoBehaviour
         {
             return;
         }
-
+        
         // the ap adjustments may need to happen as the pawn enters each tile. May be best to
         // process things one tile at a time if implementing varying AP costs, etc. But not now.
         // if doing that later, make sure to update the pathfinder code too.

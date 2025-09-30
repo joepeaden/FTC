@@ -100,7 +100,22 @@ public class Tile : MonoBehaviour
             }
         }
 
-        _pathfindingNode.Walkable = !IsImpassable;
+        SetWalkable(!IsImpassable);
+    }
+
+    public void SetNodeTag(bool isOnPlayerTeam)
+    {
+        _pathfindingNode.Tag = isOnPlayerTeam ? AIPathCustom.PLAYER_TEAM_NODE_TAG : AIPathCustom.ENEMY_TEAM_NODE_TAG;
+    }
+
+    public void ClearNodeTag()
+    {
+        _pathfindingNode.Tag = AIPathCustom.DEFAULT_NODE_TAG;
+    }
+
+    public void SetWalkable(bool isWalkable)
+    {
+        _pathfindingNode.Walkable = isWalkable && !IsImpassable;
     }
 
     public void Initialize(Dictionary<Point, Tile> tiles, Point coord, bool isImpassable)
@@ -255,11 +270,13 @@ public class Tile : MonoBehaviour
 
     public void PawnEnterTile(Pawn newPawn)
     {
+        SetNodeTag(newPawn.OnPlayerTeam);
         _pawn = newPawn;
     }
 
     public void PawnExitTile()
     {
+        ClearNodeTag();
         SetSelected(false);
         _pawn = null;
     }
@@ -319,8 +336,15 @@ public class Tile : MonoBehaviour
 
     public bool IsTraversableByThisPawn(Pawn traveller)
     {
+        bool canTraverse = true;
+        if (traveller != null && traveller.CurrentTile != this)
+        {
+            int pawnTraversableTagsBitmask = traveller.GetPathfinderTraversableTagsBitmask();
+            canTraverse = canTraverse && ((pawnTraversableTagsBitmask & (1 << (int)_pathfindingNode.Tag)) != 0);
+        }
+
         // Does it contain pawns or impassable tiles?
-        return !IsImpassable && (_pawn == null || _pawn != null && traveller.OnPlayerTeam == _pawn.OnPlayerTeam);
+        return !IsImpassable && canTraverse;
     }
 
     public void HighlightTileAsActive()

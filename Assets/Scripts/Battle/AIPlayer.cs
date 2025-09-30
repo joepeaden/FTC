@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -34,6 +35,19 @@ public class AIPlayer : MonoBehaviour
     public void DoTurn(Pawn p)
     {
         StartCoroutine(DoTurnCoroutine(p));
+    }
+    
+    private bool CanReachSpot(Vector3 start, Vector3 end)
+    {
+        var startNode = AstarPath.active.GetNearest(start).node;
+        var endNode = AstarPath.active.GetNearest(end).node;
+
+        // Nodes must exist and not be blocked
+        if (startNode == null || endNode == null) return false;
+        if (!startNode.Walkable || !endNode.Walkable) return false;
+
+        // Check if both nodes are in the same area (A* precomputes connected areas)
+        return startNode.Area == endNode.Area;
     }
 
     private IEnumerator DoTurnCoroutine(Pawn activePawn)
@@ -109,38 +123,16 @@ public class AIPlayer : MonoBehaviour
 
             ////////////////////////////////////////////////////////////////////////////////////////////////
 
+            // try to move towards enemy pawns
+            List<Pawn> pawnsToMoveTowards = activePawn.OnPlayerTeam ? _enemyPawns : BattleManager.Instance.PlayerPawns;
+            List<Tile> potentialTargetTiles = GetTargetTilesTowardsPawns(pawnsToMoveTowards, activePawn);
 
-
-            List<Pawn> pawnsToTarget = activePawn.OnPlayerTeam ? _enemyPawns : BattleManager.Instance.PlayerPawns;
-
-            List<Tile> potentialTargetTiles = new();
-            foreach (Pawn targetPawn in pawnsToTarget)
+            // otherwise, we want to move towards an ally pawn (they're probably going somewhere right?)
+            // hopefully this doesn't end up making silly things happen. Or, maybe that'd be fun.
+            if (potentialTargetTiles.Count == 0)
             {
-                // don't circle around dead pawns forever (don't be fucking creepy)
-                if (targetPawn.IsDead)
-                {
-                    continue;
-                }
-
-                Tile bestTargetTile = null;
-                foreach (Tile potentialTargetTile in targetPawn.CurrentTile.GetAdjacentTiles())
-                {
-                    Pawn pawnAtTile = potentialTargetTile.GetPawn();
-                    // don't consider if someone's there
-                    if (pawnAtTile != null && !pawnAtTile.IsDead || !potentialTargetTile.CanTraverse(activePawn))
-                    {
-                        continue;
-                    }
-
-                    // just go with the first one for now
-                    bestTargetTile = potentialTargetTile;
-                    break;
-                }
-
-                if (bestTargetTile != null)
-                {
-                    potentialTargetTiles.Add(bestTargetTile);
-                }
+                pawnsToMoveTowards = activePawn.OnPlayerTeam ? BattleManager.Instance.PlayerPawns : _enemyPawns;
+                potentialTargetTiles = GetTargetTilesTowardsPawns(pawnsToMoveTowards, activePawn);
             }
 
             // if there's no potential tiles to move towrads... just stand there.
@@ -155,6 +147,49 @@ public class AIPlayer : MonoBehaviour
                 activePawn.PassTurn();
             }
         }
+    }
+
+    private List<Tile> GetTargetTilesTowardsPawns(List<Pawn> pawnsToMoveTowards, Pawn activePawn)
+    {
+        List<Tile> potentialTargetTiles = new();
+        foreach (Pawn targetPawn in pawnsToMoveTowards)
+        {
+            // don't circle around dead pawns forever (don't be fucking creepy)
+            if (targetPawn.IsDead)
+            {
+                continue;
+            }
+
+            Tile bestTargetTile = null;
+            foreach (Tile potentialTargetTile in targetPawn.CurrentTile.GetAdjacentTiles())
+            {
+                // we don't want to include it if we couldn't get there anyway - this is the case
+                // like if we've been surrounded by allies and can't get to any enemies. For whatever
+                // reason this target tile is unreachable.
+                if (!CanReachSpot(transform.position, potentialTargetTile.transform.position))
+                {
+                    continue;
+                }
+
+                Pawn pawnAtTile = potentialTargetTile.GetPawn();
+                // don't consider if someone's there
+                if (pawnAtTile != null && !pawnAtTile.IsDead || !potentialTargetTile.CanTraverse(activePawn))
+                {
+                    continue;
+                }
+
+                // just go with the first one for now
+                bestTargetTile = potentialTargetTile;
+                break;
+            }
+
+            if (bestTargetTile != null)
+            {
+                potentialTargetTiles.Add(bestTargetTile);
+            }
+        }
+
+        return potentialTargetTiles;
     }
 
     /// <summary>
