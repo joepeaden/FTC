@@ -864,12 +864,14 @@ public class Pawn : MonoBehaviour
             if (!_onPlayerTeam)
             {
                 UpdateSpriteOnStop(true);
+                _facing = _spriteController._facingDirection;
+                BattleManager.Instance.PawnActivated(this);
             }
 
             _audioSource.loop = false;
             _audioSource.Stop();
 
-            BeginSetFacing();
+            // BeginSetFacing();
         }
 
         _spriteController.StopMoving();
@@ -878,61 +880,30 @@ public class Pawn : MonoBehaviour
         _isMoving = false;
     }
 
-    private void BeginSetFacing()
+    public void SetFacing(Vector3 mouseWorldPos)
     {
-        // something tells me we shouldn't make decisions based on this variable in here - this should be a controlling script 
-        // kind of decision.
-        if (_onPlayerTeam)
+        // going NE
+        if (mouseWorldPos.x > transform.position.x && mouseWorldPos.y > transform.position.y)
         {
-            StartCoroutine(TrackMouseForFacing());
+            _facing = PawnSprite.FacingDirection.NE;
         }
+        // going NW
+        else if (mouseWorldPos.x < transform.position.x && mouseWorldPos.y > transform.position.y)
+        {
+            _facing = PawnSprite.FacingDirection.NW;
+        }
+        // going SE
+        else if (mouseWorldPos.x > transform.position.x && mouseWorldPos.y < transform.position.y)
+        {
+            _facing = PawnSprite.FacingDirection.SE;
+        }
+        // going SW
         else
         {
-            _facing = _spriteController._facingDirection;
-            BattleManager.Instance.PawnActivated(this);
-        }
-    }
-
-    // before merging - need to remove facing code from sprite and add it to this one. DRY.
-    private IEnumerator TrackMouseForFacing()
-    {
-        while (true)
-        {
-            if (Input.GetMouseButtonDown(0))
-            {
-                break;
-            }
-            
-            Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            mouseWorldPos.z = 0f;
-
-            // going NE
-            if (mouseWorldPos.x > transform.position.x && mouseWorldPos.y > transform.position.y)
-            {
-                _facing = PawnSprite.FacingDirection.NE;
-            }
-            // going NW
-            else if (mouseWorldPos.x < transform.position.x && mouseWorldPos.y > transform.position.y)
-            {
-                _facing = PawnSprite.FacingDirection.NW;
-            }
-            // going SE
-            else if (mouseWorldPos.x > transform.position.x && mouseWorldPos.y < transform.position.y)
-            {
-                _facing = PawnSprite.FacingDirection.SE;
-            }
-            // going SW
-            else
-            {
-                _facing = PawnSprite.FacingDirection.SW;
-            }
-
-            _spriteController.UpdateFacingAndSpriteOrder(transform.position, mouseWorldPos, CurrentTile);
-
-            yield return null;
+            _facing = PawnSprite.FacingDirection.SW;
         }
 
-        BattleManager.Instance.PawnActivated(this);
+        _spriteController.UpdateFacingAndSpriteOrder(transform.position, mouseWorldPos, CurrentTile);
     }
 
     public bool IsFlankedBy(Pawn attackingPawn)
@@ -947,8 +918,6 @@ public class Pawn : MonoBehaviour
         {
             if (_facing == PawnSprite.FacingDirection.NE)
             {
-
-                Debug.Log("Flank!");
                 return true;
             }
         }
@@ -957,8 +926,6 @@ public class Pawn : MonoBehaviour
         {
             if (_facing == PawnSprite.FacingDirection.NW)
             {
-
-                Debug.Log("Flank!");
                 return true;
             }
         }
@@ -967,8 +934,6 @@ public class Pawn : MonoBehaviour
         {
             if (_facing == PawnSprite.FacingDirection.SE)
             {
-
-                Debug.Log("Flank!");
                 return true;
             }
         }
@@ -977,13 +942,9 @@ public class Pawn : MonoBehaviour
         {
             if (_facing == PawnSprite.FacingDirection.SW)
             {
-
-                Debug.Log("Flank!");
                 return true;
             }
         }
-
-        //if (attackingPawn)
 
         return false;
     }

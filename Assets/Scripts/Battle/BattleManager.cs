@@ -264,11 +264,11 @@ public class BattleManager : MonoBehaviour
 
         if (_instructionsUI.activeInHierarchy)
         {
-            _selectionManager.DisablePlayerControls();
+            _selectionManager.PlayerControlsActive = false;
         }
         else
         {
-            _selectionManager.EnablePlayerControls();
+            _selectionManager.PlayerControlsActive = true;
         }
     }
 
@@ -642,9 +642,9 @@ public class BattleManager : MonoBehaviour
         if (Ability.SelectedAbility != null)
         {
             //CurrentPawn.CurrentTile.HighlightTilesInRange(_currentAction.range + 1, false, Tile.TileHighlightType.AttackRange);
-            Ability.SelectedAbility = null;
 
-            _selectionManager.SetIdleMode(true);
+            _selectionManager.CurrentAbility = null;    
+            Ability.SelectedAbility = null;
 
             //if (CurrentPawn.HasActionsRemaining())
             //{
@@ -660,9 +660,11 @@ public class BattleManager : MonoBehaviour
     {
         ClearSelectedAction();
 
-        Ability.SelectedAbility = action;
+        // I got into some very bad coding habits over time. Using statics ALOT in this project. I have come to understand just how bad this design is.
+        // But, sometimes... if it works, it works. I need to make progress. So, this is part of the attempt to at least keep SelectionManager mostly decoupled.
 
-        _selectionManager.SetIdleMode(false);
+        Ability.SelectedAbility = action;
+        _selectionManager.CurrentAbility = action;
 
         //_selectionManager.SetSelectedTile(CurrentPawn.CurrentTile);s
 
@@ -882,6 +884,7 @@ public class BattleManager : MonoBehaviour
         }
 
         _currentPawn = GetNextPawn();
+        _selectionManager.CurrentPawn = _currentPawn;
 
         yield return new WaitUntil(() => !_currentPawn.HoldingForAttackAnimation);
 
@@ -909,12 +912,12 @@ public class BattleManager : MonoBehaviour
 
                 if (!_currentPawn.OnPlayerTeam)
                 {
-                    _selectionManager.DisablePlayerControls();
+                    _selectionManager.PlayerControlsActive = false;
                     _aiPlayer.DoTurn(_currentPawn);
                 }        
                 else if (_currentPawn.OnPlayerTeam && _currentPawn.GameChar.RollPosessed())
                 {
-                    _selectionManager.DisablePlayerControls();
+                    _selectionManager.PlayerControlsActive = false;
                     _currentPawn.IsPossessed = true;
                     AddPendingTextNotification("Possession!", Color.yellow);
                     TriggerTextNotification(_currentPawn.transform.position);
@@ -922,7 +925,7 @@ public class BattleManager : MonoBehaviour
                 }
                 else
                 {
-                    _selectionManager.EnablePlayerControls();
+                    _selectionManager.PlayerControlsActive = true;
                 }
             }
         }

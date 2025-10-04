@@ -25,6 +25,11 @@ public class PipStatBar : MonoBehaviour
     /// <param name="currentValue"></param>
     public void SetBar(int currentValue)
     {
+        if (currentValue > statPips.Count - 1)
+        {
+            return;
+        }
+
         statValueText.text = currentValue.ToString();
 
         // set currentValue num of pips to active

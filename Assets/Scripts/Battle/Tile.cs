@@ -100,7 +100,7 @@ public class Tile : MonoBehaviour
             }
         }
 
-        SetWalkable(!IsImpassable);
+       _pathfindingNode.Walkable = !IsImpassable;
     }
 
     public void SetNodeTag(bool isOnPlayerTeam)
@@ -111,11 +111,6 @@ public class Tile : MonoBehaviour
     public void ClearNodeTag()
     {
         _pathfindingNode.Tag = AIPathCustom.DEFAULT_NODE_TAG;
-    }
-
-    public void SetWalkable(bool isWalkable)
-    {
-        _pathfindingNode.Walkable = isWalkable && !IsImpassable;
     }
 
     public void Initialize(Dictionary<Point, Tile> tiles, Point coord, bool isImpassable)
@@ -296,44 +291,6 @@ public class Tile : MonoBehaviour
         SetSelected(!_isSelected);
     }
 
-    //public List<Tile> GetTilesInMoveRange()
-    //{
-    //    if (_pawn == null)
-    //    {
-    //        return null;
-    //    }
-
-    //    int pawnMoveRange = _pawn.MoveRange;
-    //    List<Tile> tilesInRange = new();
-    //    Point p = new();
-    //    Tile t;
-    //    // start at x - range because we want to be able to move backwards. 
-    //    // Go to x + range because we want to be able to move forwards. Same for Y.
-    //    for (int x = Coordinates.X - pawnMoveRange; x <= pawnMoveRange + Coordinates.X; x++)
-    //    {
-    //        p.X = x;
-    //        for (int y = Coordinates.Y - pawnMoveRange; y <= pawnMoveRange + Coordinates.Y; y++)
-    //        {
-    //            p.Y = y;
-                
-    //            // don't go outside of grid
-    //            if  (!GridGenerator.Instance.Tiles.ContainsKey(p))
-    //            {
-    //                continue;
-    //            }
-
-    //            t = GridGenerator.Instance.Tiles[p];
-
-    //            if (t.IsInRangeOf(this, pawnMoveRange) && t.IsTraversableByThisPawn(_pawn))
-    //            {
-    //                tilesInRange.Add(t);
-    //            }
-    //        }
-    //    }
-        
-    //    return tilesInRange;
-    //}
-
     public bool IsTraversableByThisPawn(Pawn traveller)
     {
         bool canTraverse = true;
@@ -433,29 +390,6 @@ public class Tile : MonoBehaviour
 
         return tilesInRange;
     }
-
-    //public HashSet<Tile> GetTilesInRange(Pawn subjectPawn, int range)
-    //{
-    //    var tilesInRange = new HashSet<Tile>();
-    //    GetTilesInRangeRecursive(subjectPawn, range, tilesInRange);
-    //    return tilesInRange;
-    //}
-
-    //private void GetTilesInRangeRecursive(Pawn subjectPawn, int range, HashSet<Tile> tilesInRange)
-    //{
-    //    if (range < 0) return;
-    //    if (!IsTraversableByThisPawn(subjectPawn)) return;
-    //    if (!tilesInRange.Add(this)) return; // skip if already visited
-
-    //    int nextRange = range - 1;
-    //    if (nextRange >= 0)
-    //    {
-    //        foreach (Tile t in _adjacentTiles)
-    //        {
-    //            t.GetTilesInRangeRecursive(subjectPawn, nextRange, tilesInRange);
-    //        }
-    //    }
-    //}
 
     /// <summary>
     /// Can this pawn traverse this tile?
