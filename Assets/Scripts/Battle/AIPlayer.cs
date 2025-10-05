@@ -1,9 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Events;
 
 public class AIPlayer : MonoBehaviour
 {
@@ -37,19 +35,6 @@ public class AIPlayer : MonoBehaviour
         StartCoroutine(DoTurnCoroutine(p));
     }
     
-    private bool CanReachSpot(Vector3 start, Vector3 end)
-    {
-        var startNode = AstarPath.active.GetNearest(start).node;
-        var endNode = AstarPath.active.GetNearest(end).node;
-
-        // Nodes must exist and not be blocked
-        if (startNode == null || endNode == null) return false;
-        if (!startNode.Walkable || !endNode.Walkable) return false;
-
-        // Check if both nodes are in the same area (A* precomputes connected areas)
-        return startNode.Area == endNode.Area;
-    }
-
     private IEnumerator DoTurnCoroutine(Pawn activePawn)
     {
         // just add a pause so it's not jarring how fast turns change
@@ -64,65 +49,6 @@ public class AIPlayer : MonoBehaviour
         // add comment
         else
         {
-            // figure out who to target first
-
-            // figure out the path to get to that target
-            // go as far as possible along that path within move range
-
-
-            ////// old code to figure out the one that you ahve the best "advantage" against //////
-
-            // dictionary is (tile, advantagerating)  
-            //Dictionary<Tile, int> moveRatingDict = new();
-
-            //int activePawnEqRating = (activePawn.GameChar.GetTotalArmor() + activePawn.GameChar.GetWeaponDamageForAction(activePawn.GameChar.WeaponItem.baseAction));
-            //foreach (Pawn targetPawn in BattleManager.Instance.PlayerPawns)
-            //{
-            //    // don't circle around dead pawns forever (don't be fucking creepy)
-            //    if (targetPawn.IsDead)
-            //    {
-            //        continue;
-            //    }
-
-            //    // get equipment advantage values
-            //    int targetEqRating = (targetPawn.GameChar.GetTotalArmor() + targetPawn.GameChar.GetWeaponDamageForAction(targetPawn.GameChar.WeaponItem.baseAction));
-            //    int eqAdvantageRating = activePawnEqRating - targetEqRating;
-
-            //    Tile bestTargetTile = null;
-            //    foreach (Tile potentialTargetTile in targetPawn.CurrentTile.GetAdjacentTiles())
-            //    {
-            //        Pawn pawnAtTile = potentialTargetTile.GetPawn();
-            //        // don't consider if someone's there
-            //        if (pawnAtTile != null  && !pawnAtTile.IsDead || potentialTargetTile.IsImpassable)
-            //        {
-            //            continue;
-            //        }
-
-            //        // just go with the first one for now
-            //        bestTargetTile = potentialTargetTile;
-            //        break;
-            //    }
-
-            //    // could be null if all positions around target are occupied
-            //    if (bestTargetTile != null)
-            //    {
-            //        moveRatingDict[bestTargetTile] = eqAdvantageRating;
-            //    }
-            //}
-
-            //int bestOdds = int.MinValue;
-            //Tile bestTile = activePawn.CurrentTile;
-            //foreach (Tile t in moveRatingDict.Keys)
-            //{
-            //    if (bestOdds < moveRatingDict[t])
-            //    {
-            //        bestOdds = moveRatingDict[t];
-            //        bestTile = t;
-            //    }
-            //}
-
-            ////////////////////////////////////////////////////////////////////////////////////////////////
-
             // try to move towards enemy pawns
             List<Pawn> pawnsToMoveTowards = activePawn.OnPlayerTeam ? _enemyPawns : BattleManager.Instance.PlayerPawns;
             List<Tile> potentialTargetTiles = GetTargetTilesTowardsPawns(pawnsToMoveTowards, activePawn);
@@ -154,7 +80,6 @@ public class AIPlayer : MonoBehaviour
         List<Tile> potentialTargetTiles = new();
         foreach (Pawn targetPawn in pawnsToMoveTowards)
         {
-            // don't circle around dead pawns forever (don't be fucking creepy)
             if (targetPawn.IsDead)
             {
                 continue;
@@ -166,7 +91,7 @@ public class AIPlayer : MonoBehaviour
                 // we don't want to include it if we couldn't get there anyway - this is the case
                 // like if we've been surrounded by allies and can't get to any enemies. For whatever
                 // reason this target tile is unreachable.
-                if (!CanReachSpot(transform.position, potentialTargetTile.transform.position))
+                if (!activePawn.HasPathToTile(potentialTargetTile))
                 {
                     continue;
                 }

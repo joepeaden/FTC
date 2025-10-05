@@ -22,6 +22,7 @@ public class SelectionManager : MonoBehaviour
     public bool PlayerRightClick { get; set; }
     public Pawn CurrentPawn { get; set; }
     public Ability CurrentAbility { get; set; }
+    public Tile ClickedTile { get; set; }
 
     private void Start()
     {
@@ -70,6 +71,20 @@ public class SelectionManager : MonoBehaviour
         _selectedTile.HighlightTilesInRange(currentPawn, currentPawn.MoveRange, false, Tile.TileHighlightType.Move);
     }
 
+    private Tile GetTileSelected()
+    {
+        Vector3 mousePos = CameraManager.MainCamera.ScreenToWorldPoint(Input.mousePosition);
+        // the terrain pieces are labeled PathfindingAvoid, so skip those.
+        RaycastHit2D[] hits = Physics2D.RaycastAll(mousePos, -Vector3.forward, float.MaxValue, ~LayerMask.GetMask("PathfindingAvoid"));
+
+        if (hits.Length > 0)
+        {
+            return hits[0].transform.GetComponent<Tile>();
+        }
+
+        return null;
+    }
+
     private void Update()
     {
         if (!PlayerControlsActive)
@@ -79,6 +94,11 @@ public class SelectionManager : MonoBehaviour
 
         PlayerLeftClick = Input.GetMouseButtonDown(0);
         PlayerRightClick = Input.GetMouseButtonDown(1);
+
+        if (PlayerLeftClick)
+        {
+            ClickedTile = GetTileSelected();
+        }
 
         InputState newState;
         newState = _currentInputState.Update();
@@ -134,7 +154,7 @@ public class IdleState : InputState
         {
             return TheSelectionManager.abilityState;
         }
-        else if (TheSelectionManager.PlayerLeftClick && TheSelectionManager.CurrentPawn.HasMovesLeft())
+        else if (TheSelectionManager.PlayerLeftClick && TheSelectionManager.CurrentPawn.HasMovesLeft() && TheSelectionManager.ClickedTile != null)
         {
             return TheSelectionManager.movingState;
         }
@@ -161,10 +181,13 @@ public class MovingState : InputState
     {
         if (_movingDone)
         {
-            return TheSelectionManager.facingState; 
+            return TheSelectionManager.facingState;
         }
-
-        if (TheSelectionManager.PlayerLeftClick)
+        else if (TheSelectionManager.CurrentAbility != null)
+        {
+            return TheSelectionManager.abilityState;
+        }
+        else if (TheSelectionManager.PlayerLeftClick)
         {
             HandleAttemptToMove();
         }
@@ -200,31 +223,21 @@ public class MovingState : InputState
     
     private void HandleAttemptToMove()
     {
-        Vector3 mousePos = CameraManager.MainCamera.ScreenToWorldPoint(Input.mousePosition);
-        RaycastHit2D[] hits = Physics2D.RaycastAll(mousePos, -Vector3.forward);
-
-        if (hits.Length > 0)
+        Tile targetTile = TheSelectionManager.ClickedTile;
+        if (targetTile != null && !targetTile.IsImpassable)
         {
-            foreach (RaycastHit2D hit in hits)
+            // should we even be raycasting and all this? Should we perhaps instead just report clicks from the Tile script? So that it just 
+            // directly tells the selection manager what was clicked?
+            // maybe later.
+            // I don't think we need to check this btw.
+            Pawn targetPawn = targetTile.GetPawn();
+            if (TheSelectionManager.CurrentPawn.CurrentTile.GetTilesInRange(TheSelectionManager.CurrentPawn, TheSelectionManager.CurrentPawn.MoveRange).Contains(targetTile) && targetPawn == null && TheSelectionManager.SelectedTile != null)
             {
-                Tile newTile = hit.transform.GetComponent<Tile>();
-                if (newTile != null && !newTile.IsImpassable)
+                if (TheSelectionManager.CurrentPawn.HasPathToTile(targetTile))
                 {
-                    if (TheSelectionManager.CurrentPawn.OnPlayerTeam)
-                    {
-                        // should we even be raycasting and all this? Should we perhaps instead just report clicks from the Tile script? So that it just 
-                        // directly tells the selection manager what was clicked?
-                        // maybe later.
-                        // I don't think we need to check this btw.
-                        Pawn targetPawn = newTile.GetPawn();
-                        if (TheSelectionManager.CurrentPawn.CurrentTile.GetTilesInRange(TheSelectionManager.CurrentPawn, TheSelectionManager.CurrentPawn.MoveRange).Contains(newTile) && targetPawn == null && TheSelectionManager.SelectedTile != null)
-                        {
-                            ClearMoveHighlight();
-                            TheSelectionManager.CurrentPawn.OnMoved.AddListener(HandleMoveComplete);
-                            TheSelectionManager.CurrentPawn.TryMoveToTile(newTile);
-                        }
-                    }
-
+                    ClearMoveHighlight();
+                    TheSelectionManager.CurrentPawn.OnMoved.AddListener(HandleMoveComplete);
+                    TheSelectionManager.CurrentPawn.TryMoveToTile(targetTile);
                 }
             }
         }
@@ -298,34 +311,25 @@ public class UsingAbilityState : InputState
 
     private bool HandleAttemptUseAbility()
     {
-        Vector3 mousePos = CameraManager.MainCamera.ScreenToWorldPoint(Input.mousePosition);
-        RaycastHit2D[] hits = Physics2D.RaycastAll(mousePos, -Vector3.forward);
-
-        if (hits.Length > 0)
+        Tile newTile = TheSelectionManager.ClickedTile;
+        if (newTile != null && !newTile.IsImpassable)
         {
-            foreach (RaycastHit2D hit in hits)
+            Pawn targetPawn = newTile.GetPawn();
+            if (Ability.SelectedAbility != null && targetPawn != null && TheSelectionManager.CurrentPawn.IsTargetInRange(targetPawn, Ability.SelectedAbility))
             {
-                Tile newTile = hit.transform.GetComponent<Tile>();
-                if (newTile != null && !newTile.IsImpassable)
-                {
-                    Pawn targetPawn = newTile.GetPawn();
-                    if (Ability.SelectedAbility != null && targetPawn != null && TheSelectionManager.CurrentPawn.IsTargetInRange(targetPawn, Ability.SelectedAbility))
-                    {
-                        bool isAlly = targetPawn.OnPlayerTeam == TheSelectionManager.CurrentPawn.OnPlayerTeam;
+                bool isAlly = targetPawn.OnPlayerTeam == TheSelectionManager.CurrentPawn.OnPlayerTeam;
 
-                        // only allow support ability use on allies or attack ability use on enemies
-                        // THIS NEEDS UPDATE IF WE ADD OTHER ABILITY TYPES OTHER THAN WEAPON OR SUPPORT
-                        if (Ability.SelectedAbility is SupportAbilityData && isAlly ||
-                            Ability.SelectedAbility is WeaponAbilityData && !isAlly)
-                        {
-                            Ability.SelectedAbility.Activate(TheSelectionManager.CurrentPawn, targetPawn);
-                            return true;
-                        }
-                    }
+                // only allow support ability use on allies or attack ability use on enemies
+                // THIS NEEDS UPDATE IF WE ADD OTHER ABILITY TYPES OTHER THAN WEAPON OR SUPPORT
+                if (Ability.SelectedAbility is SupportAbilityData && isAlly ||
+                    Ability.SelectedAbility is WeaponAbilityData && !isAlly)
+                {
+                    Ability.SelectedAbility.Activate(TheSelectionManager.CurrentPawn, targetPawn);
+                    return true;
                 }
             }
         }
-
+         
         return false;
     }
 }

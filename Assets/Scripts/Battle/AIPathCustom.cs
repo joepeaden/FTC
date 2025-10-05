@@ -4,6 +4,7 @@ using UnityEngine;
 using Pathfinding;
 using UnityEngine.Events;
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 
 public class AIPathCustom : AIPath
 {
@@ -43,8 +44,33 @@ public class AIPathCustom : AIPath
         return _seeker.traversableTags;
     }
 
+    public bool HasPathToLocation(Vector3 goalDestination)
+    {
+        // perhaps a better way to do this would be to get it from the tile itself - each tile stores a ref and when
+        // selected we already know the destination node. It's fine for now, though.
+        GraphNode originNode = AstarPath.active.GetNearest(transform.position).node;
+        GraphNode destinationNode = AstarPath.active.GetNearest(goalDestination).node;
+
+        if (!PathUtilities.IsPathPossible(originNode, destinationNode))
+        {
+            return false;   
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Make sure you check if it's possible to go to this destination first!
+    /// </summary>
     public void AttemptGoToLocation(Vector3 goalDestination)
     {
+        // this is fallback case to avoid errors.
+        if (!HasPathToLocation(goalDestination))
+        {
+            Debug.Log("Cannot reach location - ending move!");
+            HandleDestinationReached();
+        }
+
         _seeker.StartPath(transform.position, goalDestination, OnPathCalculated);
         pawnMovesLeft = _pawn.MoveRange;
     }
@@ -90,6 +116,13 @@ public class AIPathCustom : AIPath
 
     private void MoveToNextPathNode()
     {
+        if (_pathToFollow.Count <= _currentPathIndex)
+        {
+            Debug.Log("MovewToNextPathNode: Not enough nodes in path!");
+            HandleDestinationReached();
+            return;
+        }
+
         destination = _pathToFollow[_currentPathIndex];
 
         if (_currentPathIndex > 0)
@@ -105,33 +138,22 @@ public class AIPathCustom : AIPath
         if ((transform.position - destination).magnitude <= 0.1f)
         {
             _currentPathIndex++;
-
-            //bool nextTileHasPawn = false;
-            //if (_currentPathIndex == _pathToFollow.Count-2)
-            //{
-                //RaycastHit2D[] hits = Physics2D.RaycastAll(_pathToFollow[_currentPathIndex+1], -Vector3.forward);
-                //foreach (RaycastHit2D hit in hits)
-                //{
-                //    Tile newTile = hit.transform.GetComponent<Tile>();
-                //    if (newTile != null)
-                //    {
-                //        nextTileHasPawn = newTile.GetPawn() != null;
-                //        break;
-                //    }
-                //} 
-            //}
-
             if (_currentPathIndex >= _pathToFollow.Count
                 || pawnMovesLeft <= 0)
             {
-                OnDestinationReached.Invoke();
-                enabled = false;
+                HandleDestinationReached();
             }
             else
             {
                 MoveToNextPathNode();
             }
         }
+    }
+
+    private void HandleDestinationReached()
+    {
+        OnDestinationReached.Invoke();
+        enabled = false;
     }
 
     private void OnDestroy()

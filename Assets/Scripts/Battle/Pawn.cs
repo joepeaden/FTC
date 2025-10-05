@@ -818,7 +818,6 @@ public class Pawn : MonoBehaviour
 
             int tileDistance = _currentTile.GetTileDistance(targetTile);
 
-            //Vector3 position = adjustedTargetTile.transform.position;
             pathfinder.AttemptGoToLocation(targetTile.transform.position);
 
             _spriteController.Move();
@@ -837,6 +836,11 @@ public class Pawn : MonoBehaviour
             _audioSource.loop = true;
             _audioSource.Play();
         }
+    }
+
+    public bool HasPathToTile(Tile targetTile)
+    {
+        return pathfinder.HasPathToLocation(targetTile.transform.position);
     }
 
     public void PassTurn()
