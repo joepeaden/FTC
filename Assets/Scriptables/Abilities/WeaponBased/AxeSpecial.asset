@@ -15,7 +15,7 @@ MonoBehaviour:
   abilityID: brutalchop
   abilityName: Brutal Chop
   description: Attempt to slice your enemy from head to toe
-  motCost: 1
+  motCost: 0
   range: 1
   sprite: {fileID: 21300000, guid: 37f27f4eb8f4a486295cec51f0b77e60, type: 3}
   apCost: 1

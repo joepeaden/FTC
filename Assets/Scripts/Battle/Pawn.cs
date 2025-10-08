@@ -8,7 +8,7 @@ public class Pawn : MonoBehaviour
 {
     private const int MOT_REGAIN_RATE = 10;
     private const int MOT_BASIC_ATTACK_COST = 10;
-    public const int BASE_ACTION_POINTS = 2;
+    public const int BASE_ACTION_POINTS = 1;
     public const int MOTIVATED_MOT_REGAIN_BUFF = 15;
 
     public UnityEvent OnMoved = new();
@@ -86,7 +86,7 @@ public class Pawn : MonoBehaviour
 
     private bool _isMoving;
     private Vector3 _lastPosition;
-    private PawnSprite.FacingDirection _facing;
+    public PawnSprite.FacingDirection CurrentFacing;
 
     // if a pawn is guarding this pawn using an ability for example then this
     // is the reference for that guy. This is set by the HonorProtect class when
@@ -370,6 +370,14 @@ public class Pawn : MonoBehaviour
         _isMyTurn = false;
         IsPossessed = false;
         _spriteController.HandleTurnEnd();
+    }
+
+    public Pawn GetPawnInAttackRange()
+    {
+        List<Pawn> adjEnemies = GetAdjacentEnemies();
+
+        Pawn pawnToReturn = adjEnemies.Where(pawn => GetDirectionOfTargetPawn(pawn) == CurrentFacing).FirstOrDefault();
+        return pawnToReturn;
     }
 
     // perhaps this stuff should all be moved to the AttackAbility classes...
@@ -868,8 +876,12 @@ public class Pawn : MonoBehaviour
             if (!_onPlayerTeam)
             {
                 UpdateSpriteOnStop(true);
-                _facing = _spriteController._facingDirection;
+                CurrentFacing = _spriteController._facingDirection;
+
+                CurrentFacing = _spriteController._facingDirection;
                 BattleManager.Instance.PawnActivated(this);
+
+                
             }
 
             _audioSource.loop = false;
@@ -884,27 +896,47 @@ public class Pawn : MonoBehaviour
         _isMoving = false;
     }
 
+    public PawnSprite.FacingDirection GetDirectionOfTargetPawn(Pawn p)
+    {
+        if (p.transform.position.x > transform.position.x && p.transform.position.y > transform.position.y)
+        {
+            return PawnSprite.FacingDirection.NE;
+        }
+        else if (p.transform.position.x < transform.position.x && p.transform.position.y > transform.position.y)
+        {
+            return PawnSprite.FacingDirection.NW;
+        }
+        else if (p.transform.position.x > transform.position.x && p.transform.position.y < transform.position.y)
+        {
+            return PawnSprite.FacingDirection.SE;
+        }
+        else
+        {
+            return PawnSprite.FacingDirection.SW;
+        }
+    }
+
     public void SetFacing(Vector3 mouseWorldPos)
     {
         // going NE
         if (mouseWorldPos.x > transform.position.x && mouseWorldPos.y > transform.position.y)
         {
-            _facing = PawnSprite.FacingDirection.NE;
+            CurrentFacing = PawnSprite.FacingDirection.NE;
         }
         // going NW
         else if (mouseWorldPos.x < transform.position.x && mouseWorldPos.y > transform.position.y)
         {
-            _facing = PawnSprite.FacingDirection.NW;
+            CurrentFacing = PawnSprite.FacingDirection.NW;
         }
         // going SE
         else if (mouseWorldPos.x > transform.position.x && mouseWorldPos.y < transform.position.y)
         {
-            _facing = PawnSprite.FacingDirection.SE;
+            CurrentFacing = PawnSprite.FacingDirection.SE;
         }
         // going SW
         else
         {
-            _facing = PawnSprite.FacingDirection.SW;
+            CurrentFacing = PawnSprite.FacingDirection.SW;
         }
 
         _spriteController.UpdateFacingAndSpriteOrder(transform.position, mouseWorldPos, CurrentTile);
@@ -920,7 +952,7 @@ public class Pawn : MonoBehaviour
         // going NE
         if (transform.position.x > attackingPawn.transform.position.x && transform.position.y > attackingPawn.transform.position.y)
         {
-            if (_facing == PawnSprite.FacingDirection.NE)
+            if (CurrentFacing == PawnSprite.FacingDirection.NE)
             {
                 return true;
             }
@@ -928,7 +960,7 @@ public class Pawn : MonoBehaviour
         // going NW
         else if (transform.position.x < attackingPawn.transform.position.x && transform.position.y > attackingPawn.transform.position.y)
         {
-            if (_facing == PawnSprite.FacingDirection.NW)
+            if (CurrentFacing == PawnSprite.FacingDirection.NW)
             {
                 return true;
             }
@@ -936,7 +968,7 @@ public class Pawn : MonoBehaviour
         // going SE
         else if (transform.position.x > attackingPawn.transform.position.x && transform.position.y < attackingPawn.transform.position.y)
         {
-            if (_facing == PawnSprite.FacingDirection.SE)
+            if (CurrentFacing == PawnSprite.FacingDirection.SE)
             {
                 return true;
             }
@@ -944,7 +976,7 @@ public class Pawn : MonoBehaviour
         // going SW
         else
         {
-            if (_facing == PawnSprite.FacingDirection.SW)
+            if (CurrentFacing == PawnSprite.FacingDirection.SW)
             {
                 return true;
             }

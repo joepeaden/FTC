@@ -811,22 +811,17 @@ public class BattleManager : MonoBehaviour
         _turnNumber++;
         turnText.text = _turnNumber.ToString();
 
-        List<Pawn> pawnList = new();
-
-        foreach (Pawn p in GetFriendlyLivingPawns())
-        {
-            pawnList.Add(p);
-        }
+        _initiativeStack.Clear();
 
         foreach (Pawn p in _aiPlayer.GetEnemyLivingPawns())
         {
-            pawnList.Add(p);
+            _initiativeStack.Push(p);
         }
         
-        pawnList = pawnList.OrderBy(pawn => pawn.Initiative).ToList();
-
-        // this way the stack can be sorted properly 
-        _initiativeStack = new(pawnList);
+        foreach (Pawn p in GetFriendlyLivingPawns())
+        {
+            _initiativeStack.Push(p);
+        }
     }
 
     private void StartBattle()

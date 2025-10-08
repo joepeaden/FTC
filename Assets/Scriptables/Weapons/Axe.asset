@@ -18,11 +18,10 @@ MonoBehaviour:
   itemPrice: 10
   itemType: 2
   isDefault: 0
+  storeLevel: 0
   itemSprite: {fileID: 21300000, guid: 50e72420994aa5c44a30b1424e783f5b, type: 3}
-  weaponType: 3
   baseDamage: 3
   abilities:
-  - {fileID: 11400000, guid: 44abbab1a81a844698561ab662c7a5d9, type: 2}
   - {fileID: 11400000, guid: 112e003ba616a4dcc885314b0cd7ef48, type: 2}
   hitSound: {fileID: 8300000, guid: 58c7bb3c6e2d7ab4fa3caf53cda142a9, type: 3}
   killSound: {fileID: 8300000, guid: adc6d09285586c34895cca876ccd1897, type: 3}

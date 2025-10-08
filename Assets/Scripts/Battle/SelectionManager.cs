@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -255,8 +256,9 @@ public class SetFacingState : InputState
 
         if (TheSelectionManager.PlayerLeftClick)
         {
-            BattleManager.Instance.PawnActivated(TheSelectionManager.CurrentPawn);
-            return TheSelectionManager.idleState;
+            return TheSelectionManager.abilityState;
+            // BattleManager.Instance.PawnActivated(TheSelectionManager.CurrentPawn);
+            // return TheSelectionManager.idleState;
         }
 
         return this;
@@ -264,14 +266,22 @@ public class SetFacingState : InputState
 
     public override void Exit()
     {
-
-        //can put the UI here to show pointing - have ref to _selectedTile;    }
+        // Clear attack range highlights
+        if (TheSelectionManager.CurrentPawn != null && TheSelectionManager.CurrentPawn.GetWeaponAbilities().Any())
+        {
+            Ability ability = TheSelectionManager.CurrentPawn.GetBasicAttack();
+            TheSelectionManager.CurrentPawn.CurrentTile.HighlightTilesInRange(TheSelectionManager.CurrentPawn, ability.range, false, Tile.TileHighlightType.AttackRange);
+        }
     }
 
     public override void Enter()
     {
-
-        //can put the UI here to show pointing - have ref to _selectedTile;
+        // Highlight tiles in attack range
+        if (TheSelectionManager.CurrentPawn != null && TheSelectionManager.CurrentPawn.GetWeaponAbilities().Any())
+        {
+            Ability ability = TheSelectionManager.CurrentPawn.GetBasicAttack();
+            TheSelectionManager.CurrentPawn.CurrentTile.HighlightTilesInRange(TheSelectionManager.CurrentPawn, ability.range, true, Tile.TileHighlightType.AttackRange);
+        }
     }
 }
 
@@ -279,19 +289,19 @@ public class UsingAbilityState : InputState
 {
     public override InputState Update()
     {
-        if (TheSelectionManager.PlayerLeftClick)
-        {
-            if (HandleAttemptUseAbility())
-            {
-                return TheSelectionManager.idleState;
-            }
-        }
-        else if (TheSelectionManager.PlayerRightClick)
-        {
-            return TheSelectionManager.idleState;
-        }
+        // if (TheSelectionManager.PlayerLeftClick)
+        // {
+        //     if (HandleAttemptUseAbility())
+        //     {
+                return TheSelectionManager.inactiveState;
+        //     }
+        // }
+        // else if (TheSelectionManager.PlayerRightClick)
+        // {
+        //     return TheSelectionManager.idleState;
+        // }
 
-        return this;
+        // return this;
     }
 
     public override void Exit()
@@ -301,35 +311,47 @@ public class UsingAbilityState : InputState
 
     public override void Enter()
     {
-        TheSelectionManager.CurrentPawn.CurrentTile.HighlightTilesInRange(TheSelectionManager.CurrentPawn, Ability.SelectedAbility.range, true, Tile.TileHighlightType.AttackRange);
+        HandleAttemptUseAbility();
+        // TheSelectionManager.CurrentPawn.CurrentTile.HighlightTilesInRange(TheSelectionManager.CurrentPawn, Ability.SelectedAbility.range, true, Tile.TileHighlightType.AttackRange);
     }
 
     private void ClearAttackHighlight()
     {
-        TheSelectionManager.CurrentPawn.CurrentTile.HighlightTilesInRange(TheSelectionManager.CurrentPawn, TheSelectionManager.CurrentPawn.MoveRange, false, Tile.TileHighlightType.Move);
+        // TheSelectionManager.CurrentPawn.CurrentTile.HighlightTilesInRange(TheSelectionManager.CurrentPawn, TheSelectionManager.CurrentPawn.MoveRange, false, Tile.TileHighlightType.Move);
     }
 
     private bool HandleAttemptUseAbility()
     {
         Tile newTile = TheSelectionManager.ClickedTile;
-        if (newTile != null && !newTile.IsImpassable)
-        {
-            Pawn targetPawn = newTile.GetPawn();
-            if (Ability.SelectedAbility != null && targetPawn != null && TheSelectionManager.CurrentPawn.IsTargetInRange(targetPawn, Ability.SelectedAbility))
-            {
-                bool isAlly = targetPawn.OnPlayerTeam == TheSelectionManager.CurrentPawn.OnPlayerTeam;
+        // if (newTile != null && !newTile.IsImpassable)
+        // {
+        //     Pawn targetPawn = newTile.GetPawn();
+        //     if (Ability.SelectedAbility != null && targetPawn != null && TheSelectionManager.CurrentPawn.IsTargetInRange(targetPawn, Ability.SelectedAbility))
+        //     {
+        //         bool isAlly = targetPawn.OnPlayerTeam == TheSelectionManager.CurrentPawn.OnPlayerTeam;
 
-                // only allow support ability use on allies or attack ability use on enemies
-                // THIS NEEDS UPDATE IF WE ADD OTHER ABILITY TYPES OTHER THAN WEAPON OR SUPPORT
-                if (Ability.SelectedAbility is SupportAbilityData && isAlly ||
-                    Ability.SelectedAbility is WeaponAbilityData && !isAlly)
-                {
-                    Ability.SelectedAbility.Activate(TheSelectionManager.CurrentPawn, targetPawn);
-                    return true;
-                }
-            }
+        //         // only allow support ability use on allies or attack ability use on enemies
+        //         // THIS NEEDS UPDATE IF WE ADD OTHER ABILITY TYPES OTHER THAN WEAPON OR SUPPORT
+        //         if (Ability.SelectedAbility is SupportAbilityData && isAlly ||
+        //             Ability.SelectedAbility is WeaponAbilityData && !isAlly)
+        //         {
+
+
+        Pawn targetPawn = TheSelectionManager.CurrentPawn.GetPawnInAttackRange();
+
+        if (targetPawn != null)
+        {
+            Ability a = TheSelectionManager.CurrentPawn.GetBasicAttack();//GetWeaponAbilities()[0];
+            a.Activate(TheSelectionManager.CurrentPawn, targetPawn);
+            return true;
         }
-         
-        return false;
+        else
+        {
+            BattleManager.Instance.PawnActivated(TheSelectionManager.CurrentPawn);
+            return false;
+        }
+           // }
+            //     }
+            // }
     }
 }
