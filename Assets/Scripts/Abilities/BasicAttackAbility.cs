@@ -22,7 +22,7 @@ public class BasicAttackAbility : WeaponAbilityData
         }
         else
         {
-            activatedPawn.actionPoints -= apCost;
+            activatedPawn.ExpendActionPoints(apCost);
         }
         activatedPawn.Motivation -= motCost;
 

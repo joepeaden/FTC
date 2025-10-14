@@ -41,7 +41,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] GameObject winLoseUI;
     [SerializeField] private AIPlayer _aiPlayer;
     [SerializeField] private Button gameOverButton;
-    [SerializeField] private SelectionManager _selectionManager;
+    [SerializeField] private MyInputManager _selectionManager;
     [SerializeField] GameObject pawnPrefab;
     [SerializeField] Transform enemyParent;
     [SerializeField] Transform friendlyParent;
@@ -439,7 +439,7 @@ public class BattleManager : MonoBehaviour
                     tilesToHighlight.Clear();
                     tilesToHighlight.Add(targetTile);
                     
-                    if (Ability.SelectedAbility as WeaponAbilityData != null && ((WeaponAbilityData)Ability.SelectedAbility).attackStyle == WeaponAbilityData.AttackStyle.LShape)
+                    if (Ability.SelectedAbility as WeaponAbilityData != null && ((WeaponAbilityData)Ability.SelectedAbility).attackStyle == WeaponAbilityData.AttackStyle.LSweep)
                     {
                         tilesToHighlight.Add(_currentPawn.CurrentTile.GetClockwiseNextTile(targetTile));
                     }

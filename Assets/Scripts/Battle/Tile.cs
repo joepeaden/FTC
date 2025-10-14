@@ -368,6 +368,35 @@ public class Tile : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Highlights tiles in range using an attack pattern from a WeaponAbilityData.
+    /// This method applies the attack pattern to filter valid attack tiles based on facing direction.
+    /// </summary>
+    public void HighlightTilesInRange(Pawn subjectPawn, WeaponAbilityData weaponAbility, bool isHighlighting, TileHighlightType highlightType)
+    {
+        HashSet<Tile> validTiles = GetTilesInRange(subjectPawn, weaponAbility);
+        
+        // // Apply attack pattern filtering
+        // AttackPattern pattern = weaponAbility.GetAttackPattern();
+        // HashSet<Tile> validTiles = pattern.FilterTilesByPattern(this, subjectPawn.CurrentFacing, tilesInRange, weaponAbility.range);
+
+        Sprite spriteToUse = highlightType switch
+        {
+            TileHighlightType.Move => moveRangeSprite,
+            TileHighlightType.AttackRange => attackHighlightSprite,
+            _ => moveRangeSprite
+        };
+
+        foreach (Tile t in validTiles)
+        {
+            if (!t._isSelected) 
+            {
+                t.tileOverlayUI.enabled = isHighlighting;
+                t.tileOverlayUI.sprite = spriteToUse;
+            }
+        }
+    }
+
     public HashSet<Tile> GetTilesInRange(Pawn subjectPawn, int range)
     {
         var tilesInRange = new HashSet<Tile>();
@@ -389,6 +418,17 @@ public class Tile : MonoBehaviour
         }
 
         return tilesInRange;
+    }
+
+    /// <summary>
+    /// Gets tiles in range filtered by an attack pattern.
+    /// Use this when you need to determine valid attack targets based on facing direction.
+    /// </summary>
+    public HashSet<Tile> GetTilesInRange(Pawn subjectPawn, WeaponAbilityData weaponAbility)
+    {
+        HashSet<Tile> tilesInRange = GetTilesInRange(subjectPawn, weaponAbility.range);
+        AttackPattern pattern = weaponAbility.GetAttackPattern();
+        return pattern.FilterTilesByPattern(this, subjectPawn.CurrentFacing, tilesInRange, weaponAbility.range);
     }
 
     /// <summary>

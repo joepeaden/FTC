@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class SelectionManager : MonoBehaviour
+public class MyInputManager : MonoBehaviour
 {
     public Tile SelectedTile => _selectedTile;
     private Tile _selectedTile;
@@ -115,7 +115,7 @@ public class SelectionManager : MonoBehaviour
 
 public abstract class InputState
 {
-    public SelectionManager TheSelectionManager { get; set; }
+    public MyInputManager TheSelectionManager { get; set; }
 
     public abstract InputState Update();
 
@@ -157,7 +157,17 @@ public class IdleState : InputState
         }
         else if (TheSelectionManager.PlayerLeftClick && TheSelectionManager.CurrentPawn.HasMovesLeft() && TheSelectionManager.ClickedTile != null)
         {
-            return TheSelectionManager.movingState;
+            Pawn p = TheSelectionManager.ClickedTile.GetPawn();
+            if (p != null && p == TheSelectionManager.CurrentPawn)
+            {
+                // facing without a move still counts as one
+                TheSelectionManager.CurrentPawn.ExpendActionPoints(1);
+                return TheSelectionManager.facingState;
+            }
+            else
+            {
+                return TheSelectionManager.movingState;
+            }
         }
 
         return this;
@@ -220,6 +230,7 @@ public class MovingState : InputState
     {
         _movingDone = true;
         TheSelectionManager.CurrentPawn.OnMoved.RemoveListener(HandleMoveComplete);
+        TheSelectionManager.SetSelectedTile(TheSelectionManager.CurrentPawn.CurrentTile);
     }
     
     private void HandleAttemptToMove()
@@ -252,7 +263,11 @@ public class SetFacingState : InputState
         Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mouseWorldPos.z = 0f;
 
+        HighlightAttackRange(false);
+
         TheSelectionManager.CurrentPawn.SetFacing(mouseWorldPos);
+
+        HighlightAttackRange(true);
 
         if (TheSelectionManager.PlayerLeftClick)
         {
@@ -266,21 +281,20 @@ public class SetFacingState : InputState
 
     public override void Exit()
     {
-        // Clear attack range highlights
-        if (TheSelectionManager.CurrentPawn != null && TheSelectionManager.CurrentPawn.GetWeaponAbilities().Any())
-        {
-            Ability ability = TheSelectionManager.CurrentPawn.GetBasicAttack();
-            TheSelectionManager.CurrentPawn.CurrentTile.HighlightTilesInRange(TheSelectionManager.CurrentPawn, ability.range, false, Tile.TileHighlightType.AttackRange);
-        }
+        HighlightAttackRange(false);
     }
 
     public override void Enter()
     {
-        // Highlight tiles in attack range
+        ;
+    }
+
+    private void HighlightAttackRange(bool shouldHighlight)
+    {
         if (TheSelectionManager.CurrentPawn != null && TheSelectionManager.CurrentPawn.GetWeaponAbilities().Any())
         {
-            Ability ability = TheSelectionManager.CurrentPawn.GetBasicAttack();
-            TheSelectionManager.CurrentPawn.CurrentTile.HighlightTilesInRange(TheSelectionManager.CurrentPawn, ability.range, true, Tile.TileHighlightType.AttackRange);
+            WeaponAbilityData weaponAbility = TheSelectionManager.CurrentPawn.GetBasicAttack();
+            TheSelectionManager.CurrentPawn.CurrentTile.HighlightTilesInRange(TheSelectionManager.CurrentPawn, weaponAbility, shouldHighlight, Tile.TileHighlightType.AttackRange);
         }
     }
 }

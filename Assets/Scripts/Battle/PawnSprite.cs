@@ -56,15 +56,8 @@ public class PawnSprite : MonoBehaviour
 
     private ArmorItemData _currentHelm;
 
-    public FacingDirection _facingDirection;
-    public enum FacingDirection
-    {
-        NW,
-        NE,
-        SE,
-        SW
-    }
-
+    public Utils.FacingDirection _facingDirection;
+    
     #region UnityEvents
 
     private void Start()
@@ -143,16 +136,16 @@ public class PawnSprite : MonoBehaviour
 
         switch(_facingDirection)
         {
-            case FacingDirection.NW:
+            case Utils.FacingDirection.NW:
                 _anim.Play("ActivatedNW");
                 break;
-            case FacingDirection.NE:
+            case Utils.FacingDirection.NE:
                 _anim.Play("ActivatedNE");
                 break;
-            case FacingDirection.SW:
+            case Utils.FacingDirection.SW:
                 _anim.Play("ActivatedSW");
                 break;
-            case FacingDirection.SE:
+            case Utils.FacingDirection.SE:
                 _anim.Play("ActivatedSE");
                 break;
 
@@ -174,25 +167,25 @@ public class PawnSprite : MonoBehaviour
     {
         switch (_facingDirection)
         {
-            case FacingDirection.NE:
+            case Utils.FacingDirection.NE:
                 _eyesSpriteRend.sprite = _blankSprite;
                 _hairSpriteRend.sprite = _NEHair;
                 _fhairSpriteRend.sprite = _NEFacialHair;
                 _browSpriteRend.sprite = _NEBrow;
                 break;
-            case FacingDirection.SE:
+            case Utils.FacingDirection.SE:
                 _eyesSpriteRend.sprite = _SEFace;
                 _hairSpriteRend.sprite = _SEHair;
                 _fhairSpriteRend.sprite = _SEFacialHair;
                 _browSpriteRend.sprite = _SEBrow;
                 break;
-            case FacingDirection.SW:
+            case Utils.FacingDirection.SW:
                 _eyesSpriteRend.sprite = _SWFace;
                 _hairSpriteRend.sprite = _SWHair;
                 _fhairSpriteRend.sprite = _SWFacialHair;
                 _browSpriteRend.sprite = _SWBrow;
                 break;
-            case FacingDirection.NW:
+            case Utils.FacingDirection.NW:
                 _eyesSpriteRend.sprite = _blankSprite;
                 _hairSpriteRend.sprite = _NWHair;
                 _fhairSpriteRend.sprite = _NWFacialHair;
@@ -226,54 +219,50 @@ public class PawnSprite : MonoBehaviour
             totalSpriteOrder = -(int)(currentTile.transform.position.y * 20);
         }
 
-        // going NE
-        if (facingPosition.x > originPosition.x && facingPosition.y > originPosition.y)
+        _facingDirection = Utils.GetDirection(originPosition, facingPosition);
+
+        switch (_facingDirection)
         {
-            _facingDirection = FacingDirection.NE;
-            SetNewFacingAnimParam("NE");
-            if (_currentHelm != null)
-            {
-                _helmSpriteRend.sprite = _currentHelm.NESprite;
-            }
-            _bodySpriteRend.sortingOrder = totalSpriteOrder + 2;
-            UpdateFace(totalSpriteOrder + 0);
-        }
-        // going NW
-        else if (facingPosition.x < originPosition.x && facingPosition.y > originPosition.y)
-        {
-            _facingDirection = FacingDirection.NW;
-            SetNewFacingAnimParam("NW");
-            if (_currentHelm != null)
-            {
-                _helmSpriteRend.sprite = _currentHelm.NWSprite;
-            }
-            _bodySpriteRend.sortingOrder = totalSpriteOrder + 2;
-            UpdateFace(totalSpriteOrder + 0);
-        }
-        // going SE
-        else if (facingPosition.x > originPosition.x && facingPosition.y < originPosition.y)
-        {
-            _facingDirection = FacingDirection.SE;
-            SetNewFacingAnimParam("SE");
-            if (_currentHelm != null)
-            {
-                _helmSpriteRend.sprite = _currentHelm.SESprite;
-            }
-            _bodySpriteRend.sortingOrder = totalSpriteOrder + 0;
-            UpdateFace(totalSpriteOrder + 2);
-        }
-        // going SW
-        else
-        {
-            _facingDirection = FacingDirection.SW;
+            case Utils.FacingDirection.NE:
+                SetNewFacingAnimParam("NE");
+                if (_currentHelm != null)
+                {
+                    _helmSpriteRend.sprite = _currentHelm.NESprite;
+                }
+                _bodySpriteRend.sortingOrder = totalSpriteOrder + 2;
+                UpdateFace(totalSpriteOrder + 0);
+                break;
+            case Utils.FacingDirection.NW:
+                SetNewFacingAnimParam("NW");
+                if (_currentHelm != null)
+                {
+                    _helmSpriteRend.sprite = _currentHelm.NWSprite;
+                }
+                _bodySpriteRend.sortingOrder = totalSpriteOrder + 2;
+                UpdateFace(totalSpriteOrder + 0);
+                break;
+            case Utils.FacingDirection.SE:
+                SetNewFacingAnimParam("SE");
+                if (_currentHelm != null)
+                {
+                    _helmSpriteRend.sprite = _currentHelm.SESprite;
+                }
+                _bodySpriteRend.sortingOrder = totalSpriteOrder + 0;
+                UpdateFace(totalSpriteOrder + 2);   
+                break;
+            case Utils.FacingDirection.SW:
             SetNewFacingAnimParam("SW");
-            if (_currentHelm != null)
-            {
-                _helmSpriteRend.sprite = _currentHelm.SWSprite;
-            }
-            _bodySpriteRend.sortingOrder = totalSpriteOrder + 0;
-            UpdateFace(totalSpriteOrder + 2);
+                if (_currentHelm != null)
+                {
+                    _helmSpriteRend.sprite = _currentHelm.SWSprite;
+                }
+                _bodySpriteRend.sortingOrder = totalSpriteOrder + 0;
+                UpdateFace(totalSpriteOrder + 2);
+                break;
+            default:
+                break;
         }
+
 
         _headSpriteRend.sortingOrder = 1 + totalSpriteOrder;
         _weaponSpriteRend.sortingOrder = totalSpriteOrder;
@@ -310,18 +299,18 @@ public class PawnSprite : MonoBehaviour
     {
         switch (_facingDirection)
         {
-            case FacingDirection.NW:
+            case Utils.FacingDirection.NW:
                 _anim.Play("WalkNW");
                 break;
-            case FacingDirection.NE:
+            case Utils.FacingDirection.NE:
                 _anim.Play("WalkNE");
                 break;
 
-            case FacingDirection.SE:
+            case Utils.FacingDirection.SE:
                 _anim.Play("WalkSE");
                 break;
 
-            case FacingDirection.SW:
+            case Utils.FacingDirection.SW:
                 _anim.Play("WalkSW");
                 break;
         }
@@ -331,18 +320,18 @@ public class PawnSprite : MonoBehaviour
     {
         switch (_facingDirection)
         {
-            case FacingDirection.NW:
+            case Utils.FacingDirection.NW:
                 _anim.Play("IdleNW", 0, Random.Range(0f, 1f));
                 break;
-            case FacingDirection.NE:
+            case Utils.FacingDirection.NE:
                 _anim.Play("IdleNE", 0, Random.Range(0f, 1f));
                 break;
 
-            case FacingDirection.SE:
+            case Utils.FacingDirection.SE:
                 _anim.Play("IdleSE", 0, Random.Range(0f, 1f));
                 break;
 
-            case FacingDirection.SW:
+            case Utils.FacingDirection.SW:
                 _anim.Play("IdleSW", 0, Random.Range(0f, 1f));
                 break;
         }
@@ -350,11 +339,11 @@ public class PawnSprite : MonoBehaviour
 
     public void Die()
     {
-        if (_facingDirection == FacingDirection.SE)
+        if (_facingDirection == Utils.FacingDirection.SE)
         {
             _eyesSpriteRend.sprite = _SEDeadFace;
         }
-        else if (_facingDirection == FacingDirection.SW)
+        else if (_facingDirection == Utils.FacingDirection.SW)
         {
             _eyesSpriteRend.sprite = _SWDeadFace;
         }
@@ -375,16 +364,16 @@ public class PawnSprite : MonoBehaviour
             StartCoroutine(PlayArmorHitFXAfterDelay(0f));
             switch (_facingDirection)
             {
-                case FacingDirection.NW:
+                case Utils.FacingDirection.NW:
                     animationString = "GetHitARMRNW";
                     break;
-                case FacingDirection.NE:
+                case Utils.FacingDirection.NE:
                     animationString = "GetHitARMRNE";
                     break;
-                case FacingDirection.SE:
+                case Utils.FacingDirection.SE:
                     animationString = "GetHitARMRSE";
                     break;
-                case FacingDirection.SW:
+                case Utils.FacingDirection.SW:
                     animationString = "GetHitARMRSW";
                     break;
             }
@@ -394,16 +383,16 @@ public class PawnSprite : MonoBehaviour
             StartCoroutine(PlayBloodSpurtAfterDelay(0f));
             switch (_facingDirection)
             {
-                case FacingDirection.NW:
+                case Utils.FacingDirection.NW:
                     animationString = "GetHitHPNW";
                     break;
-                case FacingDirection.NE:
+                case Utils.FacingDirection.NE:
                     animationString = "GetHitHPNE";
                     break;
-                case FacingDirection.SE:
+                case Utils.FacingDirection.SE:
                     animationString = "GetHitHPSE";
                     break;
-                case FacingDirection.SW:
+                case Utils.FacingDirection.SW:
                     animationString = "GetHitHPSW";
                     break;
             }
@@ -436,16 +425,16 @@ public class PawnSprite : MonoBehaviour
     {
         switch (_facingDirection)
         {
-            case FacingDirection.NW:
+            case Utils.FacingDirection.NW:
                 StartCoroutine(PlayAnimationAfterDelay(.2f, "DodgeNW"));
                 break;
-            case FacingDirection.NE:
+            case Utils.FacingDirection.NE:
                 StartCoroutine(PlayAnimationAfterDelay(.2f, "DodgeNE"));
                 break;
-            case FacingDirection.SE:
+            case Utils.FacingDirection.SE:
                 StartCoroutine(PlayAnimationAfterDelay(.2f, "DodgeSE"));
                 break;
-            case FacingDirection.SW:
+            case Utils.FacingDirection.SW:
                 StartCoroutine(PlayAnimationAfterDelay(.2f, "DodgeSW"));
                 break;
         }

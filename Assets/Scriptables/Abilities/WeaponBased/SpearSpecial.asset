@@ -22,4 +22,4 @@ MonoBehaviour:
   critChanceMod: 2
   rangeForExtraDamage: 0
   bonusDmg: 0
-  attackStyle: 0
+  attackStyle: 4

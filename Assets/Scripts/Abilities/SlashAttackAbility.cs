@@ -19,7 +19,7 @@ public class SlashAttackAbility : WeaponAbilityData
         List<Pawn> targetPawns = new();
         targetPawns.Add(primaryTargetPawn);
 
-        if (attackStyle == WeaponAbilityData.AttackStyle.LShape)
+        if (attackStyle == WeaponAbilityData.AttackStyle.LSweep)
         {
             Tile clockwiseNextTile = activatedPawn.CurrentTile.GetClockwiseNextTile(primaryTargetPawn.CurrentTile);
             if (clockwiseNextTile.GetPawn())
@@ -28,7 +28,8 @@ public class SlashAttackAbility : WeaponAbilityData
             }
         }
 
-        activatedPawn.actionPoints -= apCost;
+        
+        activatedPawn.ExpendActionPoints(apCost);
         activatedPawn.Motivation -= motCost;
 
         foreach (Pawn targetPawn in targetPawns)

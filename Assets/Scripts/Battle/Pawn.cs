@@ -38,7 +38,7 @@ public class Pawn : MonoBehaviour
     public int ArmorPoints => _armorPoints;
     private int _armorPoints;
 
-    public int actionPoints;
+    public int actionPoints { get; private set; }
 
     private bool _hasAttacked;
     private bool _hasMoved;
@@ -86,7 +86,7 @@ public class Pawn : MonoBehaviour
 
     private bool _isMoving;
     private Vector3 _lastPosition;
-    public PawnSprite.FacingDirection CurrentFacing;
+    public Utils.FacingDirection CurrentFacing;
 
     // if a pawn is guarding this pawn using an ability for example then this
     // is the reference for that guy. This is set by the HonorProtect class when
@@ -376,7 +376,7 @@ public class Pawn : MonoBehaviour
     {
         List<Pawn> adjEnemies = GetAdjacentEnemies();
 
-        Pawn pawnToReturn = adjEnemies.Where(pawn => GetDirectionOfTargetPawn(pawn) == CurrentFacing).FirstOrDefault();
+        Pawn pawnToReturn = adjEnemies.Where(pawn => Utils.GetDirection(transform.position, pawn.transform.position) == CurrentFacing).FirstOrDefault();
         return pawnToReturn;
     }
 
@@ -744,6 +744,12 @@ public class Pawn : MonoBehaviour
         OnHPChanged.Invoke();
     }
 
+    public void ExpendActionPoints(int count)
+    {
+        // don't go below zero
+        actionPoints -= actionPoints >= count ? count : actionPoints;
+    }
+
     #region Movement
 
     /// <summary>
@@ -783,12 +789,8 @@ public class Pawn : MonoBehaviour
         {
             return;
         }
-        
-        // the ap adjustments may need to happen as the pawn enters each tile. May be best to
-        // process things one tile at a time if implementing varying AP costs, etc. But not now.
-        // if doing that later, make sure to update the pathfinder code too.
 
-        actionPoints -= 1;
+        ExpendActionPoints(1);
 
         StartCoroutine(TryMoveToTileCoroutine(targetTile));
     }
@@ -895,94 +897,20 @@ public class Pawn : MonoBehaviour
         UpdateFreeAttacksPassive();
         _isMoving = false;
     }
-
-    public PawnSprite.FacingDirection GetDirectionOfTargetPawn(Pawn p)
-    {
-        if (p.transform.position.x > transform.position.x && p.transform.position.y > transform.position.y)
-        {
-            return PawnSprite.FacingDirection.NE;
-        }
-        else if (p.transform.position.x < transform.position.x && p.transform.position.y > transform.position.y)
-        {
-            return PawnSprite.FacingDirection.NW;
-        }
-        else if (p.transform.position.x > transform.position.x && p.transform.position.y < transform.position.y)
-        {
-            return PawnSprite.FacingDirection.SE;
-        }
-        else
-        {
-            return PawnSprite.FacingDirection.SW;
-        }
-    }
-
+    
     public void SetFacing(Vector3 mouseWorldPos)
     {
-        // going NE
-        if (mouseWorldPos.x > transform.position.x && mouseWorldPos.y > transform.position.y)
-        {
-            CurrentFacing = PawnSprite.FacingDirection.NE;
-        }
-        // going NW
-        else if (mouseWorldPos.x < transform.position.x && mouseWorldPos.y > transform.position.y)
-        {
-            CurrentFacing = PawnSprite.FacingDirection.NW;
-        }
-        // going SE
-        else if (mouseWorldPos.x > transform.position.x && mouseWorldPos.y < transform.position.y)
-        {
-            CurrentFacing = PawnSprite.FacingDirection.SE;
-        }
-        // going SW
-        else
-        {
-            CurrentFacing = PawnSprite.FacingDirection.SW;
-        }
+        // this may already be true - but in the case we did not move from one tile to another and only set facing, this still counts as a move.
+        _hasMoved = true;
 
+        CurrentFacing = Utils.GetDirection(transform.position, mouseWorldPos);
         _spriteController.UpdateFacingAndSpriteOrder(transform.position, mouseWorldPos, CurrentTile);
     }
 
     public bool IsFlankedBy(Pawn attackingPawn)
     {
-
-        // this is to check if this pawn is being flanked by the parameter pawn (attackingPawn)
-
-        // DRY again here - the position comparison is same as above.
-
-        // going NE
-        if (transform.position.x > attackingPawn.transform.position.x && transform.position.y > attackingPawn.transform.position.y)
-        {
-            if (CurrentFacing == PawnSprite.FacingDirection.NE)
-            {
-                return true;
-            }
-        }
-        // going NW
-        else if (transform.position.x < attackingPawn.transform.position.x && transform.position.y > attackingPawn.transform.position.y)
-        {
-            if (CurrentFacing == PawnSprite.FacingDirection.NW)
-            {
-                return true;
-            }
-        }
-        // going SE
-        else if (transform.position.x > attackingPawn.transform.position.x && transform.position.y < attackingPawn.transform.position.y)
-        {
-            if (CurrentFacing == PawnSprite.FacingDirection.SE)
-            {
-                return true;
-            }
-        }
-        // going SW
-        else
-        {
-            if (CurrentFacing == PawnSprite.FacingDirection.SW)
-            {
-                return true;
-            }
-        }
-
-        return false;
+        Utils.FacingDirection direction = Utils.GetDirection(attackingPawn.transform.position, transform.position);
+        return CurrentFacing == direction;
     }
 
     public void UpdateFreeAttacksPassive()
