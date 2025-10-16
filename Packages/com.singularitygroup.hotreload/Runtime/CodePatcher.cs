@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -32,15 +33,17 @@ namespace SingularityGroup.HotReload {
         public List<SField> addedFields = new List<SField>();
         public readonly List<SMethod> patchedSMethods = new List<SMethod>();
         public bool inspectorModified;
+        public bool inspectorFieldAdded;
         public readonly List<Tuple<SMethod, string>> patchFailures = new List<Tuple<SMethod, string>>();
+        public readonly List<string> patchExceptions = new List<string>();
     }
 
     class FieldHandler {
-        public readonly Action<Type, FieldInfo> storeField;
+        public readonly Func<Type, FieldInfo, bool> storeField;
         public readonly Action<Type, FieldInfo, FieldInfo> registerInspectorFieldAttributes;
         public readonly Func<Type, string, bool> hideField;
 
-        public FieldHandler(Action<Type, FieldInfo> storeField, Func<Type, string, bool> hideField, Action<Type, FieldInfo, FieldInfo> registerInspectorFieldAttributes) {
+        public FieldHandler(Func<Type, FieldInfo, bool> storeField, Func<Type, string, bool> hideField, Action<Type, FieldInfo, FieldInfo> registerInspectorFieldAttributes) {
             this.storeField = storeField;
             this.hideField = hideField;
             this.registerInspectorFieldAttributes = registerInspectorFieldAttributes;
@@ -62,6 +65,7 @@ namespace SingularityGroup.HotReload {
         SymbolResolver symbolResolver;
         readonly string tmpDir;
         public FieldHandler fieldHandler;
+        public bool debuggerCompatibilityEnabled;
         
         CodePatcher() {
             pendingPatches = new List<MethodPatchResponse>();
@@ -228,7 +232,7 @@ namespace SingularityGroup.HotReload {
                         { StatKey.PatchId, patch.patchId },
                         { StatKey.Detailed_Exception, ex.ToString() },
                     }).Forget();
-                    Log.Warning("Failed to apply patch with id: {0}\n{1}", patch.patchId, ex);
+                    result.patchExceptions.Add($"Edit requires full recompile to apply: Encountered exception when applying a patch.\nCommon causes: editing code that failed to patch previously, an unsupported change, or a real bug in Hot Reload.\nIf you think this is a bug, please report the issue on Discord and include a code-snippet before/after.\nException: {ex}");
                 }
             }
         }
@@ -411,7 +415,7 @@ namespace SingularityGroup.HotReload {
                 try {
                     var declaringType = SymbolResolver.Resolve(sField.declaringType);
                     var field = SymbolResolver.Resolve(sField);
-                    fieldHandler?.storeField?.Invoke(declaringType, field);
+                    result.inspectorFieldAdded = fieldHandler?.storeField?.Invoke(declaringType, field) ?? false;
                     result.inspectorModified = true;
                 } catch (Exception e) {
                     RequestHelper.RequestEditorEventWithRetry(new Stat(StatSource.Client, StatLevel.Error, StatFeature.Patching, StatEventType.AddInspectorField), new EditorExtraData {
@@ -459,14 +463,19 @@ namespace SingularityGroup.HotReload {
                 var patchMethod = SymbolResolver.Resolve(sPatchMethod);
                 var start = DateTime.UtcNow;
                 var state = TryResolveMethod(sOriginalMethod, patchMethod);
+                if (Debugger.IsAttached && !debuggerCompatibilityEnabled) {
+                    RequestHelper.RequestEditorEventWithRetry(new Stat(StatSource.Client, StatLevel.Error, StatFeature.Patching, StatEventType.DebuggerAttached), new EditorExtraData {
+                        { StatKey.PatchId, patchId },
+                    }).Forget();
+                    return "Patching methods is not allowed while the Debugger is attached. You can change this behavior in settings if Hot Reload is compatible with the debugger you're running.";
+                }
 
                 if (DateTime.UtcNow - start > TimeSpan.FromMilliseconds(500)) {
                     Log.Info("Hot Reload apply took {0}", (DateTime.UtcNow - start).TotalMilliseconds);
                 }
 
                 if(state.match == null) {
-                    var error = "Method mismatch: {0}, patch: {1}. This can indicate a bug in Hot Reload. Please send us a reproduce (code before/after), and we'll get it fixed for you";
-                    Log.Warning(error, sOriginalMethod.simpleName, patchMethod.Name);
+                    var error = "Edit requires full recompile to apply: Method mismatch: {0}, patch: {1}. \nCommon causes: editing code that failed to patch previously, an unsupported change, or a real bug in Hot Reload.\nIf you think this is a bug, please report the issue on Discord and include a code-snippet before/after.";
                     RequestHelper.RequestEditorEventWithRetry(new Stat(StatSource.Client, StatLevel.Error, StatFeature.Patching, StatEventType.MethodMismatch), new EditorExtraData {
                         { StatKey.PatchId, patchId },
                     }).Forget();
@@ -609,11 +618,7 @@ namespace SingularityGroup.HotReload {
         }
     
         string HandleMethodPatchFailure(SMethod method, Exception exception) {
-            var err = $"Failed to apply patch for method {method.displayName} in assembly {method.assemblyName}\n{exception}"
-                + $"\n\n{method.assemblyName}\n{method.displayName}";
-
-            Log.Warning(err);
-            return err;
+            return $"Edit requires full recompile to apply: Failed to apply patch for method {method.displayName} in assembly {method.assemblyName}.\nCommon causes: editing code that failed to patch previously, an unsupported change, or a real bug in Hot Reload.\nIf you think this is a bug, please report the issue on Discord and include a code-snippet before/after.\nException: {exception}";
         }
 
         void EnsureSymbolResolver() {
