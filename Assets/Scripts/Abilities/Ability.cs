@@ -24,6 +24,8 @@ public class Ability : ScriptableObject
     /// </summary>
     /// <remarks>
     /// I'm not sure about this, but I think it's a better place than the BattleManager.
+    /// 
+    /// Bad static! Bad!
     /// </remarks>
     public static Ability SelectedAbility;
 

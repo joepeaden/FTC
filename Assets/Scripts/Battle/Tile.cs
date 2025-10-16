@@ -17,8 +17,8 @@ public class Tile : MonoBehaviour
 
     public const int BASE_AP_TO_TRAVERSE = 2;
 
-    public static UnityEvent<Tile> OnTileHoverStart = new();
-    public static UnityEvent<Tile> OnTileHoverEnd = new();
+    public UnityEvent<Tile> OnTileHoverStart = new();
+    public UnityEvent<Tile> OnTileHoverEnd = new();
     private static UnityEvent OnTileSelectChange = new();
 
     [SerializeField] private List<Sprite> tileSprites = new();
@@ -76,7 +76,7 @@ public class Tile : MonoBehaviour
 
     private void ResetTileVisuals()
     {
-        tileOverlayUI.enabled = false;
+        SetTileHighlight(false);
     }
 
     public void SetImpassable(bool isImpassable)
@@ -304,10 +304,14 @@ public class Tile : MonoBehaviour
         return !IsImpassable && canTraverse;
     }
 
-    public void HighlightTileAsActive()
+    public void SetTileHighlight(bool enabled, Sprite sprite = null)
     {
-        tileOverlayUI.enabled = true;
-        tileOverlayUI.sprite = selectionSprite;
+        tileOverlayUI.enabled = enabled;
+
+        if (sprite != null)
+        {
+            tileOverlayUI.sprite = sprite;
+        }
     }
 
     public void SetSelected(bool isSelected)
@@ -317,38 +321,18 @@ public class Tile : MonoBehaviour
         if (_isSelected)
         {
             OnTileSelectChange.Invoke();
-            HighlightTileAsActive();
+            SetTileHighlight(true, selectionSprite);
         }
         else
         {
-            tileOverlayUI.enabled = false;
-        }
-    }
-
-    public void HighlightForAction()
-    {
-        tileOverlayUI.enabled = true;
-        tileOverlayUI.sprite = attackTargetHighlightSprite;
-    }
-
-    public void ClearActionHighlight()
-    {
-        if (Ability.SelectedAbility != null && BattleManager.Instance.CurrentPawn.CurrentTile.IsInRangeOf(this, Ability.SelectedAbility.range))
-        {
-            tileOverlayUI.sprite = attackHighlightSprite;
-        }
-        else if (BattleManager.Instance.CurrentPawn.HasMovesLeft() && BattleManager.Instance.CurrentPawn.CurrentTile.IsInRangeOf(this, BattleManager.Instance.CurrentPawn.MoveRange))
-        {
-            tileOverlayUI.sprite = moveRangeSprite;
-        }
-        else
-        {
-            tileOverlayUI.enabled = false;
+            SetTileHighlight(false);
         }
     }
 
     public void HighlightTilesInRange(Pawn subjectPawn, int range, bool isHighlighting, TileHighlightType highlightType)
     {
+        // is this attack parameter really necessarY? I think it just uses the other overload.
+
         HashSet<Tile> tilesInRange = GetTilesInRange(subjectPawn, range);
 
         Sprite spriteToUse = highlightType switch
@@ -362,8 +346,7 @@ public class Tile : MonoBehaviour
         {
             if (!t._isSelected) 
             {
-                t.tileOverlayUI.enabled = isHighlighting;
-                t.tileOverlayUI.sprite = spriteToUse;
+                t.SetTileHighlight(isHighlighting, spriteToUse);
             }
         }
     }
@@ -391,8 +374,7 @@ public class Tile : MonoBehaviour
         {
             if (!t._isSelected) 
             {
-                t.tileOverlayUI.enabled = isHighlighting;
-                t.tileOverlayUI.sprite = spriteToUse;
+                t.SetTileHighlight(isHighlighting, spriteToUse);
             }
         }
     }
@@ -449,13 +431,13 @@ public class Tile : MonoBehaviour
 
     public void OnMouseEnter()
     {
-        tileHoverUI.enabled = true;
+        // tileHoverUI.enabled = true;
         OnTileHoverStart.Invoke(this);
     }
 
     public void OnMouseExit()
     {
-        tileHoverUI.enabled = false;
+        // tileHoverUI.enabled = false;
         OnTileHoverEnd.Invoke(this);
     }
 

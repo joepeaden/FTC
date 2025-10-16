@@ -1,14 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using UnityEngine.Events;
-using System.Threading.Tasks;
-using Unity.VisualScripting;
-using JetBrains.Annotations;
 
 /// <summary>
 /// Manages the Battle scene.
@@ -91,14 +86,10 @@ public class BattleManager : MonoBehaviour
 
     public Pawn CurrentPawn => _currentPawn;
     private Pawn _currentPawn;
-    private Tile _hoveredTile;
 
     private Stack<Pawn> _initiativeStack = new ();
 
-    public int TurnNumber => _turnNumber;
     private int _turnNumber = -1;
-
-    private List<Tile> tilesToHighlight = new();
 
     private List<(string, Color)> pendingTextNotifs = new();
 
@@ -123,7 +114,7 @@ public class BattleManager : MonoBehaviour
                 miniStats.SetData(newPawn);
             }
 
-            foreach(GameCharacter character in GameManager.Instance.GetEnemiesForContract())
+            foreach (GameCharacter character in GameManager.Instance.GetEnemiesForContract())
             {
                 Pawn newPawn = Instantiate(pawnPrefab, enemyParent).GetComponent<Pawn>();
                 newPawn.SetCharacter(character);
@@ -139,9 +130,6 @@ public class BattleManager : MonoBehaviour
         {
             StartCoroutine(TestModeOnDataLoadedStart());
         }
-
-        Tile.OnTileHoverStart.AddListener(HandleTileHoverStart);
-        Tile.OnTileHoverEnd.AddListener(HandleTileHoverEnd);
 
         // UI
         _endTurnButton.onClick.AddListener(EndTurn);
@@ -178,6 +166,8 @@ public class BattleManager : MonoBehaviour
 
     private void Start()
     {
+        GridGenerator.Instance.AddTileHoverListeners(HandleTileHoverStart, HandleTileHoverEnd);
+
         if (GameManager.Instance != null)
         {
             _battleResult = BattleResult.Undecided;
@@ -187,35 +177,22 @@ public class BattleManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            //ToggleInstructions();
-        }
-
         if (Input.GetKeyDown(KeyCode.F) && CurrentPawn.OnPlayerTeam)
         {
             EndTurn();
         }
 
-        // a better way to do this, for sure, would be on click method in tile 
-        //if (Input.GetMouseButtonDown(0) && _hoveredTile != null && CurrentPawn != null && CurrentPawn.OnPlayerTeam && CurrentAction == null)
-        //{
-        //    _selectionManager.SetSelectedTile(CurrentPawn.CurrentTile);
-        //}
-
         if (Input.GetMouseButtonDown(1))
         {
             ClearSelectedAction();
-            //_selectionManager.ClearSelectedTile();
         }
 
     }
 
     private void OnDestroy()
     {
-        Tile.OnTileHoverStart.RemoveListener(HandleTileHoverStart);
-        Tile.OnTileHoverEnd.RemoveListener(HandleTileHoverEnd);
-
+        GridGenerator.Instance.RemoveTileHoverListeners(HandleTileHoverStart, HandleTileHoverEnd);
+        
         // UI
         _endTurnButton.onClick.RemoveListener(EndTurn);
         gameOverButton.onClick.RemoveListener(ExitBattle);
@@ -427,57 +404,33 @@ public class BattleManager : MonoBehaviour
 
     public void HandleTileHoverStart(Tile targetTile)
     {
-        _hoveredTile = targetTile;
         Pawn hoveredPawn = targetTile.GetPawn();
 
-        if (_selectionManager.SelectedTile != null)
+        if (_currentPawn != null)
         {
-            if (_currentPawn != null)
-            {
-                if (Ability.SelectedAbility != null && targetTile.GetTileDistance(_currentPawn.CurrentTile) <= Ability.SelectedAbility.range)
-                {
-                    tilesToHighlight.Clear();
-                    tilesToHighlight.Add(targetTile);
-                    
-                    if (Ability.SelectedAbility as WeaponAbilityData != null && ((WeaponAbilityData)Ability.SelectedAbility).attackStyle == WeaponAbilityData.AttackStyle.LSweep)
-                    {
-                        tilesToHighlight.Add(_currentPawn.CurrentTile.GetClockwiseNextTile(targetTile));
-                    }
-
-                    foreach (Tile t in tilesToHighlight)
-                    {
-                        t.HighlightForAction();
-                    }
-
-                    UpdateUIForPawn(_currentPawn);
-                }
-            }
+            UpdateUIForPawn(_currentPawn);
         }
+
+        _selectionManager.UpdateTileHovered(targetTile);
 
         if (hoveredPawn != null)
         {
-            StopCoroutine(OpenTooltipAfterPause());
-            StartCoroutine(OpenTooltipAfterPause());
+            StopCoroutine(OpenTooltipAfterPause(hoveredPawn));
+            StartCoroutine(OpenTooltipAfterPause(hoveredPawn));
         }
     }
 
-    private IEnumerator OpenTooltipAfterPause()
+    private IEnumerator OpenTooltipAfterPause(Pawn hoveredPawn)
     {
         yield return new WaitForSeconds(.25f);
-        ShowTooltipForPawn();
+        ShowTooltipForPawn(hoveredPawn);
     }
 
     public void HandleTileHoverEnd(Tile t)
     {
         HideHitChance();
 
-        foreach (Tile highlightedTile in tilesToHighlight)
-        {
-            highlightedTile.ClearActionHighlight();
-        }
-        tilesToHighlight.Clear();
-
-        _hoveredTile = null;
+        _selectionManager.HoveredTile = null;
     }
 
     public void HideHitChance()
@@ -486,46 +439,14 @@ public class BattleManager : MonoBehaviour
         charTooltip.Hide();
     }
 
-    public void ShowTooltipForPawn()
+    public void ShowTooltipForPawn(Pawn hoveredPawn)
     {
-        if (_hoveredTile == null)
-        {
-            return;
-        }
-
-        Pawn hoveredPawn = _hoveredTile.GetPawn();
         if (hoveredPawn == null)
         {
             return;
         }
 
         charTooltip.SetPawn(hoveredPawn);
-
-        //if ((ActionData)Ability.SelectedAbility.GetData() as ActionData)
-        //{
-        //    if (Ability.SelectedAbility != null && CurrentPawn.OnPlayerTeam && CurrentPawn.IsTargetInRange(hoveredPawn, Ability.SelectedAbility))
-        //    {
-        //        float chance = CurrentPawn.GetHitChance(hoveredPawn);
-
-        //        ActionData attackAction = ((ActionData)Ability.SelectedAbility.GetData());
-
-        //        int arDamage;
-        //        int hpDamage;
-        //        if (hoveredPawn.ArmorPoints > 0)
-        //        {
-        //            arDamage = CurrentPawn.GameChar.GetWeaponArmorDamageForAction(attackAction);
-        //            hpDamage = CurrentPawn.GameChar.GetWeaponPenetrationDamageForAction(attackAction);
-        //        }
-        //        else
-        //        {
-        //            arDamage = 0;
-        //            hpDamage = CurrentPawn.GameChar.GetWeaponDamageForAction(attackAction);
-        //        }
-
-        //        // have to account for armor too
-        //        charTooltip.ShowHitPreview(chance, hpDamage, arDamage);
-        //    }
-        //}
     }
 
     #endregion
@@ -641,19 +562,9 @@ public class BattleManager : MonoBehaviour
 
         if (Ability.SelectedAbility != null)
         {
-            //CurrentPawn.CurrentTile.HighlightTilesInRange(_currentAction.range + 1, false, Tile.TileHighlightType.AttackRange);
-
             _selectionManager.CurrentAbility = null;    
             Ability.SelectedAbility = null;
-
-            //if (CurrentPawn.HasActionsRemaining())
-            //{
-            //    CurrentPawn.CurrentTile.HighlightTilesInRange(_currentPawn.MoveRange+1, true, Tile.TileHighlightType.Move);
-            //}
         }
-
-        ShowTooltipForPawn();
-        // UpdateUIForPawn(_currentPawn);
     }
 
     private void HandleActionClicked(Ability action)
@@ -666,21 +577,12 @@ public class BattleManager : MonoBehaviour
         Ability.SelectedAbility = action;
         _selectionManager.CurrentAbility = action;
 
-        //_selectionManager.SetSelectedTile(CurrentPawn.CurrentTile);s
-
-        //CurrentPawn.CurrentTile.HighlightTilesInRange(_currentPawn.MoveRange+1, false, Tile.TileHighlightType.Move);
-        //CurrentPawn.CurrentTile.HighlightTilesInRange(_currentAction.range+1, true, Tile.TileHighlightType.AttackRange);
-
-        //OnActionUpdated.Invoke(action);
-
-        ShowTooltipForPawn();
         UpdateUIForPawn(_currentPawn);
     }
 
     private void EndTurn()
     {
-        Pawn activePawn = _selectionManager.SelectedTile.GetPawn();
-        PawnFinished(activePawn);
+        PawnFinished(_currentPawn);
     }
 
     private void ExitBattle()
@@ -704,11 +606,6 @@ public class BattleManager : MonoBehaviour
     public void PawnFinished(Pawn p)
     {
         p.HandleTurnEnded();
-
-        if (_selectionManager.SelectedTile != null)
-        {
-            _selectionManager.SelectedTile.SetSelected(false);
-        }
 
         StartCoroutine(NextPawnCoroutine());
     }

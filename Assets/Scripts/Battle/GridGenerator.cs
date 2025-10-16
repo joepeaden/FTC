@@ -1,8 +1,8 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using Pathfinding;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class GridGenerator : MonoBehaviour
 {
@@ -169,7 +169,7 @@ public class GridGenerator : MonoBehaviour
 
         while (queue.Count > 0)
         {
-            Tile currentTile = queue.Dequeue(); 
+            Tile currentTile = queue.Dequeue();
             foreach (Tile neighbor in currentTile.GetAdjacentTiles())
             {
                 if (!neighbor.IsImpassable && !visited.Contains(neighbor))
@@ -191,33 +191,25 @@ public class GridGenerator : MonoBehaviour
         return true;
     }
 
-    // Adjust impassable tiles if necessary
-    void EnsureConnectivity()
+    public void AddTileHoverListeners(UnityAction<Tile> startEvent, UnityAction<Tile> endEvent)
     {
-        List<Tile> impassableTiles = new List<Tile>();
-
-        // Collect all impassable tiles
-        foreach (var tile in _tiles.Values)
+        // a way to improve this, and the associated remove, would be to perhaps do this event tie-ins at
+        // instantiation time for the tiles. If I collected the listeners before generating the tiles, I 
+        // could attach them as I go - thus iterating only once. But not neccessary for now, just telling
+        // you my dear future employer that I think of these things! :) 
+        foreach (Tile t in Tiles.Values)
         {
-            if (tile.IsImpassable)
-            {
-                impassableTiles.Add(tile);
-            }
+            t.OnTileHoverStart.AddListener(startEvent);
+            t.OnTileHoverEnd.AddListener(endEvent);
         }
+    }
 
-        for (int i = 0; i < impassableTiles.Count; i++)
+    public void RemoveTileHoverListeners(UnityAction<Tile> startEvent, UnityAction<Tile> endEvent)
+    {
+        foreach (Tile t in Tiles.Values)
         {
-            impassableTiles[i].SetImpassable(false); // Temporarily make passable
-
-            // Check connectivity after clearing this tile
-            if (CheckConnectivity(_playerSpawns[0]))
-            {
-                break; // Exit if the connectivity is restored
-            }
-            else
-            {
-                impassableTiles[i].SetImpassable(true); // Revert if no path is found
-            }
+            t.OnTileHoverStart.RemoveListener(startEvent);
+            t.OnTileHoverEnd.RemoveListener(endEvent);
         }
     }
 }
