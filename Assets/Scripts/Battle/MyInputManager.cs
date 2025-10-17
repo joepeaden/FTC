@@ -44,35 +44,22 @@ public class MyInputManager : MonoBehaviour
         if (_selectedTile != null)
         {
             _selectedTile.SetSelected(false);
-            // ClearHighlights();
         }
 
         _selectedTile = newTile;
         _selectedTile.SetSelected(true);
 
         // if the character has moved here during it's turn and is not done yet (not a fresh pawn)
-        if (CurrentPawn.actionPoints < Pawn.BASE_ACTION_POINTS && CurrentPawn.HasActionsRemaining())
-        {
-            _selectedTile.HighlightTilesInRange(CurrentPawn, CurrentPawn.MoveRange, true, Tile.TileHighlightType.Move);
-        }
+        // if (CurrentPawn.actionPoints < Pawn.BASE_ACTION_POINTS && CurrentPawn.HasActionsRemaining())
+        // {
+        //     _selectedTile.HighlightTilesInRange(CurrentPawn, CurrentPawn.MoveRange, true);
+        // }
     }
 
     public void HandleTurnChange(bool playerControlsActive)
     {
         this.PlayerControlsActive = playerControlsActive;
         SetSelectedTile(CurrentPawn.CurrentTile);
-    }
-
-    public void ClearHighlights()
-    {
-        Pawn currentPawn = CurrentPawn;
-
-        if (Ability.SelectedAbility != null)
-        {
-            _selectedTile.HighlightTilesInRange(currentPawn, Ability.SelectedAbility.range, false, Tile.TileHighlightType.AttackRange);
-        }
-
-        _selectedTile.HighlightTilesInRange(currentPawn, currentPawn.MoveRange, false, Tile.TileHighlightType.Move);
     }
 
     private Tile GetTileSelected()
@@ -167,7 +154,7 @@ public class IdleState : InputState
     {
         if (this.InputManager.HoveredTile != null && lastTileHighlightedFor != this.InputManager.HoveredTile)
         {
-            HandleHover();
+            HandleNewHover();
             lastTileHighlightedFor = this.InputManager.HoveredTile;
         }
 
@@ -196,8 +183,8 @@ public class IdleState : InputState
     public override void Exit()
     {
         WeaponAbilityData weaponAbility = this.InputManager.CurrentPawn.GetBasicAttack();
-        this.InputManager.CurrentPawn.CurrentTile.HighlightTilesInRange(this.InputManager.CurrentPawn, weaponAbility, false, Tile.TileHighlightType.AttackRange);
-        this.InputManager.CurrentPawn.CurrentTile.HighlightTilesInRange(this.InputManager.CurrentPawn, this.InputManager.CurrentPawn.MoveRange, false, Tile.TileHighlightType.Move);
+        this.InputManager.CurrentPawn.CurrentTile.HighlightTilesInRange(this.InputManager.CurrentPawn, weaponAbility, false);
+        this.InputManager.CurrentPawn.CurrentTile.HighlightTilesInRange(this.InputManager.CurrentPawn, this.InputManager.CurrentPawn.MoveRange, false);
     }
 
     public override void Enter()
@@ -205,8 +192,12 @@ public class IdleState : InputState
         // idle state doesn't do much 
     }
 
-    private void HandleHover()
+    private void HandleNewHover()
     {
+        WeaponAbilityData weaponAbility = this.InputManager.CurrentPawn.GetBasicAttack();
+        this.InputManager.CurrentPawn.CurrentTile.HighlightTilesInRange(this.InputManager.CurrentPawn, weaponAbility, false);
+        this.InputManager.CurrentPawn.CurrentTile.HighlightTilesInRange(this.InputManager.CurrentPawn, this.InputManager.CurrentPawn.MoveRange, false);
+
         Pawn hoveredPawn = this.InputManager.HoveredTile.GetPawn();
         if (hoveredPawn != null)
         {
@@ -218,14 +209,14 @@ public class IdleState : InputState
             // we should display attack UI
             else
             {
-                WeaponAbilityData weaponAbility = this.InputManager.CurrentPawn.GetBasicAttack();
-                this.InputManager.CurrentPawn.CurrentTile.HighlightTilesInRange(this.InputManager.CurrentPawn, weaponAbility, true, Tile.TileHighlightType.AttackRange);
+                // weaponAbility = this.InputManager.CurrentPawn.GetBasicAttack();
+                this.InputManager.CurrentPawn.CurrentTile.HighlightTilesInRange(this.InputManager.CurrentPawn, weaponAbility, true);
             }
         }
         else
         {
             // we should display moving Ui
-            this.InputManager.CurrentPawn.CurrentTile.HighlightTilesInRange(this.InputManager.CurrentPawn, this.InputManager.CurrentPawn.MoveRange, true, Tile.TileHighlightType.Move);
+            this.InputManager.CurrentPawn.CurrentTile.HighlightTilesInRange(this.InputManager.CurrentPawn, this.InputManager.CurrentPawn.MoveRange, true);
         }
     }
 }
@@ -264,12 +255,12 @@ public class MovingState : InputState
     public override void Enter()
     {
         _movingDone = false;
-        this.InputManager.CurrentPawn.CurrentTile.HighlightTilesInRange(this.InputManager.CurrentPawn, this.InputManager.CurrentPawn.MoveRange, true, Tile.TileHighlightType.Move);
+        // this.InputManager.CurrentPawn.CurrentTile.HighlightTilesInRange(this.InputManager.CurrentPawn, this.InputManager.CurrentPawn.MoveRange, true);
     }
 
     private void ClearMoveHighlight()
     {
-        this.InputManager.CurrentPawn.CurrentTile.HighlightTilesInRange(this.InputManager.CurrentPawn, this.InputManager.CurrentPawn.MoveRange, false, Tile.TileHighlightType.Move);
+        // this.InputManager.CurrentPawn.CurrentTile.HighlightTilesInRange(this.InputManager.CurrentPawn, this.InputManager.CurrentPawn.MoveRange, false);
     }
 
     private void HandleMoveComplete()
@@ -340,7 +331,7 @@ public class SetFacingState : InputState
         if (this.InputManager.CurrentPawn != null && this.InputManager.CurrentPawn.GetWeaponAbilities().Any())
         {
             WeaponAbilityData weaponAbility = this.InputManager.CurrentPawn.GetBasicAttack();
-            this.InputManager.CurrentPawn.CurrentTile.HighlightTilesInRange(this.InputManager.CurrentPawn, weaponAbility, shouldHighlight, Tile.TileHighlightType.AttackRange);
+            // this.InputManager.CurrentPawn.CurrentTile.HighlightTilesInRange(this.InputManager.CurrentPawn, weaponAbility, shouldHighlight);
         }
     }
 }

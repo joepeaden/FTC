@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -8,13 +7,6 @@ using UnityEngine.Events;
 
 public class Tile : MonoBehaviour
 {
-    public enum TileHighlightType
-    {
-        Move,
-        AttackRange,
-        AttackTarget
-    }
-
     public const int BASE_AP_TO_TRAVERSE = 2;
 
     public UnityEvent<Tile> OnTileHoverStart = new();
@@ -329,24 +321,15 @@ public class Tile : MonoBehaviour
         }
     }
 
-    public void HighlightTilesInRange(Pawn subjectPawn, int range, bool isHighlighting, TileHighlightType highlightType)
+    public void HighlightTilesInRange(Pawn subjectPawn, int range, bool isHighlighting)
     {
-        // is this attack parameter really necessarY? I think it just uses the other overload.
-
         HashSet<Tile> tilesInRange = GetTilesInRange(subjectPawn, range);
-
-        Sprite spriteToUse = highlightType switch
-        {
-            TileHighlightType.Move => moveRangeSprite,
-            TileHighlightType.AttackRange => attackHighlightSprite,
-            _ => moveRangeSprite
-        };
 
         foreach (Tile t in tilesInRange)
         {
             if (!t._isSelected) 
             {
-                t.SetTileHighlight(isHighlighting, spriteToUse);
+                t.SetTileHighlight(isHighlighting, moveRangeSprite);
             }
         }
     }
@@ -355,26 +338,15 @@ public class Tile : MonoBehaviour
     /// Highlights tiles in range using an attack pattern from a WeaponAbilityData.
     /// This method applies the attack pattern to filter valid attack tiles based on facing direction.
     /// </summary>
-    public void HighlightTilesInRange(Pawn subjectPawn, WeaponAbilityData weaponAbility, bool isHighlighting, TileHighlightType highlightType)
+    public void HighlightTilesInRange(Pawn subjectPawn, WeaponAbilityData weaponAbility, bool isHighlighting)
     {
         HashSet<Tile> validTiles = GetTilesInRange(subjectPawn, weaponAbility);
-        
-        // // Apply attack pattern filtering
-        // AttackPattern pattern = weaponAbility.GetAttackPattern();
-        // HashSet<Tile> validTiles = pattern.FilterTilesByPattern(this, subjectPawn.CurrentFacing, tilesInRange, weaponAbility.range);
-
-        Sprite spriteToUse = highlightType switch
-        {
-            TileHighlightType.Move => moveRangeSprite,
-            TileHighlightType.AttackRange => attackHighlightSprite,
-            _ => moveRangeSprite
-        };
 
         foreach (Tile t in validTiles)
         {
             if (!t._isSelected) 
             {
-                t.SetTileHighlight(isHighlighting, spriteToUse);
+                t.SetTileHighlight(isHighlighting, attackHighlightSprite);
             }
         }
     }
