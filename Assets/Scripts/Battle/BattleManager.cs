@@ -32,6 +32,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private Button _endTurnButton;
     [SerializeField] TMP_Text turnText;
     [SerializeField] GameObject turnUI;
+    [SerializeField] TMP_Text movePointsDisplay;
     [SerializeField] TMP_Text winLoseText;
     [SerializeField] GameObject winLoseUI;
     [SerializeField] private AIPlayer _aiPlayer;
@@ -252,6 +253,11 @@ public class BattleManager : MonoBehaviour
     public void AddPendingTextNotification(string str, Color color)
     {
         pendingTextNotifs.Add((str, color));
+    }
+
+    public void UpdateMPDisplay(int newValue)
+    {
+        movePointsDisplay.text = "MP: " + newValue;
     }
     
     public void TriggerTextNotification(Vector3 pos)
