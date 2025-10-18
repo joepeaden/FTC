@@ -1,4 +1,6 @@
 using System.Linq;
+using JetBrains.Annotations;
+using Unity.VisualScripting;
 using UnityEngine;
 
 // This class should be considered a sub-component of BattleManger - we shouldn't be referencing
@@ -49,30 +51,12 @@ public class MyInputManager : MonoBehaviour
 
         _selectedTile = newTile;
         _selectedTile.SetSelected(true);
-
-        // if the character has moved here during it's turn and is not done yet (not a fresh pawn)
-        if (CurrentPawn.actionPoints < Pawn.BASE_ACTION_POINTS && CurrentPawn.HasActionsRemaining())
-        {
-            _selectedTile.HighlightTilesInRange(CurrentPawn, CurrentPawn.MoveRange, true, Tile.TileHighlightType.Move);
-        }
     }
 
     public void HandleTurnChange(bool playerControlsActive)
     {
         this.PlayerControlsActive = playerControlsActive;
         SetSelectedTile(CurrentPawn.CurrentTile);
-    }
-
-    public void ClearHighlights()
-    {
-        Pawn currentPawn = CurrentPawn;
-
-        if (Ability.SelectedAbility != null)
-        {
-            _selectedTile.HighlightTilesInRange(currentPawn, Ability.SelectedAbility.range, false, Tile.TileHighlightType.AttackRange);
-        }
-
-        _selectedTile.HighlightTilesInRange(currentPawn, currentPawn.MoveRange, false, Tile.TileHighlightType.Move);
     }
 
     private Tile GetTileSelected()
@@ -113,6 +97,7 @@ public class MyInputManager : MonoBehaviour
         {
             ClickedTile = GetTileSelected();
         }
+
 
         InputState newState;
         newState = _currentInputState.Update();
@@ -165,11 +150,8 @@ public class IdleState : InputState
     public Tile lastTileHighlightedFor = null;
     public override InputState Update()
     {
-        // if (this.InputManager.HoveredTile != null && lastTileHighlightedFor != this.InputManager.HoveredTile)
-        // {
-        //     HandleHover();
-        //     lastTileHighlightedFor = this.InputManager.HoveredTile;
-        // }
+
+        Debug.Log(this.InputManager.CurrentPawn.HasMovesLeft());
 
         if (this.InputManager.CurrentAbility != null)
         {
@@ -195,38 +177,12 @@ public class IdleState : InputState
 
     public override void Exit()
     {
-        // WeaponAbilityData weaponAbility = this.InputManager.CurrentPawn.GetBasicAttack();
-        // this.InputManager.CurrentPawn.CurrentTile.HighlightTilesInRange(this.InputManager.CurrentPawn, weaponAbility, false, Tile.TileHighlightType.AttackRange);
-        // this.InputManager.CurrentPawn.CurrentTile.HighlightTilesInRange(this.InputManager.CurrentPawn, this.InputManager.CurrentPawn.MoveRange, false, Tile.TileHighlightType.Move);
+        // idle state doesn't do much
     }
 
     public override void Enter()
     {
         // idle state doesn't do much 
-    }
-
-    private void HandleHover()
-    {
-        Pawn hoveredPawn = this.InputManager.HoveredTile.GetPawn();
-        if (hoveredPawn != null)
-        {
-            // we should display set facing UI
-            if (hoveredPawn == this.InputManager.CurrentPawn)
-            {
-
-            }
-            // we should display attack UI
-            else
-            {
-                WeaponAbilityData weaponAbility = this.InputManager.CurrentPawn.GetBasicAttack();
-                this.InputManager.CurrentPawn.CurrentTile.HighlightTilesInRange(this.InputManager.CurrentPawn, weaponAbility, true, Tile.TileHighlightType.AttackRange);
-            }
-        }
-        else
-        {
-            // we should display moving Ui
-            this.InputManager.CurrentPawn.CurrentTile.HighlightTilesInRange(this.InputManager.CurrentPawn, this.InputManager.CurrentPawn.MoveRange, true, Tile.TileHighlightType.Move);
-        }
     }
 }
 
@@ -238,7 +194,7 @@ public class MovingState : InputState
     {
         if (_movingDone)
         {
-            return this.InputManager.facingState;
+            return this.InputManager.idleState;
         }
         else if (this.InputManager.CurrentAbility != null)
         {
@@ -258,18 +214,18 @@ public class MovingState : InputState
 
     public override void Exit()
     {
-        ClearMoveHighlight();
+        ;
     }
 
     public override void Enter()
     {
         _movingDone = false;
-        this.InputManager.CurrentPawn.CurrentTile.HighlightTilesInRange(this.InputManager.CurrentPawn, this.InputManager.CurrentPawn.MoveRange, true, Tile.TileHighlightType.Move);
+        this.InputManager.CurrentPawn.SetHighlightForMove(true);
     }
 
     private void ClearMoveHighlight()
     {
-        this.InputManager.CurrentPawn.CurrentTile.HighlightTilesInRange(this.InputManager.CurrentPawn, this.InputManager.CurrentPawn.MoveRange, false, Tile.TileHighlightType.Move);
+        this.InputManager.CurrentPawn.SetHighlightForMove(false);
     }
 
     private void HandleMoveComplete()
@@ -284,34 +240,26 @@ public class MovingState : InputState
         Tile targetTile = this.InputManager.ClickedTile;
         if (targetTile != null && !targetTile.IsImpassable)
         {
-            // should we even be raycasting and all this? Should we perhaps instead just report clicks from the Tile script? So that it just 
-            // directly tells the selection manager what was clicked?
-            // maybe later.
-            // I don't think we need to check this btw.
             Pawn targetPawn = targetTile.GetPawn();
-            if (this.InputManager.CurrentPawn.CurrentTile.GetTilesInRange(this.InputManager.CurrentPawn, this.InputManager.CurrentPawn.MoveRange).Contains(targetTile) && targetPawn == null && this.InputManager.SelectedTile != null)
+            if (targetPawn == null && this.InputManager.SelectedTile != null)
             {
-                if (this.InputManager.CurrentPawn.HasPathToTile(targetTile))
+                int moveCost = this.InputManager.CurrentPawn.GetMoveCostForTile(targetTile);
+
+                // Check if pawn has enough move points for this movement
+                if (this.InputManager.CurrentPawn.MovePoints >= moveCost)
                 {
-                    ClearMoveHighlight();
-                    this.InputManager.CurrentPawn.OnMoved.AddListener(HandleMoveComplete);
-                    this.InputManager.CurrentPawn.TryMoveToTile(targetTile);
+                    if (this.InputManager.CurrentPawn.HasPathToTile(targetTile))
+                    {
+                        ClearMoveHighlight();
+                        this.InputManager.CurrentPawn.OnMoved.AddListener(HandleMoveComplete);
+
+                        this.InputManager.CurrentPawn.TryMoveToTile(targetTile);
+                    }
                 }
             }
         }
     }
     
-    private void HandleHover()
-    {
-        Pawn currentPawn = this.InputManager.CurrentPawn;
-        Tile hoveredTile = this.InputManager.HoveredTile;
-
-        if (currentPawn != null)
-        {
-            // we should display moving Ui
-            currentPawn.CurrentTile.HighlightTilesInRange(this.InputManager.CurrentPawn, this.InputManager.CurrentPawn.MoveRange, true, Tile.TileHighlightType.Move);
-        }
-    }
 }
 
 public class SetFacingState : InputState
@@ -329,9 +277,16 @@ public class SetFacingState : InputState
 
         if (this.InputManager.PlayerLeftClick)
         {
-            return this.InputManager.abilityState;
-            // BattleManager.Instance.PawnActivated(TheSelectionManager.CurrentPawn);
-            // return TheSelectionManager.idleState;
+            if (this.InputManager.CurrentPawn.HasMovesLeft())
+            {
+                return this.InputManager.idleState;
+            }
+            else
+            {
+                return this.InputManager.abilityState;
+                // BattleManager.Instance.PawnActivated(TheSelectionManager.CurrentPawn);
+                // return TheSelectionManager.idleState;
+            }
         }
 
         return this;
@@ -344,7 +299,7 @@ public class SetFacingState : InputState
 
     public override void Enter()
     {
-        ;
+        this.InputManager.CurrentPawn.FinalizeFacing();
     }
 
     private void HighlightAttackRange(bool shouldHighlight)

@@ -22,7 +22,10 @@ public class Pawn : MonoBehaviour
     private UnityEvent OnKillEnemy = new();
     private UnityEvent OnDisengage = new();
 
-    public int MoveRange => GameChar.GetMoveRange();
+    public int MoveRange => _currentMoveRange;
+    private int _currentMoveRange;
+    public int MovePoints => _currentMovePoints;
+    private int _currentMovePoints;
 
     public Tile CurrentTile => _currentTile;
     private Tile _currentTile;
@@ -41,7 +44,6 @@ public class Pawn : MonoBehaviour
     public int actionPoints { get; private set; }
 
     private bool _hasAttacked;
-    private bool _hasMoved;
     private bool _isMyTurn;
 
     public int MaxMotivation => GameChar.GetBattleMotivationCap();
@@ -145,9 +147,8 @@ public class Pawn : MonoBehaviour
         _armorPoints = character.GetTotalArmor();
 
         Motivation = GameChar.GetBattleMotivationCap();
-        actionPoints = BASE_ACTION_POINTS;
-        _hasMoved = false;
-        _hasAttacked = false;
+
+        ResetResources();
 
         // set up listeners motivation conditions
         SetupMotConds();
@@ -156,6 +157,18 @@ public class Pawn : MonoBehaviour
         {
             UpdateEffect(p.effectDisplay, true);
         }
+    }
+
+    private void ResetResources()
+    {
+        actionPoints = BASE_ACTION_POINTS;
+        _currentMoveRange = GameChar.GetMoveRange();
+
+        // hardcoded value for testing - remove this magic number when committing please.
+        _currentMovePoints = 2;
+        
+        _hasAttacked = false;
+
     }
 
     private void SetupMotConds()
@@ -706,7 +719,8 @@ public class Pawn : MonoBehaviour
 
     public bool HasMovesLeft()
     {
-        return !_hasMoved && actionPoints > 0;
+        Debug.Log(actionPoints);
+        return _currentMovePoints > 0;
     }
 
     public void HandleTurnBegin()
@@ -716,9 +730,8 @@ public class Pawn : MonoBehaviour
         _isMyTurn = true;
 
         _spriteController.HandleTurnBegin();
-        actionPoints = BASE_ACTION_POINTS;
-        _hasMoved = false;
-        _hasAttacked = false;
+
+        ResetResources();
 
         if (_hitPoints < GameChar.HitPoints)
         {
@@ -760,7 +773,7 @@ public class Pawn : MonoBehaviour
     /// <returns></returns>
     public void ForceMoveToTile(Tile targetTile)
     {
-        pathfinder.AttemptGoToLocation(targetTile.transform.position);
+        pathfinder.AttemptGoToLocation(targetTile);
 
         _spriteController.Move();
 
@@ -775,6 +788,45 @@ public class Pawn : MonoBehaviour
         _isMoving = true;
     }
 
+    public bool IsTileInMoveRange(Tile targetTile)
+    {
+        int tileDistance = this.CurrentTile.GetTileDistance(targetTile);
+
+        if (tileDistance <= this.MoveRange)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public bool IsTileInExtendedMoveRange(Tile targetTile)
+    {
+        int tileDistance = this.CurrentTile.GetTileDistance(targetTile);
+
+        if (tileDistance <= GetExtendedMoveRange())
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public int GetMoveCostForTile(Tile targetTile)
+    {
+        int tileDistance = this.CurrentTile.GetTileDistance(targetTile);
+
+        if (tileDistance <= this.MoveRange)
+        {
+            return 1; // Normal move range
+        }
+        else if (tileDistance <= GetExtendedMoveRange())
+        {
+            return 2; // Extended move range
+        }
+
+        return int.MaxValue; // Unreachable (shouldn't happen due to highlighting)
+    }
 
     /// <summary>
     /// Move as close as possible to the tile. If not enough AP, pick the next
@@ -789,8 +841,6 @@ public class Pawn : MonoBehaviour
         {
             return;
         }
-
-        ExpendActionPoints(1);
 
         StartCoroutine(TryMoveToTileCoroutine(targetTile));
     }
@@ -824,20 +874,13 @@ public class Pawn : MonoBehaviour
         // don't proceed with move if got hit during opportunity attack
         if (!gotHitByOpportunityAttack)
         {
-            _hasMoved = true;
+            ChangeMovePoints(-GetMoveCostForTile(targetTile));
 
             int tileDistance = _currentTile.GetTileDistance(targetTile);
 
-            pathfinder.AttemptGoToLocation(targetTile.transform.position);
+            pathfinder.AttemptGoToLocation(targetTile);
 
             _spriteController.Move();
-
-            // use whole turn to get out of combat with someone
-            if (EngagedInCombat)
-            {
-                OnDisengage.Invoke();
-            }
-
             _currentTile.PawnExitTile();
 
             _isMoving = true;
@@ -845,6 +888,11 @@ public class Pawn : MonoBehaviour
             _audioSource.clip = _movingSound;
             _audioSource.loop = true;
             _audioSource.Play();
+        }
+        else
+        {
+            // if we got hit just remove a single move point
+            ChangeMovePoints(-1);
         }
     }
 
@@ -883,7 +931,7 @@ public class Pawn : MonoBehaviour
                 CurrentFacing = _spriteController._facingDirection;
                 BattleManager.Instance.PawnActivated(this);
 
-                
+
             }
 
             _audioSource.loop = false;
@@ -897,12 +945,46 @@ public class Pawn : MonoBehaviour
         UpdateFreeAttacksPassive();
         _isMoving = false;
     }
+
+    public void SetHighlightForMove(bool shouldHighlight)
+    {
+        // Highlight normal move range with moveRangeSprite
+        CurrentTile.HighlightTilesInRange(this, shouldHighlight, 0, MoveRange, Tile.TileHighlightType.Move);
+
+        // Only highlight extended range if pawn has enough move points (2+)
+        if (shouldHighlight && MovePoints >= 2)
+        {
+            // Highlight extended range (beyond normal move range) with attackHighlightSprite
+            CurrentTile.HighlightTilesInRange(this, shouldHighlight, MoveRange + 1, GetExtendedMoveRange(), Tile.TileHighlightType.ExtendedMove);
+        }
+        else if (!shouldHighlight)
+        {
+            // Clear extended range highlighting when disabling
+            CurrentTile.HighlightTilesInRange(this, shouldHighlight, MoveRange + 1, GetExtendedMoveRange(), Tile.TileHighlightType.ExtendedMove);
+        }
+    }
+
+    public void ChangeMovePoints(int change)
+    {
+        _currentMovePoints += change;
+        BattleManager.Instance.UpdateMPDisplay(_currentMovePoints);
+    }
+
+    /// <summary>
+    /// Gets the extended move range for this pawn (x2 normal move range).
+    /// </summary>
+    public int GetExtendedMoveRange()
+    {
+        return MoveRange * 2;
+    }
     
+    public void FinalizeFacing()
+    {
+        ChangeMovePoints(-1);   
+    }
+
     public void SetFacing(Vector3 mouseWorldPos)
     {
-        // this may already be true - but in the case we did not move from one tile to another and only set facing, this still counts as a move.
-        _hasMoved = true;
-
         CurrentFacing = Utils.GetDirection(transform.position, mouseWorldPos);
         _spriteController.UpdateFacingAndSpriteOrder(transform.position, mouseWorldPos, CurrentTile);
     }
@@ -954,7 +1036,6 @@ public class Pawn : MonoBehaviour
 
     #endregion
 
-    #region Motivation
 
     public int GetInit()
     {
@@ -963,6 +1044,4 @@ public class Pawn : MonoBehaviour
 
         return baseInit + helmInit;
     }
-
-    #endregion
 }

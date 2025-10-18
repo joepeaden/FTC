@@ -10,3 +10,6 @@ Write code with orthogonality considered
 Don't use var - use explicit types instead
 
 When in plan mode, please write first a TLDR section that is explicit and to the point. Then you can append additional thoughts and information 
+
+Do not attempt to run tests - this is a Unity project so it's a waste of tie.
+

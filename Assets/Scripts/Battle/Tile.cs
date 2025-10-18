@@ -12,7 +12,8 @@ public class Tile : MonoBehaviour
     {
         Move,
         AttackRange,
-        AttackTarget
+        AttackTarget,
+        ExtendedMove
     }
 
     public const int BASE_AP_TO_TRAVERSE = 2;
@@ -329,26 +330,54 @@ public class Tile : MonoBehaviour
         }
     }
 
-    public void HighlightTilesInRange(Pawn subjectPawn, int range, bool isHighlighting, TileHighlightType highlightType)
+    /// <summary>
+    /// Highlights tiles within a specific range using the specified sprite.
+    /// </summary>
+    public void HighlightTilesInMoveRange(Pawn subjectPawn, bool isHighlighting, int minRange, int maxRange, Sprite sprite)
     {
-        // is this attack parameter really necessarY? I think it just uses the other overload.
+        HashSet<Tile> tilesInRange = GetTilesInRange(subjectPawn, minRange, maxRange);
 
-        HashSet<Tile> tilesInRange = GetTilesInRange(subjectPawn, range);
+        foreach (Tile t in tilesInRange)
+        {
+            if (!t._isSelected)
+            {
+                t.SetTileHighlight(isHighlighting, sprite);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Highlights tiles within a specific range using a predefined highlight type.
+    /// This method handles sprite selection internally based on the highlight type.
+    /// </summary>
+    public void HighlightTilesInRange(Pawn subjectPawn, bool isHighlighting, int minRange, int maxRange, TileHighlightType highlightType)
+    {
+        HashSet<Tile> tilesInRange = GetTilesInRange(subjectPawn, minRange, maxRange);
 
         Sprite spriteToUse = highlightType switch
         {
             TileHighlightType.Move => moveRangeSprite,
             TileHighlightType.AttackRange => attackHighlightSprite,
+            TileHighlightType.AttackTarget => attackTargetHighlightSprite,
+            TileHighlightType.ExtendedMove => attackHighlightSprite, // Using attackHighlightSprite for extended move range
             _ => moveRangeSprite
         };
 
         foreach (Tile t in tilesInRange)
         {
-            if (!t._isSelected) 
+            if (!t._isSelected)
             {
                 t.SetTileHighlight(isHighlighting, spriteToUse);
             }
         }
+    }
+
+    /// <summary>
+    /// Legacy overload for backward compatibility.
+    /// </summary>
+    public void HighlightTilesInMoveRange(Pawn subjectPawn, bool isHighlighting)
+    {
+        HighlightTilesInMoveRange(subjectPawn, isHighlighting, 0, subjectPawn.MoveRange, moveRangeSprite);
     }
 
     /// <summary>
@@ -379,27 +408,53 @@ public class Tile : MonoBehaviour
         }
     }
 
-    public HashSet<Tile> GetTilesInRange(Pawn subjectPawn, int range)
+    /// <summary>
+    /// Gets tiles within a specific range band (minRange to maxRange) that are actually reachable by the pawn.
+    /// This method respects obstacles and only includes tiles that can actually be reached.
+    /// </summary>
+    public HashSet<Tile> GetTilesInRange(Pawn subjectPawn, int minRange, int maxRange)
     {
         var tilesInRange = new HashSet<Tile>();
         var queue = new Queue<(Tile tile, int distance)>();
+        var visited = new HashSet<Tile>();
+
+        // Start from the pawn's current tile
         queue.Enqueue((this, 0));
+        visited.Add(this);
 
         while (queue.Count > 0)
         {
             var (current, dist) = queue.Dequeue();
 
-            if (dist > range) continue;
-            if (!current.IsTraversableByThisPawn(subjectPawn)) continue;
-            if (!tilesInRange.Add(current)) continue;
-
-            foreach (Tile neighbor in current._adjacentTiles)
+            // Only add tiles within the specified range that are traversable
+            if (dist >= minRange && dist <= maxRange && current.IsTraversableByThisPawn(subjectPawn))
             {
-                queue.Enqueue((neighbor, dist + 1));
+                tilesInRange.Add(current);
+            }
+
+            // Only explore adjacent tiles if we're still within range and the current tile is traversable
+            if (dist < maxRange && current.IsTraversableByThisPawn(subjectPawn))
+            {
+                foreach (Tile neighbor in current._adjacentTiles)
+                {
+                    if (!visited.Contains(neighbor))
+                    {
+                        visited.Add(neighbor);
+                        queue.Enqueue((neighbor, dist + 1));
+                    }
+                }
             }
         }
 
         return tilesInRange;
+    }
+
+    /// <summary>
+    /// Legacy overload for backward compatibility - gets tiles from 0 to range.
+    /// </summary>
+    public HashSet<Tile> GetTilesInRange(Pawn subjectPawn, int range)
+    {
+        return GetTilesInRange(subjectPawn, 0, range);
     }
 
     /// <summary>

@@ -1,10 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Pathfinding;
 using UnityEngine.Events;
-using UnityEditor;
-using UnityEditor.Experimental.GraphView;
 
 public class AIPathCustom : AIPath
 {
@@ -62,8 +59,10 @@ public class AIPathCustom : AIPath
     /// <summary>
     /// Make sure you check if it's possible to go to this destination first!
     /// </summary>
-    public void AttemptGoToLocation(Vector3 goalDestination)
+    public void AttemptGoToLocation(Tile targetTile)
     {
+        Vector3 goalDestination = targetTile.transform.position;
+
         // this is fallback case to avoid errors.
         if (!HasPathToLocation(goalDestination))
         {
@@ -71,8 +70,16 @@ public class AIPathCustom : AIPath
             HandleDestinationReached();
         }
 
+        if (_pawn.IsTileInMoveRange(targetTile))
+        {
+            pawnMovesLeft = _pawn.MoveRange;
+        }
+        else if (_pawn.IsTileInExtendedMoveRange(targetTile))
+        {
+            pawnMovesLeft = _pawn.GetExtendedMoveRange();
+        }        
+
         _seeker.StartPath(transform.position, goalDestination, OnPathCalculated);
-        pawnMovesLeft = _pawn.MoveRange;
     }
 
     private void OnPathCalculated(Path p)

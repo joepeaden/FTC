@@ -23,7 +23,7 @@ MonoBehaviour:
   maxHP: 7
   minAcc: 5
   maxAcc: 8
-  moveRange: 5
+  moveRange: 2
   fallbackWeapon: {fileID: 11400000, guid: 10bfb3287a43940979f35f88999d4de9, type: 2}
   defaultWeaponOptions:
   - {fileID: 11400000, guid: 10bfb3287a43940979f35f88999d4de9, type: 2}
