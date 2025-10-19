@@ -64,7 +64,10 @@ public class AIPlayer : MonoBehaviour
             // if there's no potential tiles to move towrads... just stand there.
             if (potentialTargetTiles.Count > 0)
             {
-                Tile finalTargetTile = potentialTargetTiles.OrderBy(t => activePawn.CurrentTile.GetTileDistance(t)).First();
+                Tile selectedTargetTile = potentialTargetTiles.OrderBy(t => activePawn.CurrentTile.GetTileDistance(t)).First();
+                
+                // need to make sure we select a tile we can actually reach to go there. 
+                Tile finalTargetTile = activePawn.GetTileInMoveRangeTowards(selectedTargetTile);
 
                 activePawn.TryMoveToTile(finalTargetTile);
             }

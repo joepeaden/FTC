@@ -829,6 +829,16 @@ public class Pawn : MonoBehaviour
     }
 
     /// <summary>
+    /// Sometimes we can't reach the target tile - get the one that
+    /// is within range that we can actually go to.
+    /// </summary>
+    /// <param name="targetTile"></param>
+    public Tile GetTileInMoveRangeTowards(Tile targetTile)
+    {
+        return pathfinder.GetTileEndpointWithinRange(targetTile);
+    }
+
+    /// <summary>
     /// Move as close as possible to the tile. If not enough AP, pick the next
     /// closest tile that there is enough AP for
     /// </summary>

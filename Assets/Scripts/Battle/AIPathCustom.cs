@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Pathfinding;
 using UnityEngine.Events;
+using System.Linq;
 
 public class AIPathCustom : AIPath
 {
@@ -50,10 +51,45 @@ public class AIPathCustom : AIPath
 
         if (!PathUtilities.IsPathPossible(originNode, destinationNode))
         {
-            return false;   
+            return false;
         }
 
         return true;
+    }
+    
+    public Tile GetTileEndpointWithinRange(Tile targetTile)
+    {
+        List<Tile> t = GetPathToTileInRange(targetTile);
+        return t.LastOrDefault();
+    }
+
+    public List<Tile> GetPathToTileInRange(Tile targetTile)
+    {
+        Path p = _seeker.StartPath (transform.position, targetTile.transform.position);
+        p.BlockUntilCalculated();
+
+        List<Tile> tilePath = new();
+
+        // now that we have path, eliminate vectors not in at least extended range
+        for (int i = p.vectorPath.Count - 1; i >= 0; i--)
+        {
+            Vector3 position = p.vectorPath[i];
+
+            Tile tileAtPos = GridGenerator.Instance.GetClosestTileToPosition(position);
+            if (!_pawn.IsTileInExtendedMoveRange(tileAtPos))
+            {
+                p.vectorPath.Remove(position);
+            }
+            else
+            {
+                tilePath.Add(tileAtPos);
+            }
+        }
+
+        // we went back to front. so flip them so it's origin -> destination
+        tilePath.Reverse();
+
+        return tilePath;
     }
 
     /// <summary>
@@ -70,6 +106,9 @@ public class AIPathCustom : AIPath
             HandleDestinationReached();
         }
 
+        // I may be able to remove the path truncation stuff here, assuming we filter out
+        // unreachable stuff prior
+
         if (_pawn.IsTileInMoveRange(targetTile))
         {
             pawnMovesLeft = _pawn.MoveRange;
@@ -77,7 +116,7 @@ public class AIPathCustom : AIPath
         else if (_pawn.IsTileInExtendedMoveRange(targetTile))
         {
             pawnMovesLeft = _pawn.GetExtendedMoveRange();
-        }        
+        }
 
         _seeker.StartPath(transform.position, goalDestination, OnPathCalculated);
     }
