@@ -132,7 +132,8 @@ public class Pawn : MonoBehaviour
     {
         if (_isMoving)
         {
-            _spriteController.UpdateFacingAndSpriteOrder(_lastPosition, transform.position, CurrentTile);
+            Utils.FacingDirection newFacing = Utils.GetDirection(_lastPosition, transform.position);
+            _spriteController.UpdateFacingAndSpriteOrder(newFacing, CurrentTile);
         }
         _lastPosition = transform.position;
     }
@@ -442,6 +443,7 @@ public class Pawn : MonoBehaviour
             }
 
             targetPawn.TakeDamage(this, currentAction, isCrit);
+            targetPawn.Stagger();
 
             CameraManager.Instance.ShakeCamera();
 
@@ -608,7 +610,12 @@ public class Pawn : MonoBehaviour
         BattleManager.Instance.TriggerTextNotification(transform.position);
     }
 
-    public void TakeDamage(Pawn attackingPawn, WeaponAbilityData actionUsed, bool isCrit)
+    private void Stagger()
+    {
+        SetFacing(CurrentFacing - 1);
+    }
+
+    private void TakeDamage(Pawn attackingPawn, WeaponAbilityData actionUsed, bool isCrit)
     {
         GameCharacter attackingCharacter = attackingPawn.GameChar;
 
@@ -935,19 +942,13 @@ public class Pawn : MonoBehaviour
         {
             if (!_onPlayerTeam)
             {
-                UpdateSpriteOnStop(true);
                 CurrentFacing = _spriteController._facingDirection;
-
-                CurrentFacing = _spriteController._facingDirection;
+                UpdateSpriteOnStop();
                 BattleManager.Instance.PawnActivated(this);
-
-
             }
 
             _audioSource.loop = false;
             _audioSource.Stop();
-
-            // BeginSetFacing();
         }
 
         _spriteController.StopMoving();
@@ -995,8 +996,13 @@ public class Pawn : MonoBehaviour
 
     public void SetFacing(Vector3 mouseWorldPos)
     {
-        CurrentFacing = Utils.GetDirection(transform.position, mouseWorldPos);
-        _spriteController.UpdateFacingAndSpriteOrder(transform.position, mouseWorldPos, CurrentTile);
+        SetFacing(Utils.GetDirection(transform.position, mouseWorldPos));
+    }
+
+    public void SetFacing(Utils.FacingDirection facing)
+    {
+        CurrentFacing = facing;
+        _spriteController.UpdateFacingAndSpriteOrder(facing, CurrentTile);
     }
 
     public bool IsFlankedBy(Pawn attackingPawn)
@@ -1018,30 +1024,24 @@ public class Pawn : MonoBehaviour
 
     public void SetSpriteFacing(Vector3 targetPos)
     {
-        _spriteController.UpdateFacingAndSpriteOrder(transform.position, targetPos, CurrentTile);
+        Utils.FacingDirection newFacing = Utils.GetDirection(transform.position, targetPos);
+        _spriteController.UpdateFacingAndSpriteOrder(newFacing, CurrentTile);
     }
 
-    public void UpdateSpriteOnStop(bool isFirst)
+    public void UpdateSpriteOnStop()
     {
         // Face adjacent enemies
         List<Pawn> adjEnemies = GetAdjacentEnemies();
         if (adjEnemies.Count > 0)
         {
-            _spriteController.UpdateFacingAndSpriteOrder(transform.position, adjEnemies[0].transform.position, CurrentTile);
+            Utils.FacingDirection newFacing = Utils.GetDirection(transform.position, adjEnemies[0].transform.position);
+            _spriteController.UpdateFacingAndSpriteOrder(newFacing, CurrentTile);
         }
         else
         {
-            _spriteController.UpdateFacingAndSpriteOrder(_lastPosition, transform.position, CurrentTile);
+            Utils.FacingDirection newFacing = Utils.GetDirection(_lastPosition, transform.position);
+            _spriteController.UpdateFacingAndSpriteOrder(newFacing, CurrentTile);
         }
-
-        // get adjacent enemies to face me 
-        // if (isFirst)
-        // {
-        //     for (int i = 0; i < adjEnemies.Count; i++)
-        //     {
-        //         adjEnemies[i].UpdateSpriteOnStop(false);
-        //     }
-        // }
     }
 
     #endregion

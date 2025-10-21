@@ -178,7 +178,7 @@ public class BattleManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F) && CurrentPawn.OnPlayerTeam)
+        if (Input.GetKeyDown(KeyCode.F))// for now let me do this for testing && CurrentPawn.OnPlayerTeam)
         {
             EndTurn();
         }

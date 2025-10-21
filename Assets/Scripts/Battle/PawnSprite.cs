@@ -106,12 +106,12 @@ public class PawnSprite : MonoBehaviour
 
         if (pawn.OnPlayerTeam)
         {
-            UpdateFacingAndSpriteOrder(Vector3.zero, new Vector3(1, 1), pawn.CurrentTile);
+            UpdateFacingAndSpriteOrder(Utils.FacingDirection.NE, pawn.CurrentTile);
             _anim.Play("IdleNE", 0, Random.Range(0f, 1f));
         }
         else
         {
-            UpdateFacingAndSpriteOrder(Vector3.zero, new Vector3(-1, -1), pawn.CurrentTile);
+            UpdateFacingAndSpriteOrder(Utils.FacingDirection.SW, pawn.CurrentTile);
             _anim.Play("IdleSW", 0, Random.Range(0f, 1f));
         }
     }
@@ -192,7 +192,7 @@ public class PawnSprite : MonoBehaviour
                 _browSpriteRend.sprite = _NWBrow;
                 break;
         }
-        
+
         _eyesSpriteRend.sortingOrder = newOrder + 0;
         _browSpriteRend.sortingOrder = newOrder + 0;
         // same level as helm
@@ -210,7 +210,7 @@ public class PawnSprite : MonoBehaviour
     /// component is child of the pawn anyway - because the sprite might be moving
     /// as a result from animation.
     /// </remarks>
-    public void UpdateFacingAndSpriteOrder(Vector3 originPosition, Vector3 facingPosition, Tile currentTile = null)
+    public void UpdateFacingAndSpriteOrder(Utils.FacingDirection facingDirection, Tile currentTile = null)
     {
         int totalSpriteOrder = 0;
         if (currentTile != null)
@@ -219,7 +219,7 @@ public class PawnSprite : MonoBehaviour
             totalSpriteOrder = -(int)(currentTile.transform.position.y * 20);
         }
 
-        _facingDirection = Utils.GetDirection(originPosition, facingPosition);
+        _facingDirection = facingDirection;
 
         switch (_facingDirection)
         {
