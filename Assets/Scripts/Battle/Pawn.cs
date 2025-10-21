@@ -612,7 +612,20 @@ public class Pawn : MonoBehaviour
 
     private void Stagger()
     {
-        SetFacing(CurrentFacing - 1);
+        Utils.FacingDirection newFacing;
+
+        if (CurrentFacing == Utils.FacingDirection.NW)
+        {
+            newFacing = Utils.FacingDirection.NE;
+        }
+        else
+        {
+            newFacing = CurrentFacing - 1;
+        }
+
+        SetFacing(newFacing);
+
+        BattleManager.Instance.AddPendingTextNotification("Staggered!", Color.white);
     }
 
     private void TakeDamage(Pawn attackingPawn, WeaponAbilityData actionUsed, bool isCrit)
