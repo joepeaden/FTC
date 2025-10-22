@@ -6,6 +6,7 @@ public class WeaponItemData : ItemData
 {
     [Header("Weapon Info")]
     public int baseDamage;
+    public int strength;
     public List<Ability> abilities;
 
     [Header("Weapon Audio")]

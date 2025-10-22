@@ -8,6 +8,7 @@ public class ArmorItemData : ItemData
 
     [Header("Armor Info")]
     public int protection;
+    public int poise;
 
     [Header("Armor Mods")]
     public int moveMod;

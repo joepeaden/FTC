@@ -487,6 +487,21 @@ public class GameCharacter
         return AccRating + hitRollMod;
     }
 
+    public int GetTotalStrength()
+    {
+        return _theWeapon.Data.strength;
+    }
+
+    public int GetTotalPoise()
+    {
+        if (_helmItem == null)
+        {
+            return 0;
+        }
+        
+        return _helmItem.poise;
+    }
+
     public int GetMoveRange()
     {
         // equipment move modifier

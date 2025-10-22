@@ -23,22 +23,36 @@ public class ScriptableObjectComparer : EditorWindow
 
     public void CreateGUI()
     {
-
         rowsEstablished = false;
 
         // Each editor window contains a root VisualElement object
         VisualElement root = rootVisualElement;
 
-        ObjectField objectField = new ObjectField();
-        objectField.objectType = typeof(ScriptableObject);
-        objectField.label = "Scriptable 1";
-        objectField.name = "Scriptable";
-        root.Add(objectField);
+        // Drop zone for multiple ScriptableObjects
+        Box dropZone = new Box();
+        dropZone.style.borderBottomWidth = 1;
+        dropZone.style.borderLeftWidth = 1;
+        dropZone.style.borderRightWidth = 1;
+        dropZone.style.borderTopWidth = 1;
+        dropZone.style.borderTopColor = Color.grey;
+        dropZone.style.borderBottomColor = Color.grey;
+        dropZone.style.borderLeftColor = Color.grey;
+        dropZone.style.borderRightColor = Color.grey;
+        dropZone.style.paddingBottom = 10;
+        dropZone.style.paddingTop = 10;
+        dropZone.style.paddingLeft = 10;
+        dropZone.style.paddingRight = 10;
+        dropZone.style.marginBottom = 10;
 
-        Button b = new Button();
-        b.text = "Add";
-        b.clicked += AddScriptable;
-        root.Add(b);
+        Label dropLabel = new Label("Drag and Drop ScriptableObjects here to add them for comparison");
+        dropZone.Add(dropLabel);
+
+        root.Add(dropZone);
+
+        // Register drag and drop callbacks on the drop zone
+        dropZone.RegisterCallback<DragEnterEvent>(OnDragEnter);
+        dropZone.RegisterCallback<DragUpdatedEvent>(OnDragUpdate);
+        dropZone.RegisterCallback<DragPerformEvent>(OnDragPerform);
 
         Button c = new Button();
         c.text = "Clear";
@@ -61,6 +75,41 @@ public class ScriptableObjectComparer : EditorWindow
         comparisonScriptables.Clear();
         rootVisualElement.Q("GridContainer").Clear();
         rowsEstablished = false;
+    }
+
+    private void OnDragEnter(DragEnterEvent evt)
+    {
+        if (DragAndDrop.objectReferences.Any(obj => obj is ScriptableObject))
+        {
+            evt.StopPropagation();
+            DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+        }
+    }
+
+    private void OnDragUpdate(DragUpdatedEvent evt)
+    {
+        if (DragAndDrop.objectReferences.Any(obj => obj is ScriptableObject))
+        {
+            evt.StopPropagation();
+            DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+        }
+    }
+
+    private void OnDragPerform(DragPerformEvent evt)
+    {
+        if (DragAndDrop.objectReferences.Any(obj => obj is ScriptableObject))
+        {
+            evt.StopPropagation();
+            DragAndDrop.AcceptDrag();
+            foreach (Object obj in DragAndDrop.objectReferences)
+            {
+                if (obj is ScriptableObject so)
+                {
+                    comparisonScriptables.Add(so);
+                    AddScriptable(so);
+                }
+            }
+        }
     }
 
     private void AddScriptable(ScriptableObject scriptableToCompare)
@@ -116,8 +165,7 @@ public class ScriptableObjectComparer : EditorWindow
                 {
                     field.SetValue(scriptableToCompare, evt.newValue);
                     EditorUtility.SetDirty(scriptableToCompare);
-                    //Undo.RecordObject(scriptableToCompare, "Changed Variable");
-
+                    AssetDatabase.SaveAssets();
                 });
             }
             else if (value is float floatVal)
@@ -128,6 +176,8 @@ public class ScriptableObjectComparer : EditorWindow
                 inputField.RegisterCallback<ChangeEvent<string>>((evt) =>
                 {
                     field.SetValue(scriptableToCompare, float.Parse(evt.newValue));
+                    EditorUtility.SetDirty(scriptableToCompare);
+                    AssetDatabase.SaveAssets();
                 });
             }
             else if (value is int intVal)
@@ -138,6 +188,8 @@ public class ScriptableObjectComparer : EditorWindow
                 inputField.RegisterCallback<ChangeEvent<string>>((evt) =>
                 {
                     field.SetValue(scriptableToCompare, int.Parse(evt.newValue));
+                    EditorUtility.SetDirty(scriptableToCompare);
+                    AssetDatabase.SaveAssets();
                 });
             }
             else if (value is bool boolVal)
@@ -148,6 +200,8 @@ public class ScriptableObjectComparer : EditorWindow
                 inputField.RegisterCallback<ChangeEvent<bool>>((evt) =>
                 {
                     field.SetValue(scriptableToCompare, evt.newValue);
+                    EditorUtility.SetDirty(scriptableToCompare);
+                    AssetDatabase.SaveAssets();
                 });
 
                 //newTextField.AddToClassList(".unity-base-field__aligned");
@@ -159,6 +213,8 @@ public class ScriptableObjectComparer : EditorWindow
                 inputField.RegisterCallback<ChangeEvent<ScriptableObject>>((evt) =>
                 {
                     field.SetValue(scriptableToCompare, evt.newValue);
+                    EditorUtility.SetDirty(scriptableToCompare);
+                    AssetDatabase.SaveAssets();
                 });
             }
             else if (value is Sprite sprite)
@@ -168,6 +224,8 @@ public class ScriptableObjectComparer : EditorWindow
                 inputField.RegisterCallback<ChangeEvent<Sprite>>((evt) =>
                 {
                     field.SetValue(scriptableToCompare, evt.newValue);
+                    EditorUtility.SetDirty(scriptableToCompare);
+                    AssetDatabase.SaveAssets();
                 });
             }
             else if (value is AudioClip audioClip)
@@ -177,6 +235,8 @@ public class ScriptableObjectComparer : EditorWindow
                 inputField.RegisterCallback<ChangeEvent<AudioClip>>((evt) =>
                 {
                     field.SetValue(scriptableToCompare, evt.newValue);
+                    EditorUtility.SetDirty(scriptableToCompare);
+                    AssetDatabase.SaveAssets();
                 });
             }
             else
@@ -215,14 +275,5 @@ public class ScriptableObjectComparer : EditorWindow
 
     }
 
-    private void AddScriptable()
-    {
-        VisualElement root = rootVisualElement;
 
-        ObjectField scriptableField = (ObjectField)root.Q("Scriptable");
-        ScriptableObject scriptableToCompare = scriptableField.value as ScriptableObject;
-
-        comparisonScriptables.Add(scriptableToCompare);
-        AddScriptable(scriptableToCompare);
-    }
 }

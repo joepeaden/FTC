@@ -20,6 +20,7 @@ MonoBehaviour:
   storeLevel: -1
   itemSprite: {fileID: 21300000, guid: 95238defe70b14daba95522a6f390e4b, type: 3}
   protection: 3
+  poise: 1
   moveMod: -1
   initMod: -1
   viceToMod: 0

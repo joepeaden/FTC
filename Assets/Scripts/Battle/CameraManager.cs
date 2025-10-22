@@ -9,8 +9,8 @@ public class CameraManager : MonoBehaviour
     private static CameraManager _instance;
     public static Camera MainCamera { get; private set; }
     [SerializeField] private CinemachineVirtualCamera _vCam;
-    private float shakeTimerDuration = .1f;  
-    private float shakeTimer;              
+    private float shakeTimerDuration = .1f;
+    private float shakeTimer;
     private bool shakeTimerRunning = false;
 
     private void Awake()
@@ -28,12 +28,21 @@ public class CameraManager : MonoBehaviour
 
     public void ShakeCamera()
     {
-        _vCam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>().m_AmplitudeGain = 2;
-
-        shakeTimer = shakeTimerDuration;
-        shakeTimerRunning = true;
+        ShakeCamera(2);
     }
 
+    public void ShakeCameraIntense()
+    {
+        ShakeCamera(4);
+    }
+
+    private void ShakeCamera(int shakeAmplitude)
+    {
+        _vCam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>().m_AmplitudeGain = shakeAmplitude;
+
+        shakeTimer = shakeTimerDuration;
+        shakeTimerRunning = true;   
+    }
     private void Update()
     {
         if (shakeTimerRunning)

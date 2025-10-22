@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using UnityEngine.Events;
+using UnityEngine.UIElements;
+using System.Runtime.InteropServices;
+using UnityEditor.Tilemaps;
 
 public class Pawn : MonoBehaviour
 {
@@ -443,7 +446,28 @@ public class Pawn : MonoBehaviour
             }
 
             targetPawn.TakeDamage(this, currentAction, isCrit);
-            targetPawn.Stagger();
+
+            float staggerChance = GetStaggerChance();
+            float staggerResist = targetPawn.GetStaggerResist();
+            float staggerResult = Random.Range(0, 1f);
+
+            int myStrength = GetStrength();
+            int targetPoise = targetPawn.GetTargetPoise();
+
+            // stagger can only happen if their poise is less than our strength.
+            // then, a chance is still rolled to see if we did it.
+            if (targetPoise < myStrength && staggerResult > (staggerChance - staggerResist))
+            {
+                // in the case of strength = poise x2, then we "reel" them
+                if (targetPoise <= myStrength / 2)
+                {
+                    targetPawn.Stagger(true);
+                }
+                else
+                {
+                    targetPawn.Stagger(false);
+                }
+            }
 
             CameraManager.Instance.ShakeCamera();
 
@@ -476,6 +500,34 @@ public class Pawn : MonoBehaviour
                 TakeDamage(this, 1, false);
             }
         }
+    }
+
+    private float GetStaggerChance()
+    {
+        // eventually, I'll get this from GameChar or weapon stats, or something.
+        return .25f;
+    }
+    
+    private float GetStaggerResist()
+    {
+        // eventually, I'll get this from GameChar or weapon stats, or something.
+        return 0f;    
+    }
+    
+    private int GetStrength()
+    {
+        // eventually, this could have gameplay effects or something to factor in 
+        // that aren't part of GameChar. So, wrapping to reduce changes required. 
+
+        return GameChar.GetTotalStrength();
+    }
+
+    private int GetTargetPoise()
+    {
+        // eventually, this could have gameplay effects or something to factor in 
+        // that aren't part of GameChar. So, wrapping to reduce changes required. 
+
+        return GameChar.GetTotalPoise();
     }
 
     public void TriggerLevelUpVisuals()
@@ -610,33 +662,41 @@ public class Pawn : MonoBehaviour
         BattleManager.Instance.TriggerTextNotification(transform.position);
     }
 
-    private void Stagger()
+    private void Stagger(bool isReeling)
     {
         Utils.FacingDirection newFacing;
 
-        if (CurrentFacing == Utils.FacingDirection.NW)
+        if (isReeling)
         {
-            newFacing = Utils.FacingDirection.NE;
+            // flip 180
+            newFacing = CurrentFacing switch
+            {
+                Utils.FacingDirection.NE => Utils.FacingDirection.SW,
+                Utils.FacingDirection.SE => Utils.FacingDirection.NW,
+                Utils.FacingDirection.SW => Utils.FacingDirection.NE,
+                Utils.FacingDirection.NW => Utils.FacingDirection.SE
+            };
         }
         else
         {
-            newFacing = CurrentFacing - 1;
+            // rotate 90 degrees
+            newFacing = CurrentFacing switch
+            {
+                Utils.FacingDirection.NE => Utils.FacingDirection.SE,
+                Utils.FacingDirection.SE => Utils.FacingDirection.SW,
+                Utils.FacingDirection.SW => Utils.FacingDirection.NW,
+                Utils.FacingDirection.NW => Utils.FacingDirection.NE
+            };
         }
 
         SetFacing(newFacing);
 
-        BattleManager.Instance.AddPendingTextNotification("Staggered!", Color.white);
+        BattleManager.Instance.AddPendingTextNotification(isReeling ? "Reeling!" : "Staggered!", Color.white);
     }
 
     private void TakeDamage(Pawn attackingPawn, WeaponAbilityData actionUsed, bool isCrit)
     {
         GameCharacter attackingCharacter = attackingPawn.GameChar;
-
-        //if (actionUsed.rangeForExtraDamage > 0 && CurrentTile.GetTileDistance(attackingPawn.CurrentTile) == actionUsed.rangeForExtraDamage)
-        //{
-        //    // this could just become critical hits later perhaps.
-        //    extraDmgMult += actionUsed.extraDmgMultiplier;
-        //}
 
         int attackDmg = attackingCharacter.GetWeaponDamageForAction(actionUsed);
 

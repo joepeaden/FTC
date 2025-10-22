@@ -20,6 +20,7 @@ MonoBehaviour:
   storeLevel: -1
   itemSprite: {fileID: 21300000, guid: e28b8f6f6cf28404eb455c6f677329ec, type: 3}
   baseDamage: 1
+  strength: 1
   abilities:
   - {fileID: 11400000, guid: 048eae1a93afc4e42bc14b36427ca584, type: 2}
   hitSound: {fileID: 8300000, guid: 1743c49a91e64cd49898fbbf3ee42e25, type: 3}

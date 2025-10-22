@@ -8,7 +8,7 @@ public class Weapon
 
     public List<Ability> Abilities => _data.abilities;
     // private List<Ability> _abilities = new();
-    
+
     public void SetData(WeaponItemData data)
     {
         _data = data;
