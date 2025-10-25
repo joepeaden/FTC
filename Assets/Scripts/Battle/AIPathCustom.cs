@@ -42,19 +42,21 @@ public class AIPathCustom : AIPath
         return _seeker.traversableTags;
     }
 
-    public bool HasPathToLocation(Vector3 goalDestination)
+    public bool HasPathToLocation(Tile targetTile)
     {
+        return GetPathToTile(targetTile).vectorPath.Count > 0;
+
         // perhaps a better way to do this would be to get it from the tile itself - each tile stores a ref and when
         // selected we already know the destination node. It's fine for now, though.
-        GraphNode originNode = AstarPath.active.GetNearest(transform.position).node;
-        GraphNode destinationNode = AstarPath.active.GetNearest(goalDestination).node;
+        // GraphNode originNode = AstarPath.active.GetNearest(transform.position).node;
+        // GraphNode destinationNode = AstarPath.active.GetNearest(goalDestination).node;
 
-        if (!PathUtilities.IsPathPossible(originNode, destinationNode))
-        {
-            return false;
-        }
+        // if (!PathUtilities.IsPathPossible(originNode, destinationNode))
+        // {
+        //     return false;
+        // }
 
-        return true;
+        // return true;
     }
     
     public Tile GetTileEndpointWithinRange(Tile targetTile)
@@ -63,10 +65,17 @@ public class AIPathCustom : AIPath
         return t.LastOrDefault();
     }
 
-    public List<Tile> GetPathToTileInRange(Tile targetTile)
+    private Path GetPathToTile(Tile targetTile)
     {
         Path p = _seeker.StartPath (transform.position, targetTile.transform.position);
         p.BlockUntilCalculated();
+
+        return p;
+    }
+
+    public List<Tile> GetPathToTileInRange(Tile targetTile)
+    {
+        Path p = GetPathToTile(targetTile);
 
         List<Tile> tilePath = new();
 
@@ -100,7 +109,7 @@ public class AIPathCustom : AIPath
         Vector3 goalDestination = targetTile.transform.position;
 
         // this is fallback case to avoid errors.
-        if (!HasPathToLocation(goalDestination))
+        if (!HasPathToLocation(targetTile))
         {
             Debug.Log("Cannot reach location - ending move!");
             HandleDestinationReached();

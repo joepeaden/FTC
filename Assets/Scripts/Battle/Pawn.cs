@@ -984,7 +984,7 @@ public class Pawn : MonoBehaviour
 
     public bool HasPathToTile(Tile targetTile)
     {
-        return pathfinder.HasPathToLocation(targetTile.transform.position);
+        return pathfinder.HasPathToLocation(targetTile);
     }
 
     public void PassTurn()
