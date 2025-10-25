@@ -92,7 +92,7 @@ public class BattleManager : MonoBehaviour
 
     private int _turnNumber = -1;
 
-    private List<(string, Color)> pendingTextNotifs = new();
+    private Dictionary< Vector3, List<(string, Color)>> pendingTextNotifs = new();
 
     private void Awake()
     {
@@ -187,7 +187,15 @@ public class BattleManager : MonoBehaviour
         {
             ClearSelectedAction();
         }
+    }
 
+    private void LateUpdate()
+    {
+        // in late update so there's time to collect all necessary text notifs for the frame.
+        if (pendingTextNotifs.Count > 0)
+        {
+            TriggerTextNotification();
+        }
     }
 
     private void OnDestroy()
@@ -250,9 +258,14 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    public void AddPendingTextNotification(string str, Color color)
+    public void AddPendingTextNotification(string str, Color color, Vector3 pos)
     {
-        pendingTextNotifs.Add((str, color));
+        if (!pendingTextNotifs.ContainsKey(pos))
+        {
+            pendingTextNotifs[pos] = new();
+        }
+
+        pendingTextNotifs[pos].Add((str, color));        
     }
 
     public void UpdateMPDisplay(int newValue)
@@ -260,18 +273,24 @@ public class BattleManager : MonoBehaviour
         movePointsDisplay.text = "MP: " + newValue;
     }
     
-    public void TriggerTextNotification(Vector3 pos)
+    public void TriggerTextNotification()
     {
-        foreach (TextNotificationStack txt in _textNotifs)
+        foreach (KeyValuePair<Vector3, List<(string, Color)>> pendingNotif in pendingTextNotifs)
         {
-            if (txt.InUse)
+            List<(string, Color)> messages = pendingNotif.Value;
+            Vector3 position = pendingNotif.Key;
+
+            foreach (TextNotificationStack txt in _textNotifs)
             {
-                continue;
-            }
-            else
-            {
-                txt.SetData(pos, pendingTextNotifs);
-                break;
+                if (txt.InUse)
+                {
+                    continue;
+                }
+                else
+                {
+                    txt.SetData(position, messages);
+                    break;
+                }
             }
         }
 
@@ -649,8 +668,7 @@ public class BattleManager : MonoBehaviour
             audioSource.clip = _levelUpSound;
             audioSource.Play();
 
-            AddPendingTextNotification("Level up!", Color.yellow);
-            TriggerTextNotification(p.transform.position);
+            AddPendingTextNotification("Level up!", Color.yellow, p.transform.position);
 
             yield return new WaitForSeconds(.25f);
         }
@@ -819,8 +837,7 @@ public class BattleManager : MonoBehaviour
                 {
                     _selectionManager.PlayerControlsActive = false;
                     _currentPawn.IsPossessed = true;
-                    AddPendingTextNotification("Possession!", Color.yellow);
-                    TriggerTextNotification(_currentPawn.transform.position);
+                    AddPendingTextNotification("Possession!", Color.yellow, _currentPawn.transform.position);
                     _aiPlayer.DoTurn(_currentPawn);
                 }
                 else

@@ -25,8 +25,7 @@ public class DefensivePosture : SupportAbilityData
         BattleManager.Instance.PawnActivated(_activatedPawn);
         
         // text display event
-        BattleManager.Instance.AddPendingTextNotification("Defensive Stance", Color.white);
-        BattleManager.Instance.TriggerTextNotification(activatedPawn.transform.position);
+        BattleManager.Instance.AddPendingTextNotification("Defensive Stance", Color.white, activatedPawn.transform.position);
 
         return true;
     }

@@ -11,7 +11,7 @@ public class Pawn : MonoBehaviour
 {
     private const int MOT_REGAIN_RATE = 10;
     private const int MOT_BASIC_ATTACK_COST = 10;
-    public const int BASE_ACTION_POINTS = 1;
+    public const int BASE_ACTION_POINTS = 2;
     public const int MOTIVATED_MOT_REGAIN_BUFF = 15;
 
     public UnityEvent OnMoved = new();
@@ -461,15 +461,15 @@ public class Pawn : MonoBehaviour
                 // in the case of strength = poise x2, then we "reel" them
                 if (targetPoise <= myStrength / 2)
                 {
+                    CameraManager.Instance.ShakeCamera();
                     targetPawn.Stagger(true);
                 }
                 else
                 {
+                    CameraManager.Instance.ShakeCameraIntense();
                     targetPawn.Stagger(false);
                 }
             }
-
-            CameraManager.Instance.ShakeCamera();
 
             if (targetPawn.IsDead)
             {
@@ -547,8 +547,7 @@ public class Pawn : MonoBehaviour
             opponentPawn.HoldingForAttackAnimation = true;
             yield return new WaitForSeconds(.25f);
 
-            BattleManager.Instance.AddPendingTextNotification("Counter!", Color.white);
-            BattleManager.Instance.TriggerTextNotification(this.transform.position);
+            BattleManager.Instance.AddPendingTextNotification("Counter!", Color.white, transform.position);
 
             AttackPawn(opponentPawn, GetBasicAttack());
 
@@ -617,17 +616,17 @@ public class Pawn : MonoBehaviour
 
         if (armorDmg > 0)
         {
-            BattleManager.Instance.AddPendingTextNotification(isCrit ? armorDmg.ToString() + "(Crit!)" : armorDmg.ToString(), Color.yellow);
+            BattleManager.Instance.AddPendingTextNotification(isCrit ? armorDmg.ToString() + "(Crit!)" : armorDmg.ToString(), Color.yellow, transform.position);
         }
 
         if (hitPointsDmg > 0)
         {
-            BattleManager.Instance.AddPendingTextNotification(isCrit ? hitPointsDmg.ToString() + "(Crit!)" : hitPointsDmg.ToString(), Color.red);
+            BattleManager.Instance.AddPendingTextNotification(isCrit ? hitPointsDmg.ToString() + "(Crit!)" : hitPointsDmg.ToString(), Color.red, transform.position);
         }
 
         if (hitPointsDmg == 0 && armorDmg == 0)
         {
-            BattleManager.Instance.AddPendingTextNotification("0", Color.white);
+            BattleManager.Instance.AddPendingTextNotification("0", Color.white, transform.position);
         }
 
         attackingPawn.DmgInflicted += hitPointsDmg + armorDmg;
@@ -658,8 +657,6 @@ public class Pawn : MonoBehaviour
         _spriteController.HandleHit(_isDead, armorHit, armorHit && _armorPoints <= 0);
 
         OnHPChanged.Invoke();
-
-        BattleManager.Instance.TriggerTextNotification(transform.position);
     }
 
     private void Stagger(bool isReeling)
@@ -691,7 +688,7 @@ public class Pawn : MonoBehaviour
 
         SetFacing(newFacing);
 
-        BattleManager.Instance.AddPendingTextNotification(isReeling ? "Reeling!" : "Staggered!", Color.white);
+        BattleManager.Instance.AddPendingTextNotification(isReeling ? "Reeling!" : "Staggered!", Color.white, transform.position);
     }
 
     private void TakeDamage(Pawn attackingPawn, WeaponAbilityData actionUsed, bool isCrit)
@@ -832,8 +829,7 @@ public class Pawn : MonoBehaviour
     {
         // cap the max hitpoints to heal
         _hitPoints = Mathf.Min(healAmount + _hitPoints, GameChar.HitPoints);
-        BattleManager.Instance.AddPendingTextNotification(healAmount.ToString(), Color.green);
-        BattleManager.Instance.TriggerTextNotification(transform.position);
+        BattleManager.Instance.AddPendingTextNotification(healAmount.ToString(), Color.green, transform.position);
         OnHPChanged.Invoke();
     }
 
