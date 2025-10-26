@@ -361,7 +361,7 @@ public class BattleManager : MonoBehaviour
             armorBar.SetBar(p.ArmorPoints);
             healthBar.SetBar(p.HitPoints);
 
-            UpdateMPDisplay(p.MovePoints);
+            // UpdateMPDisplay(p.MovePoints);
 
             if (Ability.SelectedAbility != null)
             {

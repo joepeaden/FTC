@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using UnityEngine.Events;
-using UnityEngine.UIElements;
-using System.Runtime.InteropServices;
-using UnityEditor.Tilemaps;
 
 public class Pawn : MonoBehaviour
 {
@@ -27,8 +24,6 @@ public class Pawn : MonoBehaviour
 
     public int MoveRange => _currentMoveRange;
     private int _currentMoveRange;
-    public int MovePoints => _currentMovePoints;
-    private int _currentMovePoints;
 
     public Tile CurrentTile => _currentTile;
     private Tile _currentTile;
@@ -169,7 +164,7 @@ public class Pawn : MonoBehaviour
         _currentMoveRange = GameChar.GetMoveRange();
 
         // hardcoded value for testing - remove this magic number when committing please.
-        _currentMovePoints = 2;
+        // _currentMovePoints = 2;
         
         _hasAttacked = false;
 
@@ -797,7 +792,7 @@ public class Pawn : MonoBehaviour
     public bool HasMovesLeft()
     {
         Debug.Log(actionPoints);
-        return _currentMovePoints > 0;
+        return actionPoints > 0;
     }
 
     public void HandleTurnBegin()
@@ -960,7 +955,7 @@ public class Pawn : MonoBehaviour
         // don't proceed with move if got hit during opportunity attack
         if (!gotHitByOpportunityAttack)
         {
-            ChangeMovePoints(-GetMoveCostForTile(targetTile));
+            ExpendActionPoints(GetMoveCostForTile(targetTile));
 
             int tileDistance = _currentTile.GetTileDistance(targetTile);
 
@@ -978,7 +973,7 @@ public class Pawn : MonoBehaviour
         else
         {
             // if we got hit just remove a single move point
-            ChangeMovePoints(-1);
+            ExpendActionPoints(1);
         }
     }
 
@@ -1032,7 +1027,7 @@ public class Pawn : MonoBehaviour
         CurrentTile.HighlightTilesInRange(this, shouldHighlight, 0, MoveRange, Tile.TileHighlightType.Move);
 
         // Only highlight extended range if pawn has enough move points (2+)
-        if (shouldHighlight && MovePoints >= 2)
+        if (shouldHighlight && actionPoints >= 2)
         {
             // Highlight extended range (beyond normal move range) with attackHighlightSprite
             CurrentTile.HighlightTilesInRange(this, shouldHighlight, MoveRange + 1, GetExtendedMoveRange(), Tile.TileHighlightType.ExtendedMove);
@@ -1044,23 +1039,12 @@ public class Pawn : MonoBehaviour
         }
     }
 
-    public void ChangeMovePoints(int change)
-    {
-        _currentMovePoints += change;
-        BattleManager.Instance.UpdateMPDisplay(_currentMovePoints);
-    }
-
     /// <summary>
     /// Gets the extended move range for this pawn (x2 normal move range).
     /// </summary>
     public int GetExtendedMoveRange()
     {
         return MoveRange * 2;
-    }
-    
-    public void FinalizeFacing()
-    {
-        ChangeMovePoints(-1);   
     }
 
     public void SetFacing(Vector3 mouseWorldPos)

@@ -163,7 +163,7 @@ public class IdleState : InputState
             if (p != null && p == this.InputManager.CurrentPawn)
             {
                 // facing without a move still counts as one
-                this.InputManager.CurrentPawn.ExpendActionPoints(1);
+                // this.InputManager.CurrentPawn.ExpendActionPoints(1);
                 return this.InputManager.facingState;
             }
             else
@@ -246,7 +246,7 @@ public class MovingState : InputState
                 int moveCost = this.InputManager.CurrentPawn.GetMoveCostForTile(targetTile);
 
                 // Check if pawn has enough move points for this movement
-                if (this.InputManager.CurrentPawn.MovePoints >= moveCost)
+                if (this.InputManager.CurrentPawn.actionPoints >= moveCost)
                 {
                     if (this.InputManager.CurrentPawn.HasPathToTile(targetTile))
                     {
@@ -264,6 +264,7 @@ public class MovingState : InputState
 
 public class SetFacingState : InputState
 {
+    private Utils.FacingDirection originalFacing;
     public override InputState Update()
     {
         Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -279,14 +280,20 @@ public class SetFacingState : InputState
         {
             if (this.InputManager.CurrentPawn.HasMovesLeft())
             {
+                this.InputManager.CurrentPawn.ExpendActionPoints(1);
                 return this.InputManager.idleState;
             }
             else
             {
-                return this.InputManager.abilityState;
+                // return this.InputManager.abilityState;
                 // BattleManager.Instance.PawnActivated(TheSelectionManager.CurrentPawn);
                 // return TheSelectionManager.idleState;
             }
+        }
+        else if (this.InputManager.PlayerRightClick)
+        {
+            this.InputManager.CurrentPawn.SetFacing(originalFacing);
+            return this.InputManager.idleState;
         }
 
         return this;
@@ -299,7 +306,7 @@ public class SetFacingState : InputState
 
     public override void Enter()
     {
-        this.InputManager.CurrentPawn.FinalizeFacing();
+        originalFacing = this.InputManager.CurrentPawn.CurrentFacing;
     }
 
     private void HighlightAttackRange(bool shouldHighlight)

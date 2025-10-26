@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Scripting.APIUpdating;
 
 public class AIPlayer : MonoBehaviour
 {
@@ -34,7 +35,7 @@ public class AIPlayer : MonoBehaviour
     {
         StartCoroutine(DoTurnCoroutine(p));
     }
-    
+
     private IEnumerator DoTurnCoroutine(Pawn activePawn)
     {
         // just add a pause so it's not jarring how fast turns change
@@ -46,36 +47,45 @@ public class AIPlayer : MonoBehaviour
         {
             activePawn.GetWeaponAbilities()[0].Activate(activePawn, adjacentPawn);
         }
-        // add comment
         else
         {
-            // try to move towards enemy pawns
-            List<Pawn> pawnsToMoveTowards = activePawn.OnPlayerTeam ? _enemyPawns : BattleManager.Instance.PlayerPawns;
-            List<Tile> potentialTargetTiles = GetTargetTilesTowardsPawns(pawnsToMoveTowards, activePawn);
-
-            // otherwise, we want to move towards an ally pawn (they're probably going somewhere right?)
-            // hopefully this doesn't end up making silly things happen. Or, maybe that'd be fun.
-            if (potentialTargetTiles.Count == 0)
-            {
-                pawnsToMoveTowards = activePawn.OnPlayerTeam ? BattleManager.Instance.PlayerPawns : _enemyPawns;
-                potentialTargetTiles = GetTargetTilesTowardsPawns(pawnsToMoveTowards, activePawn);
-            }
-
-            // if there's no potential tiles to move towrads... just stand there.
-            if (potentialTargetTiles.Count > 0)
-            {
-                Tile selectedTargetTile = potentialTargetTiles.OrderBy(t => activePawn.CurrentTile.GetTileDistance(t)).First();
-                
-                // need to make sure we select a tile we can actually reach to go there. 
-                Tile finalTargetTile = activePawn.GetTileInMoveRangeTowards(selectedTargetTile);
-
-                activePawn.TryMoveToTile(finalTargetTile);
-            }
-            else
-            {
-                activePawn.PassTurn();
-            }
+            Move(activePawn);
         }
+    }
+
+    private void Move(Pawn activePawn)
+    {
+        List<Tile> potentialTargetTiles = GetPotentialTilesForMove(activePawn);
+
+        if (potentialTargetTiles.Count > 0)
+        {
+            Tile selectedTargetTile = potentialTargetTiles.OrderBy(t => activePawn.CurrentTile.GetTileDistance(t)).First();
+            // need to make sure we select a tile we can actually reach to go there. 
+            Tile finalTargetTile = activePawn.GetTileInMoveRangeTowards(selectedTargetTile);
+            activePawn.TryMoveToTile(finalTargetTile);
+        }
+        else
+        {
+            // nowhere to go!
+            activePawn.PassTurn();
+        }
+    }
+
+    private List<Tile> GetPotentialTilesForMove(Pawn activePawn)
+    {
+        // try to move towards enemy pawns
+        List<Pawn> pawnsToMoveTowards = activePawn.OnPlayerTeam ? _enemyPawns : BattleManager.Instance.PlayerPawns;
+        List<Tile> potentialTargetTiles = GetTargetTilesTowardsPawns(pawnsToMoveTowards, activePawn);
+
+        // otherwise, we want to move towards an ally pawn (they're probably going somewhere right?)
+        // hopefully this doesn't end up making silly things happen. Or, maybe that'd be fun.
+        if (potentialTargetTiles.Count == 0)
+        {
+            pawnsToMoveTowards = activePawn.OnPlayerTeam ? BattleManager.Instance.PlayerPawns : _enemyPawns;
+            potentialTargetTiles = GetTargetTilesTowardsPawns(pawnsToMoveTowards, activePawn);
+        }
+        
+        return potentialTargetTiles;
     }
 
     private List<Tile> GetTargetTilesTowardsPawns(List<Pawn> pawnsToMoveTowards, Pawn activePawn)
