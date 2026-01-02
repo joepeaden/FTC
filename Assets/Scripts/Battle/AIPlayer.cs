@@ -50,67 +50,6 @@ public class AIPlayer : MonoBehaviour
         // add comment
         else
         {
-            // figure out who to target first
-
-            // figure out the path to get to that target
-            // go as far as possible along that path within move range
-
-
-            ////// old code to figure out the one that you ahve the best "advantage" against //////
-
-            // dictionary is (tile, advantagerating)  
-            //Dictionary<Tile, int> moveRatingDict = new();
-
-            //int activePawnEqRating = (activePawn.GameChar.GetTotalArmor() + activePawn.GameChar.GetWeaponDamageForAction(activePawn.GameChar.WeaponItem.baseAction));
-            //foreach (Pawn targetPawn in BattleManager.Instance.PlayerPawns)
-            //{
-            //    // don't circle around dead pawns forever (don't be fucking creepy)
-            //    if (targetPawn.IsDead)
-            //    {
-            //        continue;
-            //    }
-
-            //    // get equipment advantage values
-            //    int targetEqRating = (targetPawn.GameChar.GetTotalArmor() + targetPawn.GameChar.GetWeaponDamageForAction(targetPawn.GameChar.WeaponItem.baseAction));
-            //    int eqAdvantageRating = activePawnEqRating - targetEqRating;
-
-            //    Tile bestTargetTile = null;
-            //    foreach (Tile potentialTargetTile in targetPawn.CurrentTile.GetAdjacentTiles())
-            //    {
-            //        Pawn pawnAtTile = potentialTargetTile.GetPawn();
-            //        // don't consider if someone's there
-            //        if (pawnAtTile != null  && !pawnAtTile.IsDead || potentialTargetTile.IsImpassable)
-            //        {
-            //            continue;
-            //        }
-
-            //        // just go with the first one for now
-            //        bestTargetTile = potentialTargetTile;
-            //        break;
-            //    }
-
-            //    // could be null if all positions around target are occupied
-            //    if (bestTargetTile != null)
-            //    {
-            //        moveRatingDict[bestTargetTile] = eqAdvantageRating;
-            //    }
-            //}
-
-            //int bestOdds = int.MinValue;
-            //Tile bestTile = activePawn.CurrentTile;
-            //foreach (Tile t in moveRatingDict.Keys)
-            //{
-            //    if (bestOdds < moveRatingDict[t])
-            //    {
-            //        bestOdds = moveRatingDict[t];
-            //        bestTile = t;
-            //    }
-            //}
-
-            ////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
             List<Pawn> pawnsToTarget = activePawn.OnPlayerTeam ? _enemyPawns : BattleManager.Instance.PlayerPawns;
 
             List<Tile> potentialTargetTiles = new();

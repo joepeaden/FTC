@@ -49,7 +49,7 @@ public class ShopPanel : MonoBehaviour
     public void AddShopItem(ItemData item)
     {
         GameObject itemGO = ObjectPool.instance.GetItemUI();
-        itemGO.transform.parent = _shopGrid.transform;
+        itemGO.transform.SetParent(_shopGrid.transform, false);
         itemGO.GetComponent<ItemUI>().SetData(item, PurchaseItem);
     }
 

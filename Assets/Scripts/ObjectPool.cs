@@ -98,7 +98,7 @@ public class ObjectPool : MonoBehaviour
     public void Return(GameObject g)
     {
         g.gameObject.SetActive(false);
-        g.transform.parent = ObjectPool.instance.transform;
+        g.transform.SetParent(ObjectPool.instance.transform, false);
     }
 
     /// <summary>

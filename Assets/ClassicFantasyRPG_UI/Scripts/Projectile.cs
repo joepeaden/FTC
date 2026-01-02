@@ -13,7 +13,7 @@ public class Projectile : MonoBehaviour
     {
         var right = transform.right;
         var facing = right.x / Math.Abs(right.x);
-        rb.velocity = new Vector2(facing * speed, 0f);
+        rb.linearVelocity = new Vector2(facing * speed, 0f);
     }
 
     private void OnCollisionEnter2D(Collision2D other)

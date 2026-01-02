@@ -48,7 +48,7 @@ namespace Interacting
 
         public bool IsAbleToAttack()
         {
-            return Mathf.Abs(rb.velocity.y) < 0.04f;
+            return Mathf.Abs(rb.linearVelocity.y) < 0.04f;
         }
 
         private void OnDrawGizmos()
