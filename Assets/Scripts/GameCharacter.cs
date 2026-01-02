@@ -50,11 +50,8 @@ public class GameCharacter
     public ArmorItemData HelmItem => _helmItem;
     private ArmorItemData _helmItem;
 
-    //public ArmorItemData BodyItem => _bodyItem;
-    /// <summary>
-    /// this probably needs to be removed.
-    /// </summary>
-    private ArmorItemData _bodyItem;
+    public ShieldItemData ShieldItem => _shieldItem;
+    private ShieldItemData _shieldItem;
 
     public bool OnPlayerTeam => _onPlayerTeam;
     private bool _onPlayerTeam;
@@ -413,6 +410,11 @@ public class GameCharacter
         {
             initMod += _helmItem.initMod;
         }
+        
+        if (_shieldItem != null)
+        {
+            initMod += _shieldItem.initMod;
+        }
 
         return _baseInitiative + initMod;
     }
@@ -439,8 +441,8 @@ public class GameCharacter
             case ItemType.Helmet:
                 _helmItem = null;
                 break;
-            case ItemType.Armor:
-                _bodyItem = null;
+            case ItemType.Shield:
+                _shieldItem = null;
                 break;
             case ItemType.Weapon:
                 _theWeapon.SetData(GameManager.Instance.GameCharData.fallbackWeapon);
@@ -463,9 +465,9 @@ public class GameCharacter
                 oldItem = _helmItem;
                 _helmItem = (ArmorItemData) newItem;
                 break;
-            case ItemType.Armor:
-                oldItem = _bodyItem;
-                _bodyItem = (ArmorItemData) newItem;
+            case ItemType.Shield:
+                oldItem = _shieldItem;
+                _shieldItem = (ShieldItemData) newItem;
                 break;
             case ItemType.Weapon:
                 oldItem = _theWeapon.Data;
@@ -491,6 +493,7 @@ public class GameCharacter
     {
         // equipment move modifier
         int equipmentMoveMod = HelmItem != null ? HelmItem.moveMod : 0;
+        equipmentMoveMod -= ShieldItem != null ? ShieldItem.moveMod : 0;
 
         // get passive modifiers
         int passiveMoveMod = 0;

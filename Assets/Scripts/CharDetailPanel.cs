@@ -33,6 +33,7 @@ public class CharDetailPanel : MonoBehaviour
     private DecisionsManager _decisions;
     [SerializeField] private ItemUI _helmUI;
     [SerializeField] private ItemUI _weaponUI;
+    [SerializeField] private ItemUI _shieldUI;
 
     [SerializeField] private PawnPreview _pawnPreview;
 
@@ -62,6 +63,7 @@ public class CharDetailPanel : MonoBehaviour
 
         _helmUI.RemoveCallbacks();
         _weaponUI.RemoveCallbacks();
+        _shieldUI.RemoveCallbacks();
 
         if (character.HelmItem != null)
         {
@@ -79,6 +81,15 @@ public class CharDetailPanel : MonoBehaviour
         else if (_weaponUI != null)
         {
             _weaponUI.Hide();
+        }
+
+        if (character.ShieldItem != null)
+        {
+            _shieldUI.SetData(character.ShieldItem, UnEquipItem);
+        }
+        else if (_shieldUI != null)
+        {
+            _shieldUI.Hide();
         }
 
         // update abilities
@@ -150,6 +161,9 @@ public class CharDetailPanel : MonoBehaviour
                 break;
             case ItemType.Weapon:
                 _weaponUI.Clear();
+                break;
+            case ItemType.Shield:
+                _shieldUI.Clear();
                 break;
         }
 

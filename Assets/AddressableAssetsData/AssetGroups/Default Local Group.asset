@@ -13,81 +13,13 @@ MonoBehaviour:
   m_Name: Default Local Group
   m_EditorClassIdentifier: 
   m_GroupName: Default Local Group
-  m_Data:
-    m_SerializedData: []
   m_GUID: 4bb1c285f07b9463aa037833afdfcca8
   m_SerializeEntries:
-  - m_GUID: 73487471e3a3642baa450c5f4ec85564
-    m_Address: Assets/Scriptables/MotConds/DoNotDisengage.asset
+  - m_GUID: 025279ef39ee34138ad771576ee830f3
+    m_Address: Assets/Scriptables/Items/Weapons/Sword.asset
     m_ReadOnly: 0
     m_SerializedLabels:
-    - motConditions
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 7012a0c5f04f643d3aafc5c2594a4085
-    m_Address: Assets/Scriptables/MotConds/AlliesCantTakeDamage.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - motConditions
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: ea69e8142750c4417bef33e89b21b675
-    m_Address: Assets/Scriptables/MotConds/KillOneEnemyOath.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - motConditions
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: b89fee492d73748df90a43477361b379
-    m_Address: Assets/Scriptables/FaceDetail/Hair3Blonde.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - hairDetail
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 77c61a070417445a5a44d1b7b6c1ae93
-    m_Address: Assets/Scriptables/FaceDetail/FHair3Blonde.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - facialHairDetail
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: edd91639bb43647ab85a3f98ebe6c3ed
-    m_Address: Assets/Scriptables/FaceDetail/Hair4Blonde.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - hairDetail
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 630ef35d9ed7549ccbf20f27b16ca800
-    m_Address: Assets/Scriptables/FaceDetail/Hair1Blonde.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - hairDetail
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 3221daad49faf499d9675e29e0fcf581
-    m_Address: Assets/Scriptables/FaceDetail/Hair2Blonde.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - hairDetail
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: e162db24aa1954243ac4897fe381f248
-    m_Address: Assets/Scriptables/FaceDetail/FHair2Blonde.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - facialHairDetail
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 1f71329470a18451dbe57d0432e185ae
-    m_Address: Assets/Scriptables/FaceDetail/Brow3Blonde.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - browDetail
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 22d9c2d9eaf2542d1bed17291f44eec4
-    m_Address: Assets/Scriptables/FaceDetail/FHair1Blonde.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - facialHairDetail
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 0a27fa2b9f0ea4984a2d8d4252c49866
-    m_Address: Assets/Scriptables/FaceDetail/Brow1Blonde.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - browDetail
+    - weapons
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0559674fd35604afd9c2f265852d9aca
     m_Address: Assets/Scriptables/FaceDetail/FHair4Blonde.asset
@@ -95,95 +27,53 @@ MonoBehaviour:
     m_SerializedLabels:
     - hairDetail
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 09bc3b809f61541ba816946baf191fa6
+    m_Address: Assets/Scriptables/Items/Armor/PeasantHelm.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - armor
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0a27fa2b9f0ea4984a2d8d4252c49866
+    m_Address: Assets/Scriptables/FaceDetail/Brow1Blonde.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - browDetail
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0b431dce146d34dfab68902568ff9584
+    m_Address: Assets/Scriptables/Items/Armor/BadHelm1.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - armor
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0da1a92ff290341ef8edf7abefe0a001
     m_Address: Assets/Scriptables/FaceDetail/Brow2Blonde.asset
     m_ReadOnly: 0
     m_SerializedLabels:
     - browDetail
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: d61966ac83435437bad8e25bf7c74c30
-    m_Address: Assets/Scriptables/Effects/OathBroken.asset
+  - m_GUID: 104ce6592484645c89a3fcd7600b7f32
+    m_Address: Assets/Scriptables/Passives/Bulwark.asset
     m_ReadOnly: 0
     m_SerializedLabels:
-    - characterEffects
+    - passives
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 21cefe0998bf844d483bace1e1e02377
-    m_Address: Assets/Scriptables/CharacterTypes/EnemyThrall.asset
+  - m_GUID: 10bfb3287a43940979f35f88999d4de9
+    m_Address: Assets/Scriptables/Items/Weapons/Club.asset
     m_ReadOnly: 0
     m_SerializedLabels:
-    - charTypes
+    - weapons
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 2ffcd208c31b24b8d89ae7832606b8f1
-    m_Address: Assets/Scriptables/CharacterTypes/PlayerChar.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - charTypes
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 565e3200803ed45c981d208fa1d1503b
-    m_Address: Assets/Scriptables/Contracts/KillRaiders.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - contracts
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 95b50a0b0c01b40f9b125047a0eff355
-    m_Address: Assets/Scriptables/Contracts/KillRaiders2.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - contracts
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 3b0378d2413974a19b171b6236873f30
-    m_Address: Assets/Scriptables/CharacterTypes/EnemyWarrior.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - charTypes
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: c0c616618bd0b4e759a367a292fd44c7
-    m_Address: Assets/Scriptables/Contracts/KillRaiders3.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - contracts
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 8d029cf86b179414dafff09c5bc61202
-    m_Address: Assets/Scriptables/CharacterTypes/EnemyBerserker.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - charTypes
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 5c740e5fb88bc4d838ae22bec7707af8
-    m_Address: Assets/Scriptables/Contracts/KillRaiders4.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - contracts
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 4c6919aee02884cdeac40874da9ab806
-    m_Address: Assets/Scriptables/Contracts/KillRaiders5.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - contracts
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: a51d28b9c4f274aa6b2b9c86f820f9c4
-    m_Address: Assets/Scriptables/FaceDetail/Hair2.asset
+  - m_GUID: 1252bf6c2b2ca403d83dc770b5df2f63
+    m_Address: Assets/Scriptables/FaceDetail/Hair3.asset
     m_ReadOnly: 0
     m_SerializedLabels:
     - hairDetail
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: cd586f5eef7c843fc9088d5525590f0a
-    m_Address: Assets/Scriptables/FaceDetail/FHair4.asset
+  - m_GUID: 1c625511e23494f19a1ab4dd8b9adc9e
+    m_Address: Assets/Scriptables/FaceDetail/Brow2.asset
     m_ReadOnly: 0
     m_SerializedLabels:
-    - facialHairDetail
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: a7415a9ea61d244759be2d637439835c
-    m_Address: Assets/Scriptables/FaceDetail/Hair1.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - hairDetail
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 24a25ebaea2e047be812738e6f1a4b49
-    m_Address: Assets/Scriptables/FaceDetail/Hair4.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - hairDetail
+    - browDetail
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 1e94d0760f33c4c0ca41ff16bdc4213f
     m_Address: Assets/Scriptables/FaceDetail/Brow3.asset
@@ -191,14 +81,92 @@ MonoBehaviour:
     m_SerializedLabels:
     - browDetail
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 934f420e5c61d4fdbb040a420d31e20c
-    m_Address: Assets/Scriptables/FaceDetail/FHair2.asset
+  - m_GUID: 1f71329470a18451dbe57d0432e185ae
+    m_Address: Assets/Scriptables/FaceDetail/Brow3Blonde.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - browDetail
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 21cefe0998bf844d483bace1e1e02377
+    m_Address: Assets/Scriptables/CharacterTypes/EnemyThrall.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - charTypes
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 22d9c2d9eaf2542d1bed17291f44eec4
+    m_Address: Assets/Scriptables/FaceDetail/FHair1Blonde.asset
     m_ReadOnly: 0
     m_SerializedLabels:
     - facialHairDetail
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 1252bf6c2b2ca403d83dc770b5df2f63
-    m_Address: Assets/Scriptables/FaceDetail/Hair3.asset
+  - m_GUID: 24a25ebaea2e047be812738e6f1a4b49
+    m_Address: Assets/Scriptables/FaceDetail/Hair4.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hairDetail
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2ffcd208c31b24b8d89ae7832606b8f1
+    m_Address: Assets/Scriptables/CharacterTypes/PlayerChar.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - charTypes
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 31f65f6bc6c324ccba0d3a2b5fddafd1
+    m_Address: Assets/Scriptables/Items/Armor/FancyPeasantHelm.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - armor
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3221daad49faf499d9675e29e0fcf581
+    m_Address: Assets/Scriptables/FaceDetail/Hair2Blonde.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hairDetail
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3b0378d2413974a19b171b6236873f30
+    m_Address: Assets/Scriptables/CharacterTypes/EnemyWarrior.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - charTypes
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3f5a7c9ad3d9f4a2aab2f104d01c71ab
+    m_Address: Assets/Scriptables/FaceDetail/FHair1.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - facialHairDetail
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3f9b368f6a59e4158b31a26846087db3
+    m_Address: Assets/Scriptables/Items/Weapons/Axe.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - weapons
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4c6919aee02884cdeac40874da9ab806
+    m_Address: Assets/Scriptables/Contracts/KillRaiders5.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - contracts
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 565e3200803ed45c981d208fa1d1503b
+    m_Address: Assets/Scriptables/Contracts/KillRaiders.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - contracts
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5c740e5fb88bc4d838ae22bec7707af8
+    m_Address: Assets/Scriptables/Contracts/KillRaiders4.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - contracts
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 60828ccceda0d409f8fdd4af06ef6c4c
+    m_Address: Assets/Scriptables/Items/Weapons/2HSword.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - weapons
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 630ef35d9ed7549ccbf20f27b16ca800
+    m_Address: Assets/Scriptables/FaceDetail/Hair1Blonde.asset
     m_ReadOnly: 0
     m_SerializedLabels:
     - hairDetail
@@ -209,17 +177,71 @@ MonoBehaviour:
     m_SerializedLabels:
     - browDetail
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 1c625511e23494f19a1ab4dd8b9adc9e
-    m_Address: Assets/Scriptables/FaceDetail/Brow2.asset
+  - m_GUID: 7012a0c5f04f643d3aafc5c2594a4085
+    m_Address: Assets/Scriptables/MotConds/AlliesCantTakeDamage.asset
     m_ReadOnly: 0
     m_SerializedLabels:
-    - browDetail
+    - motConditions
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 3f5a7c9ad3d9f4a2aab2f104d01c71ab
-    m_Address: Assets/Scriptables/FaceDetail/FHair1.asset
+  - m_GUID: 719cd45cbadfd4fe9b2079e57c57da87
+    m_Address: Assets/Scriptables/Abilities/DefensivePosture.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - charAbilities
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 71b52fbc9bdf34acda204a6cb64dc1d2
+    m_Address: Assets/Scriptables/Items/Armor/GloriousSoldierHelm.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - armor
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 73487471e3a3642baa450c5f4ec85564
+    m_Address: Assets/Scriptables/MotConds/DoNotDisengage.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - motConditions
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 77c61a070417445a5a44d1b7b6c1ae93
+    m_Address: Assets/Scriptables/FaceDetail/FHair3Blonde.asset
     m_ReadOnly: 0
     m_SerializedLabels:
     - facialHairDetail
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 78ca02cd9ffa44ef38a957f5115cc867
+    m_Address: Assets/Scriptables/Items/Armor/HonorableVeteranHelm.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - armor
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8678caac24ac44c738e6bdb696a14d90
+    m_Address: Assets/Scriptables/Items/Shields/BasicShield.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - shields
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8d029cf86b179414dafff09c5bc61202
+    m_Address: Assets/Scriptables/CharacterTypes/EnemyBerserker.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - charTypes
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 934f420e5c61d4fdbb040a420d31e20c
+    m_Address: Assets/Scriptables/FaceDetail/FHair2.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - facialHairDetail
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 948a5120fb2ec4686bd785d02511ad58
+    m_Address: Assets/Scriptables/Items/Armor/SoldierHelm.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - armor
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 95b50a0b0c01b40f9b125047a0eff355
+    m_Address: Assets/Scriptables/Contracts/KillRaiders2.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - contracts
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 98d0e21553f284887a2b7f5463f36b18
     m_Address: Assets/Scriptables/FaceDetail/FHair3.asset
@@ -227,26 +249,44 @@ MonoBehaviour:
     m_SerializedLabels:
     - facialHairDetail
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: ebb16c4f8c826447f92bfaceb39ce505
-    m_Address: Assets/Scriptables/Passives/Tank.asset
+  - m_GUID: 9fecc5ccb3cea43869fed948286e28ac
+    m_Address: Assets/Scriptables/Items/Armor/VeteranHelm.asset
     m_ReadOnly: 0
     m_SerializedLabels:
-    - passives
+    - armor
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a51d28b9c4f274aa6b2b9c86f820f9c4
+    m_Address: Assets/Scriptables/FaceDetail/Hair2.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hairDetail
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a7415a9ea61d244759be2d637439835c
+    m_Address: Assets/Scriptables/FaceDetail/Hair1.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hairDetail
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b1d83ba4942fd46e3804534e7f4793c5
+    m_Address: Assets/Scriptables/Abilities/FirstAid.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - charAbilities
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b89fee492d73748df90a43477361b379
+    m_Address: Assets/Scriptables/FaceDetail/Hair3Blonde.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hairDetail
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c0c616618bd0b4e759a367a292fd44c7
+    m_Address: Assets/Scriptables/Contracts/KillRaiders3.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - contracts
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: c12bdfd2f4b104fda93f8c7d5b10dbaf
     m_Address: Assets/Scriptables/Passives/Perfect.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - passives
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 104ce6592484645c89a3fcd7600b7f32
-    m_Address: Assets/Scriptables/Passives/Bulwark.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - passives
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: c208907b15fa542bbb344b7e4b1d2d2f
-    m_Address: Assets/Scriptables/Passives/Warrior.asset
     m_ReadOnly: 0
     m_SerializedLabels:
     - passives
@@ -257,23 +297,17 @@ MonoBehaviour:
     m_SerializedLabels:
     - passives
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: faaafa6fe8ecf482f8bd1b902cd91bd0
-    m_Address: Assets/Scriptables/Passives/Courage.asset
+  - m_GUID: c208907b15fa542bbb344b7e4b1d2d2f
+    m_Address: Assets/Scriptables/Passives/Warrior.asset
     m_ReadOnly: 0
     m_SerializedLabels:
     - passives
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: b1d83ba4942fd46e3804534e7f4793c5
-    m_Address: Assets/Scriptables/Abilities/FirstAid.asset
+  - m_GUID: cd586f5eef7c843fc9088d5525590f0a
+    m_Address: Assets/Scriptables/FaceDetail/FHair4.asset
     m_ReadOnly: 0
     m_SerializedLabels:
-    - charAbilities
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 719cd45cbadfd4fe9b2079e57c57da87
-    m_Address: Assets/Scriptables/Abilities/DefensivePosture.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - charAbilities
+    - facialHairDetail
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: ce82754719cb74d3184aed24fa207833
     m_Address: Assets/Scriptables/Abilities/Shove.asset
@@ -281,81 +315,51 @@ MonoBehaviour:
     m_SerializedLabels:
     - charAbilities
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 3f9b368f6a59e4158b31a26846087db3
-    m_Address: Assets/Scriptables/Weapons/Axe.asset
+  - m_GUID: d61966ac83435437bad8e25bf7c74c30
+    m_Address: Assets/Scriptables/Effects/OathBroken.asset
     m_ReadOnly: 0
     m_SerializedLabels:
-    - weapons
+    - characterEffects
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 60828ccceda0d409f8fdd4af06ef6c4c
-    m_Address: Assets/Scriptables/Weapons/2HSword.asset
+  - m_GUID: e162db24aa1954243ac4897fe381f248
+    m_Address: Assets/Scriptables/FaceDetail/FHair2Blonde.asset
     m_ReadOnly: 0
     m_SerializedLabels:
-    - weapons
+    - facialHairDetail
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ea69e8142750c4417bef33e89b21b675
+    m_Address: Assets/Scriptables/MotConds/KillOneEnemyOath.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - motConditions
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ebb16c4f8c826447f92bfaceb39ce505
+    m_Address: Assets/Scriptables/Passives/Tank.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - passives
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: edc95d4d67c154e75a73c0b5d49afce6
-    m_Address: Assets/Scriptables/Weapons/Spear.asset
+    m_Address: Assets/Scriptables/Items/Weapons/Spear.asset
     m_ReadOnly: 0
     m_SerializedLabels:
     - weapons
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 10bfb3287a43940979f35f88999d4de9
-    m_Address: Assets/Scriptables/Weapons/Club.asset
+  - m_GUID: edd91639bb43647ab85a3f98ebe6c3ed
+    m_Address: Assets/Scriptables/FaceDetail/Hair4Blonde.asset
     m_ReadOnly: 0
     m_SerializedLabels:
-    - weapons
+    - hairDetail
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 025279ef39ee34138ad771576ee830f3
-    m_Address: Assets/Scriptables/Weapons/Sword.asset
+  - m_GUID: faaafa6fe8ecf482f8bd1b902cd91bd0
+    m_Address: Assets/Scriptables/Passives/Courage.asset
     m_ReadOnly: 0
     m_SerializedLabels:
-    - weapons
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 09bc3b809f61541ba816946baf191fa6
-    m_Address: Assets/Scriptables/Armor/PeasantHelm.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - armor
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 9fecc5ccb3cea43869fed948286e28ac
-    m_Address: Assets/Scriptables/Armor/VeteranHelm.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - armor
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 78ca02cd9ffa44ef38a957f5115cc867
-    m_Address: Assets/Scriptables/Armor/HonorableVeteranHelm.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - armor
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 71b52fbc9bdf34acda204a6cb64dc1d2
-    m_Address: Assets/Scriptables/Armor/GloriousSoldierHelm.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - armor
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 948a5120fb2ec4686bd785d02511ad58
-    m_Address: Assets/Scriptables/Armor/SoldierHelm.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - armor
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 0b431dce146d34dfab68902568ff9584
-    m_Address: Assets/Scriptables/Armor/BadHelm1.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - armor
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 31f65f6bc6c324ccba0d3a2b5fddafd1
-    m_Address: Assets/Scriptables/Armor/FancyPeasantHelm.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - armor
+    - passives
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 7c8bf46af66d94c95b7860930c29ad14, type: 2}
   m_SchemaSet:
     m_Schemas:
-    - {fileID: 11400000, guid: fe597ebe2bb5e4d0e8e4949ce745adcf, type: 2}
     - {fileID: 11400000, guid: 34470bc54fd654ff197a7b5becb3b04e, type: 2}
+    - {fileID: 11400000, guid: fe597ebe2bb5e4d0e8e4949ce745adcf, type: 2}

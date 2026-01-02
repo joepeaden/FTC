@@ -14,10 +14,4 @@ public class ArmorItemData : ItemData
     public int initMod;
     public GameCharacter.CharMotivators viceToMod;
     public int viceMod;
-
-    [Header("Armor Display")]
-    public Sprite SESprite;
-    public Sprite SWSprite;
-    public Sprite NWSprite;
-    public Sprite NESprite;
 }

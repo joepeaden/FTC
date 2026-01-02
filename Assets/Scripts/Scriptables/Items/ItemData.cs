@@ -20,11 +20,17 @@ public class ItemData : ScriptableObject
 
     [Header("Display")]
     public Sprite itemSprite;
+
+    [Header("Directional Display")]
+    public Sprite SESprite;
+    public Sprite SWSprite;
+    public Sprite NWSprite;
+    public Sprite NESprite;
 }
 
 public enum ItemType
 {
     Helmet,
-    Armor,
+    Shield,
     Weapon
 }
