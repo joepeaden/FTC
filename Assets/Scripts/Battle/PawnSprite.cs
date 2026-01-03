@@ -194,11 +194,21 @@ public class PawnSprite : MonoBehaviour
     /// </remarks>
     public void UpdateFacingAndSpriteOrder(Vector3 originPosition, Vector3 facingPosition, Tile currentTile = null)
     {
+        // Facing Player
+        // Body: 0
+        // Head: 1
+        // Weapon: 0
+        // Face & FHair: 2
+        // Helmet & Hair: 4
+
+        // Away from Player
+        //
+
         int totalSpriteOrder = 0;
         if (currentTile != null)
         {
             // make sure he's rendered in front of and behind appropriate terrain pieces
-            totalSpriteOrder = -(int)(currentTile.transform.position.y * 20);
+            totalSpriteOrder = -(int)(currentTile.transform.position.y * GridGenerator.TILE_SPRITE_LAYER_SEPARATION_MULTIPLIER);
         }
 
         // going NE
@@ -236,7 +246,7 @@ public class PawnSprite : MonoBehaviour
 
         _headSpriteRend.sortingOrder = 1 + totalSpriteOrder;
         _weaponSpriteRend.sortingOrder = totalSpriteOrder;
-        _shieldSpriteRend.sortingOrder = totalSpriteOrder + 3;
+        _shieldSpriteRend.sortingOrder = totalSpriteOrder;
         _helmSpriteRend.sortingOrder = 4 + totalSpriteOrder;
     
         UpdateFacingAnimParam();
