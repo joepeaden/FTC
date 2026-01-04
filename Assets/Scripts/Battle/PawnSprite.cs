@@ -45,7 +45,7 @@ public class PawnSprite : MonoBehaviour
     private ArmorItemData _currentHelm;
     private ShieldItemData _currentShield;
 
-    private FacingDirection _facingDirection;
+    private FacingDirection _currentFacing;
     private enum FacingDirection
     {
         NW,
@@ -53,6 +53,8 @@ public class PawnSprite : MonoBehaviour
         SE,
         SW
     }
+
+    private FacingDirection _lastFacing;
 
     #region UnityEvents
 
@@ -106,16 +108,28 @@ public class PawnSprite : MonoBehaviour
             _SEFace = pawn.GameChar.SEEyesSprite;
         }
 
+        _anim.Play("IdleSW", 0, Random.Range(0f, 1f));
+
         if (pawn.OnPlayerTeam)
         {
             UpdateFacingAndSpriteOrder(Vector3.zero, new Vector3(1, 1), pawn.CurrentTile);
-            _anim.Play("IdleNE", 0, Random.Range(0f, 1f));
+            FlipRotation();
+            _lastFacing = FacingDirection.NE;
+            // _anim.Play("IdleNE", 0, Random.Range(0f, 1f));
         }
         else
         {
+
+            // can this just be moved into the Set facing function?
+
             UpdateFacingAndSpriteOrder(Vector3.zero, new Vector3(-1, -1), pawn.CurrentTile);
-            _anim.Play("IdleSW", 0, Random.Range(0f, 1f));
+            _lastFacing = FacingDirection.SW;
         }
+    }
+
+    private void FlipRotation()
+    {
+        transform.Rotate(0, 180, 0, Space.Self);
     }
 
     public void Reset()
@@ -136,7 +150,7 @@ public class PawnSprite : MonoBehaviour
         // anim
         _anim.SetBool("MyTurn", true);
 
-        switch(_facingDirection)
+        switch(_currentFacing)
         {
             case FacingDirection.NW:
                 _anim.Play("ActivatedNW");
@@ -161,7 +175,7 @@ public class PawnSprite : MonoBehaviour
         _anim.SetBool("SW", false);
         _anim.SetBool("NW", false);
 
-        string facingStringParam = _facingDirection switch
+        string facingStringParam = _currentFacing switch
         {
             FacingDirection.NW => "NW",
             FacingDirection.NE => "NE",
@@ -249,14 +263,15 @@ public class PawnSprite : MonoBehaviour
         _shieldSpriteRend.sortingOrder = totalSpriteOrder;
         _helmSpriteRend.sortingOrder = 4 + totalSpriteOrder;
     
-        UpdateFacingAnimParam();
+        // UpdateFacingAnimParam();
     }
 
     private void UpdateSpriteFacing(FacingDirection newDirection)
     {
-        _facingDirection = newDirection;
+        _lastFacing = _currentFacing;
+        _currentFacing = newDirection;
 
-        switch (_facingDirection)
+        switch (_currentFacing)
         {
             case FacingDirection.NE:
                 _eyesSpriteRend.sprite = _blankSprite;
@@ -321,7 +336,7 @@ public class PawnSprite : MonoBehaviour
 
     public void Move()
     {
-        switch (_facingDirection)
+        switch (_currentFacing)
         {
             case FacingDirection.NW:
                 _anim.Play("WalkNW");
@@ -342,32 +357,42 @@ public class PawnSprite : MonoBehaviour
 
     public void StopMoving()
     {
-        switch (_facingDirection)
+        switch (_currentFacing)
         {
-            case FacingDirection.NW:
-                _anim.Play("IdleNW", 0, Random.Range(0f, 1f));
-                break;
             case FacingDirection.NE:
-                _anim.Play("IdleNE", 0, Random.Range(0f, 1f));
-                break;
+                // _anim.Play("IdleNE", 0, Random.Range(0f, 1f));
+                // break;
 
             case FacingDirection.SE:
-                _anim.Play("IdleSE", 0, Random.Range(0f, 1f));
+                if (_lastFacing == FacingDirection.NW || _lastFacing == FacingDirection.SW)
+                {
+                    FlipRotation();
+                }
+                // _anim.Play("IdleSE", 0, Random.Range(0f, 1f));
                 break;
 
+            case FacingDirection.NW:
+                // _anim.Play("IdleNW", 0, Random.Range(0f, 1f));
+                // break;
+                
             case FacingDirection.SW:
-                _anim.Play("IdleSW", 0, Random.Range(0f, 1f));
+                if (_lastFacing == FacingDirection.NE || _lastFacing == FacingDirection.SE)
+                {
+                    FlipRotation();
+                }
                 break;
         }
+        
+        _anim.Play("IdleSW", 0, Random.Range(0f, 1f));
     }
 
     public void Die()
     {
-        if (_facingDirection == FacingDirection.SE)
+        if (_currentFacing == FacingDirection.SE)
         {
             _eyesSpriteRend.sprite = _SEDeadFace;
         }
-        else if (_facingDirection == FacingDirection.SW)
+        else if (_currentFacing == FacingDirection.SW)
         {
             _eyesSpriteRend.sprite = _SWDeadFace;
         }
@@ -391,7 +416,7 @@ public class PawnSprite : MonoBehaviour
         if (armorHit)
         {
             StartCoroutine(PlayArmorHitFXAfterDelay(0f));
-            switch (_facingDirection)
+            switch (_currentFacing)
             {
                 case FacingDirection.NW:
                     animationString = "GetHitARMRNW";
@@ -410,7 +435,7 @@ public class PawnSprite : MonoBehaviour
         else
         {
             StartCoroutine(PlayBloodSpurtAfterDelay(0f));
-            switch (_facingDirection)
+            switch (_currentFacing)
             {
                 case FacingDirection.NW:
                     animationString = "GetHitHPNW";
@@ -452,7 +477,7 @@ public class PawnSprite : MonoBehaviour
 
     public void TriggerDodge()
     {
-        switch (_facingDirection)
+        switch (_currentFacing)
         {
             case FacingDirection.NW:
                 StartCoroutine(PlayAnimationAfterDelay(.2f, "DodgeNW"));
