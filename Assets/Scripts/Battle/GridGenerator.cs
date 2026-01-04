@@ -18,7 +18,9 @@ public class GridGenerator : MonoBehaviour
     [SerializeField] GameObject tilePrefab;
     [SerializeField] int gridHeight;
     [SerializeField] int gridWidth;
-    [SerializeField] float tileSize;
+
+    [SerializeField] float tileHeight;
+    [SerializeField] float tileWidth;
     [SerializeField] float impassableChancePerTile;
 
     public Dictionary<Point, Tile> Tiles => _tiles;
@@ -71,8 +73,8 @@ public class GridGenerator : MonoBehaviour
                     GameObject tileGO = Instantiate(tilePrefab, transform);
                     Tile tileScript = tileGO.GetComponent<Tile>();
 
-                    float posX = (x * tileSize + y * tileSize) / 2f;
-                    float posY = (x * tileSize - y * tileSize) / 4f;
+                    float posX = x * tileWidth;
+                    float posY = y * tileHeight;
 
                     tileGO.transform.position = new Vector3(posX, posY);
                     tileGO.name = "Tile (" + x + ", " + y + ")";
