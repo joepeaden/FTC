@@ -115,6 +115,7 @@ public class Pawn : MonoBehaviour
     private void Awake()
     {
         pathfinder.OnDestinationReached.AddListener(HandleDestinationReached);
+        pathfinder.OnDestinationSet.AddListener(HandleNewDestination);
     }
 
     private void Start()
@@ -126,18 +127,24 @@ public class Pawn : MonoBehaviour
     private void OnDestroy()
     {
         pathfinder.OnDestinationReached.RemoveListener(HandleDestinationReached);
+        pathfinder.OnDestinationSet.RemoveListener(HandleNewDestination);
     }
 
     private void Update()
     {
-        if (_isMoving)
-        {
-            _spriteController.UpdateFacingAndSpriteOrder(_lastPosition, transform.position, CurrentTile);
-        }
         _lastPosition = transform.position;
     }
 
     #endregion
+
+    private void HandleNewDestination(Vector3 newDestination)
+    {
+        if (_isMoving)
+        {
+            Tile tileAtThisLocation = GridGenerator.Instance.GetClosestTileToPosition(transform.position);
+            _spriteController.UpdateFacingAndSpriteOrder(tileAtThisLocation.transform.position, newDestination, CurrentTile);
+        }
+    }
 
     public void SetCharacter(GameCharacter character)
     {
@@ -396,7 +403,7 @@ public class Pawn : MonoBehaviour
         BattleLogUI.Instance.AddLogEntry($"{GameChar.CharName} uses {currentAction.abilityName} against {targetPawn.GameChar.CharName}!");
         BattleLogUI.Instance.AddLogEntry($"Needs: {toHit}, Rolled: {hitRoll}");
 
-        Vector2 attackDirection = transform.position - targetPawn.transform.position;
+        Vector2 attackDirection = targetPawn.transform.position - transform.position;
         attackDirection.Normalize();
         _spriteController.PlayAttack(attackDirection);
 
@@ -895,10 +902,10 @@ public class Pawn : MonoBehaviour
         {
             _spriteController.UpdateFacingAndSpriteOrder(transform.position, adjEnemies[0].transform.position, CurrentTile);
         }
-        else
-        {
-            _spriteController.UpdateFacingAndSpriteOrder(_lastPosition, transform.position, CurrentTile);
-        }
+        // else
+        // {
+        //     _spriteController.UpdateFacingAndSpriteOrder(_lastPosition, transform.position, CurrentTile);
+        // }
 
         // get adjacent enemies to face me 
         if (isFirst)

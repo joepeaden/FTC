@@ -1,7 +1,10 @@
 fileFormatVersion: 2
-guid: 87705c8be948744fdb21cb3419b1c653
+guid: dc5b346c015cd4a629a4aa04239276ac
 TextureImporter:
-  internalIDToNameTable: []
+  internalIDToNameTable:
+  - first:
+      213: 3994941431399090647
+    second: SquareTileGrass4_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -121,7 +124,29 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: SquareTileGrass4_0
+      rect:
+        serializedVersion: 2
+        x: 71
+        y: 90
+        width: 117
+        height: 81
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7d98805d012e07730800000000000000
+      internalID: 3994941431399090647
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []

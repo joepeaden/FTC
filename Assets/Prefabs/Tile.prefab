@@ -359,7 +359,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tileSprites:
-  - {fileID: 21300000, guid: 562a2a938a8f14332ad8a1eb5903a813, type: 3}
+  - {fileID: 21300000, guid: a5ec9758a82e44b8184596c5a2eac3bc, type: 3}
+  - {fileID: 21300000, guid: 7126a81b097ed48ddba3a60cfe6d2fb2, type: 3}
+  - {fileID: 21300000, guid: e393d7f8e207041d99d22f9f415a4ef5, type: 3}
+  - {fileID: 21300000, guid: dc5b346c015cd4a629a4aa04239276ac, type: 3}
   terrainSprites:
   - {fileID: 21300000, guid: e4496bc7d37b56a408d8cbdd884c63b1, type: 3}
   - {fileID: 21300000, guid: ed0bc25a7cc704303ab3f76f5acae69e, type: 3}
@@ -550,7 +553,7 @@ SpriteRenderer:
   m_SortingLayerID: 1760227829
   m_SortingLayer: 1
   m_SortingOrder: -1
-  m_Sprite: {fileID: 21300000, guid: 562a2a938a8f14332ad8a1eb5903a813, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 7126a81b097ed48ddba3a60cfe6d2fb2, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

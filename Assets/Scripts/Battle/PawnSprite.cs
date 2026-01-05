@@ -19,25 +19,12 @@ public class PawnSprite : MonoBehaviour
     [SerializeField] private Sprite _blankSprite;
 
     private Sprite _SWFace;
-    private Sprite _SEFace;
 
-    [SerializeField] private Sprite _SWDeadFace;
-    [SerializeField] private Sprite _SEDeadFace;
-
-    private Sprite _NEHair;
-    private Sprite _NWHair;
     private Sprite _SWHair;
-    private Sprite _SEHair;
 
-    private Sprite _NEBrow;
-    private Sprite _NWBrow;
     private Sprite _SWBrow;
-    private Sprite _SEBrow;
 
-    private Sprite _NEFacialHair;
-    private Sprite _NWFacialHair;
     private Sprite _SWFacialHair;
-    private Sprite _SEFacialHair;
 
     [SerializeField] 
     private ParticleSystem _moveDust;
@@ -45,13 +32,11 @@ public class PawnSprite : MonoBehaviour
     private ArmorItemData _currentHelm;
     private ShieldItemData _currentShield;
 
-    private FacingDirection _currentFacing;
+    private FacingDirection _currentFacing = FacingDirection.West;
     private enum FacingDirection
     {
-        NW,
-        NE,
-        SE,
-        SW
+        West,
+        East
     }
 
     private FacingDirection _lastFacing;
@@ -86,55 +71,41 @@ public class PawnSprite : MonoBehaviour
             _shieldSpriteRend.sprite = pawn.GameChar.ShieldItem.SWSprite;
         }
 
-        _NEHair = pawn.GameChar.HairDetail.NESprite;
-        _NWHair = pawn.GameChar.HairDetail.NWSprite;
         _SWHair = pawn.GameChar.HairDetail.SWSprite;
-        _SEHair = pawn.GameChar.HairDetail.SESprite;
-
-        _NEBrow = pawn.GameChar.BrowDetail.NESprite;
-        _NWBrow = pawn.GameChar.BrowDetail.NWSprite;
+        
         _SWBrow = pawn.GameChar.BrowDetail.SWSprite;
-        _SEBrow = pawn.GameChar.BrowDetail.SESprite;
-
-        _NEFacialHair = pawn.GameChar.FacialHairDetail.NESprite;
-        _NWFacialHair = pawn.GameChar.FacialHairDetail.NWSprite;
+        
         _SWFacialHair = pawn.GameChar.FacialHairDetail.SWSprite;
-        _SEFacialHair = pawn.GameChar.FacialHairDetail.SESprite;
-
+        
         if (pawn.GameChar.BodySprite != null)
         {
             _bodySpriteRend.sprite = pawn.GameChar.BodySprite;
             _SWFace = pawn.GameChar.SWEyesSprite;
-            _SEFace = pawn.GameChar.SEEyesSprite;
         }
+
+        _eyesSpriteRend.sprite = _SWFace;
+        _hairSpriteRend.sprite = _SWHair;
+        _fhairSpriteRend.sprite = _SWFacialHair;
+        _browSpriteRend.sprite = _SWBrow;
+        _helmSpriteRend.sprite = _currentHelm?.SWSprite;
+        _shieldSpriteRend.sprite = _currentShield?.SWSprite;
+
 
         _anim.Play("IdleSW", 0, Random.Range(0f, 1f));
 
         if (pawn.OnPlayerTeam)
         {
-            UpdateFacingAndSpriteOrder(Vector3.zero, new Vector3(1, 1), pawn.CurrentTile);
-            FlipRotation();
-            _lastFacing = FacingDirection.NE;
-            // _anim.Play("IdleNE", 0, Random.Range(0f, 1f));
+            UpdateFacingAndSpriteOrder(Vector3.zero, new Vector3(1, 0), pawn.CurrentTile);
         }
         else
         {
-
-            // can this just be moved into the Set facing function?
-
-            UpdateFacingAndSpriteOrder(Vector3.zero, new Vector3(-1, -1), pawn.CurrentTile);
-            _lastFacing = FacingDirection.SW;
+            UpdateFacingAndSpriteOrder(Vector3.zero, new Vector3(-1, 0), pawn.CurrentTile);
         }
     }
 
     private void FlipRotation()
     {
-        transform.Rotate(0, 180, 0, Space.Self);
-    }
-
-    public void Reset()
-    {
-    
+        transform.parent.Rotate(0, 180, 0, Space.Self);
     }
 
     public void HandleTurnEnd()
@@ -144,56 +115,8 @@ public class PawnSprite : MonoBehaviour
 
     public void HandleTurnBegin()
     {
-        // MyTurn is just useful for triggering exit state to certain anims,
-        // like IdleMyTurn, if we're still in them on turn end, without
-        // explicitly calling Idle anim - so we don't interrupt another possible
-        // anim
         _anim.SetBool("MyTurn", true);
-
-        switch(_currentFacing)
-        {
-            case FacingDirection.NW:
-                _anim.Play("ActivatedNW");
-                break;
-            case FacingDirection.NE:
-                _anim.Play("ActivatedNE");
-                break;
-            case FacingDirection.SW:
-                _anim.Play("ActivatedSW");
-                break;
-            case FacingDirection.SE:
-                _anim.Play("ActivatedSE");
-                break;
-        }
-
-    }
-
-    public void UpdateFacingAnimParam()
-    {
-        _anim.SetBool("NE", false);
-        _anim.SetBool("SE", false);
-        _anim.SetBool("SW", false);
-        _anim.SetBool("NW", false);
-
-        string facingStringParam = _currentFacing switch
-        {
-            FacingDirection.NW => "NW",
-            FacingDirection.NE => "NE",
-            FacingDirection.SW => "SW",
-            FacingDirection.SE => "SE",
-            _ => "SE"
-        };
-
-        _anim.SetBool(facingStringParam, true);
-    }
-
-    private void UpdateFaceOrder(int newOrder)
-    {
-        _eyesSpriteRend.sortingOrder = newOrder + 0;
-        _browSpriteRend.sortingOrder = newOrder + 0;
-        // same level as helm
-        _hairSpriteRend.sortingOrder = newOrder + 4;
-        _fhairSpriteRend.sortingOrder = newOrder + 0;
+        _anim.Play("ActivatedSW");
     }
 
     /// <summary>
@@ -208,62 +131,16 @@ public class PawnSprite : MonoBehaviour
     /// </remarks>
     public void UpdateFacingAndSpriteOrder(Vector3 originPosition, Vector3 facingPosition, Tile currentTile = null)
     {
-        // Facing Player
-        // Body: 0
-        // Head: 1
-        // Weapon: 0
-        // Face & FHair: 2
-        // Helmet & Hair: 4
-
-        // Away from Player
-        //
-
-        int totalSpriteOrder = 0;
-        if (currentTile != null)
-        {
-            // make sure he's rendered in front of and behind appropriate terrain pieces
-            totalSpriteOrder = -(int)(currentTile.transform.position.y * GridGenerator.TILE_SPRITE_LAYER_SEPARATION_MULTIPLIER);
-        }
-
         // going NE
-        if (facingPosition.x > originPosition.x && facingPosition.y > originPosition.y)
+        if (facingPosition.x > originPosition.x)
         {
-            UpdateSpriteFacing(FacingDirection.NE);
-
-            _bodySpriteRend.sortingOrder = totalSpriteOrder + 2;
-            UpdateFaceOrder(totalSpriteOrder + 0);
+            UpdateSpriteFacing(FacingDirection.East);
         }
         // going NW
-        else if (facingPosition.x < originPosition.x && facingPosition.y > originPosition.y)
+        else if (facingPosition.x < originPosition.x)
         {
-            UpdateSpriteFacing(FacingDirection.NW);
-
-            _bodySpriteRend.sortingOrder = totalSpriteOrder + 2;
-            UpdateFaceOrder(totalSpriteOrder + 0);
+            UpdateSpriteFacing(FacingDirection.West);
         }
-        // going SE
-        else if (facingPosition.x > originPosition.x && facingPosition.y < originPosition.y)
-        {
-            UpdateSpriteFacing(FacingDirection.SE);
-
-            _bodySpriteRend.sortingOrder = totalSpriteOrder + 0;
-            UpdateFaceOrder(totalSpriteOrder + 2);
-        }
-        // going SW
-        else
-        {
-            UpdateSpriteFacing(FacingDirection.SW);
-
-            _bodySpriteRend.sortingOrder = totalSpriteOrder + 0;
-            UpdateFaceOrder(totalSpriteOrder + 2);
-        }
-
-        _headSpriteRend.sortingOrder = 1 + totalSpriteOrder;
-        _weaponSpriteRend.sortingOrder = totalSpriteOrder;
-        _shieldSpriteRend.sortingOrder = totalSpriteOrder;
-        _helmSpriteRend.sortingOrder = 4 + totalSpriteOrder;
-    
-        // UpdateFacingAnimParam();
     }
 
     private void UpdateSpriteFacing(FacingDirection newDirection)
@@ -271,132 +148,82 @@ public class PawnSprite : MonoBehaviour
         _lastFacing = _currentFacing;
         _currentFacing = newDirection;
 
-        switch (_currentFacing)
-        {
-            case FacingDirection.NE:
-                _eyesSpriteRend.sprite = _blankSprite;
-                _hairSpriteRend.sprite = _NEHair;
-                _fhairSpriteRend.sprite = _NEFacialHair;
-                _browSpriteRend.sprite = _NEBrow;
-                _helmSpriteRend.sprite = _currentHelm?.NESprite;
-                _shieldSpriteRend.sprite = _currentShield?.NESprite;
-                break;
-            case FacingDirection.SE:
-                _eyesSpriteRend.sprite = _SEFace;
-                _hairSpriteRend.sprite = _SEHair;
-                _fhairSpriteRend.sprite = _SEFacialHair;
-                _browSpriteRend.sprite = _SEBrow;
-                _helmSpriteRend.sprite = _currentHelm?.SESprite;
-                _shieldSpriteRend.sprite = _currentShield?.SESprite;
-                break;
-            case FacingDirection.SW:
-                _eyesSpriteRend.sprite = _SWFace;
-                _hairSpriteRend.sprite = _SWHair;
-                _fhairSpriteRend.sprite = _SWFacialHair;
-                _browSpriteRend.sprite = _SWBrow;
-                _helmSpriteRend.sprite = _currentHelm?.SWSprite;
-                _shieldSpriteRend.sprite = _currentShield?.SWSprite;
-                break;
-            case FacingDirection.NW:
-                _eyesSpriteRend.sprite = _blankSprite;
-                _hairSpriteRend.sprite = _NWHair;
-                _fhairSpriteRend.sprite = _NWFacialHair;
-                _browSpriteRend.sprite = _NWBrow;
-                _helmSpriteRend.sprite = _currentHelm?.NWSprite;
-                _shieldSpriteRend.sprite = _currentShield?.NWSprite;
-                break;
-        }
+        HandleRotation();
     }
 
     #region Animations
 
     public void PlayAttack(Vector3 attackDirection)
     {
-        string animationString = "AttackSW";
+        StartCoroutine(AttackAnimation(attackDirection));
+    }
 
-        if (attackDirection.x > 0 && attackDirection.y > 0)
+    // since this is direction dependent, it's done in code.
+    private IEnumerator AttackAnimation(Vector3 direction)
+    {
+        Transform t = transform.parent;
+
+        Vector3 startPos = t.position;
+
+        float lungeDistance = 0.5f;
+        Vector3 lungePos = startPos + direction * lungeDistance;
+
+        float forwardTime = 0.15f;
+        float returnTime = 0.35f;
+
+        // Fast lunge
+        float t01 = 0f;
+        while (t01 < .2f)
         {
-            animationString = "AttackSW";
-        }
-        if (attackDirection.x < 0 && attackDirection.y > 0)
-        {
-            animationString = "AttackSE";
-        }
-        if (attackDirection.x > 0 && attackDirection.y < 0)
-        {
-            animationString = "AttackNW";
-        }
-        if (attackDirection.x < 0 && attackDirection.y < 0)
-        {
-            animationString = "AttackNE";
+            t01 += Time.deltaTime / forwardTime;
+            t.position = Vector3.Lerp(startPos, lungePos, t01);
+            yield return null;
         }
 
-        _anim.Play(animationString);
+        // Slower return
+        t01 = 0f;
+        while (t01 < .35f)
+        {
+            t01 += Time.deltaTime / returnTime;
+            t.position = Vector3.Lerp(lungePos, startPos, t01);
+            yield return null;
+        }
+
+        t.position = startPos; // snap for safety
     }
 
     public void Move()
     {
+        _anim.Play("WalkSW");
+    }
+
+    public void HandleRotation()
+    {
         switch (_currentFacing)
         {
-            case FacingDirection.NW:
-                _anim.Play("WalkNW");
-                break;
-            case FacingDirection.NE:
-                _anim.Play("WalkNE");
-                break;
-
-            case FacingDirection.SE:
-                _anim.Play("WalkSE");
+            case FacingDirection.East:
+                if (_lastFacing == FacingDirection.West)
+                {
+                    FlipRotation();
+                }
                 break;
 
-            case FacingDirection.SW:
-                _anim.Play("WalkSW");
+            case FacingDirection.West:
+                if (_lastFacing == FacingDirection.East)
+                {
+                    FlipRotation();
+                }
                 break;
         }
     }
 
     public void StopMoving()
-    {
-        switch (_currentFacing)
-        {
-            case FacingDirection.NE:
-                // _anim.Play("IdleNE", 0, Random.Range(0f, 1f));
-                // break;
-
-            case FacingDirection.SE:
-                if (_lastFacing == FacingDirection.NW || _lastFacing == FacingDirection.SW)
-                {
-                    FlipRotation();
-                }
-                // _anim.Play("IdleSE", 0, Random.Range(0f, 1f));
-                break;
-
-            case FacingDirection.NW:
-                // _anim.Play("IdleNW", 0, Random.Range(0f, 1f));
-                // break;
-                
-            case FacingDirection.SW:
-                if (_lastFacing == FacingDirection.NE || _lastFacing == FacingDirection.SE)
-                {
-                    FlipRotation();
-                }
-                break;
-        }
-        
+    {    
         _anim.Play("IdleSW", 0, Random.Range(0f, 1f));
     }
 
     public void Die()
     {
-        if (_currentFacing == FacingDirection.SE)
-        {
-            _eyesSpriteRend.sprite = _SEDeadFace;
-        }
-        else if (_currentFacing == FacingDirection.SW)
-        {
-            _eyesSpriteRend.sprite = _SWDeadFace;
-        }
-
         StartCoroutine(PlayAnimationAfterDelay(.2f, "Die"));
         
         _hairSpriteRend.sortingLayerName = "DeadCharacters";
@@ -416,46 +243,17 @@ public class PawnSprite : MonoBehaviour
         if (armorHit)
         {
             StartCoroutine(PlayArmorHitFXAfterDelay(0f));
-            switch (_currentFacing)
-            {
-                case FacingDirection.NW:
-                    animationString = "GetHitARMRNW";
-                    break;
-                case FacingDirection.NE:
-                    animationString = "GetHitARMRNE";
-                    break;
-                case FacingDirection.SE:
-                    animationString = "GetHitARMRSE";
-                    break;
-                case FacingDirection.SW:
-                    animationString = "GetHitARMRSW";
-                    break;
-            }
+            animationString = "GetHitARMRSW";
         }
         else
         {
             StartCoroutine(PlayBloodSpurtAfterDelay(0f));
-            switch (_currentFacing)
-            {
-                case FacingDirection.NW:
-                    animationString = "GetHitHPNW";
-                    break;
-                case FacingDirection.NE:
-                    animationString = "GetHitHPNE";
-                    break;
-                case FacingDirection.SE:
-                    animationString = "GetHitHPSE";
-                    break;
-                case FacingDirection.SW:
-                    animationString = "GetHitHPSW";
-                    break;
-            }
+            animationString = "GetHitHPSW";
         }
 
         if (!isDead)
         {
             _anim.Play(animationString);
-            //StartCoroutine(PlayAnimationAfterDelay(.2f, animationString));
         }
 
         // make the helmet gone if there's no armor for cool factor
@@ -477,21 +275,7 @@ public class PawnSprite : MonoBehaviour
 
     public void TriggerDodge()
     {
-        switch (_currentFacing)
-        {
-            case FacingDirection.NW:
-                StartCoroutine(PlayAnimationAfterDelay(.2f, "DodgeNW"));
-                break;
-            case FacingDirection.NE:
-                StartCoroutine(PlayAnimationAfterDelay(.2f, "DodgeNE"));
-                break;
-            case FacingDirection.SE:
-                StartCoroutine(PlayAnimationAfterDelay(.2f, "DodgeSE"));
-                break;
-            case FacingDirection.SW:
-                StartCoroutine(PlayAnimationAfterDelay(.2f, "DodgeSW"));
-                break;
-        }
+        StartCoroutine(PlayAnimationAfterDelay(.2f, "DodgeSW"));
     }
 
     #endregion
