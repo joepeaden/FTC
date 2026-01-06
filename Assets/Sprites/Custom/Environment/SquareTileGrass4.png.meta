@@ -160,7 +160,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      SquareTileGrass4_0: 3994941431399090647
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

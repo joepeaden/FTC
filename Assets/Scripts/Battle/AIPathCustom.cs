@@ -4,7 +4,7 @@ using UnityEngine;
 using Pathfinding;
 using UnityEngine.Events;
 
-public class AIPathCustom : AIPath
+public class AIPathCustom : AILerp
 {
     public UnityEvent<Vector3> OnDestinationSet = new ();
     public UnityEvent OnDestinationReached = new ();

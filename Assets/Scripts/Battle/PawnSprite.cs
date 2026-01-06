@@ -14,7 +14,11 @@ public class PawnSprite : MonoBehaviour
     [SerializeField] private SpriteRenderer _bodySpriteRend;
     [SerializeField] private SpriteRenderer _helmSpriteRend;
     [SerializeField] private SpriteRenderer _weaponSpriteRend;
-    [SerializeField] private SpriteRenderer _shieldSpriteRend;
+    [SerializeField] private SpriteRenderer _offhandSpriteRend;
+    [SerializeField] private Transform _weaponTransform;
+    [SerializeField] private Transform _offhandTransform;
+    [SerializeField] private Transform _hand1;
+    [SerializeField] private Transform _hand2;
 
     [SerializeField] private Sprite _blankSprite;
 
@@ -68,7 +72,7 @@ public class PawnSprite : MonoBehaviour
         
         if (pawn.GameChar.ShieldItem != null)
         {
-            _shieldSpriteRend.sprite = pawn.GameChar.ShieldItem.SWSprite;
+            _offhandSpriteRend.sprite = pawn.GameChar.ShieldItem.SWSprite;
         }
 
         _SWHair = pawn.GameChar.HairDetail.SWSprite;
@@ -88,7 +92,7 @@ public class PawnSprite : MonoBehaviour
         _fhairSpriteRend.sprite = _SWFacialHair;
         _browSpriteRend.sprite = _SWBrow;
         _helmSpriteRend.sprite = _currentHelm?.SWSprite;
-        _shieldSpriteRend.sprite = _currentShield?.SWSprite;
+        _offhandSpriteRend.sprite = _currentShield?.SWSprite;
 
 
         _anim.Play("IdleSW", 0, Random.Range(0f, 1f));
@@ -131,6 +135,24 @@ public class PawnSprite : MonoBehaviour
     /// </remarks>
     public void UpdateFacingAndSpriteOrder(Vector3 originPosition, Vector3 facingPosition, Tile currentTile = null)
     {
+        int totalSpriteOrder = 0;
+        if (currentTile != null)
+        {
+            // make sure he's rendered in front of and behind appropriate terrain pieces
+            totalSpriteOrder = -(int)(currentTile.transform.position.y * GridGenerator.TILE_SPRITE_LAYER_SEPARATION_MULTIPLIER);
+        }
+
+        _bodySpriteRend.sortingOrder = totalSpriteOrder;
+
+        _eyesSpriteRend.sortingOrder = totalSpriteOrder + 2;
+        _browSpriteRend.sortingOrder = totalSpriteOrder + 2;
+        // same level as helm
+        _hairSpriteRend.sortingOrder = totalSpriteOrder + 4;
+        _fhairSpriteRend.sortingOrder = totalSpriteOrder + 2;
+        _headSpriteRend.sortingOrder = totalSpriteOrder + 1;
+
+        _helmSpriteRend.sortingOrder = totalSpriteOrder + 4;
+
         // going NE
         if (facingPosition.x > originPosition.x)
         {
@@ -173,7 +195,7 @@ public class PawnSprite : MonoBehaviour
 
         // Fast lunge
         float t01 = 0f;
-        while (t01 < .2f)
+        while (t01 < 1f)
         {
             t01 += Time.deltaTime / forwardTime;
             t.position = Vector3.Lerp(startPos, lungePos, t01);
@@ -182,7 +204,7 @@ public class PawnSprite : MonoBehaviour
 
         // Slower return
         t01 = 0f;
-        while (t01 < .35f)
+        while (t01 < 1f)
         {
             t01 += Time.deltaTime / returnTime;
             t.position = Vector3.Lerp(lungePos, startPos, t01);
@@ -234,7 +256,7 @@ public class PawnSprite : MonoBehaviour
         _headSpriteRend.sortingLayerName = "DeadCharacters";
         _helmSpriteRend.sortingLayerName = "DeadCharacters";
         _weaponSpriteRend.sortingLayerName = "DeadCharacters";
-        _shieldSpriteRend.sortingLayerName = "DeadCharacters";
+        _offhandSpriteRend.sortingLayerName = "DeadCharacters";
     }
 
     public void HandleHit(bool isDead, bool armorHit, bool armorDestroyed)
