@@ -12,7 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 262ce3e95c70240b0b397720240a18f8, type: 3}
   m_Name: Hair2
   m_EditorClassIdentifier: 
-  SESprite: {fileID: 21300000, guid: 85c4475b881cd4d48a6956d8545a61f0, type: 3}
-  SWSprite: {fileID: 21300000, guid: ff062135239214b8b907b9cdfcf8b1f5, type: 3}
-  NWSprite: {fileID: 21300000, guid: aa4441ffcf8a6458db354158987b3e87, type: 3}
-  NESprite: {fileID: 21300000, guid: 4326febc85139445a9fb08492e295682, type: 3}
+  hairColor: 0
+  sprite: {fileID: 21300000, guid: ff062135239214b8b907b9cdfcf8b1f5, type: 3}

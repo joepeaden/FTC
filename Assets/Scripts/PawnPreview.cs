@@ -53,7 +53,7 @@ public class PawnPreview : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         ArmorItemData helm = g.HelmItem;
         WeaponItemData weapon = g.TheWeapon.Data;
 
-        SetupAppearance(helm, weapon, shield, g.SWEyesSprite, g.BodySprite, g.HairDetail.SWSprite, g.FacialHairDetail.SWSprite, g.BrowDetail.SWSprite);
+        SetupAppearance(helm, weapon, shield, g.EyesSprite, g.BodySprite, g.HairDetail.sprite, g.FacialHairDetail.sprite, g.BrowDetail.sprite);
     }
 
     public void SetData(Pawn p)
@@ -73,7 +73,7 @@ public class PawnPreview : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         WeaponItemData weapon = p.GameChar.TheWeapon.Data;
         ShieldItemData shield = p.GameChar.ShieldItem;
 
-        SetupAppearance(helm, weapon, shield, p.GameChar.SWEyesSprite, p.GameChar.BodySprite, p.GameChar.HairDetail.SWSprite, p.GameChar.FacialHairDetail.SWSprite, p.GameChar.BrowDetail.SWSprite);
+        SetupAppearance(helm, weapon, shield, p.GameChar.EyesSprite, p.GameChar.BodySprite, p.GameChar.HairDetail.sprite, p.GameChar.FacialHairDetail.sprite, p.GameChar.BrowDetail.sprite);
     }
 
     private void SetupAppearance(ArmorItemData helm, WeaponItemData weapon, ShieldItemData shield, Sprite eyesSprite, Sprite bodySprite, Sprite hairSprite, Sprite fHairSprite, Sprite browSprite)

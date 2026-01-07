@@ -62,7 +62,7 @@ public class GameCharacter
 
     public Sprite SEEyesSprite => _seEyesSprite;
     private Sprite _seEyesSprite;
-    public Sprite SWEyesSprite => _swEyesSprite;
+    public Sprite EyesSprite => _swEyesSprite;
     private Sprite _swEyesSprite;
 
     // detail data objects - basically different sprites that make up the face

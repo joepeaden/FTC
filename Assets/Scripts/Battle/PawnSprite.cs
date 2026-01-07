@@ -54,13 +54,13 @@ public class PawnSprite : MonoBehaviour
 
         if (pawn.GameChar.HelmItem != null)
         {
-            _helmSpriteRend.sprite = _currentHelm.SWSprite;
+            _helmSpriteRend.sprite = _currentHelm.itemSprite;
             _hairSpriteRend.gameObject.SetActive(false);
         }
         
         if (pawn.GameChar.ShieldItem != null)
         {
-            _offhandSpriteRend.sprite = pawn.GameChar.ShieldItem.SWSprite;
+            _offhandSpriteRend.sprite = pawn.GameChar.ShieldItem.itemSprite;
         }
 
         
@@ -69,12 +69,12 @@ public class PawnSprite : MonoBehaviour
             _bodySpriteRend.sprite = pawn.GameChar.BodySprite;
         }
 
-        _eyesSpriteRend.sprite = pawn.GameChar.SWEyesSprite;
-        _hairSpriteRend.sprite = pawn.GameChar.HairDetail.SWSprite;
-        _fhairSpriteRend.sprite = pawn.GameChar.FacialHairDetail.SWSprite;
-        _browSpriteRend.sprite = pawn.GameChar.BrowDetail.SWSprite;
-        _helmSpriteRend.sprite = _currentHelm?.SWSprite;
-        _offhandSpriteRend.sprite = _currentShield?.SWSprite;
+        _eyesSpriteRend.sprite = pawn.GameChar.EyesSprite;
+        _hairSpriteRend.sprite = pawn.GameChar.HairDetail.sprite;
+        _fhairSpriteRend.sprite = pawn.GameChar.FacialHairDetail.sprite;
+        _browSpriteRend.sprite = pawn.GameChar.BrowDetail.sprite;
+        _helmSpriteRend.sprite = _currentHelm?.itemSprite;
+        _offhandSpriteRend.sprite = _currentShield?.itemSprite;
 
 
         _anim.Play("IdleSW", 0, Random.Range(0f, 1f));

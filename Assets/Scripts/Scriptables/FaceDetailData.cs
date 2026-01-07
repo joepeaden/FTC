@@ -14,5 +14,5 @@ public class FaceDetailData : ScriptableObject
     }
 
     public HairColor hairColor;
-    public Sprite SWSprite;
+    public Sprite sprite;
 }

@@ -13,7 +13,4 @@ MonoBehaviour:
   m_Name: Brow2Blonde
   m_EditorClassIdentifier: 
   hairColor: 1
-  SESprite: {fileID: 21300000, guid: f6ab3f9f6860843208dd70fb2fc5b9c6, type: 3}
-  SWSprite: {fileID: 21300000, guid: 249e5c84d4c594d29a4ff5e4e9985dca, type: 3}
-  NWSprite: {fileID: 21300000, guid: 77636eecde00cbb47a050427ae2e923f, type: 3}
-  NESprite: {fileID: 21300000, guid: 77636eecde00cbb47a050427ae2e923f, type: 3}
+  sprite: {fileID: 21300000, guid: 249e5c84d4c594d29a4ff5e4e9985dca, type: 3}
