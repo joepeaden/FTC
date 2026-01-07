@@ -30,6 +30,5 @@ MonoBehaviour:
   defaultArmorOptions: []
   abilityList: []
   shirt: {fileID: 21300000, guid: a85206170700bc544a1a8e9ea5f03244, type: 3}
-  eyesSE: {fileID: 21300000, guid: 3e2493cfa88614e389c508b1c4fc9055, type: 3}
-  eyesSW: {fileID: 21300000, guid: 26ef5e718aeec4c8bb8971b45c7a468c, type: 3}
+  eyes: {fileID: 21300000, guid: 26ef5e718aeec4c8bb8971b45c7a468c, type: 3}
   contractDisplaySprite: {fileID: 0}

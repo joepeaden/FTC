@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PawnSprite : MonoBehaviour
 {
+    private const float REACT_TO_ATTACK_DELAY = .2f;
+
     [SerializeField] private Animator _anim;
 
     [SerializeField] private SpriteRenderer _eyesSpriteRend;
@@ -161,17 +163,20 @@ public class PawnSprite : MonoBehaviour
 
     public void PlayAttack(Vector3 attackDirection)
     {
-        StartCoroutine(AttackAnimation(attackDirection));
+        StartCoroutine(MoveFromHitDirection(0, false, attackDirection));
     }
 
     // since this is direction dependent, it's done in code.
-    private IEnumerator AttackAnimation(Vector3 direction)
+    private IEnumerator MoveFromHitDirection(float delay, bool isReaction, Vector3 direction)
     {
+        yield return new WaitForSeconds(delay);
+
         Transform t = transform.parent;
 
         Vector3 startPos = t.position;
 
-        float lungeDistance = 0.5f;
+        float lungeDistance = isReaction ? 0.1f : 0.5f;
+
         Vector3 lungePos = startPos + direction * lungeDistance;
 
         float forwardTime = 0.05f;
@@ -230,7 +235,7 @@ public class PawnSprite : MonoBehaviour
 
     public void Die()
     {
-        StartCoroutine(PlayAnimationAfterDelay(.2f, "Die"));
+        StartCoroutine(PlayAnimationAfterDelay(REACT_TO_ATTACK_DELAY, "Die"));
         
         _eyesSpriteRend.sprite = _deadEyesSprite;
 
@@ -245,7 +250,7 @@ public class PawnSprite : MonoBehaviour
         _offhandSpriteRend.sortingLayerName = "DeadCharacters";
     }
 
-    public void HandleHit(bool isDead, bool armorHit, bool armorDestroyed)
+    public void HandleHit(Vector3 attackDirection, bool isDead, bool armorHit, bool armorDestroyed)
     {
         string animationString = "";
         if (armorHit)
@@ -262,6 +267,8 @@ public class PawnSprite : MonoBehaviour
         if (!isDead)
         {
             _anim.Play(animationString);
+
+            StartCoroutine(MoveFromHitDirection(REACT_TO_ATTACK_DELAY, true, attackDirection));
         }
 
         // make the helmet gone if there's no armor for cool factor
@@ -281,14 +288,15 @@ public class PawnSprite : MonoBehaviour
         _anim.SetBool("LevelUp", true);
     }
 
-    public void TriggerBlock()
+    public void TriggerBlock(Vector3 attackDirection)
     {
-        StartCoroutine(PlayAnimationAfterDelay(.2f, "Block"));
+        StartCoroutine(PlayAnimationAfterDelay(REACT_TO_ATTACK_DELAY, "Block"));
+        StartCoroutine(MoveFromHitDirection(REACT_TO_ATTACK_DELAY, true, attackDirection));
     }
 
     public void TriggerDodge()
     {
-        StartCoroutine(PlayAnimationAfterDelay(.2f, "DodgeSW"));
+        StartCoroutine(PlayAnimationAfterDelay(REACT_TO_ATTACK_DELAY, "DodgeSW"));
     }
 
     #endregion

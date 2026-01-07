@@ -422,7 +422,7 @@ public class Pawn : MonoBehaviour
         }
         else if (ShieldBlocked(targetPawn, hitRoll, toHit))
         {
-            targetPawn.TriggerBlock();
+            targetPawn.TriggerBlock(attackDirection);
         }
         else
         {
@@ -495,9 +495,9 @@ public class Pawn : MonoBehaviour
         _spriteController.SetLevelUp();
     }
 
-    public void TriggerBlock()
+    public void TriggerBlock(Vector3 attackDirection)
     {
-        _spriteController.TriggerBlock();
+        _spriteController.TriggerBlock(attackDirection);
         
         BattleManager.Instance.AddPendingTextNotification("Block!", Color.white);
         BattleManager.Instance.TriggerTextNotification(this.transform.position);
@@ -629,7 +629,9 @@ public class Pawn : MonoBehaviour
             }
         }
 
-        _spriteController.HandleHit(_isDead, armorHit, armorHit && _armorPoints <= 0);
+
+        Vector2 attackDirection = transform.position - attackingPawn.transform.position;
+        _spriteController.HandleHit(attackDirection, _isDead, armorHit, armorHit && _armorPoints <= 0);
 
         OnHPChanged.Invoke();
 
