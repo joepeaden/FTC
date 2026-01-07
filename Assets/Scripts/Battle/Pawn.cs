@@ -446,13 +446,10 @@ public class Pawn : MonoBehaviour
                 BattleKills++;
                 OnKillEnemy.Invoke();
             }
-            
-            // I don't think we need this? Looks like it happens in TakeDamage. Delete if you see this later and haven't deleted it yet.
-
-            // else if (!targetHadArmor)
-            // {
-            //     StartCoroutine(PlayAudioAfterDelay(0f, GameChar.TheWeapon.Data.hitSound));
-            // }
+            else if (!targetHadArmor)
+            {
+                StartCoroutine(PlayAudioAfterDelay(0f, GameChar.TheWeapon.Data.hitSound));
+            }
         }
     }
 

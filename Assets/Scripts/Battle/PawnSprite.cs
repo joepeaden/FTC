@@ -17,14 +17,7 @@ public class PawnSprite : MonoBehaviour
     [SerializeField] private SpriteRenderer _offhandSpriteRend;
 
     [SerializeField] private Sprite _blankSprite;
-
-    private Sprite _SWFace;
-
-    private Sprite _SWHair;
-
-    private Sprite _SWBrow;
-
-    private Sprite _SWFacialHair;
+    
 
     [SerializeField] 
     private ParticleSystem _moveDust;
@@ -71,22 +64,16 @@ public class PawnSprite : MonoBehaviour
             _offhandSpriteRend.sprite = pawn.GameChar.ShieldItem.SWSprite;
         }
 
-        _SWHair = pawn.GameChar.HairDetail.SWSprite;
-        
-        _SWBrow = pawn.GameChar.BrowDetail.SWSprite;
-        
-        _SWFacialHair = pawn.GameChar.FacialHairDetail.SWSprite;
         
         if (pawn.GameChar.BodySprite != null)
         {
             _bodySpriteRend.sprite = pawn.GameChar.BodySprite;
-            _SWFace = pawn.GameChar.SWEyesSprite;
         }
 
-        _eyesSpriteRend.sprite = _SWFace;
-        _hairSpriteRend.sprite = _SWHair;
-        _fhairSpriteRend.sprite = _SWFacialHair;
-        _browSpriteRend.sprite = _SWBrow;
+        _eyesSpriteRend.sprite = pawn.GameChar.SWEyesSprite;
+        _hairSpriteRend.sprite = pawn.GameChar.HairDetail.SWSprite;
+        _fhairSpriteRend.sprite = pawn.GameChar.FacialHairDetail.SWSprite;
+        _browSpriteRend.sprite = pawn.GameChar.BrowDetail.SWSprite;
         _helmSpriteRend.sprite = _currentHelm?.SWSprite;
         _offhandSpriteRend.sprite = _currentShield?.SWSprite;
 
