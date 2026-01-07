@@ -185,7 +185,7 @@ MonoBehaviour:
   _helmSpriteRend: {fileID: 523573614248301957}
   _weaponSpriteRend: {fileID: 7680635963903929364}
   _offhandSpriteRend: {fileID: 8742719209805748986}
-  _blankSprite: {fileID: 21300000, guid: 77636eecde00cbb47a050427ae2e923f, type: 3}
+  _deadEyesSprite: {fileID: 21300000, guid: b434ab0f1218845c79e652b3cd0bb2f9, type: 3}
   _moveDust: {fileID: 0}
 --- !u!1 &2498003295827522020
 GameObject:

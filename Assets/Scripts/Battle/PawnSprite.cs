@@ -16,8 +16,7 @@ public class PawnSprite : MonoBehaviour
     [SerializeField] private SpriteRenderer _weaponSpriteRend;
     [SerializeField] private SpriteRenderer _offhandSpriteRend;
 
-    [SerializeField] private Sprite _blankSprite;
-    
+    [SerializeField] private Sprite _deadEyesSprite;
 
     [SerializeField] 
     private ParticleSystem _moveDust;
@@ -231,6 +230,8 @@ public class PawnSprite : MonoBehaviour
     {
         StartCoroutine(PlayAnimationAfterDelay(.2f, "Die"));
         
+        _eyesSpriteRend.sprite = _deadEyesSprite;
+
         _hairSpriteRend.sortingLayerName = "DeadCharacters";
         _browSpriteRend.sortingLayerName = "DeadCharacters";
         _fhairSpriteRend.sortingLayerName = "DeadCharacters";

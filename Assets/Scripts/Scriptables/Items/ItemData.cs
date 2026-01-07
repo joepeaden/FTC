@@ -22,10 +22,7 @@ public class ItemData : ScriptableObject
     public Sprite itemSprite;
 
     [Header("Directional Display")]
-    public Sprite SESprite;
     public Sprite SWSprite;
-    public Sprite NWSprite;
-    public Sprite NESprite;
 }
 
 public enum ItemType

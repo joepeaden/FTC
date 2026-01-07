@@ -207,7 +207,6 @@ public class GameCharacter
     {
         Dictionary<string, FaceDetailData> hairDetails = DataLoader.hairDetail;
         _hairDetail = hairDetails.Values.ToList()[Random.Range(0, hairDetails.Count)];
-        
 
         Dictionary<string, FaceDetailData> fHairDetails = DataLoader.facialHairDetail;
         List<FaceDetailData> hairDetailOptions = fHairDetails.Values.Where(x => x.hairColor == _hairDetail.hairColor).ToList(); 
