@@ -134,6 +134,8 @@ public class PawnSprite : MonoBehaviour
         _headSpriteRend.sortingOrder = totalSpriteOrder + 1;
 
         _helmSpriteRend.sortingOrder = totalSpriteOrder + 4;
+        _offhandSpriteRend.sortingOrder = totalSpriteOrder + 5;
+        _weaponSpriteRend.sortingOrder = totalSpriteOrder + 1;
 
         // going NE
         if (facingPosition.x > originPosition.x)
