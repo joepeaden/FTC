@@ -478,6 +478,11 @@ public class GameCharacter
         return oldItem;
     }
 
+    public bool HasShield()
+    {
+        return _shieldItem != null;
+    }
+
     public int GetHitRollChance()
     {        
         int hitRollMod = 0;

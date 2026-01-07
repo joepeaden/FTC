@@ -15,10 +15,6 @@ public class PawnSprite : MonoBehaviour
     [SerializeField] private SpriteRenderer _helmSpriteRend;
     [SerializeField] private SpriteRenderer _weaponSpriteRend;
     [SerializeField] private SpriteRenderer _offhandSpriteRend;
-    [SerializeField] private Transform _weaponTransform;
-    [SerializeField] private Transform _offhandTransform;
-    [SerializeField] private Transform _hand1;
-    [SerializeField] private Transform _hand2;
 
     [SerializeField] private Sprite _blankSprite;
 
@@ -190,7 +186,7 @@ public class PawnSprite : MonoBehaviour
         float lungeDistance = 0.5f;
         Vector3 lungePos = startPos + direction * lungeDistance;
 
-        float forwardTime = 0.15f;
+        float forwardTime = 0.05f;
         float returnTime = 0.35f;
 
         // Fast lunge
@@ -295,6 +291,11 @@ public class PawnSprite : MonoBehaviour
         _anim.SetBool("LevelUp", true);
     }
 
+    public void TriggerBlock()
+    {
+        StartCoroutine(PlayAnimationAfterDelay(.2f, "Block"));
+    }
+
     public void TriggerDodge()
     {
         StartCoroutine(PlayAnimationAfterDelay(.2f, "DodgeSW"));
@@ -319,7 +320,6 @@ public class PawnSprite : MonoBehaviour
     private IEnumerator PlayAnimationAfterDelay(float delay, string animName)
     {
         yield return new WaitForSeconds(delay);
-
 
         _anim.Play(animName);
     }

@@ -55,7 +55,7 @@ public class EquipmentTooltip : MonoBehaviour
                 break;
             case ItemType.Shield:
                 ShieldItemData shieldItem = (ShieldItemData)item;
-                SetLine("Block Chance", shieldItem.blockChance.ToString());
+                SetLine("Block Chance", shieldItem.blockRange.ToString());
                 SetLine("Move", shieldItem.moveMod.ToString());
                 SetLine("Initiative", shieldItem.initMod.ToString());
                 break; 

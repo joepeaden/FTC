@@ -407,22 +407,29 @@ public class Pawn : MonoBehaviour
         attackDirection.Normalize();
         _spriteController.PlayAttack(attackDirection);
 
-        if (hitRoll >= toHit)
+        if (hitRoll < toHit)
         {
+            targetPawn.TriggerDodge(this);
+            
+            // BattleManager.Instance.AddTextNotification(transform.position, "Miss!");
+            StartCoroutine(PlayAudioAfterDelay(0.1f, GameChar.TheWeapon.Data.missSound));
+
+            // if damage self upon miss and greater than half HP, damage self
+            if (GameChar.DamageSelfOnMiss() && HitPoints >= (GameChar.HitPoints/2) && (HitPoints-1) > 0)
+            {
+                TakeDamage(this, 1, false);
+            }
+        }
+        else if (ShieldBlocked(targetPawn, hitRoll, toHit))
+        {
+            targetPawn.TriggerBlock();
+        }
+        else
+        {
+            bool isCrit = GetIsCrit(hitRoll, currentAction);
+
+            // need to get this before TakeDamage because after their armor will be different 
             bool targetHadArmor = targetPawn.ArmorPoints > 0;
-
-            int critRollMod = 0;
-            foreach (PassiveData passive in GameChar.Passives)
-            {
-                critRollMod += passive.critRollModifier;
-            }
-
-            // Note - the defending pawn in TakeDamage can turn this crit false if they have abilities that do so.
-            bool isCrit = false;
-            if (hitRoll >= (GameChar.CritChance - currentAction.critChanceMod + critRollMod))
-            {
-                isCrit = true;
-            }
 
             targetPawn.TakeDamage(this, currentAction, isCrit);
 
@@ -439,29 +446,66 @@ public class Pawn : MonoBehaviour
                 BattleKills++;
                 OnKillEnemy.Invoke();
             }
-            else if (!targetHadArmor)
-            {
-                StartCoroutine(PlayAudioAfterDelay(0f, GameChar.TheWeapon.Data.hitSound));
-            }
-        }
-        else
-        {
-            targetPawn.TriggerDodge(this);
             
-            // BattleManager.Instance.AddTextNotification(transform.position, "Miss!");
-            StartCoroutine(PlayAudioAfterDelay(0.1f, GameChar.TheWeapon.Data.missSound));
+            // I don't think we need this? Looks like it happens in TakeDamage. Delete if you see this later and haven't deleted it yet.
 
-            // if damage self upon miss and greater than half HP, damage self
-            if (GameChar.DamageSelfOnMiss() && HitPoints >= (GameChar.HitPoints/2) && (HitPoints-1) > 0)
-            {
-                TakeDamage(this, 1, false);
-            }
+            // else if (!targetHadArmor)
+            // {
+            //     StartCoroutine(PlayAudioAfterDelay(0f, GameChar.TheWeapon.Data.hitSound));
+            // }
         }
+    }
+
+    private bool ShieldBlocked(Pawn targetPawn, int hitRoll, int toHit)
+    {
+        if (!targetPawn.GameChar.HasShield())
+        {
+            return false;
+        }
+
+        // if we were missed by the blockRange or less, then
+        // the shield blocks it.
+
+        ShieldItemData shield = targetPawn.GameChar.ShieldItem;
+        int difference = Mathf.Abs(toHit - hitRoll);
+        if (difference <= shield.blockRange)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool GetIsCrit(int hitRoll, WeaponAbilityData currentAction)
+    {
+        int critRollMod = 0;
+        foreach (PassiveData passive in GameChar.Passives)
+        {
+            critRollMod += passive.critRollModifier;
+        }
+
+        // Note - the defending pawn in TakeDamage can turn this crit false if they have abilities that do so.
+        if (hitRoll >= (GameChar.CritChance - currentAction.critChanceMod + critRollMod))
+        {
+            return true;
+        }
+    
+        return false;
     }
 
     public void TriggerLevelUpVisuals()
     {
         _spriteController.SetLevelUp();
+    }
+
+    public void TriggerBlock()
+    {
+        _spriteController.TriggerBlock();
+        
+        BattleManager.Instance.AddPendingTextNotification("Block!", Color.white);
+        BattleManager.Instance.TriggerTextNotification(this.transform.position);
+
+        StartCoroutine(PlayAudioAfterDelay(0.1f, GameChar.ShieldItem.blockSound));
     }
 
     public void TriggerDodge(Pawn opponentPawn)
@@ -471,13 +515,15 @@ public class Pawn : MonoBehaviour
 
     private IEnumerator TriggerDodgeCoroutine(Pawn opponentPawn)
     {
+
+        BattleManager.Instance.AddPendingTextNotification("Dodge!", Color.white);
+
         if (InDefensiveStance)
         {
             opponentPawn.HoldingForAttackAnimation = true;
             yield return new WaitForSeconds(.25f);
 
             BattleManager.Instance.AddPendingTextNotification("Counter!", Color.white);
-            BattleManager.Instance.TriggerTextNotification(this.transform.position);
 
             AttackPawn(opponentPawn, GetBasicAttack());
 
@@ -487,6 +533,8 @@ public class Pawn : MonoBehaviour
         {
             _spriteController.TriggerDodge();
         }
+
+        BattleManager.Instance.TriggerTextNotification(this.transform.position);
     }
 
     public void TakeDamage(Pawn attackingPawn, int attackDmg, bool isCrit)
