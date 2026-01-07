@@ -29,7 +29,6 @@ public class GameCharacterData : ScriptableObject
 
     [Header("Appearance")]
     public Sprite shirt;
-    public Sprite eyesSE;
-    public Sprite eyesSW;
+    public Sprite eyes;
     public Sprite contractDisplaySprite;
 }

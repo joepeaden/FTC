@@ -4,8 +4,9 @@ using UnityEngine;
 using Pathfinding;
 using UnityEngine.Events;
 
-public class AIPathCustom : AIPath
+public class AIPathCustom : AILerp
 {
+    public UnityEvent<Vector3> OnDestinationSet = new ();
     public UnityEvent OnDestinationReached = new ();
     private Seeker _seeker;
     private Pawn _pawn;
@@ -71,6 +72,7 @@ public class AIPathCustom : AIPath
     private void MoveToNextPathNode()
     {
         destination = _pathToFollow[_currentPathIndex];
+        OnDestinationSet.Invoke(destination);
 
         if (_currentPathIndex > 0)
         {

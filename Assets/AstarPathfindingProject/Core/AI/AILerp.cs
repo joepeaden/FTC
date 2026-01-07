@@ -196,7 +196,18 @@ namespace Pathfinding {
 		}
 
 		/// <summary>\copydoc Pathfinding::IAstarAI::position</summary>
-		public Vector3 position { get { return updatePosition ? tr.position : simulatedPosition; } }
+		public Vector3 position 
+		{
+			get 
+			{
+				if (tr == null)
+				{
+					tr = GetComponent<Transform>();	
+				}
+
+				return updatePosition ? tr.position : simulatedPosition;
+			}
+		}
 
 		/// <summary>\copydoc Pathfinding::IAstarAI::rotation</summary>
 		public Quaternion rotation {
@@ -380,6 +391,11 @@ namespace Pathfinding {
 		/// <summary>Called when the component is enabled</summary>
 		protected virtual void OnEnable () {
 			// Make sure we receive callbacks when paths complete
+			if (seeker == null)
+			{
+				seeker = GetComponent<Seeker>();
+			}
+
 			seeker.pathCallback += OnPathComplete;
 			Init();
 		}

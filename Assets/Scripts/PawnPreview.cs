@@ -21,6 +21,7 @@ public class PawnPreview : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     [SerializeField] private GameObject detailedPreview;
     [SerializeField] private Image helmRend;
     [SerializeField] private Image weaponRend;
+    [SerializeField] private Image shieldRend;
     [SerializeField] private Image bodyRend;
     [SerializeField] private Image hairRend;
     [SerializeField] private Image eyesRend;
@@ -48,10 +49,11 @@ public class PawnPreview : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         simplePreview.SetActive(false);
         detailedPreview.SetActive(true);
 
+        ShieldItemData shield = g.ShieldItem;
         ArmorItemData helm = g.HelmItem;
         WeaponItemData weapon = g.TheWeapon.Data;
 
-        SetupAppearance(helm, weapon, g.SWEyesSprite, g.BodySprite, g.HairDetail.SWSprite, g.FacialHairDetail.SWSprite, g.BrowDetail.SWSprite);
+        SetupAppearance(helm, weapon, shield, g.EyesSprite, g.BodySprite, g.HairDetail.sprite, g.FacialHairDetail.sprite, g.BrowDetail.sprite);
     }
 
     public void SetData(Pawn p)
@@ -61,8 +63,6 @@ public class PawnPreview : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
         _pawn = p;
 
-        //headRend.sprite = p.GetFaceSprite();
-
         ArmorItemData helm = p.GameChar.HelmItem;
         // don't show helm if it's destroyed
         if (p.ArmorPoints < 0)
@@ -71,11 +71,12 @@ public class PawnPreview : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         }
 
         WeaponItemData weapon = p.GameChar.TheWeapon.Data;
+        ShieldItemData shield = p.GameChar.ShieldItem;
 
-        SetupAppearance(helm, weapon, p.GameChar.SWEyesSprite, p.GameChar.BodySprite, p.GameChar.HairDetail.SWSprite, p.GameChar.FacialHairDetail.SWSprite, p.GameChar.BrowDetail.SWSprite);
+        SetupAppearance(helm, weapon, shield, p.GameChar.EyesSprite, p.GameChar.BodySprite, p.GameChar.HairDetail.sprite, p.GameChar.FacialHairDetail.sprite, p.GameChar.BrowDetail.sprite);
     }
 
-    private void SetupAppearance(ArmorItemData helm, WeaponItemData weapon, Sprite eyesSprite, Sprite bodySprite, Sprite hairSprite, Sprite fHairSprite, Sprite browSprite)
+    private void SetupAppearance(ArmorItemData helm, WeaponItemData weapon, ShieldItemData shield, Sprite eyesSprite, Sprite bodySprite, Sprite hairSprite, Sprite fHairSprite, Sprite browSprite)
     {
         if (helm != null)
         {
@@ -97,6 +98,16 @@ public class PawnPreview : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         else
         {
             weaponRend.gameObject.SetActive(false);
+        }
+
+        if (shield != null)
+        {
+            shieldRend.gameObject.SetActive(true);
+            shieldRend.sprite = shield.itemSprite;
+        }
+        else
+        {
+            shieldRend.gameObject.SetActive(false);
         }
 
         if (bodySprite != null)

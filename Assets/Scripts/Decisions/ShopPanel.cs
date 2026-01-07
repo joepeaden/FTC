@@ -23,6 +23,7 @@ public class ShopPanel : MonoBehaviour
         // and that are available at the current store level
         possibleItems = DataLoader.weapons.Values.Where(x => x.storeLevel >= 0 && x.storeLevel <= GameManager.Instance.ShopLevel).ToList();
         possibleItems.AddRange(DataLoader.armor.Values.Where(x => x.storeLevel >= 0 && x.storeLevel <= GameManager.Instance.ShopLevel).ToList());
+        possibleItems.AddRange(DataLoader.shields.Values.Where(x => x.storeLevel >= 0 && x.storeLevel <= GameManager.Instance.ShopLevel).ToList());
     }
 
     /// <summary>

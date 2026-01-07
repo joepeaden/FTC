@@ -41,34 +41,24 @@ public class EquipmentTooltip : MonoBehaviour
 
         HideInfoLines();
 
-        if (item.itemType == ItemType.Weapon)
+        switch (item.itemType)
         {
-            WeaponItemData weaponItem = (WeaponItemData)item;
-            SetLine("Damage", weaponItem.baseDamage.ToString());
-        }
-        else
-        {
-            ArmorItemData armorItem = (ArmorItemData)item;
-            SetLine("Armor", armorItem.protection.ToString());
-            SetLine("Move", armorItem.moveMod.ToString());
-            SetLine("Initiative", armorItem.initMod.ToString());
-            
-            //UpdateModText(viceModElements, viceModValue, armorItem.viceMod);
-            //if (armorItem.viceMod != 0)
-            //{
-            //    switch (armorItem.viceToMod)
-            //    {
-            //        case GameCharacter.CharMotivators.Greed:
-            //            viceModLabel.text = "GRD:";
-            //            break;
-            //        case GameCharacter.CharMotivators.Honor:
-            //            viceModLabel.text = "HNR:";
-            //            break;
-            //        case GameCharacter.CharMotivators.Glory:
-            //            viceModLabel.text = "GLY:";
-            //            break;
-            //    }
-            //}
+            case ItemType.Weapon:
+                WeaponItemData weaponItem = (WeaponItemData)item;
+                SetLine("Damage", weaponItem.baseDamage.ToString());
+                break;
+            case ItemType.Helmet:
+                ArmorItemData armorItem = (ArmorItemData)item;
+                SetLine("Armor", armorItem.protection.ToString());
+                SetLine("Move", armorItem.moveMod.ToString());
+                SetLine("Initiative", armorItem.initMod.ToString());
+                break;
+            case ItemType.Shield:
+                ShieldItemData shieldItem = (ShieldItemData)item;
+                SetLine("Block Chance", shieldItem.blockRange.ToString());
+                SetLine("Move", shieldItem.moveMod.ToString());
+                SetLine("Initiative", shieldItem.initMod.ToString());
+                break; 
         }
     }
 

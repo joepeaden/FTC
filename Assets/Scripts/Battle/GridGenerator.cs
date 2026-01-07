@@ -6,6 +6,10 @@ using UnityEngine;
 
 public class GridGenerator : MonoBehaviour
 {
+    // this value is 20, but because each tile is really .5 y delta, there's 10 units to work with for layering. 
+    // doubling this should give you 20 spaces to work with, and so on.
+    public const int TILE_SPRITE_LAYER_SEPARATION_MULTIPLIER = 20;
+
     public static GridGenerator Instance => _instance;
     private static GridGenerator _instance;
 
@@ -14,7 +18,9 @@ public class GridGenerator : MonoBehaviour
     [SerializeField] GameObject tilePrefab;
     [SerializeField] int gridHeight;
     [SerializeField] int gridWidth;
-    [SerializeField] float tileSize;
+
+    [SerializeField] float tileHeight;
+    [SerializeField] float tileWidth;
     [SerializeField] float impassableChancePerTile;
 
     public Dictionary<Point, Tile> Tiles => _tiles;
@@ -24,8 +30,6 @@ public class GridGenerator : MonoBehaviour
     public List<Tile> EnemySpawns => _enemySpawns;
     private List<Tile> _playerSpawns = new();
     private List<Tile> _enemySpawns = new();
-
-    //private int layerIncrement = 10;
 
     void Awake()
     {
@@ -69,15 +73,15 @@ public class GridGenerator : MonoBehaviour
                     GameObject tileGO = Instantiate(tilePrefab, transform);
                     Tile tileScript = tileGO.GetComponent<Tile>();
 
-                    float posX = (x * tileSize + y * tileSize) / 2f;
-                    float posY = (x * tileSize - y * tileSize) / 4f;
+                    float posX = x * tileWidth;
+                    float posY = y * tileHeight;
 
                     tileGO.transform.position = new Vector3(posX, posY);
                     tileGO.name = "Tile (" + x + ", " + y + ")";
 
                     // 10 unit increments (the y pos are all .5 different) so that there's enough
                     // room for pawn sprite detail layering between obstacles
-                    tileScript.SetTerrainSortingOrder((int)(-1 * posY * 20));
+                    tileScript.SetTerrainSortingOrder((int)(-1 * posY * TILE_SPRITE_LAYER_SEPARATION_MULTIPLIER));
 
                     _tiles[gridPoint] = tileScript;
 

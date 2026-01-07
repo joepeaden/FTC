@@ -13,7 +13,4 @@ MonoBehaviour:
   m_Name: Hair3Blonde
   m_EditorClassIdentifier: 
   hairColor: 1
-  SESprite: {fileID: 21300000, guid: 8345058a053b941f0bda71148376859b, type: 3}
-  SWSprite: {fileID: 21300000, guid: aed3bc1140f57455b88f59c036d385d0, type: 3}
-  NWSprite: {fileID: 21300000, guid: 6939aa6fa4c004d12aee5a0e9eab124b, type: 3}
-  NESprite: {fileID: 21300000, guid: d5c14ae08dbd24f219ff3c7bc974bb63, type: 3}
+  sprite: {fileID: 21300000, guid: aed3bc1140f57455b88f59c036d385d0, type: 3}

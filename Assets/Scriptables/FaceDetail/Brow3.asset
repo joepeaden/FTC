@@ -12,7 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 262ce3e95c70240b0b397720240a18f8, type: 3}
   m_Name: Brow3
   m_EditorClassIdentifier: 
-  SESprite: {fileID: 21300000, guid: e81c6bf48df6b42cb9f2197c47a9fc25, type: 3}
-  SWSprite: {fileID: 21300000, guid: 026b628b943924d618b3d9a030934f5f, type: 3}
-  NWSprite: {fileID: 21300000, guid: 77636eecde00cbb47a050427ae2e923f, type: 3}
-  NESprite: {fileID: 21300000, guid: 77636eecde00cbb47a050427ae2e923f, type: 3}
+  hairColor: 0
+  sprite: {fileID: 21300000, guid: 026b628b943924d618b3d9a030934f5f, type: 3}

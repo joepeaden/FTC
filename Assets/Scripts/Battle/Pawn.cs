@@ -115,6 +115,7 @@ public class Pawn : MonoBehaviour
     private void Awake()
     {
         pathfinder.OnDestinationReached.AddListener(HandleDestinationReached);
+        pathfinder.OnDestinationSet.AddListener(HandleNewDestination);
     }
 
     private void Start()
@@ -126,18 +127,24 @@ public class Pawn : MonoBehaviour
     private void OnDestroy()
     {
         pathfinder.OnDestinationReached.RemoveListener(HandleDestinationReached);
+        pathfinder.OnDestinationSet.RemoveListener(HandleNewDestination);
     }
 
     private void Update()
     {
-        if (_isMoving)
-        {
-            _spriteController.UpdateFacingAndSpriteOrder(_lastPosition, transform.position, CurrentTile);
-        }
         _lastPosition = transform.position;
     }
 
     #endregion
+
+    private void HandleNewDestination(Vector3 newDestination)
+    {
+        if (_isMoving)
+        {
+            Tile tileAtThisLocation = GridGenerator.Instance.GetClosestTileToPosition(transform.position);
+            _spriteController.UpdateFacingAndSpriteOrder(tileAtThisLocation.transform.position, newDestination, CurrentTile);
+        }
+    }
 
     public void SetCharacter(GameCharacter character)
     {
@@ -396,26 +403,33 @@ public class Pawn : MonoBehaviour
         BattleLogUI.Instance.AddLogEntry($"{GameChar.CharName} uses {currentAction.abilityName} against {targetPawn.GameChar.CharName}!");
         BattleLogUI.Instance.AddLogEntry($"Needs: {toHit}, Rolled: {hitRoll}");
 
-        Vector2 attackDirection = transform.position - targetPawn.transform.position;
+        Vector2 attackDirection = targetPawn.transform.position - transform.position;
         attackDirection.Normalize();
         _spriteController.PlayAttack(attackDirection);
 
-        if (hitRoll >= toHit)
+        if (hitRoll < toHit)
         {
+            targetPawn.TriggerDodge(this);
+            
+            // BattleManager.Instance.AddTextNotification(transform.position, "Miss!");
+            StartCoroutine(PlayAudioAfterDelay(0.1f, GameChar.TheWeapon.Data.missSound));
+
+            // if damage self upon miss and greater than half HP, damage self
+            if (GameChar.DamageSelfOnMiss() && HitPoints >= (GameChar.HitPoints/2) && (HitPoints-1) > 0)
+            {
+                TakeDamage(this, 1, false);
+            }
+        }
+        else if (ShieldBlocked(targetPawn, hitRoll, toHit))
+        {
+            targetPawn.TriggerBlock();
+        }
+        else
+        {
+            bool isCrit = GetIsCrit(hitRoll, currentAction);
+
+            // need to get this before TakeDamage because after their armor will be different 
             bool targetHadArmor = targetPawn.ArmorPoints > 0;
-
-            int critRollMod = 0;
-            foreach (PassiveData passive in GameChar.Passives)
-            {
-                critRollMod += passive.critRollModifier;
-            }
-
-            // Note - the defending pawn in TakeDamage can turn this crit false if they have abilities that do so.
-            bool isCrit = false;
-            if (hitRoll >= (GameChar.CritChance - currentAction.critChanceMod + critRollMod))
-            {
-                isCrit = true;
-            }
 
             targetPawn.TakeDamage(this, currentAction, isCrit);
 
@@ -437,24 +451,58 @@ public class Pawn : MonoBehaviour
                 StartCoroutine(PlayAudioAfterDelay(0f, GameChar.TheWeapon.Data.hitSound));
             }
         }
-        else
-        {
-            targetPawn.TriggerDodge(this);
-            
-            // BattleManager.Instance.AddTextNotification(transform.position, "Miss!");
-            StartCoroutine(PlayAudioAfterDelay(0.1f, GameChar.TheWeapon.Data.missSound));
+    }
 
-            // if damage self upon miss and greater than half HP, damage self
-            if (GameChar.DamageSelfOnMiss() && HitPoints >= (GameChar.HitPoints/2) && (HitPoints-1) > 0)
-            {
-                TakeDamage(this, 1, false);
-            }
+    private bool ShieldBlocked(Pawn targetPawn, int hitRoll, int toHit)
+    {
+        if (!targetPawn.GameChar.HasShield())
+        {
+            return false;
         }
+
+        // if we were missed by the blockRange or less, then
+        // the shield blocks it.
+
+        ShieldItemData shield = targetPawn.GameChar.ShieldItem;
+        int difference = Mathf.Abs(toHit - hitRoll);
+        if (difference <= shield.blockRange)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool GetIsCrit(int hitRoll, WeaponAbilityData currentAction)
+    {
+        int critRollMod = 0;
+        foreach (PassiveData passive in GameChar.Passives)
+        {
+            critRollMod += passive.critRollModifier;
+        }
+
+        // Note - the defending pawn in TakeDamage can turn this crit false if they have abilities that do so.
+        if (hitRoll >= (GameChar.CritChance - currentAction.critChanceMod + critRollMod))
+        {
+            return true;
+        }
+    
+        return false;
     }
 
     public void TriggerLevelUpVisuals()
     {
         _spriteController.SetLevelUp();
+    }
+
+    public void TriggerBlock()
+    {
+        _spriteController.TriggerBlock();
+        
+        BattleManager.Instance.AddPendingTextNotification("Block!", Color.white);
+        BattleManager.Instance.TriggerTextNotification(this.transform.position);
+
+        StartCoroutine(PlayAudioAfterDelay(0.1f, GameChar.ShieldItem.blockSound));
     }
 
     public void TriggerDodge(Pawn opponentPawn)
@@ -464,13 +512,15 @@ public class Pawn : MonoBehaviour
 
     private IEnumerator TriggerDodgeCoroutine(Pawn opponentPawn)
     {
+
+        BattleManager.Instance.AddPendingTextNotification("Dodge!", Color.white);
+
         if (InDefensiveStance)
         {
             opponentPawn.HoldingForAttackAnimation = true;
             yield return new WaitForSeconds(.25f);
 
             BattleManager.Instance.AddPendingTextNotification("Counter!", Color.white);
-            BattleManager.Instance.TriggerTextNotification(this.transform.position);
 
             AttackPawn(opponentPawn, GetBasicAttack());
 
@@ -480,6 +530,8 @@ public class Pawn : MonoBehaviour
         {
             _spriteController.TriggerDodge();
         }
+
+        BattleManager.Instance.TriggerTextNotification(this.transform.position);
     }
 
     public void TakeDamage(Pawn attackingPawn, int attackDmg, bool isCrit)
@@ -895,11 +947,7 @@ public class Pawn : MonoBehaviour
         {
             _spriteController.UpdateFacingAndSpriteOrder(transform.position, adjEnemies[0].transform.position, CurrentTile);
         }
-        else
-        {
-            _spriteController.UpdateFacingAndSpriteOrder(_lastPosition, transform.position, CurrentTile);
-        }
-
+        
         // get adjacent enemies to face me 
         if (isFirst)
         {

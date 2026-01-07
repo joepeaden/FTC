@@ -50,11 +50,8 @@ public class GameCharacter
     public ArmorItemData HelmItem => _helmItem;
     private ArmorItemData _helmItem;
 
-    //public ArmorItemData BodyItem => _bodyItem;
-    /// <summary>
-    /// this probably needs to be removed.
-    /// </summary>
-    private ArmorItemData _bodyItem;
+    public ShieldItemData ShieldItem => _shieldItem;
+    private ShieldItemData _shieldItem;
 
     public bool OnPlayerTeam => _onPlayerTeam;
     private bool _onPlayerTeam;
@@ -63,10 +60,8 @@ public class GameCharacter
     public Sprite BodySprite => _bodySprite;
     private Sprite _bodySprite;
 
-    public Sprite SEEyesSprite => _seEyesSprite;
-    private Sprite _seEyesSprite;
-    public Sprite SWEyesSprite => _swEyesSprite;
-    private Sprite _swEyesSprite;
+    public Sprite EyesSprite => _eyesSprite;
+    private Sprite _eyesSprite;
 
     // detail data objects - basically different sprites that make up the face
     public FaceDetailData HairDetail => _hairDetail;
@@ -196,8 +191,7 @@ public class GameCharacter
             EquipItem(startingArmor);
         }
 
-        _seEyesSprite = charData.eyesSE;
-        _swEyesSprite = charData.eyesSW;
+        _eyesSprite = charData.eyes;
         _bodySprite = charData.shirt;
         GenerateFace();
 
@@ -210,7 +204,6 @@ public class GameCharacter
     {
         Dictionary<string, FaceDetailData> hairDetails = DataLoader.hairDetail;
         _hairDetail = hairDetails.Values.ToList()[Random.Range(0, hairDetails.Count)];
-        
 
         Dictionary<string, FaceDetailData> fHairDetails = DataLoader.facialHairDetail;
         List<FaceDetailData> hairDetailOptions = fHairDetails.Values.Where(x => x.hairColor == _hairDetail.hairColor).ToList(); 
@@ -413,6 +406,11 @@ public class GameCharacter
         {
             initMod += _helmItem.initMod;
         }
+        
+        if (_shieldItem != null)
+        {
+            initMod += _shieldItem.initMod;
+        }
 
         return _baseInitiative + initMod;
     }
@@ -439,8 +437,8 @@ public class GameCharacter
             case ItemType.Helmet:
                 _helmItem = null;
                 break;
-            case ItemType.Armor:
-                _bodyItem = null;
+            case ItemType.Shield:
+                _shieldItem = null;
                 break;
             case ItemType.Weapon:
                 _theWeapon.SetData(GameManager.Instance.GameCharData.fallbackWeapon);
@@ -463,9 +461,9 @@ public class GameCharacter
                 oldItem = _helmItem;
                 _helmItem = (ArmorItemData) newItem;
                 break;
-            case ItemType.Armor:
-                oldItem = _bodyItem;
-                _bodyItem = (ArmorItemData) newItem;
+            case ItemType.Shield:
+                oldItem = _shieldItem;
+                _shieldItem = (ShieldItemData) newItem;
                 break;
             case ItemType.Weapon:
                 oldItem = _theWeapon.Data;
@@ -474,6 +472,11 @@ public class GameCharacter
         }
 
         return oldItem;
+    }
+
+    public bool HasShield()
+    {
+        return _shieldItem != null;
     }
 
     public int GetHitRollChance()
@@ -491,6 +494,7 @@ public class GameCharacter
     {
         // equipment move modifier
         int equipmentMoveMod = HelmItem != null ? HelmItem.moveMod : 0;
+        equipmentMoveMod += ShieldItem != null ? ShieldItem.moveMod : 0;
 
         // get passive modifiers
         int passiveMoveMod = 0;

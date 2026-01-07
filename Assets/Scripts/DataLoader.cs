@@ -36,6 +36,9 @@ public class DataLoader
     // armor
     public static Dictionary<string, ItemData> armor = new();
 
+    // shields
+    public static Dictionary<string, ItemData> shields = new();
+
     public void LoadData()
     {
         Addressables.LoadAssetsAsync<GameCharacterData>("charTypes", OnLoadCharTypesCompleted);
@@ -49,6 +52,7 @@ public class DataLoader
         Addressables.LoadAssetsAsync<PassiveData>("passives", OnLoadPassives);
         Addressables.LoadAssetsAsync<WeaponItemData>("weapons", OnLoadWeaponsCompleted);
         Addressables.LoadAssetsAsync<ArmorItemData>("armor", OnLoadArmorCompleted);
+        Addressables.LoadAssetsAsync<ShieldItemData>("shields", OnLoadShieldsCompleted);
     }
 
     private void OnLoadPassives(PassiveData result)
@@ -108,5 +112,10 @@ public class DataLoader
     private void OnLoadArmorCompleted(ItemData result)
     {
         armor[result.itemName] = result;
+    }
+    
+    private void OnLoadShieldsCompleted(ItemData result)
+    {
+        shields[result.itemName] = result;
     }
 }

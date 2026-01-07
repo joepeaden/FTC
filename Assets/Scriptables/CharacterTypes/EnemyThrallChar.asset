@@ -31,6 +31,5 @@ MonoBehaviour:
   - {fileID: 0}
   abilityList: []
   shirt: {fileID: 21300000, guid: dd9116136e8cb408c92f464663fe2c9e, type: 3}
-  eyesSE: {fileID: 21300000, guid: 3e2493cfa88614e389c508b1c4fc9055, type: 3}
-  eyesSW: {fileID: 21300000, guid: 26ef5e718aeec4c8bb8971b45c7a468c, type: 3}
+  eyes: {fileID: 21300000, guid: 26ef5e718aeec4c8bb8971b45c7a468c, type: 3}
   contractDisplaySprite: {fileID: 21300000, guid: 44a758cd03ade4281b7392edc68256f8, type: 3}
