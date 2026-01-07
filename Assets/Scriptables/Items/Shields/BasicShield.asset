@@ -19,11 +19,7 @@ MonoBehaviour:
   isDefault: 0
   storeLevel: 0
   itemSprite: {fileID: 21300000, guid: 2da16b1c617cf448c839e6247138825a, type: 3}
-  SESprite: {fileID: 21300000, guid: 2da16b1c617cf448c839e6247138825a, type: 3}
-  SWSprite: {fileID: 21300000, guid: 2da16b1c617cf448c839e6247138825a, type: 3}
-  NWSprite: {fileID: 21300000, guid: 9d805b7c6d7594167aa926b91f30cf3f, type: 3}
-  NESprite: {fileID: 21300000, guid: 9d805b7c6d7594167aa926b91f30cf3f, type: 3}
   blockRange: 4
   blockSound: {fileID: 8300000, guid: e65f26438f2344c4dbd0a54376060518, type: 3}
-  moveMod: 2
-  initMod: 2
+  moveMod: -2
+  initMod: -2

@@ -60,10 +60,8 @@ public class GameCharacter
     public Sprite BodySprite => _bodySprite;
     private Sprite _bodySprite;
 
-    public Sprite SEEyesSprite => _seEyesSprite;
-    private Sprite _seEyesSprite;
-    public Sprite EyesSprite => _swEyesSprite;
-    private Sprite _swEyesSprite;
+    public Sprite EyesSprite => _eyesSprite;
+    private Sprite _eyesSprite;
 
     // detail data objects - basically different sprites that make up the face
     public FaceDetailData HairDetail => _hairDetail;
@@ -193,8 +191,7 @@ public class GameCharacter
             EquipItem(startingArmor);
         }
 
-        _seEyesSprite = charData.eyesSE;
-        _swEyesSprite = charData.eyesSW;
+        _eyesSprite = charData.eyes;
         _bodySprite = charData.shirt;
         GenerateFace();
 
@@ -497,7 +494,7 @@ public class GameCharacter
     {
         // equipment move modifier
         int equipmentMoveMod = HelmItem != null ? HelmItem.moveMod : 0;
-        equipmentMoveMod -= ShieldItem != null ? ShieldItem.moveMod : 0;
+        equipmentMoveMod += ShieldItem != null ? ShieldItem.moveMod : 0;
 
         // get passive modifiers
         int passiveMoveMod = 0;

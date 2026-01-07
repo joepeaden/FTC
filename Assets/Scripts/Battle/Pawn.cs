@@ -947,11 +947,7 @@ public class Pawn : MonoBehaviour
         {
             _spriteController.UpdateFacingAndSpriteOrder(transform.position, adjEnemies[0].transform.position, CurrentTile);
         }
-        // else
-        // {
-        //     _spriteController.UpdateFacingAndSpriteOrder(_lastPosition, transform.position, CurrentTile);
-        // }
-
+        
         // get adjacent enemies to face me 
         if (isFirst)
         {
