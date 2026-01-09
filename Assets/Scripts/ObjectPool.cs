@@ -23,9 +23,14 @@ public class ObjectPool : MonoBehaviour
     public GameObject itemUIPrefab;
     public int itemUIPoolSize;
 
+    [Header("Blood Splats")]
+    public GameObject bloodSplatPrefab;
+    public int bloodSplatPoolSize;
+
     private List<GameObject> pawnPreviews;
     private List<GameObject> audioSources;
     private List<GameObject> itemUIs;
+    private List<GameObject> bloodSplats;
 
     void Awake()
     {
@@ -37,6 +42,7 @@ public class ObjectPool : MonoBehaviour
         audioSources = CreatePool(audioSourcePrefab, audioSources, audioSourcePoolSize);
         pawnPreviews = CreatePool(pawnPreviewPrefab, pawnPreviews, pawnPreviewPoolSize);
         itemUIs = CreatePool(itemUIPrefab, itemUIs, itemUIPoolSize);
+        bloodSplats = CreatePool(bloodSplatPrefab, bloodSplats, bloodSplatPoolSize);
 
         // some of these are re-parented (the pawn previews) so they need to
         // be individually set like this.
@@ -90,6 +96,12 @@ public class ObjectPool : MonoBehaviour
     {
         return GetPooledObject(itemUIs, itemUIPrefab);
     }
+    
+    public GameObject GetBloodSplat()
+    {
+        return GetPooledObject(bloodSplats, bloodSplatPrefab);
+    }
+    
 
     /// <summary>
     /// Disable and re-parent the gameobject back to the object pool
@@ -110,6 +122,7 @@ public class ObjectPool : MonoBehaviour
         ResetPooledObjects(itemUIs);
         ResetPooledObjects(pawnPreviews);
         ResetPooledObjects(audioSources);
+        ResetPooledObjects(bloodSplats);
     }
 
     /// <summary>

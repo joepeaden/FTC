@@ -163,6 +163,7 @@ public class PawnSprite : MonoBehaviour
 
     public void PlayAttack(Vector3 attackDirection)
     {
+        StartCoroutine(PlayAnimationAfterDelay(0f, "AttackSW"));
         StartCoroutine(MoveFromHitDirection(0, false, attackDirection));
     }
 
@@ -262,6 +263,12 @@ public class PawnSprite : MonoBehaviour
         {
             StartCoroutine(PlayBloodSpurtAfterDelay(0f));
             animationString = "GetHitHPSW";
+
+            if (Random.Range(0f,1f) > BloodSplat.BLOOD_SPLAT_SPAWN_CHANCE)
+            {
+                GameObject bloodSplat = ObjectPool.instance.GetBloodSplat();
+                bloodSplat.GetComponent<BloodSplat>().Activate(transform.position, _bodySpriteRend.sortingOrder - 1);
+            }
         }
 
         if (!isDead)
