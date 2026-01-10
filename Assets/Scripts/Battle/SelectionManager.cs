@@ -30,7 +30,7 @@ public class SelectionManager : MonoBehaviour
         // if the character has moved here during it's turn and is not done yet (not a fresh pawn)
         if (BattleManager.Instance.CurrentPawn.actionPoints < Pawn.BASE_ACTION_POINTS && BattleManager.Instance.CurrentPawn.HasActionsRemaining())
         {
-            _selectedTile.HighlightTilesInRange(BattleManager.Instance.CurrentPawn, BattleManager.Instance.CurrentPawn.MoveRange, true, Tile.TileHighlightType.Move);
+            _selectedTile.HighlightTilesInRange(BattleManager.Instance.CurrentPawn, 0, BattleManager.Instance.CurrentPawn.MoveRange, true, Tile.TileHighlightType.Move);
         }
     }
 
@@ -76,10 +76,10 @@ public class SelectionManager : MonoBehaviour
 
         if (Ability.SelectedAbility!= null)
         {
-            _selectedTile.HighlightTilesInRange(currentPawn, Ability.SelectedAbility.range, false, Tile.TileHighlightType.AttackRange);
+            _selectedTile.HighlightTilesInRange(currentPawn, 0, Ability.SelectedAbility.range, false, Tile.TileHighlightType.AttackRange);
         }
 
-        _selectedTile.HighlightTilesInRange(currentPawn, currentPawn.MoveRange, false, Tile.TileHighlightType.Move);
+        _selectedTile.HighlightTilesInRange(currentPawn, 0, currentPawn.MoveRange, false, Tile.TileHighlightType.Move);
     }
 
     public void SetIdleMode(bool isIdle)
@@ -98,11 +98,11 @@ public class SelectionManager : MonoBehaviour
 
         if (currentAction != null)
         {
-            _selectedTile.HighlightTilesInRange(currentPawn, Ability.SelectedAbility.range, !isIdle, Tile.TileHighlightType.AttackRange);
+            _selectedTile.HighlightTilesInRange(currentPawn, 0, Ability.SelectedAbility.range, !isIdle, Tile.TileHighlightType.AttackRange);
         }
         else
         {
-            _selectedTile.HighlightTilesInRange(currentPawn, currentPawn.MoveRange, !isIdle, Tile.TileHighlightType.Move);
+            _selectedTile.HighlightTilesInRange(currentPawn, 0, currentPawn.MoveRange, !isIdle, Tile.TileHighlightType.Move);
         }
     }
 

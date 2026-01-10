@@ -381,26 +381,34 @@ public class Tile : MonoBehaviour
         }
     }
 
-    public void HighlightTilesInRange(Pawn subjectPawn, int range, bool isHighlighting, TileHighlightType highlightType)
+    public void SetTileHighlight(bool enabled, Sprite sprite = null)
     {
-        if (!_isSelected)
-        {
-            tileOverlayUI.enabled = isHighlighting;
+        tileOverlayUI.enabled = enabled;
 
-            switch (highlightType)
-            {
-                case TileHighlightType.Move:
-                    tileOverlayUI.sprite = moveRangeSprite;
-                    break;
-                case TileHighlightType.AttackRange:
-                    tileOverlayUI.sprite = attackHighlightSprite;
-                    break;
-            }
+        if (sprite != null)
+        {
+            tileOverlayUI.sprite = sprite;
         }
+    }
 
-        foreach (Tile t in _adjacentTiles)
+    public void HighlightTilesInRange(Pawn subjectPawn, int minRange, int maxRange, bool isHighlighting, TileHighlightType highlightType)
+    {
+        HashSet<Tile> tilesInRange = GetTilesInRange(subjectPawn, minRange, maxRange);
+
+        Sprite spriteToUse = highlightType switch
         {
-            t.HighlightTilesInRangeRecursive(subjectPawn, range, isHighlighting, highlightType);
+            TileHighlightType.Move => moveRangeSprite,
+            TileHighlightType.AttackRange => attackHighlightSprite,
+            TileHighlightType.AttackTarget => attackTargetHighlightSprite,
+            _ => moveRangeSprite
+        };
+
+        foreach (Tile t in tilesInRange)
+        {
+            if (!t._isSelected)
+            {
+                t.SetTileHighlight(isHighlighting, spriteToUse);
+            }
         }
     }
 
