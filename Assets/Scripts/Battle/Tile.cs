@@ -279,43 +279,43 @@ public class Tile : MonoBehaviour
         SetSelected(!_isSelected);
     }
 
-    public List<Tile> GetTilesInMoveRange()
+    public HashSet<Tile> GetTilesInRange(Pawn subjectPawn, int minRange, int maxRange)
     {
-        if (_pawn == null)
-        {
-            return null;
-        }
+        HashSet<Tile> tilesInRange = new();
+        Queue<(Tile tile, int distance)> queue = new();
+        HashSet<Tile> visited = new();
 
-        int pawnMoveRange = _pawn.MoveRange;
-        List<Tile> tilesInRange = new();
-        Point p = new();
-        Tile t;
-        // start at x - range because we want to be able to move backwards. 
-        // Go to x + range because we want to be able to move forwards. Same for Y.
-        for (int x = Coordinates.X - pawnMoveRange; x <= pawnMoveRange + Coordinates.X; x++)
+        // Start from the pawn's current tile
+        queue.Enqueue((this, 0));
+        visited.Add(this);
+
+        while (queue.Count > 0)
         {
-            p.X = x;
-            for (int y = Coordinates.Y - pawnMoveRange; y <= pawnMoveRange + Coordinates.Y; y++)
+            (Tile current, int dist) = queue.Dequeue();
+
+            // Only add tiles within the specified range that are traversable
+            if (dist >= minRange && dist <= maxRange && current.IsTraversableByThisPawn(subjectPawn))
             {
-                p.Y = y;
-                
-                // don't go outside of grid
-                if  (!GridGenerator.Instance.Tiles.ContainsKey(p))
-                {
-                    continue;
-                }
+                tilesInRange.Add(current);
+            }
 
-                t = GridGenerator.Instance.Tiles[p];
-
-                if (t.IsInRangeOf(this, pawnMoveRange) && t.IsTraversableByThisPawn(_pawn))
+            // Only explore adjacent tiles if we're still within range and the current tile is traversable
+            if (dist < maxRange && current.IsTraversableByThisPawn(subjectPawn))
+            {
+                foreach (Tile neighbor in current._adjacentTiles)
                 {
-                    tilesInRange.Add(t);
+                    if (!visited.Contains(neighbor))
+                    {
+                        visited.Add(neighbor);
+                        queue.Enqueue((neighbor, dist + 1));
+                    }
                 }
             }
         }
-        
+
         return tilesInRange;
     }
+
 
     public bool IsTraversableByThisPawn(Pawn traveller)
     {

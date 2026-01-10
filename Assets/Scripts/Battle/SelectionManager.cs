@@ -144,7 +144,7 @@ public class SelectionManager : MonoBehaviour
                                         Ability.SelectedAbility.Activate(currentPawn, targetPawn);
                                     }
                                 }
-                                else if (currentPawn.CurrentTile.GetTilesInMoveRange().Contains(newTile) && targetPawn == null && Ability.SelectedAbility == null && _selectedTile != null)
+                                else if (currentPawn.CurrentTile.GetTilesInRange(currentPawn, 0, currentPawn.MoveRange).Contains(newTile) && targetPawn == null && Ability.SelectedAbility == null && _selectedTile != null)
                                 {
                                     ClearHighlights();
                                     currentPawn.TryMoveToTile(newTile);
