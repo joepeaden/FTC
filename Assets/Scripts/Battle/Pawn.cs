@@ -23,9 +23,6 @@ public class Pawn : MonoBehaviour
     private UnityEvent OnKillEnemy = new();
     private UnityEvent OnDisengage = new();
 
-    public float baseDodgeChance;
-    public float baseSurroundBonus;
-
     public int MoveRange => GameChar.GetMoveRange();
 
     public Tile CurrentTile => _currentTile;
@@ -42,14 +39,14 @@ public class Pawn : MonoBehaviour
     public int ArmorPoints => _armorPoints;
     private int _armorPoints;
 
-    public int actionPoints;
+    [HideInInspector] public int actionPoints;
 
     private bool _hasAttacked;
     private bool _hasMoved;
     private bool _isMyTurn;
 
     public int MaxMotivation => GameChar.GetBattleMotivationCap();
-    public int Motivation;
+    [HideInInspector] public int Motivation;
 
     public int Initiative => GetInit();
 
@@ -61,13 +58,13 @@ public class Pawn : MonoBehaviour
     public bool PendingLevelUp { get; set; }
 
     #region Buffs / Debuffs
-    public int DodgeMod;
-    public float HitMod;
+    [HideInInspector] public int DodgeMod;
+    [HideInInspector] public float HitMod;
     #endregion
 
-    public int freeAttacksRemaining;
+    [HideInInspector] public int freeAttacksRemaining;
 
-    [SerializeField] private AIPathCustom _pathfinder;
+    private AIPathCustom _pathfinder;
 
     [Header("Audio")]
     [SerializeField] private AudioClip hitSound;
@@ -86,17 +83,16 @@ public class Pawn : MonoBehaviour
 
     public GameCharacter.CharMotivators CurrentMotivator => _gameChar.Motivator;
 
-    public bool IsPossessed;
+    [HideInInspector] public bool IsPossessed;
 
     private bool _isMoving;
-    private Vector3 _lastPosition;
 
     // if a pawn is guarding this pawn using an ability for example then this
     // is the reference for that guy. This is set by the HonorProtect class when
     // the ability is used.
     public Pawn ProtectingPawn { get; set; }
 
-    public bool InDefensiveStance = false;
+    [HideInInspector] public bool InDefensiveStance = false;
 
     [Header("Audio")]
     [SerializeField] private AudioClip _movingSound;
@@ -106,15 +102,16 @@ public class Pawn : MonoBehaviour
     /// </summary>
     private HashSet<MotCondData> _fulfilledBattleMotConds = new();
 
-    public int BattleKills = 0;
-    public int DmgInflicted = 0;
+    [HideInInspector] public int BattleKills = 0;
+    [HideInInspector] public int DmgInflicted = 0;
 
-    public bool HoldingForAttackAnimation = false;
+    [HideInInspector] public bool HoldingForAttackAnimation = false;
 
     #region UnityEvents
 
     private void Awake()
     {
+        _pathfinder.GetComponent<AIPathCustom>();
         _pathfinder.OnDestinationReached.AddListener(HandleDestinationReached);
         _pathfinder.OnDestinationSet.AddListener(HandleNewDestination);
     }
@@ -129,11 +126,6 @@ public class Pawn : MonoBehaviour
     {
         _pathfinder.OnDestinationReached.RemoveListener(HandleDestinationReached);
         _pathfinder.OnDestinationSet.RemoveListener(HandleNewDestination);
-    }
-
-    private void Update()
-    {
-        _lastPosition = transform.position;
     }
 
     #endregion

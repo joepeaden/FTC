@@ -103,6 +103,16 @@ public class Tile : MonoBehaviour
         _pathfindingNode.Walkable = !IsImpassable;
     }
 
+    public void SetNodeTag(bool isOnPlayerTeam)
+    {
+        _pathfindingNode.Tag = isOnPlayerTeam ? AIPathCustom.PLAYER_TEAM_NODE_TAG : AIPathCustom.ENEMY_TEAM_NODE_TAG;
+    }
+
+    public void ClearNodeTag()
+    {
+        _pathfindingNode.Tag = AIPathCustom.DEFAULT_NODE_TAG;
+    }
+
     public void Initialize(Dictionary<Point, Tile> tiles, Point coord, bool isImpassable)
     {
         _coordinates = coord;
@@ -255,12 +265,14 @@ public class Tile : MonoBehaviour
 
     public void PawnEnterTile(Pawn newPawn)
     {
+        SetNodeTag(newPawn.OnPlayerTeam);
         _pawn = newPawn;
     }
 
     public void PawnExitTile()
     {
         SetSelected(false);
+        ClearNodeTag();
         _pawn = null;
     }
 
