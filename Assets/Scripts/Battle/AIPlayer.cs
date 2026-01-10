@@ -66,7 +66,7 @@ public class AIPlayer : MonoBehaviour
                 {
                     Pawn pawnAtTile = potentialTargetTile.GetPawn();
                     // don't consider if someone's there
-                    if (pawnAtTile != null && !pawnAtTile.IsDead || !potentialTargetTile.CanTraverse(activePawn))
+                    if (pawnAtTile != null && !pawnAtTile.IsDead || !potentialTargetTile.IsTraversableByThisPawn(activePawn))
                     {
                         continue;
                     }

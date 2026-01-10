@@ -442,21 +442,6 @@ public class Tile : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Can this pawn traverse this tile?
-    /// </summary>
-    /// <param name="traversingPawn"></param>
-    /// <returns></returns>
-    public bool CanTraverse(Pawn traversingPawn)
-    {
-        if (_pawn != null)
-        {
-            return !IsImpassable && _pawn.OnPlayerTeam == traversingPawn.OnPlayerTeam;
-        }
-
-        return !IsImpassable;
-    }
-
 
     public void OnMouseEnter()
     {

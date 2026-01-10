@@ -10,7 +10,7 @@ public class Shove : SupportAbilityData
 
         Tile pushTile = targetPawn.CurrentTile.GetNextTileInDirection(targetPawn.transform.position - activatedPawn.transform.position);
 
-        if (pushTile.CanTraverse(activatedPawn))
+        if (pushTile.IsTraversableByThisPawn(activatedPawn))
         {
             targetPawn.ForceMoveToTile(pushTile);
             // tell battle manager we acted
