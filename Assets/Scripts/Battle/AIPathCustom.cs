@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Pathfinding;
@@ -42,10 +41,35 @@ public class AIPathCustom : AILerp
         return _seeker.traversableTags;
     }
 
-    public void AttemptGoToLocation(Vector3 goalDestination)
+    public bool HasPathToLocation(Tile targetTile)
     {
-        _seeker.StartPath(transform.position, goalDestination, OnPathCalculated);
+        return GetPathToTile(targetTile).vectorPath.Count > 0;
+    }
+    
+    private Path GetPathToTile(Tile targetTile)
+    {
+        Path p = _seeker.StartPath (transform.position, targetTile.transform.position);
+        p.BlockUntilCalculated();
+
+        return p;
+    }
+
+    /// <summary>
+    /// Make sure you check if it's possible to go to this destination first!
+    /// </summary>
+    public void AttemptGoToLocation(Tile targetTile)
+    {
+        Vector3 goalDestination = targetTile.transform.position;
+        
+        // if there's no path - just end the move for now
+        if (!HasPathToLocation(targetTile))
+        {
+            Debug.Log("Cannot reach location - ending move!");
+            SetDestinationReached();
+        }
+
         pawnMovesLeft = _pawn.MoveRange;
+        _seeker.StartPath(transform.position, goalDestination, OnPathCalculated);
     }
 
     private void OnPathCalculated(Path p)
@@ -89,6 +113,13 @@ public class AIPathCustom : AILerp
 
     private void MoveToNextPathNode()
     {
+        if (_pathToFollow.Count <= _currentPathIndex)
+        {
+            Debug.Log("MovewToNextPathNode: Not enough nodes in path!");
+            SetDestinationReached();
+            return;
+        }
+
         destination = _pathToFollow[_currentPathIndex];
         OnDestinationSet.Invoke(destination);
 
@@ -106,32 +137,22 @@ public class AIPathCustom : AILerp
         {
             _currentPathIndex++;
 
-            //bool nextTileHasPawn = false;
-            //if (_currentPathIndex == _pathToFollow.Count-2)
-            //{
-                //RaycastHit2D[] hits = Physics2D.RaycastAll(_pathToFollow[_currentPathIndex+1], -Vector3.forward);
-                //foreach (RaycastHit2D hit in hits)
-                //{
-                //    Tile newTile = hit.transform.GetComponent<Tile>();
-                //    if (newTile != null)
-                //    {
-                //        nextTileHasPawn = newTile.GetPawn() != null;
-                //        break;
-                //    }
-                //} 
-            //}
-
             if (_currentPathIndex >= _pathToFollow.Count
                 || pawnMovesLeft <= 0)
             {
-                OnDestinationReached.Invoke();
-                enabled = false;
+                SetDestinationReached();
             }
             else
             {
                 MoveToNextPathNode();
             }
         }
+    }
+
+    private void SetDestinationReached()
+    {
+        OnDestinationReached.Invoke();
+        enabled = false;
     }
 
     private void OnDestroy()

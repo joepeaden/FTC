@@ -790,7 +790,7 @@ public class Pawn : MonoBehaviour
     /// <returns></returns>
     public void ForceMoveToTile(Tile targetTile)
     {
-        _pathfinder.AttemptGoToLocation(targetTile.transform.position);
+        _pathfinder.AttemptGoToLocation(targetTile);
 
         _spriteController.Move();
 
@@ -867,7 +867,7 @@ public class Pawn : MonoBehaviour
             int tileDistance = _currentTile.GetTileDistance(targetTile);
 
             //Vector3 position = adjustedTargetTile.transform.position;
-            _pathfinder.AttemptGoToLocation(targetTile.transform.position);
+            _pathfinder.AttemptGoToLocation(targetTile);
 
             _spriteController.Move();
 

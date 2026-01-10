@@ -227,7 +227,7 @@ public class GameCharacter
             case CharMotivators.Honor:
                 return _motConds;
             default:
-                Debug.Log("Class not yet supported!");
+                // Debug.Log("Class not yet supported!");
                 return _motConds;
         }    
     }

@@ -412,45 +412,6 @@ public class Tile : MonoBehaviour
         }
     }
 
-    public void HighlightTilesInRangeRecursive(Pawn subjectPawn, int range, bool isHighlighting, TileHighlightType highlightType)
-    {
-        if (range > 0 && IsTraversableByThisPawn(_pawn) &&
-            (_pawn == null ||
-            (subjectPawn.OnPlayerTeam == _pawn.OnPlayerTeam && TileHighlightType.Move == highlightType ||
-            TileHighlightType.Move != highlightType)))
-        {
-            range--;
-
-            if (!_isSelected)
-            {
-                tileOverlayUI.enabled = isHighlighting;
-
-                switch (highlightType)
-                {
-                    case TileHighlightType.Move:
-                        tileOverlayUI.sprite = moveRangeSprite;
-                        break;
-                    case TileHighlightType.AttackRange:
-                        tileOverlayUI.sprite = attackHighlightSprite;
-                        break;
-                }
-            }
-
-            foreach (Tile t in _adjacentTiles)
-            {
-                if (!t._isSelected)
-                {
-                    t.HighlightTilesInRangeRecursive(subjectPawn, range, isHighlighting, highlightType);
-                }
-            }
-        }
-        else
-        {
-            return;
-        }
-    }
-
-
     public void OnMouseEnter()
     {
         tileHoverUI.enabled = true;
