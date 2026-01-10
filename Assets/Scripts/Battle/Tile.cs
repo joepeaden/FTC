@@ -26,7 +26,6 @@ public class Tile : MonoBehaviour
     [SerializeField] private SpriteRenderer tileSpriteRend;
     [SerializeField] private SpriteRenderer terrainSpriteRend;
     [SerializeField] private Sprite selectionSprite;
-    //[SerializeField] private Sprite hoverSprite;
     [SerializeField] private Sprite moveRangeSprite;
     [SerializeField] private Sprite attackHighlightSprite;
     [SerializeField] private Sprite attackTargetHighlightSprite;
@@ -38,15 +37,12 @@ public class Tile : MonoBehaviour
 
     [SerializeField] private Pawn _pawn;
     private bool _isSelected;
-    //private bool _isInMoveRange;
     private List<Tile> _adjacentTiles = new();
 
     public PointNode PathfindingNode => _pathfindingNode;
     private PointNode _pathfindingNode;
     public Point Coordinates => _coordinates;
     private Point _coordinates;
-
-    private Sprite _prevHighlightSprite;
 
     private void Awake()
     {

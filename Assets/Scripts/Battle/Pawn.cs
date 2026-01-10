@@ -111,7 +111,7 @@ public class Pawn : MonoBehaviour
 
     private void Awake()
     {
-        _pathfinder.GetComponent<AIPathCustom>();
+        _pathfinder = GetComponent<AIPathCustom>();
         _pathfinder.OnDestinationReached.AddListener(HandleDestinationReached);
         _pathfinder.OnDestinationSet.AddListener(HandleNewDestination);
     }
