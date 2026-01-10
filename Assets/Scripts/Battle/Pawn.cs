@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using UnityEngine.Events;
+using Pathfinding;
 
 public class Pawn : MonoBehaviour
 {
@@ -66,7 +67,7 @@ public class Pawn : MonoBehaviour
 
     public int freeAttacksRemaining;
 
-    [SerializeField] AIPathCustom pathfinder;
+    [SerializeField] private AIPathCustom _pathfinder;
 
     [Header("Audio")]
     [SerializeField] private AudioClip hitSound;
@@ -114,8 +115,8 @@ public class Pawn : MonoBehaviour
 
     private void Awake()
     {
-        pathfinder.OnDestinationReached.AddListener(HandleDestinationReached);
-        pathfinder.OnDestinationSet.AddListener(HandleNewDestination);
+        _pathfinder.OnDestinationReached.AddListener(HandleDestinationReached);
+        _pathfinder.OnDestinationSet.AddListener(HandleNewDestination);
     }
 
     private void Start()
@@ -126,8 +127,8 @@ public class Pawn : MonoBehaviour
 
     private void OnDestroy()
     {
-        pathfinder.OnDestinationReached.RemoveListener(HandleDestinationReached);
-        pathfinder.OnDestinationSet.RemoveListener(HandleNewDestination);
+        _pathfinder.OnDestinationReached.RemoveListener(HandleDestinationReached);
+        _pathfinder.OnDestinationSet.RemoveListener(HandleNewDestination);
     }
 
     private void Update()
@@ -797,7 +798,7 @@ public class Pawn : MonoBehaviour
     /// <returns></returns>
     public void ForceMoveToTile(Tile targetTile)
     {
-        pathfinder.AttemptGoToLocation(targetTile.transform.position);
+        _pathfinder.AttemptGoToLocation(targetTile.transform.position);
 
         _spriteController.Move();
 
@@ -812,6 +813,10 @@ public class Pawn : MonoBehaviour
         _isMoving = true;
     }
 
+    public int GetPathfinderTraversableTagsBitmask()
+    {
+        return _pathfinder.GetTraversableTagsBitmask();
+    }
 
     /// <summary>
     /// Move as close as possible to the tile. If not enough AP, pick the next
@@ -870,7 +875,7 @@ public class Pawn : MonoBehaviour
             int tileDistance = _currentTile.GetTileDistance(targetTile);
 
             //Vector3 position = adjustedTargetTile.transform.position;
-            pathfinder.AttemptGoToLocation(targetTile.transform.position);
+            _pathfinder.AttemptGoToLocation(targetTile.transform.position);
 
             _spriteController.Move();
 

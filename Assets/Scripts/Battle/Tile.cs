@@ -319,8 +319,15 @@ public class Tile : MonoBehaviour
 
     public bool IsTraversableByThisPawn(Pawn traveller)
     {
+        bool canTraverse = true;
+        if (traveller != null && traveller.CurrentTile != this)
+        {
+            int pawnTraversableTagsBitmask = traveller.GetPathfinderTraversableTagsBitmask();
+            canTraverse = canTraverse && ((pawnTraversableTagsBitmask & (1 << (int)_pathfindingNode.Tag)) != 0);
+        }
+
         // Does it contain pawns or impassable tiles?
-        return !IsImpassable && (_pawn == null || _pawn != null && traveller.OnPlayerTeam == _pawn.OnPlayerTeam);
+        return !IsImpassable && canTraverse;
     }
 
     public void HighlightTileAsActive()
