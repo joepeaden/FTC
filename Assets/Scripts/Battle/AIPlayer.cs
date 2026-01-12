@@ -47,53 +47,87 @@ public class AIPlayer : MonoBehaviour
         {
             activePawn.GetWeaponAbilities()[0].Activate(activePawn, adjacentPawn);
         }
-        // add comment
         else
         {
-            List<Pawn> pawnsToTarget = activePawn.OnPlayerTeam ? _enemyPawns : BattleManager.Instance.PlayerPawns;
+            Move(activePawn);
+        }
+    }
 
-            List<Tile> potentialTargetTiles = new();
-            foreach (Pawn targetPawn in pawnsToTarget)
-            {
-                // don't circle around dead pawns forever (don't be fucking creepy)
-                if (targetPawn.IsDead)
-                {
-                    continue;
-                }
+    private void Move(Pawn activePawn)
+    {
+        List<Tile> potentialTargetTiles = GetPotentialTilesForMove(activePawn);
 
-                Tile bestTargetTile = null;
-                foreach (Tile potentialTargetTile in targetPawn.CurrentTile.GetAdjacentTiles())
-                {
-                    Pawn pawnAtTile = potentialTargetTile.GetPawn();
-                    // don't consider if someone's there
-                    if (pawnAtTile != null && !pawnAtTile.IsDead || !potentialTargetTile.IsTraversableByThisPawn(activePawn))
-                    {
-                        continue;
-                    }
+        if (potentialTargetTiles.Count > 0)
+        {
+            Tile closestTargetTile = potentialTargetTiles.OrderBy(t => activePawn.CurrentTile.GetTileDistance(t)).First();
 
-                    // just go with the first one for now
-                    bestTargetTile = potentialTargetTile;
-                    break;
-                }
+            Tile finalTargetTile = activePawn.GetTileInMoveRangeClosestTo(closestTargetTile);
+            bool moveStarted = activePawn.TryMoveToTile(finalTargetTile);
 
-                if (bestTargetTile != null)
-                {
-                    potentialTargetTiles.Add(bestTargetTile);
-                }
-            }
-
-            // if there's no potential tiles to move towrads... just stand there.
-            if (potentialTargetTiles.Count > 0)
-            {
-                Tile finalTargetTile = potentialTargetTiles.OrderBy(t => activePawn.CurrentTile.GetTileDistance(t)).First();
-
-                activePawn.TryMoveToTile(finalTargetTile);
-            }
-            else
+            // for some reason we didn't start move - fallback case.
+            if (!moveStarted)
             {
                 activePawn.PassTurn();
             }
         }
+        else
+        {
+            // nowhere to go!
+            activePawn.PassTurn();
+        }
+    }
+
+    private List<Tile> GetPotentialTilesForMove(Pawn activePawn)
+    {
+        // try to move towards enemy pawns
+        List<Pawn> pawnsToMoveTowards = activePawn.OnPlayerTeam ? _enemyPawns : BattleManager.Instance.PlayerPawns;
+        List<Tile> potentialTargetTiles = GetTargetTilesTowardsPawns(pawnsToMoveTowards, activePawn);
+
+        // otherwise, we want to move towards an ally pawn (they're probably going somewhere right?)
+        // hopefully this doesn't end up making silly things happen. 
+        if (potentialTargetTiles.Count == 0)
+        {
+            pawnsToMoveTowards = activePawn.OnPlayerTeam ? BattleManager.Instance.PlayerPawns : _enemyPawns;
+            potentialTargetTiles = GetTargetTilesTowardsPawns(pawnsToMoveTowards, activePawn);
+        }
+        
+        return potentialTargetTiles;
+    }
+
+    private List<Tile> GetTargetTilesTowardsPawns(List<Pawn> pawnsToMoveTowards, Pawn activePawn)
+    {
+        List<Tile> potentialTargetTiles = new();
+        foreach (Pawn targetPawn in pawnsToMoveTowards)
+        {
+            if (targetPawn.IsDead)
+            {
+                continue;
+            }
+
+            Tile bestTargetTile = null;
+            foreach (Tile potentialTargetTile in targetPawn.CurrentTile.GetAdjacentTiles())
+            {
+                // we don't want to include it if we couldn't get there anyway - this is the case
+                // like if we've been surrounded by allies and can't get to any enemies. For whatever
+                // reason this target tile is unreachable.
+                if (!activePawn.HasPathToTile(potentialTargetTile) ||
+                    !potentialTargetTile.IsTraversableByThisPawn(activePawn))
+                {
+                    continue;
+                }
+
+                // just go with the first one for now
+                bestTargetTile = potentialTargetTile;
+                break;
+            }
+
+            if (bestTargetTile != null)
+            {
+                potentialTargetTiles.Add(bestTargetTile);
+            }
+        }
+
+        return potentialTargetTiles;
     }
 
     /// <summary>

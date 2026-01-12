@@ -816,21 +816,19 @@ public class Pawn : MonoBehaviour
     /// </summary>
     /// <param name="targetTile"></param>
     /// <returns></returns>
-    public void TryMoveToTile(Tile targetTile)
+    public bool TryMoveToTile(Tile targetTile)
     {
         if (!HasMovesLeft()
             || EngagedInCombat && !GameChar.CanDisengageFromCombat())
         {
-            return;
+            return false;
         }
-
-        // the ap adjustments may need to happen as the pawn enters each tile. May be best to
-        // process things one tile at a time if implementing varying AP costs, etc. But not now.
-        // if doing that later, make sure to update the pathfinder code too.
 
         actionPoints -= 1;
 
         StartCoroutine(TryMoveToTileCoroutine(targetTile));
+
+        return true;
     }
 
     public IEnumerator TryMoveToTileCoroutine(Tile targetTile)
@@ -866,7 +864,6 @@ public class Pawn : MonoBehaviour
 
             int tileDistance = _currentTile.GetTileDistance(targetTile);
 
-            //Vector3 position = adjustedTargetTile.transform.position;
             _pathfinder.AttemptGoToLocation(targetTile);
 
             _spriteController.Move();
@@ -885,6 +882,33 @@ public class Pawn : MonoBehaviour
             _audioSource.loop = true;
             _audioSource.Play();
         }
+    }
+
+    public bool HasPathToTile(Tile targetTile)
+    {
+        return _pathfinder.HasPathToLocation(targetTile);
+    }
+
+    /// <summary>
+    /// Sometimes we can't reach the target tile - get the one that
+    /// is within range that we can actually go to.
+    /// </summary>
+    /// <param name="targetTile"></param>
+    public Tile GetTileInMoveRangeClosestTo(Tile targetTile)
+    {
+        return _pathfinder.GetTileEndpointWithinRange(targetTile);
+    }
+
+    public bool IsTileInMoveRange(Tile targetTile)
+    {
+        int tileDistance = this.CurrentTile.GetTileDistance(targetTile);
+
+        if (tileDistance <= this.MoveRange)
+        {
+            return true;
+        }
+
+        return false;
     }
 
     public void PassTurn()

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Pathfinding;
 using UnityEngine.Events;
+using System.Linq;
 
 public class AIPathCustom : AILerp
 {
@@ -147,6 +148,40 @@ public class AIPathCustom : AILerp
                 MoveToNextPathNode();
             }
         }
+    }
+    
+    public Tile GetTileEndpointWithinRange(Tile targetTile)
+    {
+        List<Tile> t = GetPathToTileInRange(targetTile);
+        return t.LastOrDefault();
+    }
+     
+    public List<Tile> GetPathToTileInRange(Tile targetTile)
+    {
+        Path p = GetPathToTile(targetTile);
+
+        List<Tile> tilePath = new();
+
+        // now that we have path, eliminate vectors not in range
+        for (int i = p.vectorPath.Count - 1; i >= 0; i--)
+        {
+            Vector3 position = p.vectorPath[i];
+
+            Tile tileAtPos = GridGenerator.Instance.GetClosestTileToPosition(position);
+            if (!_pawn.IsTileInMoveRange(tileAtPos))
+            {
+                p.vectorPath.Remove(position);
+            }
+            else
+            {
+                tilePath.Add(tileAtPos);
+            }
+        }
+
+        // we went back to front. so flip them so it's origin -> destination
+        tilePath.Reverse();
+
+        return tilePath;
     }
 
     private void SetDestinationReached()
