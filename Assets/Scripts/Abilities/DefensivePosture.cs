@@ -18,15 +18,15 @@ public class DefensivePosture : SupportAbilityData
 
         activatedPawn.DodgeMod += dodgeMod;
 
-        _activatedPawn.OnActivation.AddListener(HandleNewActivationForPawn);
+        _activatedPawn.OnTurnBegin.AddListener(HandleNewActivationForPawn);
         _activatedPawn.OnHPChanged.AddListener(HandleDeath);
 
         // tell battle manager we acted
-        BattleManager.Instance.PawnActivated(_activatedPawn);
+        BattleManager.Instance.HandlePawnActed(_activatedPawn);
         
         // text display event
-        BattleManager.Instance.AddPendingTextNotification("Defensive Stance", Color.white);
-        BattleManager.Instance.TriggerTextNotification(activatedPawn.transform.position);
+        Notifications.Instance.AddPendingTextNotification("Defensive Stance", Color.white);
+        Notifications.Instance.TriggerTextNotification(activatedPawn.transform.position);
 
         return true;
     }
@@ -66,7 +66,7 @@ public class DefensivePosture : SupportAbilityData
             return;
         }
         
-        _activatedPawn.OnActivation.RemoveListener(HandleNewActivationForPawn);
+        _activatedPawn.OnTurnBegin.RemoveListener(HandleNewActivationForPawn);
         _activatedPawn.OnHPChanged.RemoveListener(HandleDeath);
         _activatedPawn.InDefensiveStance = false;
         _activatedPawn.DodgeMod -= dodgeMod;

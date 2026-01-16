@@ -9,10 +9,6 @@ public class BasicAttackAbility : WeaponAbilityData
     {
         if (activatedPawn.actionPoints < apCost || activatedPawn.Motivation < motCost)
         {
-            // why is PawnActivated called here? That seems pretty wierd. Doesn't seem necessary.
-            // The pawn isn't acting, it can't because there's not enough resources.
-            BattleManager.Instance.PawnActivated(activatedPawn);
-
             return false;
         }
          
@@ -28,7 +24,7 @@ public class BasicAttackAbility : WeaponAbilityData
 
         activatedPawn.AttackPawn(targetPawn, this);
 
-        BattleManager.Instance.PawnActivated(activatedPawn);
+        BattleManager.Instance.HandlePawnActed(activatedPawn);
 
         activatedPawn.SetSpriteFacing(targetPawn.transform.position);
         

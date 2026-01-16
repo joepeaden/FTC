@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Linq;
 using UnityEngine.Events;
 using Pathfinding;
+using JetBrains.Annotations;
 
 public class Pawn : MonoBehaviour
 {
@@ -19,9 +20,11 @@ public class Pawn : MonoBehaviour
     /// </summary>
     public static UnityEvent<Pawn> OnTook3Damage = new();
     public UnityEvent<List<EffectData>> OnEffectUpdate = new();
-    public UnityEvent OnActivation = new();
+    public UnityEvent OnTurnBegin = new();
     private UnityEvent OnKillEnemy = new();
     private UnityEvent OnDisengage = new();
+
+    [SerializeField] private PawnEvents _pawnEvents;
 
     public int MoveRange => GameChar.GetMoveRange();
 
@@ -57,6 +60,8 @@ public class Pawn : MonoBehaviour
 
     public bool PendingLevelUp { get; set; }
 
+    public PhysicalCastle castle;
+
     #region Buffs / Debuffs
     [HideInInspector] public int DodgeMod;
     [HideInInspector] public float HitMod;
@@ -78,8 +83,7 @@ public class Pawn : MonoBehaviour
     public GameCharacter GameChar => _gameChar;
     private GameCharacter _gameChar;
 
-    [SerializeField]
-    private PawnSprite _spriteController;
+    [SerializeField] private PawnSprite _spriteController;
 
     public GameCharacter.CharMotivators CurrentMotivator => _gameChar.Motivator;
 
@@ -158,6 +162,8 @@ public class Pawn : MonoBehaviour
         {
             UpdateEffect(p.effectDisplay, true);
         }
+
+        _pawnEvents.EmitSpawn(this);
     }
 
     private void SetupMotConds()
@@ -369,6 +375,24 @@ public class Pawn : MonoBehaviour
         _spriteController.HandleTurnEnd();
     }
 
+    public void AttackCastle()
+    {
+        Vector2 attackDirection = Vector2.left;
+        attackDirection.Normalize();
+        _spriteController.PlayAttack(attackDirection);
+
+        castle.GetHit(1);
+        
+        CameraManager.Instance.ShakeCamera();
+
+        actionPoints -= 1;
+
+        _pawnEvents.EmitAct(this);
+
+        // StartCoroutine(PlayAudioAfterDelay(0f, GameChar.TheWeapon.Data.hitSound));
+        
+    }
+
     // perhaps this stuff should all be moved to the AttackAbility classes...
     public void AttackPawn(Pawn targetPawn, WeaponAbilityData currentAction)
     {
@@ -492,8 +516,8 @@ public class Pawn : MonoBehaviour
     {
         _spriteController.TriggerBlock(attackDirection);
         
-        BattleManager.Instance.AddPendingTextNotification("Block!", Color.white);
-        BattleManager.Instance.TriggerTextNotification(this.transform.position);
+        Notifications.Instance.AddPendingTextNotification("Block!", Color.white);
+        Notifications.Instance.TriggerTextNotification(this.transform.position);
 
         StartCoroutine(PlayAudioAfterDelay(0.1f, GameChar.ShieldItem.blockSound));
     }
@@ -506,14 +530,14 @@ public class Pawn : MonoBehaviour
     private IEnumerator TriggerDodgeCoroutine(Pawn opponentPawn)
     {
 
-        BattleManager.Instance.AddPendingTextNotification("Dodge!", Color.white);
+        Notifications.Instance.AddPendingTextNotification("Dodge!", Color.white);
 
         if (InDefensiveStance)
         {
             opponentPawn.HoldingForAttackAnimation = true;
             yield return new WaitForSeconds(.25f);
 
-            BattleManager.Instance.AddPendingTextNotification("Counter!", Color.white);
+            Notifications.Instance.AddPendingTextNotification("Counter!", Color.white);
 
             AttackPawn(opponentPawn, GetBasicAttack());
 
@@ -524,7 +548,7 @@ public class Pawn : MonoBehaviour
             _spriteController.TriggerDodge();
         }
 
-        BattleManager.Instance.TriggerTextNotification(this.transform.position);
+        Notifications.Instance.TriggerTextNotification(this.transform.position);
     }
 
     public void TakeDamage(Pawn attackingPawn, int attackDmg, bool isCrit)
@@ -584,17 +608,17 @@ public class Pawn : MonoBehaviour
 
         if (armorDmg > 0)
         {
-            BattleManager.Instance.AddPendingTextNotification(isCrit ? armorDmg.ToString() + "(Crit!)" : armorDmg.ToString(), Color.yellow);
+            Notifications.Instance.AddPendingTextNotification(isCrit ? armorDmg.ToString() + "(Crit!)" : armorDmg.ToString(), Color.yellow);
         }
 
         if (hitPointsDmg > 0)
         {
-            BattleManager.Instance.AddPendingTextNotification(isCrit ? hitPointsDmg.ToString() + "(Crit!)" : hitPointsDmg.ToString(), Color.red);
+            Notifications.Instance.AddPendingTextNotification(isCrit ? hitPointsDmg.ToString() + "(Crit!)" : hitPointsDmg.ToString(), Color.red);
         }
 
         if (hitPointsDmg == 0 && armorDmg == 0)
         {
-            BattleManager.Instance.AddPendingTextNotification("0", Color.white);
+            Notifications.Instance.AddPendingTextNotification("0", Color.white);
         }
         
         attackingPawn.DmgInflicted += hitPointsDmg + armorDmg;
@@ -628,7 +652,7 @@ public class Pawn : MonoBehaviour
 
         OnHPChanged.Invoke();
 
-        BattleManager.Instance.TriggerTextNotification(transform.position);
+        Notifications.Instance.TriggerTextNotification(transform.position);
     }
 
     public void TakeDamage(Pawn attackingPawn, WeaponAbilityData actionUsed, bool isCrit)
@@ -654,7 +678,8 @@ public class Pawn : MonoBehaviour
         _isDead = true;
 
         CurrentTile.PawnExitTile();
-        BattleManager.Instance.PawnKilled(this);
+        
+        _pawnEvents.EmitKilled(this);
     }
 
     #endregion
@@ -768,15 +793,15 @@ public class Pawn : MonoBehaviour
 
         UpdateFreeAttacksPassive();
 
-        OnActivation.Invoke();
+        OnTurnBegin.Invoke();
     }
 
     public void Heal(int healAmount)
     {
         // cap the max hitpoints to heal
         _hitPoints = Mathf.Min(healAmount + _hitPoints, GameChar.HitPoints);
-        BattleManager.Instance.AddPendingTextNotification(healAmount.ToString(), Color.green);
-        BattleManager.Instance.TriggerTextNotification(transform.position);
+        Notifications.Instance.AddPendingTextNotification(healAmount.ToString(), Color.green);
+        Notifications.Instance.TriggerTextNotification(transform.position);
         OnHPChanged.Invoke();
     }
 
@@ -913,7 +938,7 @@ public class Pawn : MonoBehaviour
 
     public void PassTurn()
     {
-        BattleManager.Instance.PawnActivated(this);
+        _pawnEvents.EmitAct(this);
     }
 
     public void HandleDestinationReached()
@@ -935,7 +960,7 @@ public class Pawn : MonoBehaviour
         if (_isMyTurn)
         {
             UpdateSpriteOnStop(true);
-            BattleManager.Instance.PawnActivated(this);
+            _pawnEvents.EmitAct(this);
             _audioSource.loop = false;
             _audioSource.Stop();
         }

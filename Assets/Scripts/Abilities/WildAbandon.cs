@@ -23,12 +23,12 @@ public class WildAbandon : SupportAbilityData
         _activatedPawn.Motivation -= motCost;
 
         // on new activation, will want to check duration to see if end effect
-        _activatedPawn.OnActivation.AddListener(HandleNewActivationForPawn);
+        _activatedPawn.OnTurnBegin.AddListener(HandleNewActivationForPawn);
         // ded. remove effect.
         _activatedPawn.OnHPChanged.AddListener(HandleDeath);
 
         // tell battle manager we acted
-        BattleManager.Instance.PawnActivated(_activatedPawn);
+        BattleManager.Instance.HandlePawnActed(_activatedPawn);
         
         // text display event
         // BattleManager.Instance.AddTextNotification(_targetPawn.transform.position, "+Raging");
@@ -73,7 +73,7 @@ public class WildAbandon : SupportAbilityData
 
         _targetPawn.UpdateEffect(statusEffect, false);
 
-        _activatedPawn.OnActivation.RemoveListener(HandleNewActivationForPawn);
+        _activatedPawn.OnTurnBegin.RemoveListener(HandleNewActivationForPawn);
         _activatedPawn.OnHPChanged.RemoveListener(HandleDeath);
 
         // _activatedPawn.OutDamageMult = 0;

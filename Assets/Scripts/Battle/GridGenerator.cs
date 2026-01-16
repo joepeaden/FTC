@@ -13,7 +13,8 @@ public class GridGenerator : MonoBehaviour
     public static GridGenerator Instance => _instance;
     private static GridGenerator _instance;
 
-    //[SerializeField] AstarPath pathfindingGrid;
+    public List<Tile> CastleTiles => _castleTiles;
+    private List<Tile> _castleTiles = new();
 
     [SerializeField] GameObject tilePrefab;
     [SerializeField] int gridHeight;
@@ -95,6 +96,11 @@ public class GridGenerator : MonoBehaviour
                         {
                             _enemySpawns.Add(tileScript);
                         }
+                    }
+
+                    if (x == 0)
+                    {
+                        _castleTiles.Add(tileScript);
                     }
                 }
             }

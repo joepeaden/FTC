@@ -82,14 +82,14 @@ Material:
     - _AlphaOutlineBlend: 1
     - _AlphaOutlineGlow: 100
     - _AlphaOutlineMinAlpha: 1
-    - _AlphaOutlinePower: 0
+    - _AlphaOutlinePower: 3.08
     - _AlphaRoundThreshold: 0.5
     - _BillboardY: 0
     - _BlurHD: 0
     - _BlurIntensity: 10
     - _Brightness: 0
     - _ChromAberrAlpha: 0.4
-    - _ChromAberrAmount: 1
+    - _ChromAberrAmount: 0.9
     - _ClipUvDown: 0
     - _ClipUvLeft: 0
     - _ClipUvRight: 0
@@ -119,11 +119,11 @@ Material:
     - _FlickerAlpha: 0
     - _FlickerFreq: 0.2
     - _FlickerPercent: 0.05
-    - _GhostBlend: 1
-    - _GhostColorBoost: 1.28
-    - _GhostTransparency: 0
-    - _GlitchAmount: 3
-    - _GlitchSize: 1
+    - _GhostBlend: 0.713
+    - _GhostColorBoost: 5
+    - _GhostTransparency: 0.744
+    - _GlitchAmount: 0
+    - _GlitchSize: 5
     - _Glow: 0
     - _GlowGlobal: 1
     - _GradBlend: 1
@@ -167,15 +167,15 @@ Material:
     - _OffsetUvY: 0
     - _OnlyInnerOutline: 0
     - _OnlyOutline: 0
-    - _OutlineAlpha: 0.122
+    - _OutlineAlpha: 0.114
     - _OutlineDistortAmount: 0.5
     - _OutlineDistortTexXSpeed: 5
     - _OutlineDistortTexYSpeed: 5
-    - _OutlineGlow: 48
+    - _OutlineGlow: 51.2
     - _OutlinePixelWidth: 1
     - _OutlineTexXSpeed: 10
     - _OutlineTexYSpeed: 0
-    - _OutlineWidth: 0.01
+    - _OutlineWidth: 0
     - _OverlayBlend: 1
     - _OverlayGlow: 1
     - _OverlayTextureScrollXSpeed: 0.25
@@ -242,8 +242,9 @@ Material:
     - _HitEffectColor: {r: 1, g: 0, b: 0, a: 1}
     - _HologramStripeColor: {r: 0, g: 1, b: 1, a: 1}
     - _InnerOutlineColor: {r: 0.9713696, g: 1, b: 0, a: 1}
-    - _OutlineColor: {r: 0.5768442, g: 0, b: 1, a: 1}
+    - _OutlineColor: {r: 0.97404885, g: 1, b: 0, a: 1}
     - _OverlayColor: {r: 1, g: 1, b: 1, a: 1}
     - _ShadowColor: {r: 0, g: 0, b: 0, a: 1}
     - _ShineColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1
