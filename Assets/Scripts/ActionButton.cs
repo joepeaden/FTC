@@ -154,7 +154,10 @@ public class ActionButton : MonoBehaviour
         {
             _callback(_ability);
             //image.sprite = selectedImage;
-            GameManager.Instance.PlayClickEffect();
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.PlayClickEffect();
+            }
         }
         else
         {

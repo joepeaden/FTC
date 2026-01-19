@@ -188,83 +188,58 @@ public class BattleManager : MonoBehaviour
 
     public void SpawnTestGuys(bool friendly)
     {
-        // int numToSpawn = Random.Range(DEFAULT_MIN_AMOUNT_TO_SPAWN, DEFAULT_MAX_AMOUNT_TO_SPAWN);// : 3;
+        int numToSpawn = Random.Range(DEFAULT_MIN_AMOUNT_TO_SPAWN, DEFAULT_MAX_AMOUNT_TO_SPAWN);// : 3;
 
-        // for (int i = 0; i < numToSpawn; i++)
-        // {
-        //     Pawn newPawn = Instantiate(pawnPrefab, friendly ? friendlyParent : enemyParent).GetComponent<Pawn>();
+        for (int i = 0; i < numToSpawn; i++)
+        {    
+            // if (friendly)
+            // {   
+            //     int roll = Random.Range(0,7);
+            //     switch (roll)
+            //     {
+            //     case 0:
+            //         guy.Passives.Add(DataLoader.passives["holy"]);
+            //         guy.Abilities.Add(DataLoader.abilities["firstaid"]);
+            //         guy.EquipItem(medHelm);
+            //         guy.EquipItem(sword);
+            //         break;
+            //     case 1:
+            //         guy.Passives.Add(DataLoader.passives["bulwark"]);
+            //         guy.Abilities.Add(DataLoader.abilities["defensiveposture"]);
+            //         guy.EquipItem(heavyHelm);
+            //         guy.EquipItem(bigSword);
+            //         break;
+            //     case 2:
+            //         guy.Passives.Add(DataLoader.passives["warrior"]);
+            //         guy.Abilities.Add(DataLoader.abilities["shove"]);
+            //         guy.EquipItem(lightHelm);
+            //         guy.EquipItem(spear);
+            //         break;
+            //     case 3:
+            //         guy.Passives.Add(DataLoader.passives["perfect"]);
+            //         guy.Abilities.Add(DataLoader.abilities["shove"]);
+            //         guy.EquipItem(lightHelm);
+            //         guy.EquipItem(sword);
+            //         break;
+            //     case 4: 
+            //         guy.Passives.Add(DataLoader.passives["courage"]);
+            //         guy.Abilities.Add(DataLoader.abilities["shove"]);
+            //         guy.EquipItem(axe);
+            //         break;
+            //     case 5: 
+            //         guy.Passives.Add(DataLoader.passives["tank"]);
+            //         guy.Abilities.Add(DataLoader.abilities["defensiveposture"]);
+            //         guy.EquipItem(heavyHelm);
+            //         guy.EquipItem(axe);
+            //         break;
+            //     }
+            // }
 
-        //     GameCharacter guy = new(friendly ? DataLoader.charTypes["player"] : DataLoader.charTypes["warrior"]);
-
-        //         guy.ChangeHP(6);
+            GameCharacter guy = new(friendly ? DataLoader.charTypes["player"] : DataLoader.charTypes["warrior"]);
+        
+            AddNewPawn(guy);
             
-        //     if (friendly)
-        //     {
-        //         // if (i == 1)// == 0)
-        //         // {
-        //         //     guy.EquipItem(bigSword);
-        //         //     guy.EquipItem(heavyHelm);
-        //         //     guy.Abilities.Add(DataLoader.abilities["firstaid"]);
-        //         // }
-        //         // else
-        //         // {
-        //         // }
-                
-        //         int roll = Random.Range(0,7);
-        //         switch (roll)
-        //         {
-        //         case 0:
-        //             guy.Passives.Add(DataLoader.passives["holy"]);
-        //             guy.Abilities.Add(DataLoader.abilities["firstaid"]);
-        //             guy.EquipItem(medHelm);
-        //             guy.EquipItem(sword);
-        //             break;
-        //         case 1:
-        //             guy.Passives.Add(DataLoader.passives["bulwark"]);
-        //             guy.Abilities.Add(DataLoader.abilities["defensiveposture"]);
-        //             guy.EquipItem(heavyHelm);
-        //             guy.EquipItem(bigSword);
-        //             break;
-        //         case 2:
-        //             guy.Passives.Add(DataLoader.passives["warrior"]);
-        //             guy.Abilities.Add(DataLoader.abilities["shove"]);
-        //             guy.EquipItem(lightHelm);
-        //             guy.EquipItem(spear);
-        //             break;
-        //         case 3:
-        //             guy.Passives.Add(DataLoader.passives["perfect"]);
-        //             guy.Abilities.Add(DataLoader.abilities["shove"]);
-        //             guy.EquipItem(lightHelm);
-        //             guy.EquipItem(sword);
-        //             break;
-        //         case 4: 
-        //             guy.Passives.Add(DataLoader.passives["courage"]);
-        //             guy.Abilities.Add(DataLoader.abilities["shove"]);
-        //             guy.EquipItem(axe);
-        //             break;
-        //         case 5: 
-        //             guy.Passives.Add(DataLoader.passives["tank"]);
-        //             guy.Abilities.Add(DataLoader.abilities["defensiveposture"]);
-        //             guy.EquipItem(heavyHelm);
-        //             guy.EquipItem(axe);
-        //             break;
-        //         }
-        //     }
-
-        //     newPawn.SetCharacter(guy);
-
-        //     if (friendly)
-        //     {
-        //         _playerPawns.Add(newPawn);
-        //     }
-        //     else
-        //     {
-        //         _aiPlayer.RegisterPawn(newPawn);
-        //     }
-            
-        //     MiniStatBar miniStats = Instantiate(_miniStatBarPrefab, _healthBarParent);
-        //     miniStats.SetData(newPawn);
-        // }
+        }
     }
 
 

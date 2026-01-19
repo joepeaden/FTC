@@ -5923,6 +5923,7 @@ GameObject:
   - component: {fileID: 756036163}
   - component: {fileID: 756036164}
   - component: {fileID: 756036165}
+  - component: {fileID: 756036166}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -6037,6 +6038,22 @@ MonoBehaviour:
   _pawnEvents: {fileID: 11400000, guid: 92196a55600b843d9870034ca03ee5a3, type: 2}
   _battleManager: {fileID: 756036163}
   _selectionManager: {fileID: 756036161}
+--- !u!114 &756036166
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 756036160}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d50eb8de385b43f7977b2111bf21aaa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _textNotifs:
+  - {fileID: 5472631746925560221}
+  - {fileID: 1469571136}
+  - {fileID: 2049822412}
 --- !u!1 &763875542
 GameObject:
   m_ObjectHideFlags: 0
@@ -8164,7 +8181,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1117882803
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8181,10 +8198,10 @@ MonoBehaviour:
   pawnPreviewPoolSize: 15
   audioSourcePrefab: {fileID: 8567179387656561764, guid: c5b47d9f5a6a1a04496b0f441bab48b9, type: 3}
   audioSourcePoolSize: 15
-  itemUIPrefab: {fileID: 0}
-  itemUIPoolSize: 0
-  bloodSplatPrefab: {fileID: 0}
-  bloodSplatPoolSize: 0
+  itemUIPrefab: {fileID: 6471140891649023232, guid: 8583335a164604fdc991f92b147e5b46, type: 3}
+  itemUIPoolSize: 100
+  bloodSplatPrefab: {fileID: 1780575514935555546, guid: d8e7779fea42f402a9b965172902c183, type: 3}
+  bloodSplatPoolSize: 50
 --- !u!4 &1117882804
 Transform:
   m_ObjectHideFlags: 0
@@ -10939,6 +10956,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 034b6ddfe732a411597f0649eab113c3, type: 3}
+--- !u!114 &1469571136 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 18929827204196301, guid: 034b6ddfe732a411597f0649eab113c3, type: 3}
+  m_PrefabInstance: {fileID: 1469571135}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad5198f1902b0428a9692eb59a0ab519, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1473237623
 GameObject:
   m_ObjectHideFlags: 0
@@ -14578,7 +14606,7 @@ Transform:
   m_GameObject: {fileID: 1953079083}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2508.056, y: -691.7104, z: 81397.14}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -14996,6 +15024,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 2949050133291852201, guid: 034b6ddfe732a411597f0649eab113c3, type: 3}
   m_PrefabInstance: {fileID: 2049822410}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2049822412 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 18929827204196301, guid: 034b6ddfe732a411597f0649eab113c3, type: 3}
+  m_PrefabInstance: {fileID: 2049822410}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad5198f1902b0428a9692eb59a0ab519, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2054139825
 GameObject:
   m_ObjectHideFlags: 0
@@ -16087,6 +16126,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 034b6ddfe732a411597f0649eab113c3, type: 3}
+--- !u!114 &5472631746925560221 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 18929827204196301, guid: 034b6ddfe732a411597f0649eab113c3, type: 3}
+  m_PrefabInstance: {fileID: 5472631746925560220}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad5198f1902b0428a9692eb59a0ab519, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &7576809738784867755
 PrefabInstance:
   m_ObjectHideFlags: 0
