@@ -266,7 +266,7 @@ public class PawnSprite : MonoBehaviour
 
             if (Random.Range(0f,1f) > BloodSplat.BLOOD_SPLAT_SPAWN_CHANCE)
             {
-                GameObject bloodSplat = ObjectPool.instance.GetBloodSplat();
+                GameObject bloodSplat = ObjectPool.Instance.GetBloodSplat();
                 bloodSplat.GetComponent<BloodSplat>().Activate(transform.position, _bodySpriteRend.sortingOrder - 1);
             }
         }

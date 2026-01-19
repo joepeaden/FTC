@@ -35,7 +35,7 @@ public class ShopPanel : MonoBehaviour
 
         for (int i = 0; i < _shopGrid.transform.childCount; i++)
         {
-            ObjectPool.instance.Return(_shopGrid.transform.GetChild(i).gameObject);
+            ObjectPool.Instance.Return(_shopGrid.transform.GetChild(i).gameObject);
         }
 
         // fill out shop
@@ -49,7 +49,7 @@ public class ShopPanel : MonoBehaviour
 
     public void AddShopItem(ItemData item)
     {
-        GameObject itemGO = ObjectPool.instance.GetItemUI();
+        GameObject itemGO = ObjectPool.Instance.GetItemUI();
         itemGO.transform.SetParent(_shopGrid.transform, false);
         itemGO.GetComponent<ItemUI>().SetData(item, PurchaseItem);
     }
@@ -67,6 +67,6 @@ public class ShopPanel : MonoBehaviour
 
         OnItemPurchased.Invoke(itemUI.Item);
 
-        ObjectPool.instance.Return(itemUI.gameObject);
+        ObjectPool.Instance.Return(itemUI.gameObject);
     }
 }

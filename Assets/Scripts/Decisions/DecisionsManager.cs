@@ -286,7 +286,7 @@ public class DecisionsManager : MonoBehaviour
 
     private void PlaySound(AudioClip clip)
     {
-        GameObject audioGO = ObjectPool.instance.GetAudioSource();
+        GameObject audioGO = ObjectPool.Instance.GetAudioSource();
         audioGO.SetActive(true);
         AudioSource aSource = audioGO.GetComponent<AudioSource>();
         aSource.clip = clip;

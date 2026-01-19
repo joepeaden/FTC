@@ -31,7 +31,7 @@ public class InventoryPanel : MonoBehaviour
 
     public void AddItem(ItemData item)
     {
-        GameObject itemGO = ObjectPool.instance.GetItemUI();
+        GameObject itemGO = ObjectPool.Instance.GetItemUI();
         itemGO.transform.SetParent(_inventoryGrid.transform, false);
         itemGO.GetComponent<ItemUI>().SetData(item, HandleInventoryItemSelected);
     }
@@ -41,6 +41,6 @@ public class InventoryPanel : MonoBehaviour
         OnInventoryItemClick.Invoke(itemUI.Item);
 
         itemUI.gameObject.SetActive(false);
-        itemUI.transform.SetParent(ObjectPool.instance.transform, false);
+        itemUI.transform.SetParent(ObjectPool.Instance.transform, false);
     }
 }

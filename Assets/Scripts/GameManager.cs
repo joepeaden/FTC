@@ -27,9 +27,6 @@ public class GameManager : MonoBehaviour
     public GameCharacterData GameCharData => _gameCharData;
     [SerializeField] private GameCharacterData _gameCharData;
 
-    public EquipmentListData EquipmentList => _equipmentListData;
-    [SerializeField] private EquipmentListData _equipmentListData;
-
     [SerializeField] private AudioClip _clickSound;
 
     private AudioSource _musicPlayer;
@@ -187,7 +184,7 @@ public class GameManager : MonoBehaviour
 
     public void LoadBattle(List<GameCharacter> enemies, int rewardAmount)
     {
-        ObjectPool.instance.ReparentObjects();
+        ObjectPool.Instance.ReparentObjects();
 
         foreach (GameCharacter character in PlayerFollowers)
         {
@@ -224,7 +221,7 @@ public class GameManager : MonoBehaviour
 
     public void ExitBattle(bool playerWon)
     {
-        ObjectPool.instance.ReparentObjects();
+        ObjectPool.Instance.ReparentObjects();
 
         LoadDecisionsScene();
 
@@ -239,7 +236,7 @@ public class GameManager : MonoBehaviour
 
     public void PlayClickEffect()
     {
-        GameObject pooledAudioSourceGO = ObjectPool.instance.GetAudioSource();
+        GameObject pooledAudioSourceGO = ObjectPool.Instance.GetAudioSource();
         pooledAudioSourceGO.SetActive(true);
         AudioSource audioSource = pooledAudioSourceGO.GetComponent<AudioSource>();
         audioSource.clip = _clickSound;

@@ -9,7 +9,8 @@ using UnityEngine.UIElements;
 /// </summary>
 public class ObjectPool : MonoBehaviour
 {
-    public static ObjectPool instance;
+    public static ObjectPool Instance => _instance;
+    private static ObjectPool _instance;
 
     [Header("PawnPreviews")]
     public GameObject pawnPreviewPrefab;
@@ -34,7 +35,14 @@ public class ObjectPool : MonoBehaviour
 
     void Awake()
     {
-        instance = this;
+        if (_instance != null)
+        {
+            Debug.Log("Object Pool already exists, deleting this one");
+            Destroy(gameObject);
+            return;
+        }
+
+        _instance = this;
     }
 
     void Start()
@@ -110,7 +118,7 @@ public class ObjectPool : MonoBehaviour
     public void Return(GameObject g)
     {
         g.gameObject.SetActive(false);
-        g.transform.SetParent(ObjectPool.instance.transform, false);
+        g.transform.SetParent(ObjectPool.Instance.transform, false);
     }
 
     /// <summary>

@@ -305,7 +305,7 @@ public class BattleManager : MonoBehaviour
 
             yield return new WaitForSeconds(.5f);
 
-            GameObject pooledAudioSourceGO = ObjectPool.instance.GetAudioSource();
+            GameObject pooledAudioSourceGO = ObjectPool.Instance.GetAudioSource();
             pooledAudioSourceGO.SetActive(true);
             AudioSource audioSource = pooledAudioSourceGO.GetComponent<AudioSource>();
             audioSource.clip = _levelUpSound;

@@ -335,7 +335,7 @@ public class BattleUI : MonoBehaviour
                 continue;
             }
 
-            GameObject pawnPreview = ObjectPool.instance.GetPawnPreview();
+            GameObject pawnPreview = ObjectPool.Instance.GetPawnPreview();
             pawnPreview.SetActive(true);
             pawnPreview.transform.SetParent(_initStackParent);
             // for some reason, the pawn previews get really mega stretched out.
