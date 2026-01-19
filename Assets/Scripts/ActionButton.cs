@@ -17,6 +17,7 @@ public class ActionButton : MonoBehaviour
     public Ability TheAbility => _ability;
     private Ability _ability;
     private UnityAction<Ability> _callback;
+    private UnityAction _unselectedCallback;
 
     private KeyCode _hotkey;
     public bool IsSelected => _isSelected;
@@ -84,7 +85,7 @@ public class ActionButton : MonoBehaviour
     /// </summary>
     /// <param name="action"></param>
     /// <param name="callback"></param>
-    public void SetDataButton(Ability action, UnityAction<Ability> callback, int hotkeyNum)
+    public void SetDataButton(Ability action, UnityAction<Ability> callback, UnityAction unselectedCallback, int hotkeyNum)
     {        
         SetDataDisplay(action);
 
@@ -120,6 +121,7 @@ public class ActionButton : MonoBehaviour
         hotKeyText.text = $"{GetKeyCodeDisplay(_hotkey)}";
 
         _callback = callback;
+        _unselectedCallback = unselectedCallback;
     }
 
     private void Update()
@@ -156,7 +158,7 @@ public class ActionButton : MonoBehaviour
         }
         else
         {
-            BattleManager.Instance.ClearSelectedAction();
+            _unselectedCallback();
         }
     }
 

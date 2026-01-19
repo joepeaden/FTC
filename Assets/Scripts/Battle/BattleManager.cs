@@ -43,11 +43,12 @@ public class BattleManager : MonoBehaviour
     public Pawn CurrentPawn => _currentPawn;
     private Pawn _currentPawn;
 
+    public Stack<Pawn> InitiativeStack => _initiativeStack;
     private Stack<Pawn> _initiativeStack = new ();
 
     public int TurnNumber => _turnNumber;
     private int _turnNumber = -1;
-    private BattleUI battleUI;
+    private BattleUI _battleUI;
 
     [SerializeField] private PawnEvents _pawnEvents;
 
@@ -55,9 +56,9 @@ public class BattleManager : MonoBehaviour
     {
         _instance = this;
 
-        battleUI = GetComponent<BattleUI>();
-        battleUI.OnGameOver.AddListener(ExitBattle);
-        battleUI.OnEndTurn.AddListener(EndTurn);
+        _battleUI = GetComponent<BattleUI>();
+        _battleUI.OnGameFinished.AddListener(ExitBattle);
+        _battleUI.OnEndTurn.AddListener(EndTurn);
         castle.OnGetHit.AddListener(HandleCastleHit);
 
         _pawnEvents.AddActedListener(HandlePawnActed);
@@ -116,7 +117,7 @@ public class BattleManager : MonoBehaviour
             HandleBattleResult(BattleResult.Lose);
         }
         
-        castleHitPointsUI.text = "Castle HP: " + hpRemaining.ToString();
+        //castleHitPointsUI.text = "Castle HP: " + hpRemaining.ToString();
     }
 
     /// <summary>
@@ -155,18 +156,12 @@ public class BattleManager : MonoBehaviour
         {
             EndTurn();
         }
-
-        if (Input.GetMouseButtonDown(1))
-        {
-            ClearSelectedAction();
-        }
-
     }
 
     private void OnDestroy()
     {
-        battleUI.OnGameOver.AddListener(ExitBattle);
-        battleUI.OnEndTurn.AddListener(EndTurn);
+        _battleUI.OnGameFinished.AddListener(ExitBattle);
+        _battleUI.OnEndTurn.AddListener(EndTurn);
         castle.OnGetHit.RemoveListener(HandleCastleHit);
 
         _pawnEvents.RemoveActedListener(HandlePawnActed);
@@ -400,7 +395,7 @@ public class BattleManager : MonoBehaviour
     {
         _turnNumber++;
 
-        battleUI.SetTurnUI(_turnNumber);
+        _battleUI.SetTurnUI(_turnNumber);
 
         List<Pawn> pawnList = new();
 
@@ -434,7 +429,7 @@ public class BattleManager : MonoBehaviour
             _playerPawns[i].HandleBattleEnd();
         }
 
-        battleUI.HandleBattleResult(battleResult);
+        _battleUI.HandleBattleResult(battleResult);
 
         _battleResult = battleResult;
     }
@@ -467,7 +462,7 @@ public class BattleManager : MonoBehaviour
 
         if (_currentPawn != null)
         {
-            _currentPawn.OnEffectUpdate.RemoveListener(UpdateEffects);
+            _currentPawn.OnEffectUpdate.RemoveListener(_battleUI.UpdateEffects);
         }
 
         _currentPawn = GetNextPawn();
@@ -490,12 +485,11 @@ public class BattleManager : MonoBehaviour
             else
             {
                 _currentPawn.HandleTurnBegin();
-                UpdateUIForPawn(_currentPawn);
-                _currentPawn.OnEffectUpdate.AddListener(UpdateEffects);
+                _battleUI.UpdateUIForPawn(_currentPawn);
+                _currentPawn.OnEffectUpdate.AddListener(_battleUI.UpdateEffects);
 
                 _selectionManager.HandleTurnChange(_currentPawn.OnPlayerTeam);
-                _endTurnButton.gameObject.SetActive(_currentPawn.OnPlayerTeam);
-
+                
                 if (!_currentPawn.OnPlayerTeam)
                 {
                     _selectionManager.DisablePlayerControls();

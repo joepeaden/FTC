@@ -3,19 +3,18 @@ using TMPro;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using UnityEngine.Events;
+using System.Collections;
+using System.Security;
 
 public class BattleUI : MonoBehaviour
 {
     [SerializeField] private Button _endTurnButton;
     [SerializeField] TMP_Text turnText;
     [SerializeField] GameObject turnUI;
-    [SerializeField] TMP_Text winLoseText;
-    [SerializeField] GameObject winLoseUI;
-    [SerializeField] private Button gameOverButton;
-    [SerializeField] TMP_Text castleHitPointsUI;
-    [SerializeField] TMP_Text hitChanceText;
+    [SerializeField] TMP_Text postBattleTitle;
+    [SerializeField] GameObject postBattleScreen;
+    [SerializeField] private Button gameFinishedButton;
     [SerializeField] TMP_Text characterNameText;
-    [SerializeField] TMP_Text characterMotivatorText;
     [SerializeField] PawnPreview currentPawnPreview;
     [SerializeField] PipStatBar armorBar;
     [SerializeField] PipStatBar healthBar;
@@ -23,9 +22,6 @@ public class BattleUI : MonoBehaviour
     [SerializeField] PipStatBar motBar;
     [SerializeField] private Transform _initStackParent;
     [SerializeField] private CharacterTooltip charTooltip;
-    [SerializeField] private GameObject _instructionsUI;
-    [SerializeField] private Button _startBattleButton;
-    [SerializeField] private Transform _actionsParent;
     [SerializeField] private GameObject bottomUIObjects;
     [SerializeField] private Transform _healthBarParent;
     [SerializeField] private MiniStatBar _miniStatBarPrefab;
@@ -33,12 +29,13 @@ public class BattleUI : MonoBehaviour
     [SerializeField] private Transform _pawnEffectsParent;
     [SerializeField] private Image _pawnEffectLargePrefab;
     [SerializeField] private List<ActionButton> _actionButtons = new(); 
-    [SerializeField] private List<InfoLine> _motivationConditionDisplay = new();
+    // [SerializeField] private List<InfoLine> _motivationConditionDisplay = new();
 
-    public UnityEvent OnGameOver = new();
-    public UnityEvent OnEndTurn = new();
+    [HideInInspector] public UnityEvent OnGameFinished = new();
+    [HideInInspector] public UnityEvent OnEndTurn = new();
     
     [SerializeField] private PawnEvents _pawnEvents; 
+    [SerializeField] private BattleManager _battleManager;
 
     private Tile _hoveredTile;
     private List<Tile> tilesToHighlight = new();
@@ -47,9 +44,11 @@ public class BattleUI : MonoBehaviour
     // the refactor from becoming out of scope at the time
     [SerializeField] private SelectionManager _selectionManager;
 
+    #region  Unity Event Methods
+
     private void Awake()
     {
-        gameOverButton.onClick.AddListener(NotifyGameOver);
+        gameFinishedButton.onClick.AddListener(NotifyGameFinished);
         _endTurnButton.onClick.AddListener(NotifyEndTurn);
 
         Tile.OnTileHoverStart.AddListener(HandleTileHoverStart);
@@ -62,7 +61,7 @@ public class BattleUI : MonoBehaviour
 
     private void OnDestroy()
     {
-        gameOverButton.onClick.RemoveListener(NotifyGameOver);
+        gameFinishedButton.onClick.RemoveListener(NotifyGameFinished);
         _endTurnButton.onClick.RemoveListener(NotifyEndTurn);
 
         Tile.OnTileHoverStart.RemoveListener(HandleTileHoverStart);
@@ -73,9 +72,19 @@ public class BattleUI : MonoBehaviour
         _pawnEvents.RemoveKilledListener(HandlePawnKilled);
     }
 
+    private void Update()
+    {
+        if (Input.GetMouseButtonDown(1))
+        {
+            ClearSelectedAction();
+        }
+    }
+
+    #endregion 
+
     #region Events Emitters
     
-    private void NotifyGameOver() { OnGameOver.Invoke(); }
+    private void NotifyGameFinished() { OnGameFinished.Invoke(); }
     private void NotifyEndTurn() { OnEndTurn.Invoke(); }
     
     #endregion
@@ -101,6 +110,7 @@ public class BattleUI : MonoBehaviour
 
     #endregion
     
+    #region  Unorganized
     public void SetTurnUI(int turnNum)
     {
         turnText.text = turnNum.ToString();
@@ -109,9 +119,9 @@ public class BattleUI : MonoBehaviour
     public void HandleBattleResult(BattleManager.BattleResult battleResult)
     {
         turnUI.SetActive(false);
-        winLoseUI.SetActive(true);
+        postBattleScreen.SetActive(true);
         bottomUIObjects.SetActive(false);
-        winLoseText.text = battleResult == BattleManager.BattleResult.Win ? "Victory!" : "Defeat!" ;
+        postBattleTitle.text = battleResult == BattleManager.BattleResult.Win ? "Victory!" : "Defeat!" ;
     }
 
     private void OnHoverInitPawnPreview(Pawn p)
@@ -136,7 +146,7 @@ public class BattleUI : MonoBehaviour
         _pawnPointer.gameObject.SetActive(false);
     }
     
-    private void UpdateEffects(List<EffectData> effects)
+    public void UpdateEffects(List<EffectData> effects)
     {
         for (int i = 0; i < _pawnEffectsParent.childCount; i++)
         {
@@ -151,13 +161,12 @@ public class BattleUI : MonoBehaviour
         }
     }
 
-    private void UpdateUIForPawn(Pawn p)
+    public void UpdateUIForPawn(Pawn p)
     {
         if (p != null)
         {
             bottomUIObjects.SetActive(true);
             characterNameText.text = p.GameChar.CharName;
-            characterMotivatorText.text = p.CurrentMotivator.ToString();
             armorBar.SetBar(p.ArmorPoints);
             healthBar.SetBar(p.HitPoints);
 
@@ -191,7 +200,7 @@ public class BattleUI : MonoBehaviour
                 {
                     if (actionButton.TheAbility != pawnAbilities[i])
                     {
-                        actionButton.SetDataButton(pawnAbilities[i], HandleActionClicked, i+1);
+                        actionButton.SetDataButton(pawnAbilities[i], HandleActionClicked, ClearSelectedAction, i+1);
                     }
                 }
             }
@@ -210,20 +219,22 @@ public class BattleUI : MonoBehaviour
             // this conditions list could be its own class and prefab, such that
             // it can just be dragged and dropped anywhere. Right now identical
             // code is found in CharDetailPanel.
-            List<MotCondData> motConditions = p.GameChar.GetMotCondsForBattle();
-            i = 0;
-            for (; i < motConditions.Count; i++)
-            {
-                MotCondData condition = motConditions[i];
+            // List<MotCondData> motConditions = p.GameChar.GetMotCondsForBattle();
+            // i = 0;
+            // for (; i < motConditions.Count; i++)
+            // {
+            //     MotCondData condition = motConditions[i];
 
-                _motivationConditionDisplay[i].SetData("", condition.description);
-            }
+            //     _motivationConditionDisplay[i].SetData("", condition.description);
+            // }
 
-            // update the remaining buttons
-            for (; i < _motivationConditionDisplay.Count; i++)
-            {
-                _motivationConditionDisplay[i].Hide();
-            }
+            // // update the remaining buttons
+            // for (; i < _motivationConditionDisplay.Count; i++)
+            // {
+            //     _motivationConditionDisplay[i].Hide();
+            // }
+
+            _endTurnButton.gameObject.SetActive(p.OnPlayerTeam);
         }
     }
 
@@ -234,16 +245,16 @@ public class BattleUI : MonoBehaviour
 
         if (_selectionManager.SelectedTile != null)
         {
-            if (_currentPawn != null)
+            if (_battleManager.CurrentPawn != null)
             {
-                if (Ability.SelectedAbility != null && targetTile.GetTileDistance(_currentPawn.CurrentTile) <= Ability.SelectedAbility.range)
+                if (Ability.SelectedAbility != null && targetTile.GetTileDistance(_battleManager.CurrentPawn.CurrentTile) <= Ability.SelectedAbility.range)
                 {
                     tilesToHighlight.Clear();
                     tilesToHighlight.Add(targetTile);
                     
                     if (Ability.SelectedAbility as WeaponAbilityData != null && ((WeaponAbilityData)Ability.SelectedAbility).attackStyle == WeaponAbilityData.AttackStyle.LShape)
                     {
-                        tilesToHighlight.Add(_currentPawn.CurrentTile.GetClockwiseNextTile(targetTile));
+                        tilesToHighlight.Add(_battleManager.CurrentPawn.CurrentTile.GetClockwiseNextTile(targetTile));
                     }
 
                     foreach (Tile t in tilesToHighlight)
@@ -251,7 +262,7 @@ public class BattleUI : MonoBehaviour
                         t.HighlightForAction();
                     }
 
-                    UpdateUIForPawn(_currentPawn);
+                    UpdateUIForPawn(_battleManager.CurrentPawn);
                 }
             }
         }
@@ -265,8 +276,8 @@ public class BattleUI : MonoBehaviour
 
    public void HandleTileHoverEnd(Tile t)
     {
-        HideHitChance();
-
+        charTooltip.Hide();
+    
         foreach (Tile highlightedTile in tilesToHighlight)
         {
             highlightedTile.ClearActionHighlight();
@@ -275,13 +286,6 @@ public class BattleUI : MonoBehaviour
 
         _hoveredTile = null;
     }        
-    
-    public void HideHitChance()
-    {
-        hitChanceText.gameObject.SetActive(false);
-        charTooltip.Hide();
-    }
-
     
     private IEnumerator OpenTooltipAfterPause()
     {
@@ -320,7 +324,7 @@ public class BattleUI : MonoBehaviour
         }
 
         int newChildCount = 0;
-        foreach (Pawn p in _initiativeStack)
+        foreach (Pawn p in _battleManager.InitiativeStack)
         {
             // the UI only has space for 7 to look pretty
             if (newChildCount > 7)
@@ -388,6 +392,7 @@ public class BattleUI : MonoBehaviour
         //OnActionUpdated.Invoke(action);
 
         ShowTooltipForPawn();
-        UpdateUIForPawn(_currentPawn);
+        UpdateUIForPawn(_battleManager.CurrentPawn);
     }
+    #endregion
 }
