@@ -10,10 +10,6 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public class BattleManager : MonoBehaviour
 {
-    private const int DEFAULT_MIN_AMOUNT_TO_SPAWN = 4;
-
-    private const int DEFAULT_MAX_AMOUNT_TO_SPAWN = 7;
-
     public enum BattleResult
     {
         Win,
@@ -31,9 +27,6 @@ public class BattleManager : MonoBehaviour
     [SerializeField] PhysicalCastle castle;
     [SerializeField] private AIPlayer _aiPlayer;
     [SerializeField] private SelectionManager _selectionManager;
-    [SerializeField] GameObject pawnPrefab;
-    [SerializeField] Transform enemyParent;
-    [SerializeField] Transform friendlyParent;
     [SerializeField] private ParticleSystem bloodEffect;
     [SerializeField] private ParticleSystem armorHitEffect;
 
@@ -49,6 +42,7 @@ public class BattleManager : MonoBehaviour
     public int TurnNumber => _turnNumber;
     private int _turnNumber = -1;
     private BattleUI _battleUI;
+    private PawnSpawner _spawner;
 
     [SerializeField] private PawnEvents _pawnEvents;
 
@@ -57,12 +51,15 @@ public class BattleManager : MonoBehaviour
         _instance = this;
 
         _battleUI = GetComponent<BattleUI>();
+        _spawner = GetComponent<PawnSpawner>();
+
         _battleUI.OnGameFinished.AddListener(ExitBattle);
         _battleUI.OnEndTurn.AddListener(EndTurn);
         castle.OnGetHit.AddListener(HandleCastleHit);
 
         _pawnEvents.AddActedListener(HandlePawnActed);
         _pawnEvents.AddKilledListener(HandlePawnKilled);
+        _pawnEvents.AddSpawnedListener(HandlePawnSpawned);
 
         SpawnPawns();
     }
@@ -72,16 +69,14 @@ public class BattleManager : MonoBehaviour
         // if not started from Battle scene, spawn player's company and enemies in contract
         if (GameManager.Instance != null)
         {
-            //dudesToSpawn = GameManager.Instance.GetNumOfEnemiesToSpawn();
-
             foreach (GameCharacter character in GameManager.Instance.PlayerFollowers)
             {
-                AddNewPawn(character);
+                _spawner.AddNewPawn(character);
             }
 
             foreach(GameCharacter character in GameManager.Instance.GetEnemiesForContract())
             {
-                AddNewPawn(character);
+                _spawner.AddNewPawn(character);
             }
         }
         // otherwise, spawn a random assortment of friendly and enemy dudes
@@ -89,35 +84,6 @@ public class BattleManager : MonoBehaviour
         {
             StartCoroutine(TestModeOnDataLoadedStart());
         }
-    }
-
-    private Pawn AddNewPawn(GameCharacter character)
-    {
-        Transform parent = character.OnPlayerTeam ? friendlyParent : enemyParent;
-        Pawn newPawn = Instantiate(pawnPrefab, parent).GetComponent<Pawn>();
-        newPawn.SetCharacter(character);
-        
-        if (character.OnPlayerTeam)
-        {
-            _playerPawns.Add(newPawn);
-        }
-        else
-        {
-            newPawn.castle = castle;
-            _aiPlayer.RegisterPawn(newPawn);
-        }
-
-        return newPawn;
-    }
-
-    private void HandleCastleHit(int hpRemaining)
-    {
-        if (hpRemaining <= 0)
-        {
-            HandleBattleResult(BattleResult.Lose);
-        }
-        
-        //castleHitPointsUI.text = "Castle HP: " + hpRemaining.ToString();
     }
 
     /// <summary>
@@ -134,11 +100,20 @@ public class BattleManager : MonoBehaviour
         yield return new WaitForSeconds(3f);
 
         Debug.Log("No game manager, spawning default amount");
-        SpawnTestGuys(true);
-        SpawnTestGuys(false);
+        _spawner.SpawnTestGuys();
 
         _battleResult = BattleResult.Undecided;
         StartBattle();
+    }
+
+    private void HandleCastleHit(int hpRemaining)
+    {
+        if (hpRemaining <= 0)
+        {
+            HandleBattleResult(BattleResult.Lose);
+        }
+        
+        //castleHitPointsUI.text = "Castle HP: " + hpRemaining.ToString();
     }
 
     private void Start()
@@ -166,6 +141,7 @@ public class BattleManager : MonoBehaviour
 
         _pawnEvents.RemoveActedListener(HandlePawnActed);
         _pawnEvents.RemoveKilledListener(HandlePawnKilled);
+        _pawnEvents.RemoveSpawnedListener(HandlePawnSpawned);
     }
 
     #region FX
@@ -185,63 +161,6 @@ public class BattleManager : MonoBehaviour
     #endregion
 
     #region BattleManagement
-
-    public void SpawnTestGuys(bool friendly)
-    {
-        int numToSpawn = Random.Range(DEFAULT_MIN_AMOUNT_TO_SPAWN, DEFAULT_MAX_AMOUNT_TO_SPAWN);// : 3;
-
-        for (int i = 0; i < numToSpawn; i++)
-        {    
-            // if (friendly)
-            // {   
-            //     int roll = Random.Range(0,7);
-            //     switch (roll)
-            //     {
-            //     case 0:
-            //         guy.Passives.Add(DataLoader.passives["holy"]);
-            //         guy.Abilities.Add(DataLoader.abilities["firstaid"]);
-            //         guy.EquipItem(medHelm);
-            //         guy.EquipItem(sword);
-            //         break;
-            //     case 1:
-            //         guy.Passives.Add(DataLoader.passives["bulwark"]);
-            //         guy.Abilities.Add(DataLoader.abilities["defensiveposture"]);
-            //         guy.EquipItem(heavyHelm);
-            //         guy.EquipItem(bigSword);
-            //         break;
-            //     case 2:
-            //         guy.Passives.Add(DataLoader.passives["warrior"]);
-            //         guy.Abilities.Add(DataLoader.abilities["shove"]);
-            //         guy.EquipItem(lightHelm);
-            //         guy.EquipItem(spear);
-            //         break;
-            //     case 3:
-            //         guy.Passives.Add(DataLoader.passives["perfect"]);
-            //         guy.Abilities.Add(DataLoader.abilities["shove"]);
-            //         guy.EquipItem(lightHelm);
-            //         guy.EquipItem(sword);
-            //         break;
-            //     case 4: 
-            //         guy.Passives.Add(DataLoader.passives["courage"]);
-            //         guy.Abilities.Add(DataLoader.abilities["shove"]);
-            //         guy.EquipItem(axe);
-            //         break;
-            //     case 5: 
-            //         guy.Passives.Add(DataLoader.passives["tank"]);
-            //         guy.Abilities.Add(DataLoader.abilities["defensiveposture"]);
-            //         guy.EquipItem(heavyHelm);
-            //         guy.EquipItem(axe);
-            //         break;
-            //     }
-            // }
-
-            GameCharacter guy = new(friendly ? DataLoader.charTypes["player"] : DataLoader.charTypes["warrior"]);
-        
-            AddNewPawn(guy);
-            
-        }
-    }
-
 
     private void EndTurn()
     {
@@ -349,6 +268,21 @@ public class BattleManager : MonoBehaviour
         if (p.OnPlayerTeam && GameManager.Instance != null)
         {
             GameManager.Instance.RemoveFollower(p.GameChar);
+        }
+    }
+
+    private void HandlePawnSpawned(Pawn p)
+    {
+        if (p.GameChar.OnPlayerTeam)
+        {
+            _playerPawns.Add(p);
+        }
+        else
+        {
+            // this needs to be moved somewhere else - probably to pawn - once we figure out the castle stuff
+            p.castle = castle;
+
+            _aiPlayer.RegisterPawn(p);
         }
     }
 
