@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using UnityEngine.Events;
-using Pathfinding;
-using JetBrains.Annotations;
 
 public class Pawn : MonoBehaviour
 {
