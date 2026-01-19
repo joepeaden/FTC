@@ -46,22 +46,22 @@ public class PawnEvents : ScriptableObject
     }
     #endregion
 
-    #region Pawn Created
-    private UnityEvent<Pawn> OnCreated = new();
+    #region Pawn Spawned
+    private UnityEvent<Pawn> OnSpawned = new();
 
-    public void AddSpawnListener(UnityAction<Pawn> listener)
+    public void AddSpawnedListener(UnityAction<Pawn> listener)
     {
-        OnCreated.AddListener(listener);
+        OnSpawned.AddListener(listener);
     }
         
-    public void RemoveSpawnListener(UnityAction<Pawn> listener)
+    public void RemoveSpawnedListener(UnityAction<Pawn> listener)
     {
-        OnCreated.RemoveListener(listener);
+        OnSpawned.RemoveListener(listener);
     }
 
-    public void EmitSpawn(Pawn p)
+    public void EmitSpawned(Pawn p)
     {
-        OnCreated.Invoke(p);
+        OnSpawned.Invoke(p);
     }
     #endregion
 }

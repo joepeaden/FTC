@@ -136,8 +136,7 @@ public class Pawn : MonoBehaviour
     {
         if (_isMoving)
         {
-            Tile tileAtThisLocation = GridGenerator.Instance.GetClosestTileToPosition(transform.position);
-            _spriteController.UpdateFacingAndSpriteOrder(tileAtThisLocation.transform.position, newDestination, CurrentTile);
+            _spriteController.UpdateFacingAndSpriteOrder(transform.position, newDestination, CurrentTile);
         }
     }
 
@@ -161,7 +160,7 @@ public class Pawn : MonoBehaviour
             UpdateEffect(p.effectDisplay, true);
         }
 
-        _pawnEvents.EmitSpawn(this);
+        _pawnEvents.EmitSpawned(this);
     }
 
     private void SetupMotConds()
@@ -884,8 +883,6 @@ public class Pawn : MonoBehaviour
         if (!gotHitByOpportunityAttack)
         {
             _hasMoved = true;
-
-            int tileDistance = _currentTile.GetTileDistance(targetTile);
 
             _pathfinder.AttemptGoToLocation(targetTile);
 

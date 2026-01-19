@@ -54,7 +54,7 @@ public class BattleUI : MonoBehaviour
         Tile.OnTileHoverStart.AddListener(HandleTileHoverStart);
         Tile.OnTileHoverEnd.AddListener(HandleTileHoverEnd);
 
-        _pawnEvents.AddSpawnListener(RegisterPawn);
+        _pawnEvents.AddSpawnedListener(RegisterPawn);
         _pawnEvents.AddActedListener(HandlePawnActed);
         _pawnEvents.AddKilledListener(HandlePawnKilled);
     }
@@ -67,7 +67,7 @@ public class BattleUI : MonoBehaviour
         Tile.OnTileHoverStart.RemoveListener(HandleTileHoverStart);
         Tile.OnTileHoverEnd.RemoveListener(HandleTileHoverEnd);
 
-        _pawnEvents.RemoveSpawnListener(RegisterPawn);
+        _pawnEvents.RemoveSpawnedListener(RegisterPawn);
         _pawnEvents.RemoveActedListener(HandlePawnActed);
         _pawnEvents.RemoveKilledListener(HandlePawnKilled);
     }
