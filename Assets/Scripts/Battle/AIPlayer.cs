@@ -41,21 +41,41 @@ public class AIPlayer : MonoBehaviour
         // just add a pause so it's not jarring how fast turns change
         yield return new WaitForSeconds(1f);
 
-        // see if there's anyone adjacent to attack, if so, attack
-        Pawn adjacentPawn = GetAdjacentTarget(activePawn);
-        if (adjacentPawn != null)
+        // for now, enemies should always move towards the castle. Player pawns should obviously move towards enemies
+        bool moveTowardsPawn = activePawn.OnPlayerTeam;
+
+        if (IsAdjacentToCastle(activePawn) && !activePawn.OnPlayerTeam)
         {
-            activePawn.GetWeaponAbilities()[0].Activate(activePawn, adjacentPawn);
+            activePawn.AttackCastle();
         }
         else
         {
-            Move(activePawn);
+            // see if there's anyone adjacent to attack, if so, attack. Otherwise, go towards a target
+            Pawn adjacentPawn = GetAdjacentTarget(activePawn);
+            if (adjacentPawn != null)
+            {
+                activePawn.GetWeaponAbilities()[0].Activate(activePawn, adjacentPawn);
+            }
+            else
+            {
+                Move(activePawn, moveTowardsPawn);
+            }
         }
     }
 
-    private void Move(Pawn activePawn)
+    private bool IsAdjacentToCastle(Pawn activePawn)
     {
-        List<Tile> potentialTargetTiles = GetPotentialTilesForMove(activePawn);
+        return GridGenerator.Instance.CastleTiles.Contains(activePawn.CurrentTile);
+    }
+
+    /// <summary>
+    /// Move the activePawn.
+    /// </summary>
+    /// <param name="activePawn">The pawn that's moving</param>
+    /// <param name="shouldMoveTowardsPawn">Move towards a pawn? If not, move towards castle</param>
+    private void Move(Pawn activePawn, bool shouldMoveTowardsPawn)
+    {
+        List<Tile> potentialTargetTiles = GetPotentialTilesForMove(activePawn, shouldMoveTowardsPawn);
 
         if (potentialTargetTiles.Count > 0)
         {
@@ -77,11 +97,20 @@ public class AIPlayer : MonoBehaviour
         }
     }
 
-    private List<Tile> GetPotentialTilesForMove(Pawn activePawn)
+    private List<Tile> GetPotentialTilesForMove(Pawn activePawn, bool shouldMoveTowardsPawn)
     {
-        // try to move towards enemy pawns
-        List<Pawn> pawnsToMoveTowards = activePawn.OnPlayerTeam ? _enemyPawns : BattleManager.Instance.PlayerPawns;
-        List<Tile> potentialTargetTiles = GetTargetTilesTowardsPawns(pawnsToMoveTowards, activePawn);
+        List<Pawn> pawnsToMoveTowards;
+        List<Tile> potentialTargetTiles;
+        if (shouldMoveTowardsPawn)
+        {
+            // try to move towards enemy pawns
+            pawnsToMoveTowards = activePawn.OnPlayerTeam ? _enemyPawns : BattleManager.Instance.PlayerPawns;
+            potentialTargetTiles = GetTargetTilesTowardsPawns(pawnsToMoveTowards, activePawn);
+        }
+        else
+        {
+            potentialTargetTiles = GetCastleTiles();
+        }
 
         // otherwise, we want to move towards an ally pawn (they're probably going somewhere right?)
         // hopefully this doesn't end up making silly things happen. 
@@ -92,6 +121,11 @@ public class AIPlayer : MonoBehaviour
         }
         
         return potentialTargetTiles;
+    }
+
+    private List<Tile> GetCastleTiles()
+    {
+        return GridGenerator.Instance.CastleTiles;
     }
 
     private List<Tile> GetTargetTilesTowardsPawns(List<Pawn> pawnsToMoveTowards, Pawn activePawn)

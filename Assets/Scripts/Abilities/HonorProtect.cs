@@ -27,7 +27,7 @@ public class HonorProtect : SupportAbilityData
         _activatedPawn.Motivation -= motCost;
 
         // on new activation, will want to check duration to see if stop protecting
-        _activatedPawn.OnActivation.AddListener(HandleNewActivationForPawn);
+        _activatedPawn.OnTurnBegin.AddListener(HandleNewActivationForPawn);
         // obviously can't protect someone if we're dead can we?
         _activatedPawn.OnHPChanged.AddListener(HandleDeath);
         // listen when the pawn moves to check if we're still in range to protect
@@ -35,7 +35,7 @@ public class HonorProtect : SupportAbilityData
         _targetPawn.OnMoved.AddListener(CheckAdjacencyForProtection);
 
         // tell battle manager we acted
-        BattleManager.Instance.PawnActivated(_activatedPawn);
+        BattleManager.Instance.HandlePawnActed(_activatedPawn);
         
         // text display event
         // BattleManager.Instance.AddTextNotification(_targetPawn.transform.position, "+Protection");
@@ -91,7 +91,7 @@ public class HonorProtect : SupportAbilityData
 
         _targetPawn.UpdateEffect(statusEffect, false);
 
-        _activatedPawn.OnActivation.RemoveListener(HandleNewActivationForPawn);
+        _activatedPawn.OnTurnBegin.RemoveListener(HandleNewActivationForPawn);
         _activatedPawn.OnHPChanged.RemoveListener(HandleDeath);
         _activatedPawn.OnMoved.RemoveListener(CheckAdjacencyForProtection);
         _targetPawn.OnMoved.RemoveListener(CheckAdjacencyForProtection);

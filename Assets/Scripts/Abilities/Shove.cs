@@ -14,7 +14,7 @@ public class Shove : SupportAbilityData
         {
             targetPawn.ForceMoveToTile(pushTile);
             // tell battle manager we acted
-            BattleManager.Instance.PawnActivated(activatedPawn);
+            BattleManager.Instance.HandlePawnActed(activatedPawn);
         }
 
         return true;

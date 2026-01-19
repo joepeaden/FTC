@@ -874,17 +874,16 @@ MonoBehaviour:
   OnEffectUpdate:
     m_PersistentCalls:
       m_Calls: []
-  OnActivation:
+  OnTurnBegin:
     m_PersistentCalls:
       m_Calls: []
-  baseDodgeChance: 0
-  baseSurroundBonus: 0.2
+  _pawnEvents: {fileID: 11400000, guid: 92196a55600b843d9870034ca03ee5a3, type: 2}
   actionPoints: 0
   Motivation: 0
+  castle: {fileID: 0}
   DodgeMod: 0
   HitMod: 0
   freeAttacksRemaining: 0
-  _pathfinder: {fileID: 7279780515540898986}
   hitSound: {fileID: 8300000, guid: 26e178cc91d704d69b9c8f5c90d8e061, type: 3}
   armorHitSound: {fileID: 8300000, guid: f442ae3543bf8cd4b89b4085ed9f7917, type: 3}
   dieSound: {fileID: 8300000, guid: 53defb0490f384700828806354f94976, type: 3}
