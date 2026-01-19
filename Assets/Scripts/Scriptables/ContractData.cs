@@ -10,4 +10,5 @@ public class ContractData : ScriptableObject
     public List<GameCharacterData> possibleEnemyTypes;
     public int maxEnemyCount;
     public int minEnemyCount;
+    public int waveCount;
 }

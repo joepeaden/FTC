@@ -1,7 +1,11 @@
 using UnityEngine;
 
+/// <summary>
+/// PawnSpawner should have responsibility for spawning and tracking waves.
+/// </summary>
 public class PawnSpawner : MonoBehaviour
 {
+    int currentWave;
     private const int DEFAULT_MIN_AMOUNT_TO_SPAWN = 4;
     private const int DEFAULT_MAX_AMOUNT_TO_SPAWN = 7;
 
