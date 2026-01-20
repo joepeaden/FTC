@@ -104,7 +104,7 @@ public class AIPlayer : MonoBehaviour
         if (shouldMoveTowardsPawn)
         {
             // try to move towards enemy pawns
-            pawnsToMoveTowards = activePawn.OnPlayerTeam ? _enemyPawns : BattleManager.Instance.PlayerPawns;
+            pawnsToMoveTowards = activePawn.OnPlayerTeam ? _enemyPawns : FlowDirector.Instance.PlayerPawns;
             potentialTargetTiles = GetTargetTilesTowardsPawns(pawnsToMoveTowards, activePawn);
         }
         else
@@ -116,7 +116,7 @@ public class AIPlayer : MonoBehaviour
         // hopefully this doesn't end up making silly things happen. 
         if (potentialTargetTiles.Count == 0)
         {
-            pawnsToMoveTowards = activePawn.OnPlayerTeam ? BattleManager.Instance.PlayerPawns : _enemyPawns;
+            pawnsToMoveTowards = activePawn.OnPlayerTeam ? FlowDirector.Instance.PlayerPawns : _enemyPawns;
             potentialTargetTiles = GetTargetTilesTowardsPawns(pawnsToMoveTowards, activePawn);
         }
         

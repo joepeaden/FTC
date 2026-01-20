@@ -28,9 +28,9 @@ public class SelectionManager : MonoBehaviour
         _selectedTile.SetSelected(true);
 
         // if the character has moved here during it's turn and is not done yet (not a fresh pawn)
-        if (BattleManager.Instance.CurrentPawn.actionPoints < Pawn.BASE_ACTION_POINTS && BattleManager.Instance.CurrentPawn.HasActionsRemaining())
+        if (FlowDirector.Instance.CurrentPawn.actionPoints < Pawn.BASE_ACTION_POINTS && FlowDirector.Instance.CurrentPawn.HasActionsRemaining())
         {
-            _selectedTile.HighlightTilesInRange(BattleManager.Instance.CurrentPawn, 0, BattleManager.Instance.CurrentPawn.MoveRange, true, Tile.TileHighlightType.Move);
+            _selectedTile.HighlightTilesInRange(FlowDirector.Instance.CurrentPawn, 0, FlowDirector.Instance.CurrentPawn.MoveRange, true, Tile.TileHighlightType.Move);
         }
     }
 
@@ -50,7 +50,7 @@ public class SelectionManager : MonoBehaviour
         //if (_selectedTile != null)
         //{
         //    _selectedTile.SetSelected(false);
-            SetSelectedTile(BattleManager.Instance.CurrentPawn.CurrentTile);
+            SetSelectedTile(FlowDirector.Instance.CurrentPawn.CurrentTile);
         //}
 
         if (isPlayerTurn)
@@ -72,7 +72,7 @@ public class SelectionManager : MonoBehaviour
 
     public void ClearHighlights()
     {
-        Pawn currentPawn = BattleManager.Instance.CurrentPawn;
+        Pawn currentPawn = FlowDirector.Instance.CurrentPawn;
 
         if (Ability.SelectedAbility!= null)
         {
@@ -84,7 +84,7 @@ public class SelectionManager : MonoBehaviour
 
     public void SetIdleMode(bool isIdle)
     {
-        Pawn currentPawn = BattleManager.Instance.CurrentPawn;
+        Pawn currentPawn = FlowDirector.Instance.CurrentPawn;
         Ability currentAction = Ability.SelectedAbility;
 
         // already not in idle mode and maybe switching actions -
@@ -110,7 +110,7 @@ public class SelectionManager : MonoBehaviour
     {
         if (_playerControlsEnabled && Input.GetMouseButtonDown(0))
         {
-            Pawn currentPawn = BattleManager.Instance.CurrentPawn;
+            Pawn currentPawn = FlowDirector.Instance.CurrentPawn;
 
             Vector3 mousePos = CameraManager.MainCamera.ScreenToWorldPoint(Input.mousePosition);
             RaycastHit2D[] hits = Physics2D.RaycastAll(mousePos, -Vector3.forward);

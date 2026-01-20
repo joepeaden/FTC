@@ -9,7 +9,7 @@ public class PostBattleScreen : MonoBehaviour
     private void OnEnable()
     {
         int i = 0;
-        foreach (Pawn p in BattleManager.Instance.PlayerPawns)
+        foreach (Pawn p in FlowDirector.Instance.PlayerPawns)
         {
             // really the best thing would be to have this list existing and
             // also if we hit this limit, just instantiate more as needed.

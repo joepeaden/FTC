@@ -35,7 +35,7 @@ public class BattleUI : MonoBehaviour
     [HideInInspector] public UnityEvent OnEndTurn = new();
     
     [SerializeField] private PawnEvents _pawnEvents; 
-    [SerializeField] private BattleManager _battleManager;
+    [SerializeField] private FlowDirector _battleManager;
 
     private Tile _hoveredTile;
     private List<Tile> tilesToHighlight = new();
@@ -116,12 +116,12 @@ public class BattleUI : MonoBehaviour
         turnText.text = turnNum.ToString();
     }
 
-    public void HandleBattleResult(BattleManager.BattleResult battleResult)
+    public void HandleBattleResult(FlowDirector.BattleResult battleResult)
     {
         turnUI.SetActive(false);
         postBattleScreen.SetActive(true);
         bottomUIObjects.SetActive(false);
-        postBattleTitle.text = battleResult == BattleManager.BattleResult.Win ? "Victory!" : "Defeat!" ;
+        postBattleTitle.text = battleResult == FlowDirector.BattleResult.Win ? "Victory!" : "Defeat!" ;
     }
 
     private void OnHoverInitPawnPreview(Pawn p)

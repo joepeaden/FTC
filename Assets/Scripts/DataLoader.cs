@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Events;
 
@@ -62,6 +61,7 @@ public class DataLoader
         };
         
         await Task.WhenAll(tasks);
+        
         OnDataLoaded.Invoke();
     }
 

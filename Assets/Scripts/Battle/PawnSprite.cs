@@ -313,13 +313,13 @@ public class PawnSprite : MonoBehaviour
     private IEnumerator PlayArmorHitFXAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
-        BattleManager.Instance.PlayArmorHitFX(transform.position + (Vector3.up * .3f));
+        FlowDirector.Instance.PlayArmorHitFX(transform.position + (Vector3.up * .3f));
     }
 
     private IEnumerator PlayBloodSpurtAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
-        BattleManager.Instance.PlayBloodSpurt(transform.position + (Vector3.up * .3f));
+        FlowDirector.Instance.PlayBloodSpurt(transform.position + (Vector3.up * .3f));
     }
 
     private IEnumerator PlayAnimationAfterDelay(float delay, string animName)

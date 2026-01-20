@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 /// <summary>
 /// Should manage the flow of the battle (turns), initialization, and reporting results back to GameManager.
 /// </summary>
-public class BattleManager : MonoBehaviour
+public class FlowDirector : MonoBehaviour
 {
     public enum BattleResult
     {
@@ -17,8 +17,8 @@ public class BattleManager : MonoBehaviour
     };
     private BattleResult _battleResult;
 
-    public static BattleManager Instance => _instance;
-    private static BattleManager _instance;
+    public static FlowDirector Instance => _instance;
+    private static FlowDirector _instance;
 
     public List<Pawn> PlayerPawns => _playerPawns;
     private List<Pawn> _playerPawns = new();
@@ -45,18 +45,16 @@ public class BattleManager : MonoBehaviour
 
     [SerializeField] private PawnEvents _pawnEvents;
 
-    DataLoader _dataLoader;
+    private DataLoader _dataLoader;
 
     private void Awake()
     {
         _instance = this;
 
+        _spawner = GetComponent<PawnSpawner>();
         _battleUI = GetComponent<BattleUI>();
         _battleUI.OnGameFinished.AddListener(ExitBattle);
         _battleUI.OnEndTurn.AddListener(EndTurn);
-        
-        _spawner = GetComponent<PawnSpawner>();
-        _spawner.OnReady.AddListener(HandleSpawnerReady);
 
         castle.OnGetHit.AddListener(HandleCastleHit);
 
@@ -72,7 +70,9 @@ public class BattleManager : MonoBehaviour
 
     private void HandleDataLoaded()
     {
-        _spawner.Initialize();
+        _spawner.Initialize(); 
+        _battleResult = BattleResult.Undecided;
+        StartBattle();
     }
 
     private void HandleCastleHit(int hpRemaining)
@@ -83,15 +83,6 @@ public class BattleManager : MonoBehaviour
         }
         
         //castleHitPointsUI.text = "Castle HP: " + hpRemaining.ToString();
-    }
-
-    private void HandleSpawnerReady()
-    {
-        // if (GameManager.Instance != null)
-        // {
-            _battleResult = BattleResult.Undecided;
-            StartBattle();
-        // }
     }
 
     private void Update()
@@ -106,8 +97,6 @@ public class BattleManager : MonoBehaviour
     {
         _battleUI.OnGameFinished.AddListener(ExitBattle);
         _battleUI.OnEndTurn.AddListener(EndTurn);
-        
-        _spawner.OnReady.RemoveListener(HandleSpawnerReady);
 
         castle.OnGetHit.RemoveListener(HandleCastleHit);
 
@@ -274,31 +263,29 @@ public class BattleManager : MonoBehaviour
         return livingPawns;
     }
 
-    private void RefreshInitiativeStack()
+    private void NewTurn()
     {
         _turnNumber++;
+
         _spawner.SpawnEnemiesForTurn();
 
-        _battleUI.SetTurnUI(_turnNumber);
+        RefreshInitiativeStack();
 
+        _battleUI.SetTurnUI(_turnNumber);
+        _battleUI.RefreshInitStackUI();
+    }
+
+    private void RefreshInitiativeStack()
+    {
         List<Pawn> pawnList = new();
 
-        foreach (Pawn p in GetFriendlyLivingPawns())
-        {
-            pawnList.Add(p);
-        }
-
-        foreach (Pawn p in _aiPlayer.GetEnemyLivingPawns())
-        {
-            pawnList.Add(p);
-        }
+        foreach (Pawn p in GetFriendlyLivingPawns()) { pawnList.Add(p); }
+        foreach (Pawn p in _aiPlayer.GetEnemyLivingPawns()) { pawnList.Add(p); }
         
         pawnList = pawnList.OrderBy(pawn => pawn.Initiative).ToList();
 
         // this way the stack can be sorted properly 
         _initiativeStack = new(pawnList);
-
-        _battleUI.RefreshInitStackUI();
     }
 
     private void StartBattle()
@@ -405,7 +392,7 @@ public class BattleManager : MonoBehaviour
     {
         if (_initiativeStack.Count == 0)
         {
-            RefreshInitiativeStack();
+            NewTurn();
         }
 
         Pawn p = _initiativeStack.Pop();
@@ -418,7 +405,7 @@ public class BattleManager : MonoBehaviour
             }
             else
             {
-                RefreshInitiativeStack();
+                NewTurn();
             }
         }
 

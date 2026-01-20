@@ -35,7 +35,7 @@ public class HonorProtect : SupportAbilityData
         _targetPawn.OnMoved.AddListener(CheckAdjacencyForProtection);
 
         // tell battle manager we acted
-        BattleManager.Instance.HandlePawnActed(_activatedPawn);
+        FlowDirector.Instance.HandlePawnActed(_activatedPawn);
         
         // text display event
         // BattleManager.Instance.AddTextNotification(_targetPawn.transform.position, "+Protection");
