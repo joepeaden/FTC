@@ -109,7 +109,7 @@ public class AIPlayer : MonoBehaviour
         }
         else
         {
-            potentialTargetTiles = GetCastleTiles();
+            potentialTargetTiles = GetAvailableCastleTiles(activePawn);
         }
 
         // otherwise, we want to move towards an ally pawn (they're probably going somewhere right?)
@@ -123,9 +123,11 @@ public class AIPlayer : MonoBehaviour
         return potentialTargetTiles;
     }
 
-    private List<Tile> GetCastleTiles()
+    private List<Tile> GetAvailableCastleTiles(Pawn activePawn)
     {
-        return GridGenerator.Instance.CastleTiles;
+        return GridGenerator.Instance.CastleTiles.Where(tile =>
+         activePawn.HasPathToTile(tile) &&
+         tile.GetPawn() == null).ToList();
     }
 
     private List<Tile> GetTargetTilesTowardsPawns(List<Pawn> pawnsToMoveTowards, Pawn activePawn)

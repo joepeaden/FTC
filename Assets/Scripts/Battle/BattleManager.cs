@@ -45,64 +45,34 @@ public class BattleManager : MonoBehaviour
 
     [SerializeField] private PawnEvents _pawnEvents;
 
+    DataLoader _dataLoader;
+
     private void Awake()
     {
         _instance = this;
 
         _battleUI = GetComponent<BattleUI>();
-        _spawner = GetComponent<PawnSpawner>();
-
         _battleUI.OnGameFinished.AddListener(ExitBattle);
         _battleUI.OnEndTurn.AddListener(EndTurn);
+        
+        _spawner = GetComponent<PawnSpawner>();
+        _spawner.OnReady.AddListener(HandleSpawnerReady);
+
         castle.OnGetHit.AddListener(HandleCastleHit);
 
         _pawnEvents.AddActedListener(HandlePawnActed);
         _pawnEvents.AddKilledListener(HandlePawnKilled);
         _pawnEvents.AddSpawnedListener(HandlePawnSpawned);
 
-        SpawnPawns();
-    }
+        _dataLoader = new DataLoader();
+        _dataLoader.LoadData();
 
-    private void SpawnPawns()
+        _dataLoader.OnDataLoaded.AddListener(HandleDataLoaded);
+    }    
+
+    private void HandleDataLoaded()
     {
-        // if not started from Battle scene, spawn player's company and enemies in contract
-        if (GameManager.Instance != null)
-        {
-            foreach (GameCharacter character in GameManager.Instance.PlayerFollowers)
-            {
-                _spawner.AddNewPawn(character);
-            }
-
-            foreach(GameCharacter character in GameManager.Instance.GetEnemiesForContract())
-            {
-                _spawner.AddNewPawn(character);
-            }
-        }
-        // otherwise, spawn a random assortment of friendly and enemy dudes
-        else
-        {
-            StartCoroutine(TestModeOnDataLoadedStart());
-        }
-    }
-
-    /// <summary>
-    /// Start for when just testing battles. Not very secure but it's just for testing. 
-    /// </summary>
-    /// <returns></returns>
-    private IEnumerator TestModeOnDataLoadedStart()
-    {
-        // instantiate data loader
-        DataLoader dataLoader = new DataLoader();
-        dataLoader.LoadData();
-
-        // wait for data to load. 
-        yield return new WaitForSeconds(3f);
-
-        Debug.Log("No game manager, spawning default amount");
-        _spawner.SpawnTestGuys();
-
-        _battleResult = BattleResult.Undecided;
-        StartBattle();
+        _spawner.Initialize();
     }
 
     private void HandleCastleHit(int hpRemaining)
@@ -115,13 +85,13 @@ public class BattleManager : MonoBehaviour
         //castleHitPointsUI.text = "Castle HP: " + hpRemaining.ToString();
     }
 
-    private void Start()
+    private void HandleSpawnerReady()
     {
-        if (GameManager.Instance != null)
-        {
+        // if (GameManager.Instance != null)
+        // {
             _battleResult = BattleResult.Undecided;
             StartBattle();
-        }
+        // }
     }
 
     private void Update()
@@ -136,11 +106,16 @@ public class BattleManager : MonoBehaviour
     {
         _battleUI.OnGameFinished.AddListener(ExitBattle);
         _battleUI.OnEndTurn.AddListener(EndTurn);
+        
+        _spawner.OnReady.RemoveListener(HandleSpawnerReady);
+
         castle.OnGetHit.RemoveListener(HandleCastleHit);
 
         _pawnEvents.RemoveActedListener(HandlePawnActed);
         _pawnEvents.RemoveKilledListener(HandlePawnKilled);
         _pawnEvents.RemoveSpawnedListener(HandlePawnSpawned);
+        
+        _dataLoader.OnDataLoaded.AddListener(HandleDataLoaded);
     }
 
     #region FX
@@ -302,6 +277,7 @@ public class BattleManager : MonoBehaviour
     private void RefreshInitiativeStack()
     {
         _turnNumber++;
+        _spawner.SpawnEnemiesForTurn();
 
         _battleUI.SetTurnUI(_turnNumber);
 
@@ -321,6 +297,8 @@ public class BattleManager : MonoBehaviour
 
         // this way the stack can be sorted properly 
         _initiativeStack = new(pawnList);
+
+        _battleUI.RefreshInitStackUI();
     }
 
     private void StartBattle()
