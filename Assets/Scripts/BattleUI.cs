@@ -13,7 +13,8 @@ public class BattleUI : MonoBehaviour
     [SerializeField] GameObject turnUI;
     [SerializeField] TMP_Text postBattleTitle;
     [SerializeField] GameObject postBattleScreen;
-    [SerializeField] private Button gameFinishedButton;
+    [SerializeField] private Button _waveBeginButton;
+    [SerializeField] private Button _waveFinishedButton;
     [SerializeField] TMP_Text characterNameText;
     [SerializeField] PawnPreview currentPawnPreview;
     [SerializeField] PipStatBar armorBar;
@@ -31,11 +32,12 @@ public class BattleUI : MonoBehaviour
     [SerializeField] private List<ActionButton> _actionButtons = new(); 
     // [SerializeField] private List<InfoLine> _motivationConditionDisplay = new();
 
-    [HideInInspector] public UnityEvent OnGameFinished = new();
+    [HideInInspector] public UnityEvent OnWaveBegin = new();
+    [HideInInspector] public UnityEvent OnWaveFinished = new();
     [HideInInspector] public UnityEvent OnEndTurn = new();
     
     [SerializeField] private PawnEvents _pawnEvents; 
-    [SerializeField] private BattleManager _battleManager;
+    [SerializeField] private FlowDirector _battleManager;
 
     private Tile _hoveredTile;
     private List<Tile> tilesToHighlight = new();
@@ -48,7 +50,8 @@ public class BattleUI : MonoBehaviour
 
     private void Awake()
     {
-        gameFinishedButton.onClick.AddListener(NotifyGameFinished);
+        _waveBeginButton.onClick.AddListener(NotifyWaveBegin);
+        _waveFinishedButton.onClick.AddListener(NotifyWaveFinished);
         _endTurnButton.onClick.AddListener(NotifyEndTurn);
 
         Tile.OnTileHoverStart.AddListener(HandleTileHoverStart);
@@ -61,7 +64,8 @@ public class BattleUI : MonoBehaviour
 
     private void OnDestroy()
     {
-        gameFinishedButton.onClick.RemoveListener(NotifyGameFinished);
+        _waveBeginButton.onClick.RemoveListener(NotifyWaveBegin);
+        _waveFinishedButton.onClick.RemoveListener(NotifyWaveFinished);
         _endTurnButton.onClick.RemoveListener(NotifyEndTurn);
 
         Tile.OnTileHoverStart.RemoveListener(HandleTileHoverStart);
@@ -84,7 +88,18 @@ public class BattleUI : MonoBehaviour
 
     #region Events Emitters
     
-    private void NotifyGameFinished() { OnGameFinished.Invoke(); }
+    private void NotifyWaveBegin() 
+    {
+        OnWaveBegin.Invoke();
+        OpenWaveUI();
+    }
+
+    private void NotifyWaveFinished() 
+    {
+        OnWaveFinished.Invoke();
+        OpenRespiteUI();
+    }
+    
     private void NotifyEndTurn() { OnEndTurn.Invoke(); }
     
     #endregion
@@ -116,12 +131,26 @@ public class BattleUI : MonoBehaviour
         turnText.text = turnNum.ToString();
     }
 
-    public void HandleBattleResult(BattleManager.BattleResult battleResult)
+    public void HandleBattleResult(FlowDirector.BattleResult battleResult)
     {
         turnUI.SetActive(false);
         postBattleScreen.SetActive(true);
         bottomUIObjects.SetActive(false);
-        postBattleTitle.text = battleResult == BattleManager.BattleResult.Win ? "Victory!" : "Defeat!" ;
+        postBattleTitle.text = battleResult == FlowDirector.BattleResult.Win ? "Wave Survived!" : "Defeat!" ;
+    }
+
+    public void OpenRespiteUI()
+    {
+        postBattleScreen.SetActive(false);
+        _waveBeginButton.gameObject.SetActive(true);
+        _endTurnButton.gameObject.SetActive(false);
+    }
+
+    public void OpenWaveUI()
+    {
+        _waveBeginButton.gameObject.SetActive(false);
+        bottomUIObjects.SetActive(true);
+        turnUI.SetActive(true);
     }
 
     private void OnHoverInitPawnPreview(Pawn p)

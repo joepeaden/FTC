@@ -13,7 +13,7 @@ public class FirstAid : SupportAbilityData
         targetPawn.Heal(healAmount);
 
         // tell battle manager we acted
-        BattleManager.Instance.HandlePawnActed(activatedPawn);
+        FlowDirector.Instance.HandlePawnActed(activatedPawn);
         
         return true;
     }

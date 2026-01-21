@@ -104,28 +104,30 @@ public class AIPlayer : MonoBehaviour
         if (shouldMoveTowardsPawn)
         {
             // try to move towards enemy pawns
-            pawnsToMoveTowards = activePawn.OnPlayerTeam ? _enemyPawns : BattleManager.Instance.PlayerPawns;
+            pawnsToMoveTowards = activePawn.OnPlayerTeam ? _enemyPawns : FlowDirector.Instance.PlayerPawns;
             potentialTargetTiles = GetTargetTilesTowardsPawns(pawnsToMoveTowards, activePawn);
         }
         else
         {
-            potentialTargetTiles = GetCastleTiles();
+            potentialTargetTiles = GetAvailableCastleTiles(activePawn);
         }
 
         // otherwise, we want to move towards an ally pawn (they're probably going somewhere right?)
         // hopefully this doesn't end up making silly things happen. 
         if (potentialTargetTiles.Count == 0)
         {
-            pawnsToMoveTowards = activePawn.OnPlayerTeam ? BattleManager.Instance.PlayerPawns : _enemyPawns;
+            pawnsToMoveTowards = activePawn.OnPlayerTeam ? FlowDirector.Instance.PlayerPawns : _enemyPawns;
             potentialTargetTiles = GetTargetTilesTowardsPawns(pawnsToMoveTowards, activePawn);
         }
         
         return potentialTargetTiles;
     }
 
-    private List<Tile> GetCastleTiles()
+    private List<Tile> GetAvailableCastleTiles(Pawn activePawn)
     {
-        return GridGenerator.Instance.CastleTiles;
+        return GridGenerator.Instance.CastleTiles.Where(tile =>
+         activePawn.HasPathToTile(tile) &&
+         tile.GetPawn() == null).ToList();
     }
 
     private List<Tile> GetTargetTilesTowardsPawns(List<Pawn> pawnsToMoveTowards, Pawn activePawn)

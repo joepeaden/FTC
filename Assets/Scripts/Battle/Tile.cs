@@ -367,11 +367,11 @@ public class Tile : MonoBehaviour
 
     public void ClearActionHighlight()
     {
-        if (Ability.SelectedAbility != null && BattleManager.Instance.CurrentPawn.CurrentTile.IsInRangeOf(this, Ability.SelectedAbility.range))
+        if (Ability.SelectedAbility != null && FlowDirector.Instance.CurrentPawn.CurrentTile.IsInRangeOf(this, Ability.SelectedAbility.range))
         {
             tileOverlayUI.sprite = attackHighlightSprite;
         }
-        else if (BattleManager.Instance.CurrentPawn.HasMovesLeft() && BattleManager.Instance.CurrentPawn.CurrentTile.IsInRangeOf(this, BattleManager.Instance.CurrentPawn.MoveRange))
+        else if (FlowDirector.Instance.CurrentPawn.HasMovesLeft() && FlowDirector.Instance.CurrentPawn.CurrentTile.IsInRangeOf(this, FlowDirector.Instance.CurrentPawn.MoveRange))
         {
             tileOverlayUI.sprite = moveRangeSprite;
         }

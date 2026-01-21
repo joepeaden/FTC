@@ -1,14 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor.Build;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Should manage the flow of the battle (turns), initialization, and reporting results back to GameManager.
 /// </summary>
-public class BattleManager : MonoBehaviour
+public class FlowDirector : MonoBehaviour
 {
     public enum BattleResult
     {
@@ -18,8 +18,8 @@ public class BattleManager : MonoBehaviour
     };
     private BattleResult _battleResult;
 
-    public static BattleManager Instance => _instance;
-    private static BattleManager _instance;
+    public static FlowDirector Instance => _instance;
+    private static FlowDirector _instance;
 
     public List<Pawn> PlayerPawns => _playerPawns;
     private List<Pawn> _playerPawns = new();
@@ -46,84 +46,31 @@ public class BattleManager : MonoBehaviour
 
     [SerializeField] private PawnEvents _pawnEvents;
 
+    private DataLoader _dataLoader;
+
+    #region Unity Methods
+
     private void Awake()
     {
         _instance = this;
 
-        _battleUI = GetComponent<BattleUI>();
         _spawner = GetComponent<PawnSpawner>();
-
-        _battleUI.OnGameFinished.AddListener(ExitBattle);
+        _battleUI = GetComponent<BattleUI>();
+        _battleUI.OnWaveFinished.AddListener(HandleWaveFinished);
+        _battleUI.OnWaveBegin.AddListener(StartWave);
         _battleUI.OnEndTurn.AddListener(EndTurn);
+
         castle.OnGetHit.AddListener(HandleCastleHit);
 
         _pawnEvents.AddActedListener(HandlePawnActed);
         _pawnEvents.AddKilledListener(HandlePawnKilled);
         _pawnEvents.AddSpawnedListener(HandlePawnSpawned);
 
-        SpawnPawns();
-    }
+        _dataLoader = new DataLoader();
+        _dataLoader.LoadData();
 
-    private void SpawnPawns()
-    {
-        // if not started from Battle scene, spawn player's company and enemies in contract
-        if (GameManager.Instance != null)
-        {
-            foreach (GameCharacter character in GameManager.Instance.PlayerFollowers)
-            {
-                _spawner.AddNewPawn(character);
-            }
-
-            foreach(GameCharacter character in GameManager.Instance.GetEnemiesForContract())
-            {
-                _spawner.AddNewPawn(character);
-            }
-        }
-        // otherwise, spawn a random assortment of friendly and enemy dudes
-        else
-        {
-            StartCoroutine(TestModeOnDataLoadedStart());
-        }
-    }
-
-    /// <summary>
-    /// Start for when just testing battles. Not very secure but it's just for testing. 
-    /// </summary>
-    /// <returns></returns>
-    private IEnumerator TestModeOnDataLoadedStart()
-    {
-        // instantiate data loader
-        DataLoader dataLoader = new DataLoader();
-        dataLoader.LoadData();
-
-        // wait for data to load. 
-        yield return new WaitForSeconds(3f);
-
-        Debug.Log("No game manager, spawning default amount");
-        _spawner.SpawnTestGuys();
-
-        _battleResult = BattleResult.Undecided;
-        StartBattle();
-    }
-
-    private void HandleCastleHit(int hpRemaining)
-    {
-        if (hpRemaining <= 0)
-        {
-            HandleBattleResult(BattleResult.Lose);
-        }
-        
-        //castleHitPointsUI.text = "Castle HP: " + hpRemaining.ToString();
-    }
-
-    private void Start()
-    {
-        if (GameManager.Instance != null)
-        {
-            _battleResult = BattleResult.Undecided;
-            StartBattle();
-        }
-    }
+        _dataLoader.OnDataLoaded.AddListener(HandleDataLoaded);
+    }    
 
     private void Update()
     {
@@ -135,14 +82,20 @@ public class BattleManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        _battleUI.OnGameFinished.AddListener(ExitBattle);
-        _battleUI.OnEndTurn.AddListener(EndTurn);
+        _battleUI.OnWaveFinished.RemoveListener(HandleWaveFinished);
+        _battleUI.OnWaveBegin.RemoveListener(StartWave);
+        _battleUI.OnEndTurn.RemoveListener(EndTurn);
+
         castle.OnGetHit.RemoveListener(HandleCastleHit);
 
         _pawnEvents.RemoveActedListener(HandlePawnActed);
         _pawnEvents.RemoveKilledListener(HandlePawnKilled);
         _pawnEvents.RemoveSpawnedListener(HandlePawnSpawned);
+        
+        _dataLoader.OnDataLoaded.AddListener(HandleDataLoaded);
     }
+
+    #endregion
 
     #region FX
 
@@ -160,7 +113,23 @@ public class BattleManager : MonoBehaviour
 
     #endregion
 
-    #region BattleManagement
+    #region Unorganized
+
+    private void HandleDataLoaded()
+    {
+        _spawner.SpawnPlayerCharacters(); 
+        StartWave();
+    }
+
+    private void HandleCastleHit(int hpRemaining)
+    {
+        if (hpRemaining <= 0)
+        {
+            HandleBattleResult(BattleResult.Lose);
+        }
+        
+        //castleHitPointsUI.text = "Castle HP: " + hpRemaining.ToString();
+    }
 
     private void EndTurn()
     {
@@ -168,19 +137,9 @@ public class BattleManager : MonoBehaviour
         PawnFinished(activePawn);
     }
 
-    private void ExitBattle()
+    private void HandleWaveFinished()
     {
-        if (GameManager.Instance != null)
-        {
-            bool playerWon = _battleResult == BattleResult.Win;
-
-            GameManager.Instance.ExitBattle(playerWon);
-        }
-        else
-        {
-            // easy reload for testing
-            SceneManager.LoadScene("BattleScene");
-        }
+        // nothing yet!
     }
 
     /// <summary>
@@ -195,7 +154,7 @@ public class BattleManager : MonoBehaviour
             _selectionManager.SelectedTile.SetSelected(false);
         }
 
-        StartCoroutine(NextPawnCoroutine());
+        StartCoroutine(TurnRotationCoroutine());
     }
 
     /// <summary>
@@ -269,6 +228,14 @@ public class BattleManager : MonoBehaviour
         {
             GameManager.Instance.RemoveFollower(p.GameChar);
         }
+
+        // perhaps I should change the data structure - but I don't imagine doing this
+        // alot so I'm just not gonna worry about it until the need arises. This is necessary
+        // to maintain the order of the list while removing this pawn.
+        List<Pawn> list = _initiativeStack.ToList();
+        list.Remove(p);
+        list.Reverse();
+        _initiativeStack = new Stack<Pawn>(list);
     }
 
     private void HandlePawnSpawned(Pawn p)
@@ -300,23 +267,24 @@ public class BattleManager : MonoBehaviour
         return livingPawns;
     }
 
-    private void RefreshInitiativeStack()
+    private void NewTurn()
     {
         _turnNumber++;
 
-        _battleUI.SetTurnUI(_turnNumber);
+        _spawner.SpawnEnemiesForTurn();
 
+        RefreshInitiativeStack();
+
+        _battleUI.SetTurnUI(_turnNumber);
+        _battleUI.RefreshInitStackUI();
+    }
+
+    private void RefreshInitiativeStack()
+    {
         List<Pawn> pawnList = new();
 
-        foreach (Pawn p in GetFriendlyLivingPawns())
-        {
-            pawnList.Add(p);
-        }
-
-        foreach (Pawn p in _aiPlayer.GetEnemyLivingPawns())
-        {
-            pawnList.Add(p);
-        }
+        foreach (Pawn p in GetFriendlyLivingPawns()) { pawnList.Add(p); }
+        foreach (Pawn p in _aiPlayer.GetEnemyLivingPawns()) { pawnList.Add(p); }
         
         pawnList = pawnList.OrderBy(pawn => pawn.Initiative).ToList();
 
@@ -324,10 +292,15 @@ public class BattleManager : MonoBehaviour
         _initiativeStack = new(pawnList);
     }
 
-    private void StartBattle()
+    private void StartWave()
     {
+        _spawner.PrepareNewWave();
+        _battleResult = BattleResult.Undecided;
         _turnNumber = 0;
-        StartCoroutine(NextPawnCoroutine());
+
+        _initiativeStack.Clear();
+      
+        StartCoroutine(TurnRotationCoroutine());
     }
 
     private void HandleBattleResult(BattleResult battleResult)
@@ -363,7 +336,7 @@ public class BattleManager : MonoBehaviour
         return alivePawns <= 0;
     }
 
-    public IEnumerator NextPawnCoroutine()
+    public IEnumerator TurnRotationCoroutine()
     {
         // pause a little bit so the player can keep track of what the heck is happening
         // was using await here to avoid coroutine, but web builds can't use await.
@@ -374,11 +347,14 @@ public class BattleManager : MonoBehaviour
             _currentPawn.OnEffectUpdate.RemoveListener(_battleUI.UpdateEffects);
         }
 
+        if (_initiativeStack.Count == 0)
+        {
+            NewTurn();
+        }
+
         _currentPawn = GetNextPawn();
 
         yield return new WaitUntil(() => !_currentPawn.HoldingForAttackAnimation);
-
-        // AddTextNotification(_currentPawn.transform.position, new () {(_currentPawn.OnPlayerTeam ? "For God and Glory!" : "FOR THE DARK GODS!", Color.white)});
 
         // see if the battle is over. If so, do sumthin about it 
         if (CheckEnemyWipedOut())
@@ -428,22 +404,11 @@ public class BattleManager : MonoBehaviour
     {
         if (_initiativeStack.Count == 0)
         {
-            RefreshInitiativeStack();
+            Debug.Log("Initiative stack is empty! No pawns to get.");
+            return null;
         }
 
         Pawn p = _initiativeStack.Pop();
-
-        while (p.IsDead)
-        {
-            if (_initiativeStack.Count != 0)
-            {
-                p = _initiativeStack.Pop();
-            }
-            else
-            {
-                RefreshInitiativeStack();
-            }
-        }
 
         return p;
     }

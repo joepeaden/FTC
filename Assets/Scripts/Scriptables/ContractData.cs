@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
+// this is being refactored to represent waves.
+
 [CreateAssetMenu(fileName = "ContractData", menuName = "MyScriptables/ContractData")]
 public class ContractData : ScriptableObject
 {

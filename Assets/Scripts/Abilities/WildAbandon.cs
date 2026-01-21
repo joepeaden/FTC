@@ -28,7 +28,7 @@ public class WildAbandon : SupportAbilityData
         _activatedPawn.OnHPChanged.AddListener(HandleDeath);
 
         // tell battle manager we acted
-        BattleManager.Instance.HandlePawnActed(_activatedPawn);
+        FlowDirector.Instance.HandlePawnActed(_activatedPawn);
         
         // text display event
         // BattleManager.Instance.AddTextNotification(_targetPawn.transform.position, "+Raging");

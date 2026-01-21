@@ -32,7 +32,7 @@ public class SlashAttackAbility : WeaponAbilityData
             activatedPawn.AttackPawn(targetPawn, this);
         }
         
-        BattleManager.Instance.HandlePawnActed(activatedPawn);
+        FlowDirector.Instance.HandlePawnActed(activatedPawn);
 
         activatedPawn.SetSpriteFacing(primaryTargetPawn.transform.position);
 

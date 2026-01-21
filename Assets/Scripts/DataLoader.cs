@@ -1,12 +1,15 @@
 using System.Collections.Generic;
-using UnityEngine;
+using System.Threading.Tasks;
 using UnityEngine.AddressableAssets;
+using UnityEngine.Events;
 
 /// <summary>
 /// For loading adressable stuff and access to them.
 /// </summary>
 public class DataLoader
 {
+    public UnityEvent OnDataLoaded = new();
+
     // character types
     public static Dictionary<string, GameCharacterData> charTypes = new();
 
@@ -39,20 +42,33 @@ public class DataLoader
     // shields
     public static Dictionary<string, ItemData> shields = new();
 
-    public void LoadData()
+    public async void LoadData()
     {
-        Addressables.LoadAssetsAsync<GameCharacterData>("charTypes", OnLoadCharTypesCompleted);
-        Addressables.LoadAssetsAsync<MotCondData>("motConditions", OnLoadMotCondDataCompleted);
-        Addressables.LoadAssetsAsync<FaceDetailData>("hairDetail", OnLoadHairDetailCompleted);
-        Addressables.LoadAssetsAsync<FaceDetailData>("browDetail", OnLoadBrowDetailCompleted);
-        Addressables.LoadAssetsAsync<FaceDetailData>("facialHairDetail", OnLoadFacialHairDetailCompleted);
-        Addressables.LoadAssetsAsync<EffectData>("characterEffects", OnLoadCharEffectsCompleted);
-        Addressables.LoadAssetsAsync<ContractData>("contracts", OnLoadContractsCompleted);
-        Addressables.LoadAssetsAsync<Ability>("charAbilities", OnLoadCharacterAbilities);
-        Addressables.LoadAssetsAsync<PassiveData>("passives", OnLoadPassives);
-        Addressables.LoadAssetsAsync<WeaponItemData>("weapons", OnLoadWeaponsCompleted);
-        Addressables.LoadAssetsAsync<ArmorItemData>("armor", OnLoadArmorCompleted);
-        Addressables.LoadAssetsAsync<ShieldItemData>("shields", OnLoadShieldsCompleted);
+        var tasks = new List<Task>
+        {
+            LoadAssetsAsync<GameCharacterData>("charTypes", OnLoadCharTypesCompleted),
+            LoadAssetsAsync<MotCondData>("motConditions", OnLoadMotCondDataCompleted),
+            LoadAssetsAsync<FaceDetailData>("hairDetail", OnLoadHairDetailCompleted),
+            LoadAssetsAsync<FaceDetailData>("browDetail", OnLoadBrowDetailCompleted),
+            LoadAssetsAsync<FaceDetailData>("facialHairDetail", OnLoadFacialHairDetailCompleted),
+            LoadAssetsAsync<EffectData>("characterEffects", OnLoadCharEffectsCompleted),
+            LoadAssetsAsync<ContractData>("contracts", OnLoadContractsCompleted),
+            LoadAssetsAsync<Ability>("charAbilities", OnLoadCharacterAbilities),
+            LoadAssetsAsync<PassiveData>("passives", OnLoadPassives),
+            LoadAssetsAsync<WeaponItemData>("weapons", OnLoadWeaponsCompleted),
+            LoadAssetsAsync<ArmorItemData>("armor", OnLoadArmorCompleted),
+            LoadAssetsAsync<ShieldItemData>("shields", OnLoadShieldsCompleted)
+        };
+        
+        await Task.WhenAll(tasks);
+        
+        OnDataLoaded.Invoke();
+    }
+
+    private async Task LoadAssetsAsync<T>(string label, System.Action<T> callback)
+    {
+        var handle = Addressables.LoadAssetsAsync<T>(label, callback);
+        await handle.Task;
     }
 
     private void OnLoadPassives(PassiveData result)

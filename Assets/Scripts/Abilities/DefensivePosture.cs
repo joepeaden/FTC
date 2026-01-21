@@ -22,7 +22,7 @@ public class DefensivePosture : SupportAbilityData
         _activatedPawn.OnHPChanged.AddListener(HandleDeath);
 
         // tell battle manager we acted
-        BattleManager.Instance.HandlePawnActed(_activatedPawn);
+        FlowDirector.Instance.HandlePawnActed(_activatedPawn);
         
         // text display event
         Notifications.Instance.AddPendingTextNotification("Defensive Stance", Color.white);
