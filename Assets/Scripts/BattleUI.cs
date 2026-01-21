@@ -26,7 +26,6 @@ public class BattleUI : MonoBehaviour
     [SerializeField] private GameObject bottomUIObjects;
     [SerializeField] private Transform _healthBarParent;
     [SerializeField] private MiniStatBar _miniStatBarPrefab;
-    [SerializeField] private RectTransform _pawnPointer;
     [SerializeField] private Transform _pawnEffectsParent;
     [SerializeField] private Image _pawnEffectLargePrefab;
     [SerializeField] private List<ActionButton> _actionButtons = new(); 
@@ -153,28 +152,6 @@ public class BattleUI : MonoBehaviour
         turnUI.SetActive(true);
     }
 
-    private void OnHoverInitPawnPreview(Pawn p)
-    {
-        Vector3 objScreenPos = CameraManager.MainCamera.WorldToScreenPoint(p.transform.position);
-        objScreenPos.y += 150;
-
-        // Convert screen position to a position relative to the UI's canvas
-        Vector2 uiPos;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            _pawnPointer.parent as RectTransform,
-            objScreenPos,
-            CameraManager.MainCamera,
-            out uiPos);
-
-        _pawnPointer.gameObject.SetActive(true);
-        _pawnPointer.anchoredPosition = uiPos;
-    }
-
-    private void HandleEndHoverInitPawnPreview()
-    {
-        _pawnPointer.gameObject.SetActive(false);
-    }
-    
     public void UpdateEffects(List<EffectData> effects)
     {
         for (int i = 0; i < _pawnEffectsParent.childCount; i++)
@@ -345,9 +322,6 @@ public class BattleUI : MonoBehaviour
         {
             Transform child = _initStackParent.GetChild(i);
 
-            child.GetComponent<PawnPreview>().OnPawnPreviewHoverStart.RemoveListener(OnHoverInitPawnPreview);
-            child.GetComponent<PawnPreview>().OnPawnPreviewHoverEnd.RemoveListener(HandleEndHoverInitPawnPreview);
-
             // return to object pool
             child.gameObject.SetActive(false);
         }
@@ -370,9 +344,6 @@ public class BattleUI : MonoBehaviour
             // for some reason, the pawn previews get really mega stretched out.
             pawnPreview.transform.localScale = Vector3.one;
             pawnPreview.GetComponent<PawnPreview>().SetData(p);
-
-            pawnPreview.GetComponent<PawnPreview>().OnPawnPreviewHoverStart.AddListener(OnHoverInitPawnPreview);
-            pawnPreview.GetComponent<PawnPreview>().OnPawnPreviewHoverEnd.AddListener(HandleEndHoverInitPawnPreview);
 
             newChildCount++;
         }

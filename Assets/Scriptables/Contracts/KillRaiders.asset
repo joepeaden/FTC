@@ -18,5 +18,5 @@ MonoBehaviour:
     they get the chance to cause problems. '
   possibleEnemyTypes:
   - {fileID: 11400000, guid: 21cefe0998bf844d483bace1e1e02377, type: 2}
-  maxEnemyCount: 8
-  minEnemyCount: 4
+  maxEnemyCount: 1
+  minEnemyCount: 1

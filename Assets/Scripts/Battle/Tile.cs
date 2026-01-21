@@ -412,16 +412,28 @@ public class Tile : MonoBehaviour
         }
     }
 
+    public void SetHovered(bool isHovering)
+    {
+        tileHoverUI.enabled = isHovering && _pawn != null;
+     
+        if (isHovering)
+        {
+            OnTileHoverStart.Invoke(this);
+        }
+        else
+        {
+            OnTileHoverEnd.Invoke(this);        
+        }
+    }
+
     public void OnMouseEnter()
     {
-        tileHoverUI.enabled = true;
-        OnTileHoverStart.Invoke(this);
+        SetHovered(true);
     }
 
     public void OnMouseExit()
     {
-        tileHoverUI.enabled = false;
-        OnTileHoverEnd.Invoke(this);
+        SetHovered(false);
     }
 
 }

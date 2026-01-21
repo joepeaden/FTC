@@ -123,11 +123,10 @@ public class PawnPreview : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        // pawn may be null if it's setup with a gamechar, not a pawn -
-        // like in the strategy layer (Decisions).
+        // pawn may be null if it's setup with a gamechar, not a pawn
         if (_pawn != null)
         {
-            OnPawnPreviewHoverStart.Invoke(_pawn);
+            _pawn.SetHovered(true);
         }
     }
 
@@ -135,7 +134,7 @@ public class PawnPreview : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     {
         if (_pawn != null)
         {
-            OnPawnPreviewHoverEnd.Invoke();
+            _pawn.SetHovered(false);
         }
     }
 }

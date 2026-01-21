@@ -20,5 +20,5 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 3b0378d2413974a19b171b6236873f30, type: 2}
   - {fileID: 11400000, guid: 21cefe0998bf844d483bace1e1e02377, type: 2}
   - {fileID: 11400000, guid: 8d029cf86b179414dafff09c5bc61202, type: 2}
-  maxEnemyCount: 8
-  minEnemyCount: 8
+  maxEnemyCount: 1
+  minEnemyCount: 1

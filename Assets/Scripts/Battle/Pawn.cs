@@ -414,9 +414,6 @@ public class Pawn : MonoBehaviour
         int toHit = GetRollToHit(targetPawn);
         int hitRoll = Random.Range(1, 13);
 
-        BattleLogUI.Instance.AddLogEntry($"{GameChar.CharName} uses {currentAction.abilityName} against {targetPawn.GameChar.CharName}!");
-        BattleLogUI.Instance.AddLogEntry($"Needs: {toHit}, Rolled: {hitRoll}");
-
         Vector2 attackDirection = targetPawn.transform.position - transform.position;
         attackDirection.Normalize();
         _spriteController.PlayAttack(attackDirection);
@@ -694,6 +691,11 @@ public class Pawn : MonoBehaviour
     }
 
     #endregion
+
+    public void SetHovered(bool isHovered)
+    {
+        _currentTile.SetHovered(isHovered);
+    }
 
     public void UpdateEffect(EffectData statusEffect, bool isAdding)
     {

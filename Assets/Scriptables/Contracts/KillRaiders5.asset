@@ -18,5 +18,5 @@ MonoBehaviour:
     they slaughter more innocents.. '
   possibleEnemyTypes:
   - {fileID: 11400000, guid: 8d029cf86b179414dafff09c5bc61202, type: 2}
-  maxEnemyCount: 8
-  minEnemyCount: 4
+  maxEnemyCount: 1
+  minEnemyCount: 1
