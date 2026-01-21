@@ -82,4 +82,5 @@ public class PawnSpawner : MonoBehaviour
 
         return newPawn;
     }
+    #endregion
 }
