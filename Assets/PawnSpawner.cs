@@ -21,12 +21,6 @@ public class PawnSpawner : MonoBehaviour
     Stack<GameCharacter> _enemiesForWave = new();
 
     #region Public Methods
-    public void Initialize()
-    {
-        PrepareNewWave();
-
-        SpawnPlayerCharacters();
-    }
 
     public void SpawnEnemiesForTurn()
     {
@@ -39,7 +33,7 @@ public class PawnSpawner : MonoBehaviour
     #endregion
 
     #region Internals
-    private void PrepareNewWave()
+    public void PrepareNewWave()
     {
         Dictionary<string, ContractData> contracts = DataLoader.contracts;
         ContractData contract = contracts.Values.ToList()[Random.Range(0, DataLoader.contracts.Count)];
@@ -57,7 +51,7 @@ public class PawnSpawner : MonoBehaviour
         }
     }
 
-    private void SpawnPlayerCharacters()
+    public void SpawnPlayerCharacters()
     {
         int numToSpawn = Random.Range(DEFAULT_MIN_AMOUNT_TO_SPAWN, DEFAULT_MAX_AMOUNT_TO_SPAWN);
 

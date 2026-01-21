@@ -47,13 +47,16 @@ public class FlowDirector : MonoBehaviour
 
     private DataLoader _dataLoader;
 
+    #region Unity Methods
+
     private void Awake()
     {
         _instance = this;
 
         _spawner = GetComponent<PawnSpawner>();
         _battleUI = GetComponent<BattleUI>();
-        _battleUI.OnGameFinished.AddListener(ExitBattle);
+        _battleUI.OnWaveFinished.AddListener(HandleWaveFinished);
+        _battleUI.OnWaveBegin.AddListener(StartWave);
         _battleUI.OnEndTurn.AddListener(EndTurn);
 
         castle.OnGetHit.AddListener(HandleCastleHit);
@@ -68,23 +71,6 @@ public class FlowDirector : MonoBehaviour
         _dataLoader.OnDataLoaded.AddListener(HandleDataLoaded);
     }    
 
-    private void HandleDataLoaded()
-    {
-        _spawner.Initialize(); 
-        _battleResult = BattleResult.Undecided;
-        StartBattle();
-    }
-
-    private void HandleCastleHit(int hpRemaining)
-    {
-        if (hpRemaining <= 0)
-        {
-            HandleBattleResult(BattleResult.Lose);
-        }
-        
-        //castleHitPointsUI.text = "Castle HP: " + hpRemaining.ToString();
-    }
-
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.F) && CurrentPawn.OnPlayerTeam)
@@ -95,8 +81,9 @@ public class FlowDirector : MonoBehaviour
 
     private void OnDestroy()
     {
-        _battleUI.OnGameFinished.AddListener(ExitBattle);
-        _battleUI.OnEndTurn.AddListener(EndTurn);
+        _battleUI.OnWaveFinished.RemoveListener(HandleWaveFinished);
+        _battleUI.OnWaveBegin.RemoveListener(StartWave);
+        _battleUI.OnEndTurn.RemoveListener(EndTurn);
 
         castle.OnGetHit.RemoveListener(HandleCastleHit);
 
@@ -106,6 +93,8 @@ public class FlowDirector : MonoBehaviour
         
         _dataLoader.OnDataLoaded.AddListener(HandleDataLoaded);
     }
+
+    #endregion
 
     #region FX
 
@@ -123,7 +112,23 @@ public class FlowDirector : MonoBehaviour
 
     #endregion
 
-    #region BattleManagement
+    #region Unorganized
+
+    private void HandleDataLoaded()
+    {
+        _spawner.SpawnPlayerCharacters(); 
+        StartWave();
+    }
+
+    private void HandleCastleHit(int hpRemaining)
+    {
+        if (hpRemaining <= 0)
+        {
+            HandleBattleResult(BattleResult.Lose);
+        }
+        
+        //castleHitPointsUI.text = "Castle HP: " + hpRemaining.ToString();
+    }
 
     private void EndTurn()
     {
@@ -131,19 +136,9 @@ public class FlowDirector : MonoBehaviour
         PawnFinished(activePawn);
     }
 
-    private void ExitBattle()
+    private void HandleWaveFinished()
     {
-        if (GameManager.Instance != null)
-        {
-            bool playerWon = _battleResult == BattleResult.Win;
-
-            GameManager.Instance.ExitBattle(playerWon);
-        }
-        else
-        {
-            // easy reload for testing
-            SceneManager.LoadScene("BattleScene");
-        }
+        // nothing yet!
     }
 
     /// <summary>
@@ -288,8 +283,10 @@ public class FlowDirector : MonoBehaviour
         _initiativeStack = new(pawnList);
     }
 
-    private void StartBattle()
+    private void StartWave()
     {
+        _spawner.PrepareNewWave();
+        _battleResult = BattleResult.Undecided;
         _turnNumber = 0;
         StartCoroutine(NextPawnCoroutine());
     }
