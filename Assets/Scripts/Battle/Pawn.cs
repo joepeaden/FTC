@@ -667,7 +667,7 @@ public class Pawn : MonoBehaviour
         TakeDamage(attackingPawn, attackDmg, isCrit);
     }
 
-    private void Die()
+    public void Die()
     {
         _spriteController.Die();
         StartCoroutine(PlayAudioAfterDelay(0f, dieSound));

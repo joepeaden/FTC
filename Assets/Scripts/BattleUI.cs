@@ -143,6 +143,7 @@ public class BattleUI : MonoBehaviour
     {
         postBattleScreen.SetActive(false);
         _waveBeginButton.gameObject.SetActive(true);
+        _endTurnButton.gameObject.SetActive(false);
     }
 
     public void OpenWaveUI()

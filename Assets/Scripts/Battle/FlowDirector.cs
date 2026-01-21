@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 
 /// <summary>
@@ -153,7 +154,7 @@ public class FlowDirector : MonoBehaviour
             _selectionManager.SelectedTile.SetSelected(false);
         }
 
-        StartCoroutine(NextPawnCoroutine());
+        StartCoroutine(TurnRotationCoroutine());
     }
 
     /// <summary>
@@ -227,6 +228,14 @@ public class FlowDirector : MonoBehaviour
         {
             GameManager.Instance.RemoveFollower(p.GameChar);
         }
+
+        // perhaps I should change the data structure - but I don't imagine doing this
+        // alot so I'm just not gonna worry about it until the need arises. This is necessary
+        // to maintain the order of the list while removing this pawn.
+        List<Pawn> list = _initiativeStack.ToList();
+        list.Remove(p);
+        list.Reverse();
+        _initiativeStack = new Stack<Pawn>(list);
     }
 
     private void HandlePawnSpawned(Pawn p)
@@ -288,7 +297,10 @@ public class FlowDirector : MonoBehaviour
         _spawner.PrepareNewWave();
         _battleResult = BattleResult.Undecided;
         _turnNumber = 0;
-        StartCoroutine(NextPawnCoroutine());
+
+        _initiativeStack.Clear();
+      
+        StartCoroutine(TurnRotationCoroutine());
     }
 
     private void HandleBattleResult(BattleResult battleResult)
@@ -324,7 +336,7 @@ public class FlowDirector : MonoBehaviour
         return alivePawns <= 0;
     }
 
-    public IEnumerator NextPawnCoroutine()
+    public IEnumerator TurnRotationCoroutine()
     {
         // pause a little bit so the player can keep track of what the heck is happening
         // was using await here to avoid coroutine, but web builds can't use await.
@@ -335,11 +347,14 @@ public class FlowDirector : MonoBehaviour
             _currentPawn.OnEffectUpdate.RemoveListener(_battleUI.UpdateEffects);
         }
 
+        if (_initiativeStack.Count == 0)
+        {
+            NewTurn();
+        }
+
         _currentPawn = GetNextPawn();
 
         yield return new WaitUntil(() => !_currentPawn.HoldingForAttackAnimation);
-
-        // AddTextNotification(_currentPawn.transform.position, new () {(_currentPawn.OnPlayerTeam ? "For God and Glory!" : "FOR THE DARK GODS!", Color.white)});
 
         // see if the battle is over. If so, do sumthin about it 
         if (CheckEnemyWipedOut())
@@ -389,22 +404,11 @@ public class FlowDirector : MonoBehaviour
     {
         if (_initiativeStack.Count == 0)
         {
-            NewTurn();
+            Debug.Log("Initiative stack is empty! No pawns to get.");
+            return null;
         }
 
         Pawn p = _initiativeStack.Pop();
-
-        while (p.IsDead)
-        {
-            if (_initiativeStack.Count != 0)
-            {
-                p = _initiativeStack.Pop();
-            }
-            else
-            {
-                NewTurn();
-            }
-        }
 
         return p;
     }
