@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
-public class PostBattleScreen : MonoBehaviour
+public class BattleReportUI : MonoBehaviour
 {
+    [SerializeField] private TMP_Text title;
     [SerializeField] private List<PostBattlePawnRow> rows;
 
     private void OnEnable()
@@ -33,5 +35,10 @@ public class PostBattleScreen : MonoBehaviour
         {
             rows[i].Hide();
         }
+    }
+
+    public void SetData(FlowDirector.BattleResult result)
+    {
+        title.text = result == FlowDirector.BattleResult.Win ? "Wave Survived!" : "Defeat!";
     }
 }

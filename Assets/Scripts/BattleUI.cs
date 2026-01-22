@@ -4,15 +4,17 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using UnityEngine.Events;
 using System.Collections;
-using System.Security;
 
 public class BattleUI : MonoBehaviour
 {
+    [Header("Screens")]
+    [SerializeField] BattleReportUI _battleReportUI;
+    [SerializeField] GameObject _battleUI;
+    [SerializeField] GameObject _respiteUI;
+
+    [Header("Unorganized")]
     [SerializeField] private Button _endTurnButton;
     [SerializeField] TMP_Text turnText;
-    [SerializeField] GameObject turnUI;
-    [SerializeField] TMP_Text postBattleTitle;
-    [SerializeField] GameObject postBattleScreen;
     [SerializeField] private Button _waveBeginButton;
     [SerializeField] private Button _waveFinishedButton;
     [SerializeField] TMP_Text characterNameText;
@@ -29,9 +31,7 @@ public class BattleUI : MonoBehaviour
     [SerializeField] private Transform _pawnEffectsParent;
     [SerializeField] private Image _pawnEffectLargePrefab;
     [SerializeField] private List<ActionButton> _actionButtons = new(); 
-    // [SerializeField] private List<InfoLine> _motivationConditionDisplay = new();
 
-    [HideInInspector] public UnityEvent OnWaveBegin = new();
     [HideInInspector] public UnityEvent OnWaveFinished = new();
     [HideInInspector] public UnityEvent OnEndTurn = new();
     
@@ -89,8 +89,7 @@ public class BattleUI : MonoBehaviour
     
     private void NotifyWaveBegin() 
     {
-        OnWaveBegin.Invoke();
-        OpenWaveUI();
+        OpenBattleUI();
     }
 
     private void NotifyWaveFinished() 
@@ -132,24 +131,25 @@ public class BattleUI : MonoBehaviour
 
     public void HandleBattleResult(FlowDirector.BattleResult battleResult)
     {
-        turnUI.SetActive(false);
-        postBattleScreen.SetActive(true);
-        bottomUIObjects.SetActive(false);
-        postBattleTitle.text = battleResult == FlowDirector.BattleResult.Win ? "Wave Survived!" : "Defeat!" ;
+        ShowUI(_battleReportUI.gameObject);
+        _battleReportUI.SetData(battleResult);
     }
 
     public void OpenRespiteUI()
     {
-        postBattleScreen.SetActive(false);
-        _waveBeginButton.gameObject.SetActive(true);
-        _endTurnButton.gameObject.SetActive(false);
+        ShowUI(_respiteUI);
     }
 
-    public void OpenWaveUI()
+    public void OpenBattleUI()
+    {  
+        ShowUI(_battleUI);
+    }
+
+    public void ShowUI(GameObject screenToShow)
     {
-        _waveBeginButton.gameObject.SetActive(false);
-        bottomUIObjects.SetActive(true);
-        turnUI.SetActive(true);
+        _battleUI.SetActive(_battleUI == screenToShow);
+        _respiteUI.SetActive(_respiteUI == screenToShow);
+        _battleReportUI.gameObject.SetActive(_battleReportUI == screenToShow);
     }
 
     public void UpdateEffects(List<EffectData> effects)

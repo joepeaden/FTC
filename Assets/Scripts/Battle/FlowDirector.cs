@@ -2,8 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Rendering.Universal;
-using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Should manage the flow of the battle (turns), initialization, and reporting results back to GameManager.
@@ -27,6 +25,7 @@ public class FlowDirector : MonoBehaviour
     [SerializeField] PhysicalCastle castle;
     [SerializeField] private AIPlayer _aiPlayer;
     [SerializeField] private SelectionManager _selectionManager;
+    [SerializeField] private BattleUI _battleUI;
     [SerializeField] private ParticleSystem bloodEffect;
     [SerializeField] private ParticleSystem armorHitEffect;
 
@@ -41,7 +40,6 @@ public class FlowDirector : MonoBehaviour
 
     public int TurnNumber => _turnNumber;
     private int _turnNumber = -1;
-    private BattleUI _battleUI;
     private PawnSpawner _spawner;
 
     [SerializeField] private PawnEvents _pawnEvents;
@@ -55,9 +53,8 @@ public class FlowDirector : MonoBehaviour
         _instance = this;
 
         _spawner = GetComponent<PawnSpawner>();
-        _battleUI = GetComponent<BattleUI>();
+        
         _battleUI.OnWaveFinished.AddListener(HandleWaveFinished);
-        _battleUI.OnWaveBegin.AddListener(StartWave);
         _battleUI.OnEndTurn.AddListener(EndTurn);
 
         castle.OnGetHit.AddListener(HandleCastleHit);
@@ -83,7 +80,6 @@ public class FlowDirector : MonoBehaviour
     private void OnDestroy()
     {
         _battleUI.OnWaveFinished.RemoveListener(HandleWaveFinished);
-        _battleUI.OnWaveBegin.RemoveListener(StartWave);
         _battleUI.OnEndTurn.RemoveListener(EndTurn);
 
         castle.OnGetHit.RemoveListener(HandleCastleHit);
@@ -292,7 +288,8 @@ public class FlowDirector : MonoBehaviour
         _initiativeStack = new(pawnList);
     }
 
-    private void StartWave()
+    // This is also called from the inspector reference for the Start Wave button!
+    public void StartWave()
     {
         _spawner.PrepareNewWave();
         _battleResult = BattleResult.Undecided;
