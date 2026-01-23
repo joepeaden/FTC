@@ -22,7 +22,7 @@ public class FlowDirector : MonoBehaviour
     public List<Pawn> PlayerPawns => _playerPawns;
     private List<Pawn> _playerPawns = new();
 
-    [SerializeField] PhysicalCastle castle;
+    [SerializeField] Castle castle;
     [SerializeField] private AIPlayer _aiPlayer;
     [SerializeField] private SelectionManager _selectionManager;
     [SerializeField] private BattleUI _battleUI;

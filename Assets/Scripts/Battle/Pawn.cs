@@ -58,7 +58,7 @@ public class Pawn : MonoBehaviour
 
     public bool PendingLevelUp { get; set; }
 
-    public PhysicalCastle castle;
+    public Castle castle;
 
     #region Buffs / Debuffs
     [HideInInspector] public int DodgeMod;
